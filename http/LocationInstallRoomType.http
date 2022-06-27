@@ -1,0 +1,4 @@
+GET http://localhost:8080/api/v1/locationInstallRoomType/10
+Accept: application/json
+
+### 机房类型详情

@@ -1,0 +1,4 @@
+GET http://localhost:8080/api/v1/locationInstallRoom/W100001
+Accept: application/json
+
+### 机房详情
