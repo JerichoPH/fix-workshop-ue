@@ -2,9 +2,6 @@ package models
 
 type SourceName struct {
 	BaseModel
-	Preloads  []string
-	Selects   []string
-	Omits     []string
 	UniqueCode           string           `gorm:"type:VARCHAR(64);UNIQUE;NOT NULL;COMMENT:来源名称代码;" json:"unique_code"`
 	Name                 string           `gorm:"type:VARCHAR(64);UNIQUE;NOT NULL;COMMENT:来源名称名称;" json:"name"`
 	SourceTypeUniqueCode string           `gorm:"type:CHAR(2);COMMENT:所属来源类型代码;" json:"source_type_unique_code"`

@@ -25,15 +25,16 @@ func (cls *OrganizationSectionRouter) Load() {
 			uniqueCode := ctx.Param("unique_code")
 
 			organizationSection := (&models.OrganizationSection{
-				Preloads: []string{
-					clause.Associations,
-					"OrganizationWorkshop.OrganizationWorkshopType",
-					"OrganizationWorkshop.OrganizationParagraph",
-					"OrganizationWorkshop.OrganizationParagraph.OrganizationRailway",
+				BaseModel: models.BaseModel{
+					DB: cls.MySqlConn,
+					Preloads: []string{
+						clause.Associations,
+						"OrganizationWorkshop.OrganizationWorkshopType",
+						"OrganizationWorkshop.OrganizationParagraph",
+						"OrganizationWorkshop.OrganizationParagraph.OrganizationRailway",
+					},
 				},
-				Selects: []string{},
-				Omits:   []string{},
-			}).FindOneByUniqueCode(cls.MySqlConn, uniqueCode)
+			}).FindOneByUniqueCode(uniqueCode)
 
 			ctx.JSON(tools.CorrectIns("").OK(gin.H{"organization_section": organizationSection}))
 		})

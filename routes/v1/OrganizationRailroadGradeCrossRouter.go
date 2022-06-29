@@ -25,15 +25,16 @@ func (cls *OrganizationRailroadGradeCrossRouter) Load() {
 			uniqueCode := ctx.Param("unique_code")
 
 			organizationRailroadGradeCross := (&models.OrganizationRailroadGradeCross{
-				Preloads: []string{
-					clause.Associations,
-					"OrganizationWorkshop.OrganizationWorkshopType",
-					"OrganizationWorkshop.OrganizationParagraph",
-					"OrganizationWorkshop.OrganizationParagraph.OrganizationRailway",
+				BaseModel: models.BaseModel{
+					DB: cls.MySqlConn,
+					Preloads: []string{
+						clause.Associations,
+						"OrganizationWorkshop.OrganizationWorkshopType",
+						"OrganizationWorkshop.OrganizationParagraph",
+						"OrganizationWorkshop.OrganizationParagraph.OrganizationRailway",
+					},
 				},
-				Selects: []string{},
-				Omits:   []string{},
-			}).FindOneByUniqueCode(cls.MySqlConn, uniqueCode)
+			}).FindOneByUniqueCode(uniqueCode)
 			tools.ThrowErrorWhenIsEmpty(organizationRailroadGradeCross, models.OrganizationRailroadGradeCross{}, "道口")
 
 			ctx.JSON(tools.CorrectIns("").OK(gin.H{"organization_railroad_grade_cross": organizationRailroadGradeCross}))

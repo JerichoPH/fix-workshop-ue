@@ -1,15 +1,11 @@
 package models
 
 import (
-	"gorm.io/gorm"
 	"time"
 )
 
 type EntireInstance struct {
 	BaseModel
-	Preloads                            []string
-	Selects                             []string
-	Omits                               []string
 	IdentityCode                        string                    `gorm:"type:VARCHAR(20);UNIQUE;NOT NULL;COMMENT:唯一编号;" json:"identity_code"`
 	EntireInstanceStatusUniqueCode      string                    `gorm:"type:VARCHAR(64);COMMENT:所属类型;" json:"entire_instance_status_unique_code"`
 	EntireInstanceStatus                EntireInstanceStatus      `gorm:"constraint:OnUpdate:CASCADE;foreignKey:EntireInstanceStatusUniqueCode;references:UniqueCode;COMMENT:所属状态;" json:"entire_instance_status"`
@@ -50,14 +46,16 @@ type EntireInstance struct {
 	LockDescription                     string                    `gorm:"type:TEXT;COMMENT:锁说明;" json:"lock_description"`
 	EntireInstanceUses                  []EntireInstanceUse       `gorm:"constraint:OnUpdate:CASCADE;foreignKey:EntireInstanceIdentityCode;references:IdentityCode;COMMENT:使用信息;" json:"entire_instance_uses"`
 	EntireInstanceLogs                  []EntireInstanceLog       `gorm:"constraint:OnUpdate:CASCADE;foreignKey:EntireInstanceIdentityCode;references:IdentityCode;COMMENT:相关日志;" json:"entire_instance_logs"`
-	EntireInstanceRepairs               []EntireInstanceRepair    `gorm:"constraint:OnUpdate:CASCADE;foreignKey:EntireInstanceIdentityCode;references:IdentityCode;COMMENT:相关检修记录;" json:"entire_instance_repairs"`
+	//EntireInstanceRepairs               []EntireInstanceRepair    `gorm:"constraint:OnUpdate:CASCADE;foreignKey:EntireInstanceIdentityCode;references:IdentityCode;COMMENT:相关检修记录;" json:"entire_instance_repairs"`
 	LocationWarehousePositionUniqueCode string                    `gorm:"type:CHAR(18);COMMENT:所属仓库位置代码;" json:"location_warehouse_position_unique_code"`
 	LocationWarehousePosition           LocationWarehousePosition `gorm:"constraint:OnUpdate:CASCADE;foreignKey:LocationWarehousePositionUniqueCode;references:UniqueCode;COMMENT:所属仓库位置;" json:"location_warehouse_position"`
 }
 
 // FindOneByIdentityCode 根据identity_code获取单条数据
-func (cls *EntireInstance) FindOneByIdentityCode(db *gorm.DB, identityCode string) (entireInstance EntireInstance) {
-	cls.Boot(db, cls.Preloads, cls.Selects, cls.Omits).Where(map[string]interface{}{"identity_code": identityCode}).First(&entireInstance)
+func (cls *EntireInstance) FindOneByIdentityCode(identityCode string) (entireInstance EntireInstance) {
+	cls.Boot().
+		Where(map[string]interface{}{"identity_code": identityCode}).
+		First(&entireInstance)
 
 	return
 }

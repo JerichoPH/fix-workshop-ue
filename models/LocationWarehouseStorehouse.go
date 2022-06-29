@@ -2,9 +2,6 @@ package models
 
 type LocationWarehouseStorehouse struct {
 	BaseModel
-	Preloads                                 []string
-	Selects                                  []string
-	Omits                                    []string
 	UniqueCode                               string                         `gorm:"type:CHAR(8);UNIQUE;NOT NULL;COMMENT:仓库代码;" json:"unique_code"`
 	Name                                     string                         `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:仓库名称;" json:"name"`
 	OrganizationParagraphUniqueCode          string                         `gorm:"type:CHAR(4);NOT NULL;COMMENT:所属站段代码;" json:"organization_paragraph_unique_code"`

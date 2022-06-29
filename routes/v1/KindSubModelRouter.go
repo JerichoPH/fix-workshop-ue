@@ -25,11 +25,14 @@ func (cls *KindSubModelRouter) Load() {
 			uniqueCode := ctx.Param("unique_code")
 
 			kindSubModel := (&models.KindSubModel{
-				Preloads: []string{
-					"KindCategory",
-					"KindEntireModel",
+				BaseModel: models.BaseModel{
+					DB: cls.MySqlConn,
+					Preloads: []string{
+						"KindCategory",
+						"KindEntireModel",
+					},
 				},
-			}).FindOneByUniqueCode(cls.MySqlConn, uniqueCode)
+			}).FindOneByUniqueCode(uniqueCode)
 			tools.ThrowErrorWhenIsEmpty(kindSubModel, models.KindSubModel{}, "型号")
 
 			ctx.JSON(tools.CorrectIns("").OK(gin.H{"kind_sub_model": kindSubModel}))

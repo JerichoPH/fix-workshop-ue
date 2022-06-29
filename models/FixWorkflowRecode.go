@@ -1,21 +1,7 @@
 package models
 
-//fix_workflow_process_serial_number
-//entire_instance_identity_code
-//part_instance_identity_code
-//note
-//measurement_identity_code
-//measured_value
-//processor_id
-//processed_at
-//serial_number
-//type
-//	is_allow
 type FixWorkflowRecode struct {
 	BaseModel
-	Preloads                       []string
-	Selects                        []string
-	Omits                          []string
 	SerialNumber                   string             `gorm:"type:VARCHAR(64);UNIQUE;NOT NULL;COMMENT:检修单流水号;" json:"serial_number"`
 	Note                           string             `gorm:"type:LONGTEXT;COMMENT:备注说明;" json:"note"`
 	StandardValue                  string             `gorm:"type:VARCHAR(64);COMMENT:标准值;" json:"standard_value"`

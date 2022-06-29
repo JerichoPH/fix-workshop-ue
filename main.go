@@ -2,7 +2,9 @@ package main
 
 import (
 	v1 "fix-workshop-go/routes/v1"
+	"fix-workshop-go/tools"
 	"fmt"
+	gcasbin "github.com/maxwellhertz/gin-casbin"
 	"gopkg.in/ini.v1"
 	"log"
 	"net/http"
@@ -66,10 +68,35 @@ func main() {
 	//}).
 	//	InitDB() // 创建mssql链接
 
+	authCasbin, casbinErr := gcasbin.NewCasbinMiddleware(
+		"configs/casbin.conf",
+		"configs/policy.csv",
+		func(ctx *gin.Context) string {
+			token := tools.GetJwtFromHeader(ctx)
+			fmt.Println(token)
+			claims, jwtErr := tools.ParseJwt(token)
+			fmt.Println(claims)
+			if jwtErr != nil {
+				panic(jwtErr)
+			}
+
+			return claims.UUID
+		},
+	)
+	if casbinErr != nil {
+		panic(casbinErr)
+	}
+
 	router := gin.Default()
 
-	router.Use(errors.RecoverHandler)                                                                             // 异常处理
-	(&v1.V1Router{Router: router, MySqlConn: mySqlConn, AppConfig: appConfigFile, DBConfig: dbConfigFile}).Load() // 加载v1路由
+	router.Use(errors.RecoverHandler) // 异常处理
+	(&v1.V1Router{
+		Router:     router,
+		MySqlConn:  mySqlConn,
+		AppConfig:  appConfigFile,
+		DBConfig:   dbConfigFile,
+		AuthCasbin: authCasbin,
+	}).Load() // 加载v1路由
 
 	initServer(router) // 启动服务
 }

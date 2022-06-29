@@ -1,4 +1,5 @@
-GET http://localhost:8080/api/v1/account/1
+GET http://localhost:8080/api/v1/account/2
 Accept: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiMDNmNTNhNGMtOWViZS00Yjg5LTlmZDktNzkyOGY2ZDAyNmNiIiwiZXhwIjoxNjU3MDkxOTc0LCJpc3MiOiJmaXgtd29ya3Nob3AtZ28ifQ.9xeCpQYq7kA2hOhA6Q8-Tk8QBu9saAkTak2jw-7xmPQ
 
 ### 用户详情

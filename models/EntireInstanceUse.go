@@ -6,9 +6,6 @@ import (
 
 type EntireInstanceUse struct {
 	BaseModel
-	Preloads  []string
-	Selects   []string
-	Omits     []string
 	EntireInstanceIdentityCode                             string                                   `gorm:"type:VARCHAR(20);COMMENT:所属器材;" json:"entire_instance_identity_code"`
 	EntireInstance                                         EntireInstance                           `gorm:"constraint:OnUpdate:CASCADE;foreignKey:EntireInstanceIdentityCode;references:IdentityCode;COMMENT:所属器材;" json:"entire_instance"`
 	InAt                                                   time.Time                                `gorm:"type:DATETIME;COMMENT:入所时间;" json:"in_at"`

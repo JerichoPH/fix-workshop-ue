@@ -2,9 +2,6 @@ package models
 
 type LocationInstallTier struct {
 	BaseModel
-	Preloads                       []string
-	Selects                        []string
-	Omits                          []string
 	UniqueCode                     string                    `gorm:"type:CHAR(13);UNIQUE;NOT NULL;COMMENT:层代码;" json:"unique_code"`
 	Name                           string                    `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:层名称;" json:"name"`
 	LocationInstallShelfUniqueCode string                    `gorm:"type:CHAR(11);NOT NULL;COMMENT:所属柜架代码;" json:"location_install_shelf_unique_code"`

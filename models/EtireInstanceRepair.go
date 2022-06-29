@@ -6,9 +6,6 @@ import (
 
 type EntireInstanceRepair struct {
 	BaseModel
-	Preloads  []string
-	Selects   []string
-	Omits     []string
 	EntireInstanceIdentityCode    string            `gorm:"type:VARCHAR(19);UNIQUE;NOT NULL;COMMENT:所属器材唯一编号;" json:"entire_instance_identity_code"`
 	EntireInstance                EntireInstance    `gorm:"constraint:OnUpdate:CASCADE;foreignKey:EntireInstanceIdentityCode;references:IdentityCode;COMMENT:所属器材;" json:"entire_instance"`
 	FixerName                     string            `gorm:"type:VARCHAR(64);COMMENT:检修人;" json:"fixer_name"`
@@ -23,8 +20,8 @@ type EntireInstanceRepair struct {
 	SpotCheckedAt                 time.Time         `gorm:"type:DATETIME;COMMENT:抽验时间;" json:"spot_checked_at"`
 	PrevSpotCheckerName           string            `gorm:"type:VARCHAR(64);COMMENT:上一次抽验人;" json:"prev_spot_checker_name"`
 	PrevSpotCheckedAt             time.Time         `gorm:"type:DATETIME;COMMENT:上一次抽验时间;" json:"prev_spot_checked_at"`
-	FixWorkflowReportSerialNumber string            `gorm:"type:VARCHAR(64);COMMENT:所属检修单流水号;" json:"fix_workflow_report_serial_number"`
-	FixWorkflowReport             FixWorkflowReport `gorm:"constraint:OnUpdate:CASCADE;foreignKey:FixWorkflowReportSerialNumber;references:SerialNumber;COMMENT:所属检修单;" json:"fix_workflow_report"`
-	PrevFixWorkflowSerialNumber   string            `gorm:"type:VARCHAR(64);COMMENT:上一次所属检修单号;" json:"prev_fix_workflow_serial_number"`
-	PrevFixWorkflowReport         FixWorkflowReport `gorm:"constraint:OnUpdate:CASCADE;foreignKey:PrevFixWorkflowSerialNumber;references:SerialNumber;COMMENT:上一次所属检修单;" json:"prev_fix_workflow_report"`
+	//FixWorkflowReportSerialNumber string            `gorm:"type:VARCHAR(64);COMMENT:所属检修单流水号;" json:"fix_workflow_report_serial_number"`
+	//FixWorkflowReport             FixWorkflowReport `gorm:"constraint:OnUpdate:CASCADE;foreignKey:FixWorkflowReportSerialNumber;references:SerialNumber;COMMENT:所属检修单;" json:"fix_workflow_report"`
+	//PrevFixWorkflowSerialNumber   string            `gorm:"type:VARCHAR(64);COMMENT:上一次所属检修单号;" json:"prev_fix_workflow_serial_number"`
+	//PrevFixWorkflowReport         FixWorkflowReport `gorm:"constraint:OnUpdate:CASCADE;foreignKey:PrevFixWorkflowSerialNumber;references:SerialNumber;COMMENT:上一次所属检修单;" json:"prev_fix_workflow_report"`
 }

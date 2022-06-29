@@ -1,14 +1,13 @@
 package models
 
 import (
+	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
 )
 
 type Account struct {
 	BaseModel
-	Preloads                []string
-	Selects                 []string
-	Omits                   []string
+	UUID                    string        `gorm:"type:CHAR(36);UNIQUE;NOT NULL;COMMENT:UUID;" json:"uuid"`
 	Username                string        `gorm:"type:VARCHAR(64);UNIQUE;NOT NULL;COMMENT:登录账号;"`
 	Password                string        `gorm:"type:VARCHAR(128);NOT NULL;COMMENT:登录密码;"`
 	Nickname                string        `gorm:"type:VARCHAR(64);UNIQUE;NOT NULL;COMMENT:昵称;"`
@@ -16,25 +15,39 @@ type Account struct {
 	AccountStatus           AccountStatus `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:AccountStatusUniqueCode;references:UniqueCode;"`
 }
 
+// BeforeCreate 自动生成UniqueCode
+func (cls *Account) BeforeCreate(db *gorm.DB) (err error) {
+	cls.UUID = uuid.NewV4().String()
+	return
+}
+
+// FindOneByUUID 根据uuid获取单条数据
+func (cls *Account) FindOneByUUID(uuid string) (account Account) {
+	cls.Boot().
+		Where(map[string]interface{}{"uuid": uuid}).
+		First(&account)
+	return
+}
+
 // FindOneById 根据id获取单条数据
-func (cls *Account) FindOneById(db *gorm.DB, id int) (account Account) {
-	cls.Boot(db, cls.Preloads, cls.Selects, cls.Omits).
+func (cls *Account) FindOneById(id int) (account Account) {
+	cls.Boot().
 		Where(map[string]interface{}{"id": id}).
-		First(&account, id)
-	return account
+		First(&account)
+	return
 }
 
 // FindOneByUsername 根据username获取单条数据
-func (cls *Account) FindOneByUsername(db *gorm.DB, username string) (account Account) {
-	cls.Boot(db, cls.Preloads, cls.Selects, cls.Omits).
+func (cls *Account) FindOneByUsername(username string) (account Account) {
+	cls.Boot().
 		Where(map[string]interface{}{"username": username}).
 		First(&account)
 	return
 }
 
 // FindOneByNickname 根据nickname获取单条数据
-func (cls *Account) FindOneByNickname(db *gorm.DB, nickname string) (account Account) {
-	cls.Boot(db, cls.Preloads, cls.Selects, cls.Omits).
+func (cls *Account) FindOneByNickname(nickname string) (account Account) {
+	cls.Boot().
 		Where(map[string]interface{}{"nickname": nickname}).
 		First(&account)
 	return

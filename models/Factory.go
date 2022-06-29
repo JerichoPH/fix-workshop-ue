@@ -2,9 +2,6 @@ package models
 
 type Factory struct {
 	BaseModel
-	Preloads  []string
-	Selects   []string
-	Omits     []string
 	UniqueCode      string           `gorm:"type:CHAR(5);UNIQUE;NOT NULL;COMMENT:生产厂家代码;" json:"unique_code"`
 	Name            string           `gorm:"type:VARCHAR(64);UNIQUE;NOT NULL;COMMENT:生产厂家名称;" json:"name"`
 	ShotName        string           `gorm:"type:VARCHAR(64);COMMENT:生产厂家名称;" json:"shot_name"`

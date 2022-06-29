@@ -1,15 +1,8 @@
 package models
 
-import (
-	"gorm.io/gorm"
-)
-
 // OrganizationWorkshop 车间
 type OrganizationWorkshop struct {
 	BaseModel
-	Preloads                           []string
-	Selects                            []string
-	Omits                              []string
 	UniqueCode                         string                   `gorm:"type:CHAR(7);UNIQUE;NOT NULL;COMMENT:车间代码;" json:"unique_code"`
 	Name                               string                   `gorm:"type:VARCHAR(64);UNIQUE;NOT NULL;COMMENT:车间名称;" json:"name"`
 	BeEnable                           bool                     `gorm:"type:BOOLEAN;DEFAULT:1;COMMENT:是否启用;" json:"be_enable"`
@@ -23,8 +16,8 @@ type OrganizationWorkshop struct {
 }
 
 // FindOneByUniqueCode 根据unique_code获取单条数据
-func (cls *OrganizationWorkshop) FindOneByUniqueCode(db *gorm.DB, uniqueCode string) (organizationWorkshop OrganizationWorkshop) {
-	cls.Boot(db, cls.Preloads, cls.Selects, cls.Omits).
+func (cls *OrganizationWorkshop) FindOneByUniqueCode(uniqueCode string) (organizationWorkshop OrganizationWorkshop) {
+	cls.Boot().
 		Where(map[string]interface{}{"unique_code": uniqueCode}).
 		First(&organizationWorkshop)
 

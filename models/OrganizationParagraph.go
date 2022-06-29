@@ -1,14 +1,7 @@
 package models
 
-import (
-	"gorm.io/gorm"
-)
-
 type OrganizationParagraph struct {
 	BaseModel
-	Preloads                      []string
-	Selects                       []string
-	Omits                         []string
 	UniqueCode                    string                 `gorm:"type:CHAR(4);UNIQUE;NOT NULL;COMMENT:站段代码;" json:"unique_code"` // B049
 	Name                          string                 `gorm:"type:VARCHAR(64);UNIQUE;NOT NULL;COMMENT:站段名称;" json:"name"`
 	ShotName                      string                 `gorm:"type:VARCHAR(64);COMMENT:站段简称;" json:"shot_name"`
@@ -20,9 +13,8 @@ type OrganizationParagraph struct {
 }
 
 // FindOneByUniqueCode 根据unique_code获取单条数据
-func (cls *OrganizationParagraph) FindOneByUniqueCode(db *gorm.DB, uniqueCode string) (organizationParagraph OrganizationParagraph) {
-	cls.Boot(db, cls.Preloads, cls.Omits, cls.Selects).
-		Model(&OrganizationParagraph{}).
+func (cls *OrganizationParagraph) FindOneByUniqueCode(uniqueCode string) (organizationParagraph OrganizationParagraph) {
+	cls.Boot().
 		Where(map[string]interface{}{"unique_code": uniqueCode}).
 		Find(&organizationParagraph)
 

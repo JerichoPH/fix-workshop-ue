@@ -2,9 +2,6 @@ package models
 
 type LocationWarehouseTier struct {
 	BaseModel
-	Preloads                         []string
-	Selects                          []string
-	Omits                            []string
 	UniqueCode                       string                      `gorm:"type:CHAR(16);UNIQUE;NOT NULL;COMMENT:层代码;" json:"unique_code"`
 	Name                             string                      `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:层名称;" json:"name"`
 	LocationWarehouseShelfUniqueCode string                      `gorm:"type:CHAR(10);COMMENT:所属柜架代码;" json:"location_warehouse_shelf_unique_code"`

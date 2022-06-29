@@ -4,29 +4,19 @@ import (
 	"fix-workshop-go/errors"
 	"fix-workshop-go/models"
 	"fix-workshop-go/tools"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	gcasbin "github.com/maxwellhertz/gin-casbin"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/ini.v1"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
-	"time"
 )
-
-var jwtSecret = []byte("fix-workshop-go-jwt-secret") // 加密密钥
-
-// Claims Jwt 表单
-type Claims struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	jwt.StandardClaims
-}
 
 // AuthorizationRegisterForm 注册表单
 type AuthorizationRegisterForm struct {
 	Username             string `form:"username" json:"username" binding:"required"`
 	Password             string `form:"password" json:"password" binding:"required"`
-	PasswordConfirmation string `form:"password_confirm" json:"password_confirm" binding:"required"`
+	PasswordConfirmation string `form:"password_confirmation" json:"password_confirmation" binding:"required"`
 	Nickname             string `form:"nickname" json:"nickname" binding:"required"`
 }
 
@@ -37,11 +27,12 @@ type AuthorizationLoginForm struct {
 }
 
 type AuthorizationRouter struct {
-	Router    *gin.Engine
-	MySqlConn *gorm.DB
-	MsSqlConn *gorm.DB
-	AppConfig *ini.File
-	DBConfig  *ini.File
+	Router     *gin.Engine
+	MySqlConn  *gorm.DB
+	MsSqlConn  *gorm.DB
+	AppConfig  *ini.File
+	DBConfig   *ini.File
+	AuthCasbin *gcasbin.CasbinMiddleware
 }
 
 func (cls *AuthorizationRouter) Load() {
@@ -60,10 +51,18 @@ func (cls *AuthorizationRouter) Load() {
 			}
 
 			// 检查重复项（用户名）
-			accountRepeat := (&models.Account{}).FindOneByUsername(cls.MySqlConn, authorizationRegisterForm.Username)
+			accountRepeat := (&models.Account{
+				BaseModel: models.BaseModel{
+					DB: cls.MySqlConn,
+				},
+			}).FindOneByUsername(authorizationRegisterForm.Username)
 			tools.ThrowErrorWhenIsRepeat(accountRepeat, models.Account{}, "用户名")
 			// 检查重复项（昵称）
-			accountRepeat = (&models.Account{}).FindOneByUsername(cls.MySqlConn, authorizationRegisterForm.Nickname)
+			accountRepeat = (&models.Account{
+				BaseModel: models.BaseModel{
+					DB: cls.MySqlConn,
+				},
+			}).FindOneByUsername(authorizationRegisterForm.Nickname)
 			tools.ThrowErrorWhenIsRepeat(accountRepeat, models.Account{}, "昵称")
 
 			// 密码加密
@@ -94,8 +93,11 @@ func (cls *AuthorizationRouter) Load() {
 
 			// 获取用户
 			account := (&models.Account{
-				Preloads: []string{clause.Associations},
-			}).FindOneByUsername(cls.MySqlConn, authorizationLoginForm.Username)
+				BaseModel: models.BaseModel{
+					DB:       cls.MySqlConn,
+					Preloads: []string{clause.Associations},
+				},
+			}).FindOneByUsername(authorizationLoginForm.Username)
 			tools.ThrowErrorWhenIsEmpty(account, models.Account{}, "用户")
 
 			// 验证密码
@@ -104,7 +106,7 @@ func (cls *AuthorizationRouter) Load() {
 			}
 
 			// 生成Jwt
-			token, err := cls.GenerateJwt(account.Username, account.Password)
+			token, err := tools.GenerateJwt(account.UUID)
 			if err != nil {
 				// 生成jwt错误
 				panic(err)
@@ -112,45 +114,4 @@ func (cls *AuthorizationRouter) Load() {
 			ctx.JSON(tools.CorrectIns("登陆成功").OK(gin.H{"token": token}))
 		})
 	}
-}
-
-// GenerateJwt 生成Jwt
-func (cls *AuthorizationRouter) GenerateJwt(username, password string) (string, error) {
-	// 设置token有效时间
-	nowTime := time.Now()
-	expireTime := nowTime.Add(168 * time.Hour)
-
-	claims := Claims{
-		Username: username,
-		Password: password,
-		StandardClaims: jwt.StandardClaims{
-			// 过期时间
-			ExpiresAt: expireTime.Unix(),
-			// 指定token发行人
-			Issuer: "gin-learn",
-		},
-	}
-
-	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	//该方法内部生成签名字符串，再用于获取完整、已签名的token
-	token, err := tokenClaims.SignedString(jwtSecret)
-	return token, err
-}
-
-// ParseJwt 根据传入的token值获取到Claims对象信息，（进而获取其中的用户名和密码）
-func (cls *AuthorizationRouter) ParseJwt(token string) (*Claims, error) {
-
-	//用于解析鉴权的声明，方法内部主要是具体的解码和校验的过程，最终返回*Token
-	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return jwtSecret, nil
-	})
-
-	if tokenClaims != nil {
-		// 从tokenClaims中获取到Claims对象，并使用断言，将该对象转换为我们自己定义的Claims
-		// 要传入指针，项目中结构体都是用指针传递，节省空间。
-		if claims, ok := tokenClaims.Claims.(*Claims); ok && tokenClaims.Valid {
-			return claims, nil
-		}
-	}
-	return nil, err
 }

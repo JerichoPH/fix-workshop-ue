@@ -1,14 +1,7 @@
 package models
 
-import (
-	"gorm.io/gorm"
-)
-
 type KindSubModel struct {
 	BaseModel
-	Preloads                  []string
-	Omits                     []string
-	Selects                   []string
 	UniqueCode                string           `gorm:"type:CHAR(7);UNIQUE;NOT NULL;COMMENT:型号代码;" json:"unique_code"`
 	Name                      string           `gorm:"type:VARCHAR(128);NOT NULL;COMMENT:型号名称;" json:"name"`
 	Nickname                  string           `gorm:"type:VARCHAR(128);COMMENT:打印别名;" json:"nickname"`
@@ -19,8 +12,10 @@ type KindSubModel struct {
 }
 
 // FindOneByUniqueCode 根据unique_code获取单条数据
-func (cls *KindSubModel) FindOneByUniqueCode(db *gorm.DB, uniqueCode string) (kindSubModel KindSubModel) {
-	cls.Boot(db, cls.Preloads, cls.Selects, cls.Omits).Where(map[string]interface{}{"unique_code": uniqueCode}).First(&kindSubModel)
+func (cls *KindSubModel) FindOneByUniqueCode(uniqueCode string) (kindSubModel KindSubModel) {
+	cls.Boot().
+		Where(map[string]interface{}{"unique_code": uniqueCode}).
+		First(&kindSubModel)
 
 	return
 }

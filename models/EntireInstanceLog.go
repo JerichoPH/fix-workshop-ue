@@ -3,9 +3,6 @@ package models
 // EntireInstanceLog 器材日志模型
 type EntireInstanceLog struct {
 	BaseModel
-	Preloads                                 []string
-	Selects                                  []string
-	Omits                                    []string
 	EntireInstanceLogTypeUniqueCode          string                         `gorm:"type:VARCHAR(64);DEFAULT:'fa-envelope-o';COMMENT:器材日志类型代码;" json:"entire_instance_type_unique_code"`
 	EntireInstanceLogType                    EntireInstanceLogType          `gorm:"constraint:OnUpdate:CASCADE;foreignKey:EntireInstanceLogTypeUniqueCode;references:UniqueCode;COMMENT:所属器材日志类型;" json:"entire_instance_log_type"`
 	Name                                     string                         `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:器材日志名称;" json:"name"`
