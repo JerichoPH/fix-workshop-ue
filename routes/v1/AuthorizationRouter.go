@@ -13,6 +13,29 @@ import (
 	"time"
 )
 
+var jwtSecret = []byte("fix-workshop-go-jwt-secret") // 加密密钥
+
+// Claims Jwt 表单
+type Claims struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	jwt.StandardClaims
+}
+
+// AuthorizationRegisterForm 注册表单
+type AuthorizationRegisterForm struct {
+	Username             string `form:"username" json:"username" binding:"required"`
+	Password             string `form:"password" json:"password" binding:"required"`
+	PasswordConfirmation string `form:"password_confirm" json:"password_confirm" binding:"required"`
+	Nickname             string `form:"nickname" json:"nickname" binding:"required"`
+}
+
+// AuthorizationLoginForm 登录表单
+type AuthorizationLoginForm struct {
+	Username string `form:"username" binding:"required"`
+	Password string `form:"password" binding:"required"`
+}
+
 type AuthorizationRouter struct {
 	Router    *gin.Engine
 	MySqlConn *gorm.DB
@@ -37,10 +60,10 @@ func (cls *AuthorizationRouter) Load() {
 			}
 
 			// 检查重复项（用户名）
-			accountRepeat := (&models.AccountService{CTX: ctx}).FindOneByUsername(authorizationRegisterForm.Username)
+			accountRepeat := (&models.Account{}).FindOneByUsername(cls.MySqlConn, authorizationRegisterForm.Username)
 			tools.ThrowErrorWhenIsRepeat(accountRepeat, models.Account{}, "用户名")
 			// 检查重复项（昵称）
-			accountRepeat = (&models.AccountService{CTX: ctx, MySqlConn: cls.MySqlConn}).FindOneByUsername(authorizationRegisterForm.Nickname)
+			accountRepeat = (&models.Account{}).FindOneByUsername(cls.MySqlConn, authorizationRegisterForm.Nickname)
 			tools.ThrowErrorWhenIsRepeat(accountRepeat, models.Account{}, "昵称")
 
 			// 密码加密
@@ -70,11 +93,9 @@ func (cls *AuthorizationRouter) Load() {
 			}
 
 			// 获取用户
-			account := (&models.AccountService{
-				CTX:       ctx,
-				MySqlConn: cls.MySqlConn,
-				Preloads:  []string{clause.Associations},
-			}).FindOneByUsername(authorizationLoginForm.Username)
+			account := (&models.Account{
+				Preloads: []string{clause.Associations},
+			}).FindOneByUsername(cls.MySqlConn, authorizationLoginForm.Username)
 			tools.ThrowErrorWhenIsEmpty(account, models.Account{}, "用户")
 
 			// 验证密码
@@ -132,43 +153,4 @@ func (cls *AuthorizationRouter) ParseJwt(token string) (*Claims, error) {
 		}
 	}
 	return nil, err
-}
-
-var jwtKey = []byte("a_secret_create")
-
-type Claims struct {
-	UserId uint
-	jwt.StandardClaims
-}
-
-func ReleaseToken(account models.Account) (string, error) {
-	expirationTime := time.Now().Add(7 * 24 * time.Hour)
-	claims := &Claims{
-		UserId: account.ID,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expirationTime.Unix(),
-			IssuedAt:  time.Now().Unix(),
-			Issuer:    "jkdev.cn",
-			Subject:   "account token",
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(jwtKey)
-
-	if err != nil {
-		return "", err
-	}
-
-	return tokenString, nil
-}
-
-func ParseToken(tokenString string) (*jwt.Token, *Claims, error) {
-	claims := &Claims{}
-
-	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return jwtKey, nil
-	})
-
-	return token, claims, err
 }
