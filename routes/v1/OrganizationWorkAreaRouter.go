@@ -24,9 +24,7 @@ func (cls *OrganizationWorkAreaRouter) Load() {
 		r.GET("/:unique_code", func(ctx *gin.Context) {
 			uniqueCode := ctx.Param("unique_code")
 
-			organizationWorkArea := (&models.OrganizationWorkAreaService{
-				CTX:       ctx,
-				MySqlConn: cls.MySqlConn,
+			organizationWorkArea := (&models.OrganizationWorkArea{
 				Preloads: []string{
 					clause.Associations,
 					"OrganizationWorkshop.OrganizationWorkshopType",
@@ -35,7 +33,7 @@ func (cls *OrganizationWorkAreaRouter) Load() {
 				},
 				Selects: []string{},
 				Omits:   []string{},
-			}).FindOneByUniqueCode(uniqueCode)
+			}).FindOneByUniqueCode(cls.MySqlConn, uniqueCode)
 			tools.ThrowErrorWhenIsEmpty(organizationWorkArea, models.OrganizationWorkArea{}, "工区")
 
 			ctx.JSON(tools.CorrectIns("").OK(gin.H{"organization_work_area": organizationWorkArea}))
