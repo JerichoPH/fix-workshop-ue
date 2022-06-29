@@ -24,13 +24,11 @@ func (cls *OrganizationRailwayRouter) Load() {
 		r.GET("/:unique_code", func(ctx *gin.Context) {
 			uniqueCode := ctx.Param("unique_code")
 
-			organizationRailway := (&models.OrganizationRailwayService{
-				CTX:       ctx,
-				MySqlConn: cls.MySqlConn,
+			organizationRailway := (&models.OrganizationRailway{
 				Preloads:  []string{clause.Associations},
 				Selects:   []string{},
 				Omits:     []string{},
-			}).FindOneByUniqueCode(uniqueCode)
+			}).FindOneByUniqueCode(cls.MySqlConn, uniqueCode)
 			tools.ThrowErrorWhenIsEmpty(organizationRailway, models.OrganizationRailway{}, "路局")
 
 			ctx.JSON(tools.CorrectIns("").OK(gin.H{"organization_railway": organizationRailway}))

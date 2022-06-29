@@ -24,9 +24,7 @@ func (cls *OrganizationRailroadGradeCrossRouter) Load() {
 		r.GET("/:unique_code", func(ctx *gin.Context) {
 			uniqueCode := ctx.Param("unique_code")
 
-			organizationRailroadGradeCross := (&models.OrganizationRailroadGradeCrossService{
-				CTX:       ctx,
-				MySqlConn: cls.MySqlConn,
+			organizationRailroadGradeCross := (&models.OrganizationRailroadGradeCross{
 				Preloads: []string{
 					clause.Associations,
 					"OrganizationWorkshop.OrganizationWorkshopType",
@@ -35,7 +33,7 @@ func (cls *OrganizationRailroadGradeCrossRouter) Load() {
 				},
 				Selects: []string{},
 				Omits:   []string{},
-			}).FindOneByUniqueCode(uniqueCode)
+			}).FindOneByUniqueCode(cls.MySqlConn, uniqueCode)
 			tools.ThrowErrorWhenIsEmpty(organizationRailroadGradeCross, models.OrganizationRailroadGradeCross{}, "道口")
 
 			ctx.JSON(tools.CorrectIns("").OK(gin.H{"organization_railroad_grade_cross": organizationRailroadGradeCross}))

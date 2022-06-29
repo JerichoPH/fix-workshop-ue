@@ -25,13 +25,11 @@ func (cls *LocationInstallRoomTypeRouter) Load() {
 		r.GET("/:unique_code", func(ctx *gin.Context) {
 			uniqueCode := ctx.Param("unique_code")
 
-			locationInstallRoomType := (&models.LocationInstallRoomTypeService{
-				CTX:       ctx,
-				MySqlConn: cls.MySqlConn,
+			locationInstallRoomType := (&models.LocationInstallRoomType{
 				Preloads: []string{
 					clause.Associations,
 				},
-			}).FindOneByUniqueCode(uniqueCode)
+			}).FindOneByUniqueCode(cls.MySqlConn, uniqueCode)
 			ctx.JSON(tools.CorrectIns("").OK(gin.H{"location_install_room_type": locationInstallRoomType}))
 		})
 	}

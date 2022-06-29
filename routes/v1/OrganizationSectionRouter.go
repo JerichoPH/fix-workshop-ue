@@ -24,9 +24,7 @@ func (cls *OrganizationSectionRouter) Load() {
 		r.GET("/:unique_code", func(ctx *gin.Context) {
 			uniqueCode := ctx.Param("unique_code")
 
-			organizationSection := (&models.OrganizationSectionService{
-				CTX:       ctx,
-				MySqlConn: cls.MySqlConn,
+			organizationSection := (&models.OrganizationSection{
 				Preloads: []string{
 					clause.Associations,
 					"OrganizationWorkshop.OrganizationWorkshopType",
@@ -35,7 +33,7 @@ func (cls *OrganizationSectionRouter) Load() {
 				},
 				Selects: []string{},
 				Omits:   []string{},
-			}).FindOneByUniqueCode(uniqueCode)
+			}).FindOneByUniqueCode(cls.MySqlConn, uniqueCode)
 
 			ctx.JSON(tools.CorrectIns("").OK(gin.H{"organization_section": organizationSection}))
 		})

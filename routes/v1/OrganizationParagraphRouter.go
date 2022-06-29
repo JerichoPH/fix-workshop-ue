@@ -24,12 +24,10 @@ func (cls *OrganizationParagraphRouter) Load() {
 		r.GET("/:unique_code", func(ctx *gin.Context) {
 			uniqueCode := ctx.Param("unique_code")
 
-			organizationParagraph := (&models.OrganizationParagraphService{
-				CTX:       ctx,
-				MySqlConn: cls.MySqlConn,
+			organizationParagraph := (&models.OrganizationParagraph{
 				Preloads:  []string{clause.Associations},
 				Selects:   []string{},
-			}).FindOneByUniqueCode(uniqueCode)
+			}).FindOneByUniqueCode(cls.MySqlConn, uniqueCode)
 			tools.ThrowErrorWhenIsEmpty(organizationParagraph, models.OrganizationParagraph{}, "站段")
 
 			ctx.JSON(tools.CorrectIns("").OK(gin.H{"organization_paragraph": organizationParagraph}))
