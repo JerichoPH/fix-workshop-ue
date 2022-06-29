@@ -4,7 +4,6 @@ import (
 	"fix-workshop-go/models"
 	"fix-workshop-go/tools"
 	"github.com/gin-gonic/gin"
-	gcasbin "github.com/maxwellhertz/gin-casbin"
 	"gorm.io/gorm/clause"
 )
 
@@ -18,7 +17,6 @@ func (cls *AccountRouter) Load() {
 	{
 		r.GET(
 			"/:id",
-			cls.AuthCasbin.RequiresPermissions([]string{"account:show"}, gcasbin.WithLogic(gcasbin.AND)),
 			//middlewares.JwtCheck(cls.MySqlConn),
 			func(ctx *gin.Context) {
 				id := tools.ThrowErrorWhenIsNotInt(ctx.Param("id"), "id必须填写整数")
