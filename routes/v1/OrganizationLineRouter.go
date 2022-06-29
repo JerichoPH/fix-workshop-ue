@@ -24,13 +24,13 @@ func (cls *OrganizationLineRouter) Load() {
 		r.GET("/:unique_code", func(ctx *gin.Context) {
 			uniqueCode := ctx.Param("unique_code")
 
-			organizationLine := (&models.OrganizationLine{
+			organizationLine := (&models.OrganizationLineModel{
 				BaseModel: models.BaseModel{
 					DB:       cls.MySqlConn,
 					Preloads: []string{clause.Associations},
 				},
 			}).FindOneByUniqueCode(uniqueCode)
-			tools.ThrowErrorWhenIsEmpty(organizationLine, models.OrganizationLine{}, "线别")
+			tools.ThrowErrorWhenIsEmpty(organizationLine, models.OrganizationLineModel{}, "线别")
 
 			ctx.JSON(tools.CorrectIns("").OK(gin.H{"organization_line": organizationLine}))
 		})

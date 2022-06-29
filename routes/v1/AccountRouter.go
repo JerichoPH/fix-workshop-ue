@@ -30,14 +30,14 @@ func (cls *AccountRouter) Load() {
 			func(ctx *gin.Context) {
 				id := tools.ThrowErrorWhenIsNotInt(ctx.Param("id"), "id必须填写整数")
 
-				account := (&models.Account{
+				account := (&models.AccountModel{
 					BaseModel: models.BaseModel{
 						DB:       cls.MySqlConn,
 						Preloads: []string{clause.Associations},
 					},
 				}).
 					FindOneById(id)
-				tools.ThrowErrorWhenIsEmpty(account, models.Account{}, "用户")
+				tools.ThrowErrorWhenIsEmpty(account, models.AccountModel{}, "用户")
 
 				ctx.JSON(tools.CorrectIns("").OK(gin.H{"account": account}))
 			})

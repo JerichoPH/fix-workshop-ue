@@ -3,12 +3,15 @@ module fix-workshop-go
 go 1.13
 
 require (
+	github.com/casbin/gorm-adapter v1.0.0 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.7.7
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.6 // indirect
+	github.com/jinzhu/gorm v1.9.16 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
+	github.com/lib/pq v1.10.6 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/maxwellhertz/gin-casbin v1.0.0
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect

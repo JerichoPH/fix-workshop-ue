@@ -24,13 +24,13 @@ func (cls *OrganizationWorkshopRouter) Load() {
 		r.GET("/:unique_code", func(ctx *gin.Context) {
 			uniqueCode := ctx.Param("unique_code")
 
-			organizationWorkshop := (&models.OrganizationWorkshop{
+			organizationWorkshop := (&models.OrganizationWorkshopModel{
 				BaseModel: models.BaseModel{
 					DB: cls.MySqlConn,
 					Preloads: []string{
 						clause.Associations,
-						"OrganizationWorkshopType",
-						"OrganizationParagraph.OrganizationRailway",
+						"OrganizationWorkshopTypeModel",
+						"OrganizationParagraphModel.OrganizationRailwayModel",
 					},
 				},
 			}).FindOneByUniqueCode(uniqueCode)

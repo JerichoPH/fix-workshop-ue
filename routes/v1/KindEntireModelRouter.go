@@ -24,16 +24,16 @@ func (cls *KindEntireModelRouter) Load() {
 		r.GET("/:unique_code", func(ctx *gin.Context) {
 			uniqueCode := ctx.Param("unique_code")
 
-			kindEntireModel := (&models.KindEntireModel{
+			kindEntireModel := (&models.KindEntireTypeModel{
 				BaseModel: models.BaseModel{
 					DB: cls.MySqlConn,
 					Preloads: []string{
-						"KindCategory",
+						"KindCategoryModel",
 						"KindSubModels",
 					},
 				},
 			}).FindOneByUniqueCode(uniqueCode)
-			tools.ThrowErrorWhenIsEmpty(kindEntireModel, models.KindEntireModel{}, "类型")
+			tools.ThrowErrorWhenIsEmpty(kindEntireModel, models.KindEntireTypeModel{}, "类型")
 
 			ctx.JSON(tools.CorrectIns("").OK(gin.H{"kind_entire_model": kindEntireModel}))
 		})

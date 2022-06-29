@@ -25,7 +25,7 @@ func (cls *LocationInstallRoomTypeRouter) Load() {
 		r.GET("/:unique_code", func(ctx *gin.Context) {
 			uniqueCode := ctx.Param("unique_code")
 
-			locationInstallRoomType := (&models.LocationInstallRoomType{
+			locationInstallRoomType := (&models.LocationInstallRoomTypeModel{
 				BaseModel: models.BaseModel{
 					DB:       cls.MySqlConn,
 					Preloads: []string{clause.Associations},

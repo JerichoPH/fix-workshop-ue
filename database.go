@@ -127,64 +127,64 @@ func (cls *MySql) InitDB() *gorm.DB {
 		Set("gorm:table_options", "ENGINE=InnoDB").
 		AutoMigrate(
 			// 用户
-			&models.Account{},       // 用户主表
-			&models.AccountStatus{}, // 用户状态
+			&models.AccountModel{},       // 用户主表
+			&models.AccountStatusModel{}, // 用户状态
 
 			// 种类型
-			&models.KindCategory{},    // 种类
-			&models.KindEntireModel{}, // 类型
-			&models.KindSubModel{},    // 型号
+			&models.KindCategoryModel{},   // 种类
+			&models.KindEntireTypeModel{}, // 类型
+			&models.KindSubTypeModel{},    // 型号
 
 			// 组织机构
-			&models.OrganizationRailway{},            // 路局
-			&models.OrganizationParagraph{},          // 站段
-			&models.OrganizationWorkshop{},           // 车间
-			&models.OrganizationWorkshopType{},       // 车间类型
-			&models.OrganizationSection{},            // 区间
-			&models.OrganizationRailroadGradeCross{}, // 道口
-			&models.OrganizationWorkArea{},           // 工区
-			&models.OrganizationStation{},            // 站场
-			&models.OrganizationLine{},               // 线别
-			&models.OrganizationCenter{},             // 中心
+			&models.OrganizationRailwayModel{},            // 路局
+			&models.OrganizationParagraphModel{},          // 站段
+			&models.OrganizationWorkshopModel{},           // 车间
+			&models.OrganizationWorkshopTypeModel{},       // 车间类型
+			&models.OrganizationSectionModel{},            // 区间
+			&models.OrganizationRailroadGradeCrossModel{}, // 道口
+			&models.OrganizationWorkAreaModel{},           // 工区
+			&models.OrganizationStationModel{},            // 站场
+			&models.OrganizationLineModel{},               // 线别
+			&models.OrganizationCenterModel{},             // 中心
 
 			// 器材
-			&models.EntireInstance{},        // 器材主表
-			&models.EntireInstanceStatus{},  // 器材状态
-			&models.EntireInstanceUse{},     // 器材使用数据
-			&models.EntireInstanceLog{},     // 器材日志
-			&models.EntireInstanceLogType{}, // 器材日志类型
-			&models.EntireInstanceRepair{},  // 器材检修记录
+			&models.EntireInstanceModel{},        // 器材主表
+			&models.EntireInstanceStatusModel{},  // 器材状态
+			&models.EntireInstanceUseModel{},     // 器材使用数据
+			&models.EntireInstanceLogModel{},     // 器材日志
+			&models.EntireInstanceLogTypeModel{}, // 器材日志类型
+			&models.EntireInstanceRepairModel{},  // 器材检修记录
 
 			// 检修单
-			&models.FixWorkflowReport{},  // 检测单主表
-			//&models.FixWorkflowProcess{}, // 检测过程
-			//&models.FixWorkflowRecode{},  // 实测值
+			&models.FixWorkflowReportModel{}, // 检测单主表
+			//&models.FixWorkflowProcessModel{}, // 检测过程
+			//&models.FixWorkflowRecodeModel{},  // 实测值
 
 			// 仓库位置
-			&models.LocationWarehouseStorehouse{}, // 仓
-			&models.LocationWarehouseArea{},       // 区
-			&models.LocationWarehousePlatoon{},    // 排
-			&models.LocationWarehouseShelf{},      // 柜架
-			&models.LocationWarehouseTier{},       // 层
-			&models.LocationWarehousePosition{},   // 位
+			&models.LocationWarehouseStorehouseModel{}, // 仓
+			&models.LocationWarehouseAreaModel{},       // 区
+			&models.LocationWarehousePlatoonModel{},    // 排
+			&models.LocationWarehouseShelfModel{},      // 柜架
+			&models.LocationWarehouseTierModel{},       // 层
+			&models.LocationWarehousePositionModel{},   // 位
 
 			// 上道位置
-			&models.LocationInstallRoom{},                      // 机房
-			&models.LocationInstallRoomType{},                  // 机房类型
-			&models.LocationInstallPlatoon{},                   // 排
-			&models.LocationInstallShelf{},                     // 柜架
-			&models.LocationInstallTier{},                      // 层
-			&models.LocationInstallPosition{},                  // 位
-			&models.LocationSignalPostMainOrIndicator{},        // 信号机主体或表示器
-			&models.LocationSignalPostMainLightPosition{},      // 信号机主体灯位
-			&models.LocationSignalPostIndicatorLightPosition{}, // 信号机表示器灯位
+			&models.LocationInstallRoomModel{},                      // 机房
+			&models.LocationInstallRoomTypeModel{},                  // 机房类型
+			&models.LocationInstallPlatoonModel{},                   // 排
+			&models.LocationInstallShelfModel{},                     // 柜架
+			&models.LocationInstallTierModel{},                      // 层
+			&models.LocationInstallPositionModel{},                  // 位
+			&models.LocationSignalPostMainOrIndicatorModel{},        // 信号机主体或表示器
+			&models.LocationSignalPostMainLightPositionModel{},      // 信号机主体灯位
+			&models.LocationSignalPostIndicatorLightPositionModel{}, // 信号机表示器灯位
 
 			// 供应商
-			&models.Factory{},
+			&models.FactoryModel{},
 
 			// 来源
-			&models.SourceType{}, // 来源类型
-			&models.SourceName{}, // 来源名称
+			&models.SourceTypeModel{}, // 来源类型
+			&models.SourceNameModel{}, // 来源名称
 
 		)
 

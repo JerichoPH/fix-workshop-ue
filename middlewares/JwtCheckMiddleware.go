@@ -15,7 +15,7 @@ type GetJWTMiddleware struct {
 
 func JwtCheck(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var account models.Account
+		var account models.AccountModel
 
 		token := tools.GetJwtFromHeader(ctx)
 
@@ -39,8 +39,8 @@ func JwtCheck(db *gorm.DB) gin.HandlerFunc {
 			}
 
 			// 获取用户信息
-			account = (&models.Account{BaseModel: models.BaseModel{DB: db}}).FindOneByUUID(claims.UUID)
-			if reflect.DeepEqual(account, models.Account{}) {
+			account = (&models.AccountModel{BaseModel: models.BaseModel{DB: db}}).FindOneByUUID(claims.UUID)
+			if reflect.DeepEqual(account, models.AccountModel{}) {
 				panic(errors.ThrowUnAuthorization("用户不存在"))
 			}
 		}

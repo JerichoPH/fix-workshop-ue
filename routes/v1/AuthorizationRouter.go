@@ -51,25 +51,25 @@ func (cls *AuthorizationRouter) Load() {
 			}
 
 			// 检查重复项（用户名）
-			accountRepeat := (&models.Account{
+			accountRepeat := (&models.AccountModel{
 				BaseModel: models.BaseModel{
 					DB: cls.MySqlConn,
 				},
 			}).FindOneByUsername(authorizationRegisterForm.Username)
-			tools.ThrowErrorWhenIsRepeat(accountRepeat, models.Account{}, "用户名")
+			tools.ThrowErrorWhenIsRepeat(accountRepeat, models.AccountModel{}, "用户名")
 			// 检查重复项（昵称）
-			accountRepeat = (&models.Account{
+			accountRepeat = (&models.AccountModel{
 				BaseModel: models.BaseModel{
 					DB: cls.MySqlConn,
 				},
 			}).FindOneByUsername(authorizationRegisterForm.Nickname)
-			tools.ThrowErrorWhenIsRepeat(accountRepeat, models.Account{}, "昵称")
+			tools.ThrowErrorWhenIsRepeat(accountRepeat, models.AccountModel{}, "昵称")
 
 			// 密码加密
 			bytes, _ := bcrypt.GenerateFromPassword([]byte(authorizationRegisterForm.Password), 14)
 
 			// 保存新用户
-			account := models.Account{
+			account := models.AccountModel{
 				Username:                authorizationRegisterForm.Username,
 				Password:                string(bytes),
 				Nickname:                authorizationRegisterForm.Nickname,
@@ -92,13 +92,13 @@ func (cls *AuthorizationRouter) Load() {
 			}
 
 			// 获取用户
-			account := (&models.Account{
+			account := (&models.AccountModel{
 				BaseModel: models.BaseModel{
 					DB:       cls.MySqlConn,
 					Preloads: []string{clause.Associations},
 				},
 			}).FindOneByUsername(authorizationLoginForm.Username)
-			tools.ThrowErrorWhenIsEmpty(account, models.Account{}, "用户")
+			tools.ThrowErrorWhenIsEmpty(account, models.AccountModel{}, "用户")
 
 			// 验证密码
 			if err := bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(authorizationLoginForm.Password)); err != nil {
