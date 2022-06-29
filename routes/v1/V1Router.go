@@ -2,23 +2,15 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
-	gcasbin "github.com/maxwellhertz/gin-casbin"
-	"gopkg.in/ini.v1"
-	"gorm.io/gorm"
 )
 
 type V1Router struct {
 	Router     *gin.Engine
-	MySqlConn  *gorm.DB
-	MsSqlConn  *gorm.DB
-	AppConfig  *ini.File
-	DBConfig   *ini.File
-	AuthCasbin *gcasbin.CasbinMiddleware
 }
 
 func (cls *V1Router) Load() {
-	(&AuthorizationRouter{Router: cls.Router, MySqlConn: cls.MySqlConn, MsSqlConn: cls.MsSqlConn, AppConfig: cls.AppConfig, DBConfig: cls.DBConfig, AuthCasbin: cls.AuthCasbin}).Load() // 权鉴
-	(&AccountRouter{Router: cls.Router, MySqlConn: cls.MySqlConn, MsSqlConn: cls.MsSqlConn, AppConfig: cls.AppConfig, DBConfig: cls.DBConfig, AuthCasbin: cls.AuthCasbin}).Load()                                                                                                                                                           // 用户
+	(&AuthorizationRouter{Router: cls.Router}).Load() // 权鉴
+	(&AccountRouter{Router: cls.Router}).Load()                                                                                                                                                           // 用户
 	//(&AccountStatusRouter{Router: cls.Router, MySqlConn: cls.MySqlConn, MsSqlConn: cls.MsSqlConn, AppConfig: cls.AppConfig, DBConfig: cls.DBConfig}).Load() // 用户状态
 	//
 	//// 种类型

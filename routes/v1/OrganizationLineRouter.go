@@ -4,17 +4,11 @@ import (
 	"fix-workshop-go/models"
 	"fix-workshop-go/tools"
 	"github.com/gin-gonic/gin"
-	"gopkg.in/ini.v1"
-	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
 type OrganizationLineRouter struct {
 	Router    *gin.Engine
-	MySqlConn *gorm.DB
-	MsSqlConn *gorm.DB
-	AppConfig *ini.File
-	DBConfig  *ini.File
 }
 
 func (cls *OrganizationLineRouter) Load() {
@@ -26,7 +20,6 @@ func (cls *OrganizationLineRouter) Load() {
 
 			organizationLine := (&models.OrganizationLineModel{
 				BaseModel: models.BaseModel{
-					DB:       cls.MySqlConn,
 					Preloads: []string{clause.Associations},
 				},
 			}).FindOneByUniqueCode(uniqueCode)

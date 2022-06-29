@@ -5,18 +5,11 @@ import (
 	"fix-workshop-go/tools"
 	"github.com/gin-gonic/gin"
 	gcasbin "github.com/maxwellhertz/gin-casbin"
-	"gopkg.in/ini.v1"
-	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
 type AccountRouter struct {
 	Router     *gin.Engine
-	MySqlConn  *gorm.DB
-	MsSqlConn  *gorm.DB
-	AppConfig  *ini.File
-	DBConfig   *ini.File
-	AuthCasbin *gcasbin.CasbinMiddleware
 }
 
 // Load 加载路由
@@ -32,7 +25,6 @@ func (cls *AccountRouter) Load() {
 
 				account := (&models.AccountModel{
 					BaseModel: models.BaseModel{
-						DB:       cls.MySqlConn,
 						Preloads: []string{clause.Associations},
 					},
 				}).

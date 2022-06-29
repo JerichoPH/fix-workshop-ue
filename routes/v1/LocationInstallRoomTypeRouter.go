@@ -4,17 +4,11 @@ import (
 	"fix-workshop-go/models"
 	"fix-workshop-go/tools"
 	"github.com/gin-gonic/gin"
-	"gopkg.in/ini.v1"
-	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
 type LocationInstallRoomTypeRouter struct {
 	Router    *gin.Engine
-	MySqlConn *gorm.DB
-	MsSqlConn *gorm.DB
-	AppConfig *ini.File
-	DBConfig  *ini.File
 }
 
 // Load 加载路由
@@ -27,7 +21,6 @@ func (cls *LocationInstallRoomTypeRouter) Load() {
 
 			locationInstallRoomType := (&models.LocationInstallRoomTypeModel{
 				BaseModel: models.BaseModel{
-					DB:       cls.MySqlConn,
 					Preloads: []string{clause.Associations},
 				},
 			}).FindOneByUniqueCode(uniqueCode)

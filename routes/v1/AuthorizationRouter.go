@@ -1,14 +1,12 @@
 package v1
 
 import (
+	"fix-workshop-go/databases"
 	"fix-workshop-go/errors"
 	"fix-workshop-go/models"
 	"fix-workshop-go/tools"
 	"github.com/gin-gonic/gin"
-	gcasbin "github.com/maxwellhertz/gin-casbin"
 	"golang.org/x/crypto/bcrypt"
-	"gopkg.in/ini.v1"
-	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
@@ -28,11 +26,6 @@ type AuthorizationLoginForm struct {
 
 type AuthorizationRouter struct {
 	Router     *gin.Engine
-	MySqlConn  *gorm.DB
-	MsSqlConn  *gorm.DB
-	AppConfig  *ini.File
-	DBConfig   *ini.File
-	AuthCasbin *gcasbin.CasbinMiddleware
 }
 
 func (cls *AuthorizationRouter) Load() {
@@ -52,16 +45,12 @@ func (cls *AuthorizationRouter) Load() {
 
 			// 检查重复项（用户名）
 			accountRepeat := (&models.AccountModel{
-				BaseModel: models.BaseModel{
-					DB: cls.MySqlConn,
-				},
+				BaseModel: models.BaseModel{},
 			}).FindOneByUsername(authorizationRegisterForm.Username)
 			tools.ThrowErrorWhenIsRepeat(accountRepeat, models.AccountModel{}, "用户名")
 			// 检查重复项（昵称）
 			accountRepeat = (&models.AccountModel{
-				BaseModel: models.BaseModel{
-					DB: cls.MySqlConn,
-				},
+				BaseModel: models.BaseModel{},
 			}).FindOneByUsername(authorizationRegisterForm.Nickname)
 			tools.ThrowErrorWhenIsRepeat(accountRepeat, models.AccountModel{}, "昵称")
 
@@ -76,7 +65,7 @@ func (cls *AuthorizationRouter) Load() {
 				AccountStatusUniqueCode: "DEFAULT",
 			}
 
-			if ret := cls.MySqlConn.Omit(clause.Associations).Create(&account); ret.Error != nil {
+			if ret := (&databases.MySql{}).GetMySqlConn().Omit(clause.Associations).Create(&account); ret.Error != nil {
 				panic(ret.Error)
 			}
 
@@ -94,7 +83,6 @@ func (cls *AuthorizationRouter) Load() {
 			// 获取用户
 			account := (&models.AccountModel{
 				BaseModel: models.BaseModel{
-					DB:       cls.MySqlConn,
 					Preloads: []string{clause.Associations},
 				},
 			}).FindOneByUsername(authorizationLoginForm.Username)

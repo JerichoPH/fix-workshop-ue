@@ -4,16 +4,10 @@ import (
 	"fix-workshop-go/models"
 	"fix-workshop-go/tools"
 	"github.com/gin-gonic/gin"
-	"gopkg.in/ini.v1"
-	"gorm.io/gorm"
 )
 
 type KindCategoryRouter struct {
 	Router    *gin.Engine
-	MySqlConn *gorm.DB
-	MsSqlConn *gorm.DB
-	AppConfig *ini.File
-	DBConfig  *ini.File
 }
 
 // Load 加载路由
@@ -26,7 +20,6 @@ func (cls *KindCategoryRouter) Load() {
 
 			kindCategory := (&models.KindCategoryModel{
 				BaseModel: models.BaseModel{
-					DB:       cls.MySqlConn,
 					Preloads: []string{
 						"KindEntireModels",
 						"KindEntireModels.KindSubModels",

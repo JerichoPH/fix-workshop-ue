@@ -6,13 +6,13 @@ import (
 
 type EntireInstanceModel struct {
 	BaseModel
-	IdentityCode                    string                    `gorm:"type:VARCHAR(20);UNIQUE;NOT NULL;COMMENT:唯一编号;" json:"identity_code"`
-	EntireInstanceStatusUniqueCode  string                    `gorm:"type:VARCHAR(64);COMMENT:所属类型;" json:"entire_instance_status_unique_code"`
-	EntireInstanceStatus            EntireInstanceStatusModel `gorm:"constraint:OnUpdate:CASCADE;foreignKey:EntireInstanceStatusUniqueCode;references:UniqueCode;COMMENT:所属状态;" json:"entire_instance_status"`
-	KindCategoryUniqueCode          string                    `gorm:"type:CHAR(3);COMMENT:所属类型;" json:"kind_category_unique_code"`
-	KindCategory                    KindCategoryModel         `gorm:"constraint:OnUpdate:CASCADE;foreignKey:KindCategoryUniqueCode;references:UniqueCode;COMMENT:所属种类;" json:"kind_category"`
-	KindEntireModelUniqueCode       string                    `gorm:"type:CHAR(5);COMMENT:所属类型;" json:"kind_entire_model_unique_code"`
-	KindEntireModel                 KindEntireTypeModel       `gorm:"constraint:OnUpdate:CASCADE;foreignKey:KindEntireModelUniqueCode;references:UniqueCode;COMMENT:所属类型;" json:"kind_entire_model"`
+	IdentityCode                    string                     `gorm:"type:VARCHAR(20);UNIQUE;NOT NULL;COMMENT:唯一编号;" json:"identity_code"`
+	EntireInstanceStatusUniqueCode  string                     `gorm:"type:VARCHAR(64);COMMENT:所属类型;" json:"entire_instance_status_unique_code"`
+	EntireInstanceStatus            EntireInstanceStatusModel  `gorm:"constraint:OnUpdate:CASCADE;foreignKey:EntireInstanceStatusUniqueCode;references:UniqueCode;COMMENT:所属状态;" json:"entire_instance_status"`
+	KindCategoryUniqueCode          string                     `gorm:"type:CHAR(3);COMMENT:所属类型;" json:"kind_category_unique_code"`
+	KindCategory                    KindCategoryModel          `gorm:"constraint:OnUpdate:CASCADE;foreignKey:KindCategoryUniqueCode;references:UniqueCode;COMMENT:所属种类;" json:"kind_category"`
+	KindEntireModelUniqueCode       string                     `gorm:"type:CHAR(5);COMMENT:所属类型;" json:"kind_entire_model_unique_code"`
+	KindEntireModel                 KindEntireTypeModel        `gorm:"constraint:OnUpdate:CASCADE;foreignKey:KindEntireModelUniqueCode;references:UniqueCode;COMMENT:所属类型;" json:"kind_entire_model"`
 	KindSubModelUniqueCode          string                     `gorm:"type:CHAR(7);COMMENT:所属型号;" json:"kind_sub_model_unique_code"`
 	KindSubModel                    KindSubTypeModel           `gorm:"constraint:OnUpdate:CASCADE;foreignKey:KindSubModelUniqueCode;references:UniqueCode;COMMENT:所属型号;" json:"kind_sub_model"`
 	ParentIdentityCode              string                     `gorm:"type:VARCHAR(20);COMMENT:所属整机唯一编号;" json:"parent_identity_code"`
@@ -45,7 +45,7 @@ type EntireInstanceModel struct {
 	LockName                        string                     `gorm:"type:VARCHAR(64);COMMENT:锁名称;" json:"lock_name"`
 	LockDescription                 string                     `gorm:"type:TEXT;COMMENT:锁说明;" json:"lock_description"`
 	EntireInstanceUses              []EntireInstanceUseModel   `gorm:"constraint:OnUpdate:CASCADE;foreignKey:EntireInstanceIdentityCode;references:IdentityCode;COMMENT:使用信息;" json:"entire_instance_uses"`
-	EntireInstanceLogs             []EntireInstanceLogModel  `gorm:"constraint:OnUpdate:CASCADE;foreignKey:EntireInstanceIdentityCode;references:IdentityCode;COMMENT:相关日志;" json:"entire_instance_logs"`
+	EntireInstanceLogs              []EntireInstanceLogModel   `gorm:"constraint:OnUpdate:CASCADE;foreignKey:EntireInstanceIdentityCode;references:IdentityCode;COMMENT:相关日志;" json:"entire_instance_logs"`
 	//EntireInstanceRepairs               []EntireInstanceRepairModel    `gorm:"constraint:OnUpdate:CASCADE;foreignKey:EntireInstanceIdentityCode;references:IdentityCode;COMMENT:相关检修记录;" json:"entire_instance_repairs"`
 	LocationWarehousePositionUniqueCode string                         `gorm:"type:CHAR(18);COMMENT:所属仓库位置代码;" json:"location_warehouse_position_unique_code"`
 	LocationWarehousePosition           LocationWarehousePositionModel `gorm:"constraint:OnUpdate:CASCADE;foreignKey:LocationWarehousePositionUniqueCode;references:UniqueCode;COMMENT:所属仓库位置;" json:"location_warehouse_position"`

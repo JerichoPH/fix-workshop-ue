@@ -4,17 +4,11 @@ import (
 	"fix-workshop-go/models"
 	"fix-workshop-go/tools"
 	"github.com/gin-gonic/gin"
-	"gopkg.in/ini.v1"
-	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
 type OrganizationSectionRouter struct {
 	Router    *gin.Engine
-	MySqlConn *gorm.DB
-	MsSqlConn *gorm.DB
-	AppConfig *ini.File
-	DBConfig  *ini.File
 }
 
 func (cls *OrganizationSectionRouter) Load() {
@@ -26,7 +20,6 @@ func (cls *OrganizationSectionRouter) Load() {
 
 			organizationSection := (&models.OrganizationSectionModel{
 				BaseModel: models.BaseModel{
-					DB: cls.MySqlConn,
 					Preloads: []string{
 						clause.Associations,
 						"OrganizationWorkshopModel.OrganizationWorkshopTypeModel",
