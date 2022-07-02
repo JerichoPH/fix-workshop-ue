@@ -2,26 +2,26 @@ package models
 
 import (
 	uuid "github.com/satori/go.uuid"
-	"gorm.io/gorm"
 )
 
 type AccountModel struct {
 	BaseModel
-	UUID                    string             `gorm:"type:CHAR(36);UNIQUE;NOT NULL;COMMENT:UUID;" json:"uuid"`
-	Username                string             `gorm:"type:VARCHAR(64);UNIQUE;NOT NULL;COMMENT:登录账号;"`
-	Password                string             `gorm:"type:VARCHAR(128);NOT NULL;COMMENT:登录密码;"`
-	Nickname                string             `gorm:"type:VARCHAR(64);UNIQUE;NOT NULL;COMMENT:昵称;"`
-	AccountStatusUniqueCode string             `gorm:"type:VARCHAR(64);COMMENT:所属状态;"`
-	AccountStatus           AccountStatusModel `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:AccountStatusUniqueCode;references:UniqueCode;"`
+	UUID                    string                 `gorm:"type:CHAR(36);UNIQUE;NOT NULL;COMMENT:UUID;" json:"uuid"`
+	Username                string                 `gorm:"type:VARCHAR(64);UNIQUE;NOT NULL;COMMENT:登录账号;"`
+	Password                string                 `gorm:"type:VARCHAR(128);NOT NULL;COMMENT:登录密码;"`
+	Nickname                string                 `gorm:"type:VARCHAR(64);UNIQUE;NOT NULL;COMMENT:昵称;"`
+	AccountStatusUniqueCode string                 `gorm:"type:VARCHAR(64);COMMENT:所属状态;"`
+	AccountStatus           AccountStatusModel     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:AccountStatusUniqueCode;references:UniqueCode;"`
+	DeleteEntireInstances   []*EntireInstanceModel `gorm:"constraint:OnUpdate:CASCADE;foreignKey:DeleteOperatorUUID;references:UUID;COMMENT:相关删除的器材;" json:"delete_entire_instances"`
 }
 
 // TableName 表名称
 func (cls *AccountModel) TableName() string {
-	return "Accounts"
+	return "accounts"
 }
 
 // BeforeCreate 自动生成UniqueCode
-func (cls *AccountModel) BeforeCreate(db *gorm.DB) (err error) {
+func (cls *AccountModel) BeforeCreate() (err error) {
 	cls.UUID = uuid.NewV4().String()
 	return
 }

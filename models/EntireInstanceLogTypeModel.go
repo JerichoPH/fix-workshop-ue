@@ -11,5 +11,5 @@ type EntireInstanceLogTypeModel struct {
 
 // TableName 表名称
 func (cls *EntireInstanceLogTypeModel) TableName() string {
-	return "EntireInstanceLogTypes"
+	return "entire_instance_log_types"
 }

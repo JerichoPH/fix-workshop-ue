@@ -13,7 +13,7 @@ type LocationInstallRoomModel struct {
 
 // TableName 表名称
 func (cls *LocationInstallRoomModel) TableName() string {
-	return "LocationInstallRooms"
+	return "location_install_rooms"
 }
 
 // FindOneByUniqueCode 根据unique_code

@@ -49,11 +49,13 @@ type EntireInstanceModel struct {
 	//EntireInstanceRepairs               []EntireInstanceRepairModel    `gorm:"constraint:OnUpdate:CASCADE;foreignKey:EntireInstanceIdentityCode;references:IdentityCode;COMMENT:相关检修记录;" json:"entire_instance_repairs"`
 	LocationWarehousePositionUniqueCode string                         `gorm:"type:CHAR(18);COMMENT:所属仓库位置代码;" json:"location_warehouse_position_unique_code"`
 	LocationWarehousePosition           LocationWarehousePositionModel `gorm:"constraint:OnUpdate:CASCADE;foreignKey:LocationWarehousePositionUniqueCode;references:UniqueCode;COMMENT:所属仓库位置;" json:"location_warehouse_position"`
+	DeleteOperatorUUID                  string                         `gorm:"type:CHAR(36);COMMENT:删除操作人UUID;" json:"delete_operator_uuid"`
+	DeleteOperator                      AccountModel                   `gorm:"constraint:OnUpdate:CASCADE;foreignKey:DeleteOperatorUUID;references:UUID;COMMENT:删除操作人;" json:"delete_operator"`
 }
 
 // TableName 表名称
 func (cls *EntireInstanceModel) TableName() string {
-	return "EntireInstances"
+	return "entire_instances"
 }
 
 // FindOneByIdentityCode 根据identity_code获取单条数据

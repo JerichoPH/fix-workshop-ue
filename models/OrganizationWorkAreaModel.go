@@ -14,7 +14,7 @@ type OrganizationWorkAreaModel struct {
 
 // TableName 表名称
 func (cls *OrganizationWorkAreaModel) TableName() string {
-	return "OrganizationWorkAreas"
+	return "organization_work_areas"
 }
 
 // FindOneByUniqueCode 根据unique_code获取单条数据

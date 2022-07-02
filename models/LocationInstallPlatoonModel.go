@@ -11,5 +11,5 @@ type LocationInstallPlatoonModel struct {
 
 // TableName 表名称
 func (cls *LocationInstallPlatoonModel) TableName() string {
-	return "LocationInstallPlatoons"
+	return "location_install_platoons"
 }

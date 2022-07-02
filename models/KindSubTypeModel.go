@@ -14,7 +14,7 @@ type KindSubTypeModel struct {
 
 // TableName 表名称
 func (cls *KindSubTypeModel) TableName() string {
-	return "KindSubTypes"
+	return "kind_sub_types"
 }
 
 // FindOneByUniqueCode 根据unique_code获取单条数据

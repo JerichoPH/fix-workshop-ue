@@ -14,7 +14,7 @@ type KindEntireTypeModel struct {
 
 // TableName 表名称
 func (cls *KindEntireTypeModel) TableName() string {
-	return "KindEntireTypes"
+	return "kind_entire_types"
 }
 
 // FindOneByUniqueCode 根据unique_code获取单条数据

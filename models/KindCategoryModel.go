@@ -12,7 +12,7 @@ type KindCategoryModel struct {
 
 // TableName 表名称
 func (cls *KindCategoryModel) TableName() string {
-	return "KindCategories"
+	return "kind_categories"
 }
 
 // FindOneByUniqueCode 根据unique_code获取单条数据

@@ -11,5 +11,5 @@ type LocationInstallShelfModel struct {
 
 // TableName 表名称
 func (cls *LocationInstallShelfModel) TableName() string {
-	return "LocationInstallShelves"
+	return "location_install_shelves"
 }

@@ -13,7 +13,7 @@ type OrganizationRailwayModel struct {
 
 // TableName 表名称
 func (cls *OrganizationRailwayModel) TableName() string {
-	return "OrganizationRailways"
+	return "organization_railways"
 }
 
 // FindOneByUniqueCode 根据unique_code获取单条数据

@@ -11,5 +11,5 @@ type SourceNameModel struct {
 
 // TableName 表名称
 func (cls *SourceNameModel) TableName() string {
-	return "SourceNames"
+	return "source_names"
 }

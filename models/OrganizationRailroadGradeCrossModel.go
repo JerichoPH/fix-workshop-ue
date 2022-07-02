@@ -11,7 +11,7 @@ type OrganizationRailroadGradeCrossModel struct {
 
 // TableName 表名称
 func (cls *OrganizationRailroadGradeCrossModel) TableName() string {
-	return "OrganizationRailroadGradeCrosses"
+	return "organization_railroad_grade_crosses"
 }
 
 // FindOneByUniqueCode 通过unique_code获取单条数据

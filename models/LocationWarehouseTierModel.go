@@ -11,5 +11,5 @@ type LocationWarehouseTierModel struct {
 
 // TableName 表名称
 func (cls *LocationWarehouseTierModel) TableName() string {
-	return "LocationWarehouseTiers"
+	return "location_warehouse_tiers"
 }

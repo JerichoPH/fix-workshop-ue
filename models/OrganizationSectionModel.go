@@ -12,7 +12,7 @@ type OrganizationSectionModel struct {
 
 // TableName 表名称
 func (cls *OrganizationSectionModel) TableName() string {
-	return "OrganizationSections"
+	return "organization_sections"
 }
 
 // FindOneByUniqueCode 根据unique_code获取单条数据

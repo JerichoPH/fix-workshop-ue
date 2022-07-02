@@ -28,5 +28,5 @@ type EntireInstanceRepairModel struct {
 
 // TableName 表名称
 func (cls *EntireInstanceRepairModel) TableName() string {
-	return "EntireInstanceRepairs"
+	return "entire_instance_repairs"
 }

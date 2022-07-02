@@ -14,5 +14,5 @@ type FixWorkflowProcessModel struct {
 
 // TableName 表名称
 func (cls *FixWorkflowProcessModel) TableName() string {
-	return "FixWorkflowProcesses"
+	return "fix_workflow_processes"
 }

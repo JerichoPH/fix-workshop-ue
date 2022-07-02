@@ -14,7 +14,7 @@ type OrganizationParagraphModel struct {
 
 // TableName 表名称
 func (cls *OrganizationParagraphModel) TableName() string {
-	return "OrganizationParagraphs"
+	return "organization_paragraphs"
 }
 
 // FindOneByUniqueCode 根据unique_code获取单条数据

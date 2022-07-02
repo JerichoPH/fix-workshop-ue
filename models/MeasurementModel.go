@@ -6,5 +6,5 @@ type MeasurementModel struct {
 
 // TableName 表名称
 func (cls *MeasurementModel) TableName() string {
-	return "Measurements"
+	return "measurements"
 }

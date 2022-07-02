@@ -10,5 +10,5 @@ type OrganizationCenterModel struct {
 
 // TableName 表名称
 func (cls *OrganizationCenterModel) TableName() string {
-	return "OrganizationCenters"
+	return "organization_centers"
 }

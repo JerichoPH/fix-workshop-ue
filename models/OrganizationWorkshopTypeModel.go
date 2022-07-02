@@ -11,7 +11,7 @@ type OrganizationWorkshopTypeModel struct {
 
 // TableName 表名称
 func (cls *OrganizationWorkshopTypeModel) TableName() string {
-	return "OrganizationWorkshopTypes"
+	return "organization_workshop_types"
 }
 
 // FindOneByUniqueCode 根据unique_code获取单条数据

@@ -10,5 +10,5 @@ type FactoryModel struct {
 
 // TableName 表名称
 func (cls *FactoryModel) TableName() string {
-	return "Factories"
+	return "factories"
 }

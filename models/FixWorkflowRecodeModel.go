@@ -14,5 +14,5 @@ type FixWorkflowRecodeModel struct {
 
 // TableName 表名称
 func (cls *FixWorkflowRecodeModel) TableName() string {
-	return "FixWorkflowRecodes"
+	return "fix_workflow_recodes"
 }

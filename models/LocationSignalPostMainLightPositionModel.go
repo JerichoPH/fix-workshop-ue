@@ -8,5 +8,5 @@ type LocationSignalPostMainLightPositionModel struct {
 
 // TableName 表名称
 func (cls *LocationSignalPostMainLightPositionModel) TableName() string {
-	return "LocationSignalPostMainLightPositions"
+	return "location_signal_post_main_light_positions"
 }

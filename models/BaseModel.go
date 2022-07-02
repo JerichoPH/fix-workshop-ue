@@ -17,6 +17,19 @@ type BaseModel struct {
 	Omits     []string     `gorm:"-:all"`
 }
 
+// BeforeCreate 插入数据前
+func (cls *BaseModel) BeforeCreate() (err error) {
+	cls.CreatedAt = time.Now()
+	cls.UpdatedAt = time.Now()
+	return
+}
+
+// BeforeSave 修改数据前
+func (cls *BaseModel) BeforeSave() (err error) {
+	cls.UpdatedAt = time.Now()
+	return
+}
+
 // Boot 初始化
 func (cls *BaseModel) Boot() *gorm.DB {
 	db := (&databases.MySql{}).GetMySqlConn()

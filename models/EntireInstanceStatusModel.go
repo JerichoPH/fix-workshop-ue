@@ -10,5 +10,5 @@ type EntireInstanceStatusModel struct {
 
 // TableName 表名称
 func (cls *EntireInstanceStatusModel) TableName() string {
-	return "EntireInstanceStatuses"
+	return "entire_instance_statuses"
 }

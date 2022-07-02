@@ -11,5 +11,5 @@ type LocationInstallTierModel struct {
 
 // TableName 表名称
 func (cls *LocationInstallTierModel) TableName() string {
-	return "locationInstallTiers"
+	return "location_install_tiers"
 }

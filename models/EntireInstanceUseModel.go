@@ -68,5 +68,5 @@ type EntireInstanceUseModel struct {
 
 // TableName 表名称
 func (cls *EntireInstanceUseModel) TableName() string {
-	return "EntireInstanceUses"
+	return "entire_instance_uses"
 }
