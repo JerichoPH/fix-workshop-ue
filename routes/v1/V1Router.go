@@ -30,6 +30,6 @@ func (cls *V1Router) Load() {
 	//(&EntireInstanceRouter{Router: cls.Router}).Load() //器材
 
 	// 上道位置
-	(&LocationInstallRoomRouter{Router: cls.Router}).Load()     // 机房
-	(&LocationInstallRoomTypeRouter{Router: cls.Router}).Load() // 机房类型
+	//(&LocationInstallRoomRouter{Router: cls.Router}).Load()     // 机房
+	//(&LocationInstallRoomTypeRouter{Router: cls.Router}).Load() // 机房类型
 }

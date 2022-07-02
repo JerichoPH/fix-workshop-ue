@@ -17,7 +17,7 @@ type MySql struct {
 	Charset  string
 }
 
-var MySqlConn *gorm.DB
+var mySqlConn *gorm.DB
 
 func (cls *MySql) getMySqlConn() (tx *gorm.DB) {
 	ctf := configs.Config{}
@@ -57,10 +57,10 @@ func (cls *MySql) getMySqlConn() (tx *gorm.DB) {
 
 // GetMySqlConn 获取数据库链接
 func (cls *MySql) GetMySqlConn() *gorm.DB {
-	if MySqlConn == nil {
-		MySqlConn = cls.getMySqlConn()
+	if mySqlConn == nil {
+		mySqlConn = cls.getMySqlConn()
 	}
-	return MySqlConn
+	return mySqlConn
 }
 
 // GetNewMySqlConn 获取新数据库链接

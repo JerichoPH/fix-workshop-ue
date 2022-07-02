@@ -55,8 +55,7 @@ func initServer(router *gin.Engine, addr string) {
 
 func main() {
 	// 获取参数
-	ctf := configs.Config{}
-	config := ctf.Init()
+	config := (&configs.Config{}).Init()
 
 	//mssqlConn := (&MsSql{
 	//	Schema:   "sqlserver",
@@ -146,7 +145,7 @@ func main() {
 	router := gin.Default()
 
 	router.Use(errors.RecoverHandler)     // 异常处理
-	(&v1.V1Router{Router:router}).Load() // 加载v1路由
+	(&v1.V1Router{Router: router}).Load() // 加载v1路由
 
 	initServer(router, config.App.Section("app").Key("addr").MustString(":8080")) // 启动服务
 }
