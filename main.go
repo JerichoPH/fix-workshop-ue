@@ -1,14 +1,16 @@
 package main
 
 import (
+	"context"
+	"fix-workshop-go/configs"
 	"fix-workshop-go/databases"
 	"fix-workshop-go/models"
 	v1 "fix-workshop-go/routes/v1"
 	"fmt"
-	"gopkg.in/ini.v1"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"time"
 
 	"fix-workshop-go/errors"
@@ -16,9 +18,9 @@ import (
 )
 
 // initServer 启动服务
-func initServer(router *gin.Engine) {
+func initServer(router *gin.Engine, addr string) {
 	server := &http.Server{
-		Addr:           ":8080",
+		Addr:           addr,
 		Handler:        router,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
@@ -28,26 +30,34 @@ func initServer(router *gin.Engine) {
 	if serverErr != nil {
 		log.Println("服务器启动错误：", serverErr)
 	}
-}
 
-// initConfig 初始化配置
-func initConfig() (appConfigFile *ini.File, dbConfigFile *ini.File) {
-	appConfigFile, appConfigErr := ini.Load("./configs/app.ini")
-	if appConfigErr != nil {
-		fmt.Println("加载主配置文件失败")
-		os.Exit(1)
+	go func() {
+		// 服务连接
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen: %s\n", err)
+		}
+	}()
+
+	// 等待中断信号以优雅地关闭服务器（设置 5 秒的超时时间）
+	quit := make(chan os.Signal)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
+	log.Println("关闭服务中……")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatal("服务无法关闭", err)
 	}
+	log.Println("服务关闭")
 
-	dbConfigFile, dbConfigErr := ini.Load("./configs/db.ini")
-	if dbConfigErr != nil {
-		fmt.Println("加载数据库配置文件失败")
-		os.Exit(1)
-	}
-
-	return
 }
 
 func main() {
+	// 获取参数
+	ctf := configs.Config{}
+	config := ctf.Init()
+
 	//mssqlConn := (&MsSql{
 	//	Schema:   "sqlserver",
 	//	Username: "sa",
@@ -65,6 +75,10 @@ func main() {
 			// 用户
 			&models.AccountModel{},       // 用户主表
 			&models.AccountStatusModel{}, // 用户状态
+
+			// RBAC
+			&models.RbacRoleModel{},       // 角色
+			&models.RbacPermissionModel{}, // 权限
 
 			// 种类型
 			&models.KindCategoryModel{},   // 种类
@@ -116,7 +130,7 @@ func main() {
 			&models.LocationSignalPostIndicatorLightPositionModel{}, // 信号机表示器灯位
 
 			// 供应商
-			&models.FactoryModel{},
+			&models.FactoryModel{}, // 供应商
 
 			// 来源
 			&models.SourceTypeModel{}, // 来源类型
@@ -134,5 +148,5 @@ func main() {
 	router.Use(errors.RecoverHandler)     // 异常处理
 	(&v1.V1Router{Router: router}).Load() // 加载v1路由
 
-	initServer(router) // 启动服务
+	initServer(router, config.App.Section("app").Key("addr").MustString(":8080")) // 启动服务
 }

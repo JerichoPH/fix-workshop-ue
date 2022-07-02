@@ -18,14 +18,14 @@ type BaseModel struct {
 }
 
 // BeforeCreate 插入数据前
-func (cls *BaseModel) BeforeCreate() (err error) {
+func (cls *BaseModel) BeforeCreate(tx *gorm.DB) (err error) {
 	cls.CreatedAt = time.Now()
 	cls.UpdatedAt = time.Now()
 	return
 }
 
 // BeforeSave 修改数据前
-func (cls *BaseModel) BeforeSave() (err error) {
+func (cls *BaseModel) BeforeSave(tx *gorm.DB) (err error) {
 	cls.UpdatedAt = time.Now()
 	return
 }

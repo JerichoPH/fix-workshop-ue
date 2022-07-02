@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"fix-workshop-go/middlewares"
 	"fix-workshop-go/models"
 	"fix-workshop-go/tools"
 	"github.com/gin-gonic/gin"
@@ -17,7 +18,8 @@ func (cls *AccountRouter) Load() {
 	{
 		r.GET(
 			"/:id",
-			//middlewares.JwtCheck(cls.MySqlConn),
+			middlewares.CheckJWT(),
+			middlewares.CheckPermission(),
 			func(ctx *gin.Context) {
 				id := tools.ThrowErrorWhenIsNotInt(ctx.Param("id"), "id必须填写整数")
 
