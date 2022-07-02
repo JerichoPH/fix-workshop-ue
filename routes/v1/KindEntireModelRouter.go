@@ -12,23 +12,23 @@ type KindEntireModelRouter struct {
 
 // Load 加载路由
 func (cls *KindEntireModelRouter) Load() {
-	r := cls.Router.Group("/api/v1/kindEntireModel")
+	r := cls.Router.Group("/api/v1/kind")
 	{
 		// 类型详情
-		r.GET("/:unique_code", func(ctx *gin.Context) {
+		r.GET("entireType/:unique_code", func(ctx *gin.Context) {
 			uniqueCode := ctx.Param("unique_code")
 
-			kindEntireModel := (&models.KindEntireTypeModel{
+			kindEntireType := (&models.KindEntireTypeModel{
 				BaseModel: models.BaseModel{
 					Preloads: []string{
 						"KindCategoryModel",
-						"KindSubModels",
+						"KindSubTypes",
 					},
 				},
 			}).FindOneByUniqueCode(uniqueCode)
-			tools.ThrowErrorWhenIsEmpty(kindEntireModel, models.KindEntireTypeModel{}, "类型")
+			tools.ThrowErrorWhenIsEmpty(kindEntireType, models.KindEntireTypeModel{}, "类型")
 
-			ctx.JSON(tools.CorrectIns("").OK(gin.H{"kind_entire_model": kindEntireModel}))
+			ctx.JSON(tools.CorrectIns("").OK(gin.H{"kind_entire_type": kindEntireType}))
 		})
 	}
 }

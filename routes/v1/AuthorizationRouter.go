@@ -25,7 +25,7 @@ type AuthorizationLoginForm struct {
 }
 
 type AuthorizationRouter struct {
-	Router     *gin.Engine
+	Router *gin.Engine
 }
 
 func (cls *AuthorizationRouter) Load() {

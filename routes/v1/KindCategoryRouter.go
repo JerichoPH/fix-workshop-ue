@@ -12,17 +12,17 @@ type KindCategoryRouter struct {
 
 // Load 加载路由
 func (cls *KindCategoryRouter) Load() {
-	r := cls.Router.Group("/api/v1/kindCategory")
+	r := cls.Router.Group("/api/v1/kind")
 	{
 		// 种类详情
-		r.GET("/:unique_code", func(ctx *gin.Context) {
+		r.GET("category/:unique_code", func(ctx *gin.Context) {
 			uniqueCode := ctx.Param("unique_code")
 
 			kindCategory := (&models.KindCategoryModel{
 				BaseModel: models.BaseModel{
 					Preloads: []string{
-						"KindEntireModels",
-						"KindEntireModels.KindSubModels",
+						"KindEntireTypes",
+						"KindEntireTypes.KindSubTypes",
 					},
 				},
 			}).FindOneByUniqueCode(uniqueCode)

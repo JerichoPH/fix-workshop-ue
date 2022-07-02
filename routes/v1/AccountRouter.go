@@ -9,7 +9,7 @@ import (
 )
 
 type AccountRouter struct {
-	Router     *gin.Engine
+	Router *gin.Engine
 }
 
 // Load 加载路由

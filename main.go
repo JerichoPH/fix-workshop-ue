@@ -146,7 +146,7 @@ func main() {
 	router := gin.Default()
 
 	router.Use(errors.RecoverHandler)     // 异常处理
-	(&v1.V1Router{Router: router}).Load() // 加载v1路由
+	(&v1.V1Router{Router:router}).Load() // 加载v1路由
 
 	initServer(router, config.App.Section("app").Key("addr").MustString(":8080")) // 启动服务
 }

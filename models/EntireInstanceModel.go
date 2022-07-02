@@ -6,24 +6,24 @@ import (
 
 type EntireInstanceModel struct {
 	BaseModel
-	IdentityCode                    string                     `gorm:"type:VARCHAR(20);UNIQUE;NOT NULL;COMMENT:唯一编号;" json:"identity_code"`
-	EntireInstanceStatusUniqueCode  string                     `gorm:"type:VARCHAR(64);COMMENT:所属类型;" json:"entire_instance_status_unique_code"`
-	EntireInstanceStatus            EntireInstanceStatusModel  `gorm:"constraint:OnUpdate:CASCADE;foreignKey:EntireInstanceStatusUniqueCode;references:UniqueCode;COMMENT:所属状态;" json:"entire_instance_status"`
-	KindCategoryUniqueCode          string                     `gorm:"type:CHAR(3);COMMENT:所属类型;" json:"kind_category_unique_code"`
-	KindCategory                    KindCategoryModel          `gorm:"constraint:OnUpdate:CASCADE;foreignKey:KindCategoryUniqueCode;references:UniqueCode;COMMENT:所属种类;" json:"kind_category"`
-	KindEntireModelUniqueCode       string                     `gorm:"type:CHAR(5);COMMENT:所属类型;" json:"kind_entire_model_unique_code"`
-	KindEntireModel                 KindEntireTypeModel        `gorm:"constraint:OnUpdate:CASCADE;foreignKey:KindEntireModelUniqueCode;references:UniqueCode;COMMENT:所属类型;" json:"kind_entire_model"`
-	KindSubModelUniqueCode          string                     `gorm:"type:CHAR(7);COMMENT:所属型号;" json:"kind_sub_model_unique_code"`
-	KindSubModel                    KindSubTypeModel           `gorm:"constraint:OnUpdate:CASCADE;foreignKey:KindSubModelUniqueCode;references:UniqueCode;COMMENT:所属型号;" json:"kind_sub_model"`
-	ParentIdentityCode              string                     `gorm:"type:VARCHAR(20);COMMENT:所属整机唯一编号;" json:"parent_identity_code"`
-	Parent                          *EntireInstanceModel       `gorm:"constraint:OnUpdate:CASCADE;foreignKey:ParentIdentityCode;references:IdentityCode;COMMENT:所属整机;" json:"parent"`
-	Parts                           []*EntireInstanceModel     `gorm:"constraint:OnUpdate:CASCADE;foreignKey:ParentIdentityCode;references:IdentityCode;COMMENT:相关部件;" json:"parts"`
-	BePart                          bool                       `gorm:"type:BOOLEAN;DEFAULT:0;COMMENT:是否是部件;" json:"be_part"`
-	HasExtrusionShroud              bool                       `gorm:"type:BOOLEAN;DEFAULT:0;COMMENT:是否具备防挤压防护装置;" json:"has_extrusion_shroud"`
-	SaidRod                         string                     `gorm:"type:VARCHAR(64);COMMENT:表示杆特征;" json:"said_rod"`
-	FixCycleYear                    int16                      `gorm:"type:TINYINT;COMMENT:周期修年;" json:"fix_cycle_year"`
-	OrganizationRailwayUniqueCode   string                     `gorm:"type:CHAR(3);COMMENT:所属路局;" json:"organization_railway_unique_code"`
-	OrganizationRailway             OrganizationRailwayModel   `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OrganizationRailwayUniqueCode;references:UniqueCode;COMMENT:所属路局;" json:"organization_railway"`
+	IdentityCode                   string                    `gorm:"type:VARCHAR(20);UNIQUE;NOT NULL;COMMENT:唯一编号;" json:"identity_code"`
+	EntireInstanceStatusUniqueCode string                    `gorm:"type:VARCHAR(64);COMMENT:所属类型;" json:"entire_instance_status_unique_code"`
+	EntireInstanceStatus           EntireInstanceStatusModel `gorm:"constraint:OnUpdate:CASCADE;foreignKey:EntireInstanceStatusUniqueCode;references:UniqueCode;COMMENT:所属状态;" json:"entire_instance_status"`
+	KindCategoryUniqueCode         string                    `gorm:"type:CHAR(3);COMMENT:所属类型;" json:"kind_category_unique_code"`
+	KindCategory                   KindCategoryModel         `gorm:"constraint:OnUpdate:CASCADE;foreignKey:KindCategoryUniqueCode;references:UniqueCode;COMMENT:所属种类;" json:"kind_category"`
+	KindEntireTypeUniqueCode       string                    `gorm:"type:CHAR(5);COMMENT:所属类型;" json:"kind_entire_model_unique_code"`
+	KindEntireType                 KindEntireTypeModel       `gorm:"constraint:OnUpdate:CASCADE;foreignKey:KindEntireTypeUniqueCode;references:UniqueCode;COMMENT:所属类型;" json:"kind_entire_model"`
+	KindSubTypeUniqueCode          string                    `gorm:"type:CHAR(7);COMMENT:所属型号;" json:"kind_sub_model_unique_code"`
+	KindSubModel                   KindSubTypeModel          `gorm:"constraint:OnUpdate:CASCADE;foreignKey:KindSubTypeUniqueCode;references:UniqueCode;COMMENT:所属型号;" json:"kind_sub_model"`
+	ParentIdentityCode             string                    `gorm:"type:VARCHAR(20);COMMENT:所属整机唯一编号;" json:"parent_identity_code"`
+	Parent                         *EntireInstanceModel      `gorm:"constraint:OnUpdate:CASCADE;foreignKey:ParentIdentityCode;references:IdentityCode;COMMENT:所属整机;" json:"parent"`
+	Parts                          []*EntireInstanceModel    `gorm:"constraint:OnUpdate:CASCADE;foreignKey:ParentIdentityCode;references:IdentityCode;COMMENT:相关部件;" json:"parts"`
+	BePart                         bool                      `gorm:"type:BOOLEAN;DEFAULT:0;COMMENT:是否是部件;" json:"be_part"`
+	HasExtrusionShroud             bool                      `gorm:"type:BOOLEAN;DEFAULT:0;COMMENT:是否具备防挤压防护装置;" json:"has_extrusion_shroud"`
+	SaidRod                        string                    `gorm:"type:VARCHAR(64);COMMENT:表示杆特征;" json:"said_rod"`
+	FixCycleYear                   int16                     `gorm:"type:TINYINT;COMMENT:周期修年;" json:"fix_cycle_year"`
+	OrganizationRailwayUniqueCode  string                    `gorm:"type:CHAR(3);COMMENT:所属路局;" json:"organization_railway_unique_code"`
+	OrganizationRailway            OrganizationRailwayModel  `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OrganizationRailwayUniqueCode;references:UniqueCode;COMMENT:所属路局;" json:"organization_railway"`
 	OrganizationParagraphUniqueCode string                     `gorm:"type:CHAR(4);COMMENT:所属站段;" json:"organization_paragraph_unique_code"`
 	OrganizationParagraph           OrganizationParagraphModel `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OrganizationParagraphUniqueCode;references:UniqueCode;COMMENT:所属站段;" json:"organization_paragraph"`
 	OrganizationWorkshopUniqueCode  string                     `gorm:"type:CHAR(7);COMMENT:所属车间;" json:"organization_workshop_unique_code"`
