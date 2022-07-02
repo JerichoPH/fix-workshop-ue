@@ -12,10 +12,10 @@ type OrganizationLineRouter struct {
 }
 
 func (cls *OrganizationLineRouter) Load() {
-	r := cls.Router.Group("/api/v1/organizationLine")
+	r := cls.Router.Group("/api/v1/organization")
 	{
 		// 线别详情
-		r.GET("/:unique_code", func(ctx *gin.Context) {
+		r.GET("line/:unique_code", func(ctx *gin.Context) {
 			uniqueCode := ctx.Param("unique_code")
 
 			organizationLine := (&models.OrganizationLineModel{

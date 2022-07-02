@@ -12,10 +12,10 @@ type OrganizationRailroadGradeCrossRouter struct {
 }
 
 func (cls *OrganizationRailroadGradeCrossRouter) Load() {
-	r := cls.Router.Group("/api/v1/organizationRailroadGradeCross")
+	r := cls.Router.Group("/api/v1/organization")
 	{
 		// 道口详情
-		r.GET("/:unique_code", func(ctx *gin.Context) {
+		r.GET("railroadGradeCross/:unique_code", func(ctx *gin.Context) {
 			uniqueCode := ctx.Param("unique_code")
 
 			organizationRailroadGradeCross := (&models.OrganizationRailroadGradeCrossModel{

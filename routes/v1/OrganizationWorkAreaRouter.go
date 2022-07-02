@@ -12,10 +12,10 @@ type OrganizationWorkAreaRouter struct {
 }
 
 func (cls *OrganizationWorkAreaRouter) Load() {
-	r := cls.Router.Group("/api/v1/organizationWorkArea")
+	r := cls.Router.Group("/api/v1/organization")
 	{
 		// 工区详情
-		r.GET("/:unique_code", func(ctx *gin.Context) {
+		r.GET("workArea/:unique_code", func(ctx *gin.Context) {
 			uniqueCode := ctx.Param("unique_code")
 
 			organizationWorkArea := (&models.OrganizationWorkAreaModel{

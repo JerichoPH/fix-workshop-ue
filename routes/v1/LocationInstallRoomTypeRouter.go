@@ -13,10 +13,10 @@ type LocationInstallRoomTypeRouter struct {
 
 // Load 加载路由
 func (cls *LocationInstallRoomTypeRouter) Load() {
-	r := cls.Router.Group("/api/v1/locationInstallRoomType")
+	r := cls.Router.Group("/api/v1/location")
 	{
 		// 机房类型详情
-		r.GET("/:unique_code", func(ctx *gin.Context) {
+		r.GET("installRoomType/:unique_code", func(ctx *gin.Context) {
 			uniqueCode := ctx.Param("unique_code")
 
 			locationInstallRoomType := (&models.LocationInstallRoomTypeModel{

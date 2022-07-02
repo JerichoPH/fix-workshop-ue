@@ -13,9 +13,9 @@ type LocationInstallRoomRouter struct {
 
 // Load 加载路由
 func (cls *LocationInstallRoomRouter) Load() {
-	r := cls.Router.Group("/api/v1/locationInstallRoom")
+	r := cls.Router.Group("/api/v1/location")
 	{
-		r.GET("/:unique_code", func(ctx *gin.Context) {
+		r.GET("installRoom/:unique_code", func(ctx *gin.Context) {
 			uniqueCode := ctx.Param("unique_code")
 
 			locationInstallRoom := (&models.LocationInstallRoomModel{

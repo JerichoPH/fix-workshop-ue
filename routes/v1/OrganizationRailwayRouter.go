@@ -17,7 +17,7 @@ func (cls *OrganizationRailwayRouter) Load() {
 	{
 		// 路局详情
 		r.GET(
-			"/railway/:unique_code",
+			"railway/:unique_code",
 			middlewares.CheckJWT(),
 			middlewares.CheckPermission(),
 			func(ctx *gin.Context) {

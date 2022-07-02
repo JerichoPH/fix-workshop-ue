@@ -12,10 +12,10 @@ type OrganizationParagraphRouter struct {
 }
 
 func (cls *OrganizationParagraphRouter) Load() {
-	r := cls.Router.Group("/api/v1/organizationParagraph")
+	r := cls.Router.Group("/api/v1/organization")
 	{
 		// 站段详情
-		r.GET("/:unique_code", func(ctx *gin.Context) {
+		r.GET("paragraph/:unique_code", func(ctx *gin.Context) {
 			uniqueCode := ctx.Param("unique_code")
 
 			organizationParagraph := (&models.OrganizationParagraphModel{

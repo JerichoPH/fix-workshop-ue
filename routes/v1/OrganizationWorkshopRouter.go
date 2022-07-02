@@ -12,10 +12,10 @@ type OrganizationWorkshopRouter struct {
 }
 
 func (cls *OrganizationWorkshopRouter) Load() {
-	r := cls.Router.Group("/api/v1/organizationWorkshop")
+	r := cls.Router.Group("/api/v1/organization")
 	{
 		// 车间详情
-		r.GET("/:unique_code", func(ctx *gin.Context) {
+		r.GET("workshop/:unique_code", func(ctx *gin.Context) {
 			uniqueCode := ctx.Param("unique_code")
 
 			organizationWorkshop := (&models.OrganizationWorkshopModel{

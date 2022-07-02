@@ -12,10 +12,10 @@ type OrganizationSectionRouter struct {
 }
 
 func (cls *OrganizationSectionRouter) Load() {
-	r := cls.Router.Group("/api/v1/organizationSection")
+	r := cls.Router.Group("/api/v1/organization")
 	{
 		// 区间详情
-		r.GET("/:unique_code", func(ctx *gin.Context) {
+		r.GET("section/:unique_code", func(ctx *gin.Context) {
 			uniqueCode := ctx.Param("unique_code")
 
 			organizationSection := (&models.OrganizationSectionModel{
