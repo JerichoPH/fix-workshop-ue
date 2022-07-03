@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fix-workshop-ue/models"
+	"fix-workshop-ue/model"
 	"fmt"
 	"gopkg.in/ini.v1"
 	"gorm.io/driver/mysql"
@@ -20,7 +20,7 @@ import (
 //var MsSqlConn *gorm.DB
 //
 //func (cls *MsSql) InitConfig() *MsSql {
-//	dbConfigFile, dbConfigErr := ini.Load("./configs/db.ini")
+//	dbConfigFile, dbConfigErr := ini.Load("./config/db.ini")
 //	if dbConfigErr != nil {
 //		panic(dbConfigErr)
 //	}
@@ -80,7 +80,7 @@ type MySql struct {
 var MySqlConn *gorm.DB
 
 func (cls *MySql) InitConfig() *MySql {
-	dbConfigFile, dbConfigErr := ini.Load("./configs/db.ini")
+	dbConfigFile, dbConfigErr := ini.Load("./config/db.ini")
 	if dbConfigErr != nil {
 		panic(dbConfigErr)
 	}
@@ -127,64 +127,64 @@ func (cls *MySql) InitDB() *gorm.DB {
 		Set("gorm:table_options", "ENGINE=InnoDB").
 		AutoMigrate(
 			// 用户
-			&models.AccountModel{},       // 用户主表
-			&models.AccountStatusModel{}, // 用户状态
+			&model.AccountModel{},       // 用户主表
+			&model.AccountStatusModel{}, // 用户状态
 
 			// 种类型
-			&models.KindCategoryModel{},   // 种类
-			&models.KindEntireTypeModel{}, // 类型
-			&models.KindSubTypeModel{},    // 型号
+			&model.KindCategoryModel{},   // 种类
+			&model.KindEntireTypeModel{}, // 类型
+			&model.KindSubTypeModel{},    // 型号
 
 			// 组织机构
-			&models.OrganizationRailwayModel{},            // 路局
-			&models.OrganizationParagraphModel{},          // 站段
-			&models.OrganizationWorkshopModel{},           // 车间
-			&models.OrganizationWorkshopTypeModel{},       // 车间类型
-			&models.OrganizationSectionModel{},            // 区间
-			&models.OrganizationRailroadGradeCrossModel{}, // 道口
-			&models.OrganizationWorkAreaModel{},           // 工区
-			&models.OrganizationStationModel{},            // 站场
-			&models.OrganizationLineModel{},               // 线别
-			&models.OrganizationCenterModel{},             // 中心
+			&model.OrganizationRailwayModel{},            // 路局
+			&model.OrganizationParagraphModel{},          // 站段
+			&model.OrganizationWorkshopModel{},           // 车间
+			&model.OrganizationWorkshopTypeModel{},       // 车间类型
+			&model.OrganizationSectionModel{},            // 区间
+			&model.OrganizationRailroadGradeCrossModel{}, // 道口
+			&model.OrganizationWorkAreaModel{},           // 工区
+			&model.OrganizationStationModel{},            // 站场
+			&model.OrganizationLineModel{},               // 线别
+			&model.OrganizationCenterModel{},             // 中心
 
 			// 器材
-			&models.EntireInstanceModel{},        // 器材主表
-			&models.EntireInstanceStatusModel{},  // 器材状态
-			&models.EntireInstanceUseModel{},     // 器材使用数据
-			&models.EntireInstanceLogModel{},     // 器材日志
-			&models.EntireInstanceLogTypeModel{}, // 器材日志类型
-			&models.EntireInstanceRepairModel{},  // 器材检修记录
+			&model.EntireInstanceModel{},        // 器材主表
+			&model.EntireInstanceStatusModel{},  // 器材状态
+			&model.EntireInstanceUseModel{},     // 器材使用数据
+			&model.EntireInstanceLogModel{},     // 器材日志
+			&model.EntireInstanceLogTypeModel{}, // 器材日志类型
+			&model.EntireInstanceRepairModel{},  // 器材检修记录
 
 			// 检修单
-			&models.FixWorkflowReportModel{}, // 检测单主表
-			//&models.FixWorkflowProcessModel{}, // 检测过程
-			//&models.FixWorkflowRecodeModel{},  // 实测值
+			&model.FixWorkflowReportModel{}, // 检测单主表
+			//&model.FixWorkflowProcessModel{}, // 检测过程
+			//&model.FixWorkflowRecodeModel{},  // 实测值
 
 			// 仓库位置
-			&models.LocationWarehouseStorehouseModel{}, // 仓
-			&models.LocationWarehouseAreaModel{},       // 区
-			&models.LocationWarehousePlatoonModel{},    // 排
-			&models.LocationWarehouseShelfModel{},      // 柜架
-			&models.LocationWarehouseTierModel{},       // 层
-			&models.LocationWarehousePositionModel{},   // 位
+			&model.LocationWarehouseStorehouseModel{}, // 仓
+			&model.LocationWarehouseAreaModel{},       // 区
+			&model.LocationWarehousePlatoonModel{},    // 排
+			&model.LocationWarehouseShelfModel{},      // 柜架
+			&model.LocationWarehouseTierModel{},       // 层
+			&model.LocationWarehousePositionModel{},   // 位
 
 			// 上道位置
-			&models.LocationInstallRoomModel{},                      // 机房
-			&models.LocationInstallRoomTypeModel{},                  // 机房类型
-			&models.LocationInstallPlatoonModel{},                   // 排
-			&models.LocationInstallShelfModel{},                     // 柜架
-			&models.LocationInstallTierModel{},                      // 层
-			&models.LocationInstallPositionModel{},                  // 位
-			&models.LocationSignalPostMainOrIndicatorModel{},        // 信号机主体或表示器
-			&models.LocationSignalPostMainLightPositionModel{},      // 信号机主体灯位
-			&models.LocationSignalPostIndicatorLightPositionModel{}, // 信号机表示器灯位
+			&model.LocationInstallRoomModel{},                      // 机房
+			&model.LocationInstallRoomTypeModel{},                  // 机房类型
+			&model.LocationInstallPlatoonModel{},                   // 排
+			&model.LocationInstallShelfModel{},                     // 柜架
+			&model.LocationInstallTierModel{},                      // 层
+			&model.LocationInstallPositionModel{},                  // 位
+			&model.LocationSignalPostMainOrIndicatorModel{},        // 信号机主体或表示器
+			&model.LocationSignalPostMainLightPositionModel{},      // 信号机主体灯位
+			&model.LocationSignalPostIndicatorLightPositionModel{}, // 信号机表示器灯位
 
 			// 供应商
-			&models.FactoryModel{},
+			&model.FactoryModel{},
 
 			// 来源
-			&models.SourceTypeModel{}, // 来源类型
-			&models.SourceNameModel{}, // 来源名称
+			&model.SourceTypeModel{}, // 来源类型
+			&model.SourceNameModel{}, // 来源名称
 
 		)
 
