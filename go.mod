@@ -1,4 +1,4 @@
-module fix-workshop-go
+module fix-workshop-ue
 
 go 1.13
 

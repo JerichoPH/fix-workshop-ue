@@ -1,9 +1,9 @@
 package middlewares
 
 import (
-	"fix-workshop-go/errors"
-	"fix-workshop-go/models"
-	"fix-workshop-go/tools"
+	"fix-workshop-ue/errors"
+	"fix-workshop-ue/models"
+	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
 	"reflect"
 	"strings"

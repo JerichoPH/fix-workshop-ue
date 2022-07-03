@@ -1,18 +1,23 @@
 package v1
 
 import (
-	"fix-workshop-go/models"
-	"fix-workshop-go/tools"
+	"fix-workshop-ue/middlewares"
+	"fix-workshop-ue/models"
+	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
 )
 
 type KindSubModelRouter struct {
-	Router    *gin.Engine
+	Router *gin.Engine
 }
 
 // Load 加载路由
 func (cls *KindSubModelRouter) Load() {
-	r := cls.Router.Group("/api/v1/kind")
+	r := cls.Router.Group(
+		"/api/v1/kind",
+		middlewares.CheckJWT(),
+		middlewares.CheckPermission(),
+	)
 	{
 		// 型号详情
 		r.GET("subType/:unique_code", func(ctx *gin.Context) {
@@ -21,8 +26,8 @@ func (cls *KindSubModelRouter) Load() {
 			kindSubType := (&models.KindSubTypeModel{
 				BaseModel: models.BaseModel{
 					Preloads: []string{
-						"KindCategoryModel",
-						"KindEntireTypeModel",
+						"KindCategory",
+						"KindEntireType",
 					},
 				},
 			}).FindOneByUniqueCode(uniqueCode)

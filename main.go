@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
-	"fix-workshop-go/configs"
-	"fix-workshop-go/databases"
-	"fix-workshop-go/models"
-	v1 "fix-workshop-go/routes/v1"
+	"fix-workshop-ue/configs"
+	"fix-workshop-ue/databases"
+	"fix-workshop-ue/models"
+	v1 "fix-workshop-ue/routes/v1"
 	"fmt"
 	"log"
 	"net/http"
@@ -13,7 +13,7 @@ import (
 	"os/signal"
 	"time"
 
-	"fix-workshop-go/errors"
+	"fix-workshop-ue/errors"
 	"github.com/gin-gonic/gin"
 )
 

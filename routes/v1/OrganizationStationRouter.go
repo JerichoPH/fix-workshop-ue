@@ -1,23 +1,27 @@
 package v1
 
 import (
+	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
 )
 
-type OrganizationSectionRouter struct {
+type OrganizationStationRouter struct {
 	Router *gin.Engine
 }
 
-func (cls *OrganizationSectionRouter) Load() {
-	r := cls.Router.Group("/api/v1/organization")
+func (cls *OrganizationStationRouter) Load() {
+	r := cls.Router.Group(
+		"/api/v1/organization",
+		middlewares.CheckJWT(),
+		middlewares.CheckPermission(),
+	)
 	{
-		// 区间详情
-		r.GET("section/:unique_code", func(ctx *gin.Context) {
+		r.GET("/:unique_code", func(ctx *gin.Context) {
 			uniqueCode := ctx.Param("unique_code")
 
-			organizationSection := (&models.OrganizationSectionModel{
+			station := (&models.OrganizationStationModel{
 				BaseModel: models.BaseModel{
 					Preloads: []string{
 						"OrganizationWorkshop",
@@ -28,7 +32,7 @@ func (cls *OrganizationSectionRouter) Load() {
 				},
 			}).FindOneByUniqueCode(uniqueCode)
 
-			ctx.JSON(tools.CorrectIns("").OK(gin.H{"organization_section": organizationSection}))
+			ctx.JSON(tools.CorrectIns("").OK(gin.H{"station": station}))
 		})
 	}
 }

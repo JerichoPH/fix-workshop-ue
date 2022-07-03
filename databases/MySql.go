@@ -1,7 +1,7 @@
 package databases
 
 import (
-	"fix-workshop-go/configs"
+	"fix-workshop-ue/configs"
 	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"

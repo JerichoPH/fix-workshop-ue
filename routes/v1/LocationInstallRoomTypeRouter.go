@@ -1,8 +1,8 @@
 package v1
 
 import (
-	"fix-workshop-go/models"
-	"fix-workshop-go/tools"
+	"fix-workshop-ue/models"
+	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm/clause"
 )

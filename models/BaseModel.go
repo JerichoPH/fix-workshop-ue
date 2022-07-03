@@ -2,11 +2,12 @@ package models
 
 import (
 	"database/sql"
-	"fix-workshop-go/databases"
+	"fix-workshop-ue/databases"
 	"gorm.io/gorm"
 	"time"
 )
 
+// BaseModel 出厂数据、财务数据、检修数据、仓储数据、流转数据、运用数据
 type BaseModel struct {
 	ID        uint         `gorm:"primaryKey" json:"id"`
 	CreatedAt time.Time    `gorm:"type:DATETIME;auto_now_add;" json:"created_at"`

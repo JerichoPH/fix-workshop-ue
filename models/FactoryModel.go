@@ -12,3 +12,9 @@ type FactoryModel struct {
 func (cls *FactoryModel) TableName() string {
 	return "factories"
 }
+
+// FindOneByUniqueCode 根据unique_code获取单条数据
+func (cls *FactoryModel) FindOneByUniqueCode(uniqueCode string) (factory FactoryModel) {
+	cls.Boot().Where(map[string]interface{}{"unique_code": uniqueCode}).First(&factory)
+	return
+}

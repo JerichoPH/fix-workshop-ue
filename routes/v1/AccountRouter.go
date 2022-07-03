@@ -1,11 +1,10 @@
 package v1
 
 import (
-	"fix-workshop-go/middlewares"
-	"fix-workshop-go/models"
-	"fix-workshop-go/tools"
+	"fix-workshop-ue/middlewares"
+	"fix-workshop-ue/models"
+	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm/clause"
 )
 
 type AccountRouter struct {
@@ -14,18 +13,22 @@ type AccountRouter struct {
 
 // Load 加载路由
 func (cls *AccountRouter) Load() {
-	r := cls.Router.Group("/api/v1/account")
+	r := cls.Router.Group(
+		"/api/v1",
+		middlewares.CheckJWT(),
+		middlewares.CheckPermission(),
+	)
 	{
 		r.GET(
-			"/:id",
-			middlewares.CheckJWT(),
-			middlewares.CheckPermission(),
+			"account/:id",
 			func(ctx *gin.Context) {
 				id := tools.ThrowErrorWhenIsNotInt(ctx.Param("id"), "id必须填写整数")
 
 				account := (&models.AccountModel{
 					BaseModel: models.BaseModel{
-						Preloads: []string{clause.Associations},
+						Preloads: []string{
+							"AccountStatus",
+						},
 					},
 				}).
 					FindOneById(id)

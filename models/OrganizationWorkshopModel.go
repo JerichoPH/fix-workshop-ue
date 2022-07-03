@@ -11,6 +11,7 @@ type OrganizationWorkshopModel struct {
 	OrganizationParagraphUniqueCode    string                        `gorm:"type:CHAR(4);COMMENT:所属站段;" json:"organization_paragraph_unique_code"`
 	OrganizationParagraph              OrganizationParagraphModel    `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OrganizationParagraphUniqueCode;references:UniqueCode;COMMENT:所属站段;" json:"organization_paragraph"`
 	OrganizationSections               []OrganizationSectionModel    `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OrganizationWorkshopUniqueCode;references:UniqueCode;COMMENT:相关区间;" json:"organization_sections"`
+	OrganizationWorkAreas              []OrganizationWorkAreaModel   `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OrganizationWorkshopUniqueCode;references:UniqueCode;COMMENT:相关工区;" json:"organization_work_areas"`
 	OrganizationStations               []OrganizationStationModel    `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OrganizationWorkshopUniqueCode;references:UniqueCode;COMMENT:相关站场;" json:"organization_stations"`
 	EntireInstances                    []EntireInstanceModel         `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OrganizationWorkshopUniqueCode;references:UniqueCode;COMMENT:所属器材;" json:"entire_instances"`
 }

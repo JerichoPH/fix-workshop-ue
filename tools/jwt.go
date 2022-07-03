@@ -1,13 +1,13 @@
 package tools
 
 import (
-	"fix-workshop-go/errors"
+	"fix-workshop-ue/errors"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"time"
 )
 
-var jwtSecret = []byte("fix-workshop-go-jwt-secret") // 加密密钥
+var jwtSecret = []byte("fix-workshop-ue-jwt-secret") // 加密密钥
 
 // Claims Jwt 表单
 type Claims struct {
@@ -27,7 +27,7 @@ func GenerateJwt(uuid string) (string, error) {
 			// 过期时间
 			ExpiresAt: expireTime.Unix(),
 			// 指定token发行人
-			Issuer: "fix-workshop-go",
+			Issuer: "fix-workshop-ue",
 		},
 	}
 

@@ -1,10 +1,9 @@
 package v1
 
 import (
-	"fix-workshop-go/models"
-	"fix-workshop-go/tools"
+	"fix-workshop-ue/models"
+	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm/clause"
 )
 
 type OrganizationWorkAreaRouter struct {
@@ -21,10 +20,10 @@ func (cls *OrganizationWorkAreaRouter) Load() {
 			organizationWorkArea := (&models.OrganizationWorkAreaModel{
 				BaseModel: models.BaseModel{
 					Preloads: []string{
-						clause.Associations,
-						"OrganizationWorkshopModel.OrganizationWorkshopTypeModel",
-						"OrganizationWorkshopModel.OrganizationParagraphModel",
-						"OrganizationWorkshopModel.OrganizationParagraphModel.OrganizationRailwayModel",
+						"OrganizationWorkshop",
+						"OrganizationWorkshop.OrganizationWorkshopType",
+						"OrganizationWorkshop.OrganizationParagraph",
+						"OrganizationWorkshop.OrganizationParagraph.OrganizationRailway",
 					},
 				},
 			}).FindOneByUniqueCode(uniqueCode)

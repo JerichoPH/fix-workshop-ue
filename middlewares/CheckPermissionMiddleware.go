@@ -1,9 +1,10 @@
 package middlewares
 
 import (
-	"fix-workshop-go/errors"
-	"fix-workshop-go/models"
-	"fix-workshop-go/tools"
+	"fix-workshop-ue/configs"
+	"fix-workshop-ue/errors"
+	"fix-workshop-ue/models"
+	"fix-workshop-ue/tools"
 	"fmt"
 	"github.com/gin-gonic/gin"
 )
@@ -18,33 +19,37 @@ func CheckPermission() gin.HandlerFunc {
 		}
 		tools.ThrowErrorWhenIsEmpty(currentAccount, models.AccountModel{}, "用户")
 
-		// 获取权限
-		rbacPermissions := (&models.RbacPermissionModel{
-			BaseModel: models.BaseModel{
-				Preloads: []string{
-					"RbacRoles",
-					"RbacRoles.Accounts",
-				},
-			},
-		}).
-			FindOneByURIAndMethod(ctx.FullPath(), ctx.Request.Method)
-		tools.ThrowErrorWhenIsEmpty(rbacPermissions, models.RbacPermissionModel{}, "权限")
+		config := (&configs.Config{}).Init()
 
-		ok := false
-		if len(rbacPermissions.RbacRoles) > 0 {
-			for _, rbacRole := range rbacPermissions.RbacRoles {
-				if len(rbacRole.Accounts) > 0 {
-					for _, account := range rbacRole.Accounts {
-						if account.UUID == currentAccount.(map[string]interface{})["uuid"] {
-							ok = true
+		if !config.App.Section("app").Key("production").MustBool(true){
+			// 获取权限
+			rbacPermissions := (&models.RbacPermissionModel{
+				BaseModel: models.BaseModel{
+					Preloads: []string{
+						"RbacRoles",
+						"RbacRoles.Accounts",
+					},
+				},
+			}).
+				FindOneByURIAndMethod(ctx.FullPath(), ctx.Request.Method)
+			tools.ThrowErrorWhenIsEmpty(rbacPermissions, models.RbacPermissionModel{}, "权限")
+
+			ok := false
+			if len(rbacPermissions.RbacRoles) > 0 {
+				for _, rbacRole := range rbacPermissions.RbacRoles {
+					if len(rbacRole.Accounts) > 0 {
+						for _, account := range rbacRole.Accounts {
+							if account.UUID == currentAccount.(map[string]interface{})["uuid"] {
+								ok = true
+							}
 						}
 					}
 				}
 			}
-		}
 
-		if !ok{
-			panic(errors.ThrowUnAuthorization("未授权"))
+			if !ok{
+				panic(errors.ThrowUnAuthorization("未授权"))
+			}
 		}
 
 		ctx.Next()

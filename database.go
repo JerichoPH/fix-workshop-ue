@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fix-workshop-go/models"
+	"fix-workshop-ue/models"
 	"fmt"
 	"gopkg.in/ini.v1"
 	"gorm.io/driver/mysql"

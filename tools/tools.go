@@ -1,7 +1,7 @@
 package tools
 
 import (
-	"fix-workshop-go/errors"
+	"fix-workshop-ue/errors"
 	"fmt"
 	"reflect"
 	"strconv"

@@ -1,11 +1,10 @@
 package v1
 
 import (
-	"fix-workshop-go/middlewares"
-	"fix-workshop-go/models"
-	"fix-workshop-go/tools"
+	"fix-workshop-ue/middlewares"
+	"fix-workshop-ue/models"
+	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm/clause"
 )
 
 type OrganizationRailwayRouter struct {
@@ -25,7 +24,13 @@ func (cls *OrganizationRailwayRouter) Load() {
 
 				organizationRailway := (&models.OrganizationRailwayModel{
 					BaseModel: models.BaseModel{
-						Preloads: []string{clause.Associations},
+						Preloads: []string{
+							"OrganizationParagraphs",
+							"OrganizationParagraphs.OrganizationWorkshops",
+							"OrganizationParagraphs.OrganizationWorkshops.OrganizationSections",
+							"OrganizationParagraphs.OrganizationWorkshops.OrganizationWorkAreas",
+							"OrganizationParagraphs.OrganizationWorkshops.OrganizationStations",
+						},
 					},
 				}).FindOneByUniqueCode(uniqueCode)
 				tools.ThrowErrorWhenIsEmpty(organizationRailway, models.OrganizationRailwayModel{}, "路局")

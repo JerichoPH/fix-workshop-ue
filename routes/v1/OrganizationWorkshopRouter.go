@@ -1,14 +1,13 @@
 package v1
 
 import (
-	"fix-workshop-go/models"
-	"fix-workshop-go/tools"
+	"fix-workshop-ue/models"
+	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm/clause"
 )
 
 type OrganizationWorkshopRouter struct {
-	Router    *gin.Engine
+	Router *gin.Engine
 }
 
 func (cls *OrganizationWorkshopRouter) Load() {
@@ -21,9 +20,13 @@ func (cls *OrganizationWorkshopRouter) Load() {
 			organizationWorkshop := (&models.OrganizationWorkshopModel{
 				BaseModel: models.BaseModel{
 					Preloads: []string{
-						clause.Associations,
+						"OrganizationParagraph",
+						"OrganizationParagraph.OrganizationRailway",
+						"OrganizationParagraphs",
+						"OrganizationSections",
+						"OrganizationWorkAreas",
+						"OrganizationStations",
 						"OrganizationWorkshopTypeModel",
-						"OrganizationParagraphModel.OrganizationRailwayModel",
 					},
 				},
 			}).FindOneByUniqueCode(uniqueCode)
