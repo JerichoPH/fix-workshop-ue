@@ -8,7 +8,7 @@ type LocationInstallRoomModel struct {
 	LocationInstallRoomType           LocationInstallRoomTypeModel `gorm:"constraint:OnUpdate:CASCADE;foreignKey:LocationInstallRoomTypeUniqueCode;references:UniqueCode;COMMENT:所属机房类型;" json:"location_install_room_type"`
 	OrganizationStationUniqueCode     string                       `gorm:"type:CHAR(6);COMMENT:所属车站代码;" json:"organization_station_unique_code"`
 	OrganizationStation               OrganizationStationModel     `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OrganizationStationUniqueCode;references:UniqueCode;COMMENT:所属车站;" json:"organization_station"`
-	//LocationInstallPlatoons           []LocationInstallPlatoonModel `gorm:"constraint:OnUpdate:CASCADE;foreignKey:LocationInstallRoomUniqueCode;references:UniqueCode;COMMENT:相关;" json:"location_install_platoons"`
+	LocationInstallPlatoons           []LocationInstallPlatoonModel `gorm:"constraint:OnUpdate:CASCADE;foreignKey:LocationInstallRoomUniqueCode;references:UniqueCode;COMMENT:相关排;" json:"location_install_platoons"`
 }
 
 // TableName 表名称
