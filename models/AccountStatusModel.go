@@ -14,8 +14,14 @@ func (cls *AccountStatusModel) TableName() string {
 
 // FindOneByUniqueCode 根据unique_code获取单条数据
 func (cls *AccountStatusModel) FindOneByUniqueCode(uniqueCode string) (accountStatus AccountStatusModel) {
-	cls.Boot().
+	cls.Preare().
 		Where(map[string]interface{}{"unique_code": uniqueCode}).
 		First(&accountStatus)
+	return
+}
+
+// FindMany 根据query获取多条数据
+func (cls *AccountStatusModel) FindManyByQuery() (accountStatuses []AccountStatusModel) {
+	cls.PreareQuery().Find(&accountStatuses)
 	return
 }

@@ -60,7 +60,7 @@ func (cls *EntireInstanceModel) TableName() string {
 
 // FindOneByIdentityCode 根据identity_code获取单条数据
 func (cls *EntireInstanceModel) FindOneByIdentityCode(identityCode string) (entireInstance EntireInstanceModel) {
-	cls.Boot().
+	cls.Preare().
 		Where(map[string]interface{}{"identity_code": identityCode}).
 		First(&entireInstance)
 

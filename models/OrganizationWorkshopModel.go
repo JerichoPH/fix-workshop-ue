@@ -23,7 +23,7 @@ func (cls *OrganizationWorkshopModel) TableName() string {
 
 // FindOneByUniqueCode 根据unique_code获取单条数据
 func (cls *OrganizationWorkshopModel) FindOneByUniqueCode(uniqueCode string) (organizationWorkshop OrganizationWorkshopModel) {
-	cls.Boot().
+	cls.Preare().
 		Where(map[string]interface{}{"unique_code": uniqueCode}).
 		First(&organizationWorkshop)
 

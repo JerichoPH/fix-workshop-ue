@@ -15,6 +15,7 @@ func CheckJWT() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var account map[string]interface{}
 
+		// 获取令牌
 		split := strings.Split(tools.GetJwtFromHeader(ctx), " ")
 		tokenType := split[0]
 		token := split[1]

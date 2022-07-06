@@ -16,7 +16,7 @@ func (cls *OrganizationWorkshopTypeModel) TableName() string {
 
 // FindOneByUniqueCode 根据unique_code获取单条数据
 func (cls *OrganizationWorkshopTypeModel) FindOneByUniqueCode(uniqueCode string) (organizationWorkshopType OrganizationWorkshopTypeModel) {
-	cls.Boot().Where(map[string]interface{}{"unique_code": uniqueCode}).First(&organizationWorkshopType)
+	cls.Preare().Where(map[string]interface{}{"unique_code": uniqueCode}).First(&organizationWorkshopType)
 
 	return
 }

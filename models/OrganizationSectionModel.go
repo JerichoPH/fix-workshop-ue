@@ -17,7 +17,7 @@ func (cls *OrganizationSectionModel) TableName() string {
 
 // FindOneByUniqueCode 根据unique_code获取单条数据
 func (cls *OrganizationSectionModel) FindOneByUniqueCode(uniqueCode string) (organizationSection OrganizationSectionModel) {
-	cls.Boot().
+	cls.Preare().
 		Where(map[string]interface{}{"unique_code": uniqueCode}).
 		First(&organizationSection)
 

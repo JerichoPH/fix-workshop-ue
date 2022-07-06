@@ -18,7 +18,7 @@ func (cls *KindSubTypeModel) TableName() string {
 
 // FindOneByUniqueCode 根据unique_code获取单条数据
 func (cls *KindSubTypeModel) FindOneByUniqueCode(uniqueCode string) (kindSubModel KindSubTypeModel) {
-	cls.Boot().
+	cls.Preare().
 		Where(map[string]interface{}{"unique_code": uniqueCode}).
 		First(&kindSubModel)
 

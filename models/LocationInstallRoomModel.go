@@ -18,7 +18,7 @@ func (cls *LocationInstallRoomModel) TableName() string {
 
 // FindOneByUniqueCode 根据unique_code
 func (cls *LocationInstallRoomModel) FindOneByUniqueCode(uniqueCode string) (locationInstallRoom LocationInstallRoomModel) {
-	cls.Boot().
+	cls.Preare().
 		Where(map[string]interface{}{"unique_code": uniqueCode}).
 		First(&locationInstallRoom)
 

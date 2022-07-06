@@ -33,19 +33,19 @@ func (cls *AccountModel) BeforeCreate(tx *gorm.DB) (err error) {
 
 // FindOneByUUID 根据uuid获取单条数据
 func (cls *AccountModel) FindOneByUUID(uuid string) (account AccountModel) {
-	cls.Boot().Where(map[string]interface{}{"uuid": uuid}).First(&account)
+	cls.Preare().Where(map[string]interface{}{"uuid": uuid}).First(&account)
 	return
 }
 
 // FindOneByUUIDAsMap 根据uuid获取单条数据 返回map
 func (cls *AccountModel) FindOneByUUIDAsMap(uuid string) (account map[string]interface{}) {
-	cls.Boot().Model(&cls).Where(map[string]interface{}{"uuid": uuid}).First(&account)
+	cls.Preare().Model(&cls).Where(map[string]interface{}{"uuid": uuid}).First(&account)
 	return
 }
 
 // FindOneById 根据id获取单条数据
 func (cls *AccountModel) FindOneById(id int) (account AccountModel) {
-	cls.Boot().
+	cls.Preare().
 		Where(map[string]interface{}{"id": id}).
 		First(&account)
 	return
@@ -53,7 +53,7 @@ func (cls *AccountModel) FindOneById(id int) (account AccountModel) {
 
 // FindOneByUsername 根据username获取单条数据
 func (cls *AccountModel) FindOneByUsername(username string) (account AccountModel) {
-	cls.Boot().
+	cls.Preare().
 		Where(map[string]interface{}{"username": username}).
 		First(&account)
 	return
@@ -61,7 +61,7 @@ func (cls *AccountModel) FindOneByUsername(username string) (account AccountMode
 
 // FindOneByNickname 根据nickname获取单条数据
 func (cls *AccountModel) FindOneByNickname(nickname string) (account AccountModel) {
-	cls.Boot().
+	cls.Preare().
 		Where(map[string]interface{}{"nickname": nickname}).
 		First(&account)
 	return

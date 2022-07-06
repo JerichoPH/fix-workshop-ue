@@ -19,7 +19,7 @@ func (cls *OrganizationParagraphModel) TableName() string {
 
 // FindOneByUniqueCode 根据unique_code获取单条数据
 func (cls *OrganizationParagraphModel) FindOneByUniqueCode(uniqueCode string) (organizationParagraph OrganizationParagraphModel) {
-	cls.Boot().
+	cls.Preare().
 		Where(map[string]interface{}{"unique_code": uniqueCode}).
 		Find(&organizationParagraph)
 

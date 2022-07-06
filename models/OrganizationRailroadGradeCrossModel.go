@@ -16,7 +16,7 @@ func (cls *OrganizationRailroadGradeCrossModel) TableName() string {
 
 // FindOneByUniqueCode 通过unique_code获取单条数据
 func (cls *OrganizationRailroadGradeCrossModel) FindOneByUniqueCode(uniqueCode string) (organizationRailroadGradeCross OrganizationRailroadGradeCrossModel) {
-	cls.Boot().
+	cls.Preare().
 		Where(map[string]interface{}{"unique_code": uniqueCode}).
 		First(&organizationRailroadGradeCross)
 

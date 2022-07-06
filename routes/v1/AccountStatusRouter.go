@@ -4,6 +4,7 @@ import (
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
+	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,10 +19,9 @@ func (cls *AccountStatusRouter) Load() {
 		middlewares.CheckPermission(),
 	)
 	{
-		// GET 用户状态详情
+		// 用户状态详情
 		r.GET(
 			"/:unique_code",
-
 			func(ctx *gin.Context) {
 				uniqueCode := ctx.Param("unique_code")
 				accountStatus := (&models.AccountStatusModel{
@@ -32,5 +32,21 @@ func (cls *AccountStatusRouter) Load() {
 
 				ctx.JSON(tools.CorrectIns("").OK(gin.H{"account_status": accountStatus}))
 			})
+
+		r.GET(
+			"",
+			func(ctx *gin.Context) {
+				wheres := make(map[string]interface{})
+				wheres["name"] = ctx.Query("name")
+				fmt.Println(wheres)
+
+				(&models.AccountStatusModel{
+					BaseModel: models.BaseModel{
+						Ctx:    ctx,
+						Wheres: wheres,
+					},
+				}).FindManyByQuery()
+			},
+		)
 	}
 }

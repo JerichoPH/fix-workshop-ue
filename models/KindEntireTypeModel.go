@@ -19,7 +19,7 @@ func (cls *KindEntireTypeModel) TableName() string {
 
 // FindOneByUniqueCode 根据unique_code获取单条数据
 func (cls *KindEntireTypeModel) FindOneByUniqueCode(uniqueCode string) (kindEntireModel KindEntireTypeModel) {
-	cls.Boot().Where(map[string]interface{}{"unique_code": uniqueCode}).First(&kindEntireModel)
+	cls.Preare().Where(map[string]interface{}{"unique_code": uniqueCode}).First(&kindEntireModel)
 
 	return
 }
