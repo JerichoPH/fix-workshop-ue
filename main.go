@@ -2,10 +2,9 @@ package main
 
 import (
 	"context"
-	"fix-workshop-ue/config"
-	"fix-workshop-ue/database"
-	"fix-workshop-ue/model"
-	v1 "fix-workshop-ue/router/v1"
+	"fix-workshop-ue/configs"
+	"fix-workshop-ue/databases"
+	v1 "fix-workshop-ue/routes/v1"
 	"fmt"
 	"log"
 	"net/http"
@@ -13,7 +12,7 @@ import (
 	"os/signal"
 	"time"
 
-	"fix-workshop-ue/error"
+	"fix-workshop-ue/errors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -55,7 +54,7 @@ func initServer(router *gin.Engine, addr string) {
 
 func main() {
 	// 获取参数
-	config := (&config.Config{}).Init()
+	config := (&configs.Config{}).Init()
 
 	//mssqlConn := (&MsSql{
 	//	Schema:   "sqlserver",
@@ -66,74 +65,74 @@ func main() {
 	//}).
 	//	InitDB() // 创建mssql链接
 
-	mySqlConn := (&database.MySql{}).GetMySqlConn()
+	mySqlConn := (&databases.MySql{}).GetMySqlConn()
 	errAutoMigrate := mySqlConn.
 		//Set("gorm:table_options", "ENGINE=Distributed(cluster, default, hits)").
 		Set("gorm:table_options", "ENGINE=InnoDB").
 		AutoMigrate(
-			// 用户
-			&model.AccountModel{},       // 用户主表
-			&model.AccountStatusModel{}, // 用户状态
-
-			// RBAC
-			&model.RbacRoleModel{},       // 角色
-			&model.RbacPermissionModel{}, // 权限
-
-			// 种类型
-			&model.KindCategoryModel{},   // 种类
-			&model.KindEntireTypeModel{}, // 类型
-			&model.KindSubTypeModel{},    // 型号
-
-			// 组织机构
-			&model.OrganizationRailwayModel{},            // 路局
-			&model.OrganizationParagraphModel{},          // 站段
-			&model.OrganizationWorkshopModel{},           // 车间
-			&model.OrganizationWorkshopTypeModel{},       // 车间类型
-			&model.OrganizationSectionModel{},            // 区间
-			&model.OrganizationRailroadGradeCrossModel{}, // 道口
-			&model.OrganizationWorkAreaModel{},           // 工区
-			&model.OrganizationStationModel{},            // 站场
-			&model.OrganizationLineModel{},               // 线别
-			&model.OrganizationCenterModel{},             // 中心
-
-			// 器材
-			&model.EntireInstanceModel{},        // 器材主表
-			&model.EntireInstanceStatusModel{},  // 器材状态
-			&model.EntireInstanceUseModel{},     // 器材使用数据
-			&model.EntireInstanceLogModel{},     // 器材日志
-			&model.EntireInstanceLogTypeModel{}, // 器材日志类型
-			&model.EntireInstanceRepairModel{},  // 器材检修记录
-
-			// 检修单
-			&model.FixWorkflowReportModel{}, // 检测单主表
-			//&model.FixWorkflowProcessModel{}, // 检测过程
-			//&model.FixWorkflowRecodeModel{},  // 实测值
-
-			// 仓库位置
-			&model.LocationWarehouseStorehouseModel{}, // 仓
-			&model.LocationWarehouseAreaModel{},       // 区
-			&model.LocationWarehousePlatoonModel{},    // 排
-			&model.LocationWarehouseShelfModel{},      // 柜架
-			&model.LocationWarehouseTierModel{},       // 层
-			&model.LocationWarehousePositionModel{},   // 位
-
-			// 上道位置
-			&model.LocationInstallRoomModel{},                      // 机房
-			&model.LocationInstallRoomTypeModel{},                  // 机房类型
-			&model.LocationInstallPlatoonModel{},                   // 排
-			&model.LocationInstallShelfModel{},                     // 柜架
-			&model.LocationInstallTierModel{},                      // 层
-			&model.LocationInstallPositionModel{},                  // 位
-			&model.LocationSignalPostMainOrIndicatorModel{},        // 信号机主体或表示器
-			&model.LocationSignalPostMainLightPositionModel{},      // 信号机主体灯位
-			&model.LocationSignalPostIndicatorLightPositionModel{}, // 信号机表示器灯位
-
-			// 供应商
-			&model.FactoryModel{}, // 供应商
-
-			// 来源
-			&model.SourceTypeModel{}, // 来源类型
-			&model.SourceNameModel{}, // 来源名称
+			//// 用户
+			//&models.AccountModel{},       // 用户主表
+			//&models.AccountStatusModel{}, // 用户状态
+			//
+			//// RBAC
+			//&models.RbacRoleModel{},       // 角色
+			//&models.RbacPermissionModel{}, // 权限
+			//
+			//// 种类型
+			//&models.KindCategoryModel{},   // 种类
+			//&models.KindEntireTypeModel{}, // 类型
+			//&models.KindSubTypeModel{},    // 型号
+			//
+			//// 组织机构
+			//&models.OrganizationRailwayModel{},            // 路局
+			//&models.OrganizationParagraphModel{},          // 站段
+			//&models.OrganizationWorkshopModel{},           // 车间
+			//&models.OrganizationWorkshopTypeModel{},       // 车间类型
+			//&models.OrganizationSectionModel{},            // 区间
+			//&models.OrganizationRailroadGradeCrossModel{}, // 道口
+			//&models.OrganizationWorkAreaModel{},           // 工区
+			//&models.OrganizationStationModel{},            // 站场
+			//&models.OrganizationLineModel{},               // 线别
+			//&models.OrganizationCenterModel{},             // 中心
+			//
+			//// 器材
+			//&models.EntireInstanceModel{},        // 器材主表
+			//&models.EntireInstanceStatusModel{},  // 器材状态
+			//&models.EntireInstanceUseModel{},     // 器材使用数据
+			//&models.EntireInstanceLogModel{},     // 器材日志
+			//&models.EntireInstanceLogTypeModel{}, // 器材日志类型
+			//&models.EntireInstanceRepairModel{},  // 器材检修记录
+			//
+			//// 检修单
+			//&models.FixWorkflowReportModel{}, // 检测单主表
+			////&models.FixWorkflowProcessModel{}, // 检测过程
+			////&models.FixWorkflowRecodeModel{},  // 实测值
+			//
+			//// 仓库位置
+			//&models.LocationWarehouseStorehouseModel{}, // 仓
+			//&models.LocationWarehouseAreaModel{},       // 区
+			//&models.LocationWarehousePlatoonModel{},    // 排
+			//&models.LocationWarehouseShelfModel{},      // 柜架
+			//&models.LocationWarehouseTierModel{},       // 层
+			//&models.LocationWarehousePositionModel{},   // 位
+			//
+			//// 上道位置
+			//&models.LocationInstallRoomModel{},                      // 机房
+			//&models.LocationInstallRoomTypeModel{},                  // 机房类型
+			//&models.LocationInstallPlatoonModel{},                   // 排
+			//&models.LocationInstallShelfModel{},                     // 柜架
+			//&models.LocationInstallTierModel{},                      // 层
+			//&models.LocationInstallPositionModel{},                  // 位
+			//&models.LocationSignalPostMainOrIndicatorModel{},        // 信号机主体或表示器
+			//&models.LocationSignalPostMainLightPositionModel{},      // 信号机主体灯位
+			//&models.LocationSignalPostIndicatorLightPositionModel{}, // 信号机表示器灯位
+			//
+			//// 供应商
+			//&models.FactoryModel{}, // 供应商
+			//
+			//// 来源
+			//&models.SourceTypeModel{}, // 来源类型
+			//&models.SourceNameModel{}, // 来源名称
 
 		)
 
@@ -144,7 +143,7 @@ func main() {
 
 	router := gin.Default()
 
-	router.Use(error.RecoverHandler)      // 异常处理
+	router.Use(errors.RecoverHandler)     // 异常处理
 	(&v1.V1Router{Router: router}).Load() // 加载v1路由
 
 	initServer(router, config.App.Section("app").Key("addr").MustString(":8080")) // 启动服务
