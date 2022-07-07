@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"fix-workshop-ue/databases"
 	"fix-workshop-ue/errors"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
@@ -22,84 +21,120 @@ func (cls *AccountStatusRouter) Load() {
 	)
 	{
 		// 新建用户状态
-		r.POST(
-			"",
-			func(ctx *gin.Context) {
-				// 表单验证
-				var form models.AccountStatusStoreForm
-				if err := ctx.ShouldBind(&form); err != nil {
-					panic(err)
-				}
+		r.POST("", func(ctx *gin.Context) {
+			// 表单验证
+			var form models.AccountStatusStoreForm
+			if err := ctx.ShouldBind(&form); err != nil {
+				panic(err)
+			}
 
-				// 重复验证
-				var repeat models.AccountStatusModel
-				var ret *gorm.DB
-				ret = (&models.BaseModel{
-					Wheres: map[string]interface{}{"unique_code": form.UniqueCode},
-				}).
-					Prepare().
-					First(&repeat)
-				tools.ThrowErrorWhenIsRepeatByDB(ret, "用户代码")
-				ret = (&models.BaseModel{
-					Wheres: map[string]interface{}{"name": form.Name},
-				}).
-					Prepare().
-					First(&repeat)
-				tools.ThrowErrorWhenIsRepeatByDB(ret, "用户状态名称")
+			// 重复验证
+			var repeat models.AccountStatusModel
+			var ret *gorm.DB
+			ret = (&models.BaseModel{}).
+				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
+				Prepare().
+				First(&repeat)
+			tools.ThrowErrorWhenIsRepeatByDB(ret, "用户代码")
+			ret = (&models.BaseModel{}).
+				SetWheres(tools.Map{"name": form.Name}).
+				Prepare().
+				First(&repeat)
+			tools.ThrowErrorWhenIsRepeatByDB(ret, "用户状态名称")
 
-				if ret := (&databases.MySql{}).GetMySqlConn().Create(&models.AccountStatusModel{
-					UniqueCode: form.UniqueCode,
-					Name:       form.Name,
-				});
-					ret.Error != nil {
-					panic(ret.Error)
-				}
-
-				ctx.JSON(tools.CorrectIns("").Created(nil))
-			},
-		)
-
-		// 用户状态详情
-		r.GET(
-			":unique_code",
-			func(ctx *gin.Context) {
-				uniqueCode := ctx.Param("unique_code")
-
-				var accountStatus models.AccountStatusModel
-				if ret := (&models.BaseModel{
-					Wheres: map[string]interface{}{"unique_code": uniqueCode},
-				}).
-					Prepare().
-					First(&accountStatus);
-					ret.Error != nil {
-					panic(errors.ThrowEmpty(""))
-				}
-
-				ctx.JSON(tools.CorrectIns("").OK(gin.H{"account_status": accountStatus}))
+			ret = (&models.BaseModel{}).DB().Create(&models.AccountStatusModel{
+				UniqueCode: form.UniqueCode,
+				Name:       form.Name,
 			})
+			if ret.Error != nil {
+				panic(ret.Error)
+			}
+
+			ctx.JSON(tools.CorrectIns("").Created(tools.Map{}))
+		})
+
+		// 删除用户状态
+		r.DELETE(":unique_code", func(ctx *gin.Context) {
+			// 查询
+			uniqueCode := ctx.Param("unique_code")
+			var accountStatus models.AccountStatusModel
+			var ret *gorm.DB
+			ret = (&models.BaseModel{}).
+				SetWheres(tools.Map{"unique_code": uniqueCode}).
+				Prepare().
+				First(&accountStatus)
+			tools.ThrowErrorWhenIsEmptyByDB(ret, "用户状态")
+
+			// 删除
+			(&models.BaseModel{}).DB().Delete(&accountStatus)
+
+			ctx.JSON(tools.CorrectIns("").Deleted())
+		})
+
+		// 修改用户状态
+		r.PUT(":unique_code", func(ctx *gin.Context) {
+			var ret *gorm.DB
+			uniqueCode := ctx.Param("unique_code")
+
+			// 表单
+			var form models.AccountStatusUpdateForm
+			if err := ctx.ShouldBind(&form); err != nil {
+				panic(err)
+			}
+
+			// 查重
+			var repeat models.AccountStatusModel
+			ret = (&models.BaseModel{}).
+				SetWheres(tools.Map{"name": form.Name}).
+				SetNotWheres(tools.Map{"unique_code": uniqueCode}).
+				Prepare().
+				First(&repeat)
+			tools.ThrowErrorWhenIsRepeatByDB(ret, "用户状态名称")
+
+			// 查询
+			var accountStatus models.AccountStatusModel
+			ret = (&models.BaseModel{}).
+				SetWheres(tools.Map{"unique_code": uniqueCode}).
+				Prepare().
+				First(&accountStatus)
+			tools.ThrowErrorWhenIsEmptyByDB(ret, "用户状态")
+
+			// 修改
+			accountStatus.Name = form.Name
+			ret = (&models.BaseModel{}).DB().Save(&accountStatus)
+			if ret.Error != nil {
+				panic(errors.ThrowForbidden(ret.Error.Error()))
+			}
+
+			ctx.JSON(tools.CorrectIns("").Updated(nil))
+		})
 
 		// 用户状态列表
-		r.GET(
-			"",
-			func(ctx *gin.Context) {
-				var accountStatuses []models.AccountStatusModel
+		r.GET("", func(ctx *gin.Context) {
+			var accountStatuses []models.AccountStatusModel
 
-				(&models.BaseModel{
-					Ctx: ctx,
-					WhereFields: []string{
-						"id",
-						"created_at",
-						"updated_at",
-						"deleted_at",
-						"unique_code",
-						"name",
-					},
-				}).
-					PrepareQuery().
-					Find(&accountStatuses)
+			(&models.BaseModel{}).
+				SetWhereFields(tools.Strings{"id", "created_at", "updated_at", "deleted_at", "unique_code", "name"}).
+				PrepareQuery(ctx).
+				Find(&accountStatuses)
 
-				ctx.JSON(tools.CorrectIns("").OK(gin.H{"account_statuses": accountStatuses}))
-			},
-		)
+			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"account_statuses": accountStatuses}))
+		})
+
+		// 用户状态详情
+		r.GET(":unique_code", func(ctx *gin.Context) {
+			uniqueCode := ctx.Param("unique_code")
+
+			var accountStatus models.AccountStatusModel
+			if ret := (&models.BaseModel{}).
+				SetWheres(tools.Map{"unique_code": uniqueCode}).
+				Prepare().
+				First(&accountStatus);
+				ret.Error != nil {
+				panic(errors.ThrowEmpty(""))
+			}
+
+			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"account_status": accountStatus}))
+		})
 	}
 }

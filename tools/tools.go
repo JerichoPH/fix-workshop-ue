@@ -6,6 +6,9 @@ import (
 	"strconv"
 )
 
+type Map map[string]interface{}
+type Strings []string
+
 // ThrowErrorWhenIsNotInt 文字转整型
 func ThrowErrorWhenIsNotInt(v string, errMsg string) (intValue int) {
 	intValue, err := strconv.Atoi(v)
@@ -24,13 +27,16 @@ func ThrowErrorWhenIsNotUint(v string, errMsg string) (uintValue uint) {
 
 // ThrowErrorWhenIsEmptyByDB 当数据库返回空则报错
 func ThrowErrorWhenIsEmptyByDB(db *gorm.DB, name string) bool {
-	switch db.Error.Error() {
-	case "record not found":
-		if name != "" {
-			panic(errors.ThrowEmpty(name + "不存在"))
-			return false
-		} else {
-			return false
+	if db.Error != nil {
+		switch db.Error.Error() {
+		default:
+		case "record not found":
+			if name != "" {
+				panic(errors.ThrowEmpty(name + "不存在"))
+				return false
+			} else {
+				return false
+			}
 		}
 	}
 	return true

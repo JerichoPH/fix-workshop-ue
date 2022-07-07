@@ -5,10 +5,8 @@ import (
 	"fix-workshop-ue/errors"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"reflect"
 )
 
 func CheckPermission() gin.HandlerFunc {
@@ -18,7 +16,6 @@ func CheckPermission() gin.HandlerFunc {
 		if !exists {
 			panic(errors.ThrowUnLogin("未登录"))
 		}
-		fmt.Println(reflect.TypeOf(currentAccount))
 
 		cfg := (&configs.Config{}).Init()
 
@@ -26,13 +23,12 @@ func CheckPermission() gin.HandlerFunc {
 			// 获取权限
 			var rbacPermission models.RbacPermissionModel
 			var ret *gorm.DB
-			ret = (&models.BaseModel{
-				Preloads: []string{"RbacRoles"},
-				Wheres: map[string]interface{}{
+			ret = (&models.BaseModel{}).
+				SetPreloads(tools.Strings{"RbacRoles"}).
+				SetWheres(tools.Map{
 					"uri":    ctx.FullPath(),
 					"method": ctx.Request.Method,
-				},
-			}).
+				}).
 				Prepare().
 				First(&rbacPermission)
 			tools.ThrowErrorWhenIsEmptyByDB(ret, "权限")

@@ -47,15 +47,13 @@ func (cls *AuthorizationRouter) Load() {
 			// 检查重复项（用户名）
 			var repeat models.AccountModel
 			var ret *gorm.DB
-			ret = (&models.BaseModel{
-				Wheres: map[string]interface{}{"username": authorizationRegisterForm.Username},
-			}).
+			ret = (&models.BaseModel{}).
+				SetWheres(tools.Map{"username": authorizationRegisterForm.Username}).
 				Prepare().
 				First(&repeat)
 			tools.ThrowErrorWhenIsRepeatByDB(ret, "用户名")
-			ret = (&models.BaseModel{
-				Wheres: map[string]interface{}{"nickname": authorizationRegisterForm.Nickname},
-			}).
+			ret = (&models.BaseModel{}).
+				SetWheres(tools.Map{"nickname": authorizationRegisterForm.Nickname}).
 				Prepare().
 				First(&repeat)
 			tools.ThrowErrorWhenIsRepeatByDB(ret, "昵称")
@@ -81,24 +79,23 @@ func (cls *AuthorizationRouter) Load() {
 		// 登录
 		r.POST("/login", func(ctx *gin.Context) {
 			// 表单验证
-			var authorizationLoginForm AuthorizationLoginForm
-			if err := ctx.ShouldBind(&authorizationLoginForm); err != nil {
+			var form AuthorizationLoginForm
+			if err := ctx.ShouldBind(&form); err != nil {
 				panic(err)
 			}
 
 			// 获取用户
 			var account models.AccountModel
 			var ret *gorm.DB
-			ret = (&models.BaseModel{
-				Preloads: []string{clause.Associations},
-				Wheres:   map[string]interface{}{"username": authorizationLoginForm.Username},
-			}).
+			ret = (&models.BaseModel{}).
+				SetPreloads(tools.Strings{clause.Associations}).
+				SetWheres(tools.Map{"username": form.Username}).
 				Prepare().
 				First(&account)
 			tools.ThrowErrorWhenIsEmptyByDB(ret, "用户")
 
 			// 验证密码
-			if err := bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(authorizationLoginForm.Password)); err != nil {
+			if err := bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(form.Password)); err != nil {
 				panic(errors.ThrowUnAuthorization("账号或密码错误"))
 			}
 

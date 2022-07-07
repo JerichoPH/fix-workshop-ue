@@ -46,9 +46,8 @@ func CheckJWT() gin.HandlerFunc {
 					// 获取用户信息
 					var account = make(map[string]interface{})
 					var ret *gorm.DB
-					ret = (&models.BaseModel{
-						Wheres: map[string]interface{}{"uuid": claims.UUID},
-					}).
+					ret = (&models.BaseModel{}).
+						SetWheres(tools.Map{"uuid": claims.UUID}).
 						Prepare().
 						First(&account)
 					tools.ThrowErrorWhenIsEmptyByDB(ret, "用户")
