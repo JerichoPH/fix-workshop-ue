@@ -1,4 +1,0 @@
-GET http://localhost:8080/api/v1/organizationLine/E0001
-Accept: application/json
-
-### 线别详情

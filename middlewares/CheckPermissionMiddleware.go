@@ -25,7 +25,7 @@ func CheckPermission() gin.HandlerFunc {
 			var ret *gorm.DB
 			ret = (&models.BaseModel{}).
 				SetPreloads(tools.Strings{"RbacRoles"}).
-				SetWheres(tools.Map{
+				SetWheresMap(tools.Map{
 					"uri":    ctx.FullPath(),
 					"method": ctx.Request.Method,
 				}).

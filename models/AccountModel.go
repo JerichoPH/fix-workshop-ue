@@ -18,20 +18,13 @@ type AccountModel struct {
 	RbacRoles               []*RbacRoleModel       `gorm:"many2many:pivot_rbac_role_and_accounts;foreignKey:id;joinForeignKey:account_id;References:id;joinReferences:rbac_role_id;COMMENT:角色与用户多对多;" json:"rbac_roles"`
 }
 
-// AccountUpdateForm 用户编辑表单
-type AccountUpdateForm struct {
-	Username                string `form:"username" json:"string" uri:"username"`
-	Nickname                string `form:"nickname" json:"nickname" uri:"nickname"`
-	AccountStatusUniqueCode string `form:"account_status_unique_code" json:"account_status_unique_code" uri:"account_status_unique_code"`
-}
-
 // TableName 表名称
 func (cls *AccountModel) TableName() string {
 	return "accounts"
 }
 
-// BeforeCreate 自动生成UniqueCode
-func (cls *AccountModel) BeforeCreate(tx *gorm.DB) (err error) {
+// BeforeCreate 插入数据前
+func (cls *AccountModel) BeforeCreate(db *gorm.DB) (err error) {
 	cls.UUID = uuid.NewV4().String()
 	return
 }

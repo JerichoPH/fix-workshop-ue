@@ -7,11 +7,9 @@ require (
 	github.com/gin-gonic/gin v1.7.7
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.6 // indirect
-	github.com/jinzhu/gorm v1.9.16 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
-	github.com/maxwellhertz/gin-casbin v1.0.0
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/stretchr/testify v1.7.1-0.20210427113832-6241f9ab9942 // indirect

@@ -1,4 +1,0 @@
-GET http://localhost:8080/api/v1/organizationSection/H07675
-Accept: application/json
-
-### 区间详情

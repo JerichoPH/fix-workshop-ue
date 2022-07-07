@@ -1,4 +1,0 @@
-GET http://localhost:8080/api/v1/organizationWorkArea/B048D001
-Accept: application/json
-
-### 工区详情

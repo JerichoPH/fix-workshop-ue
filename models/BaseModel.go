@@ -32,7 +32,7 @@ func (cls *BaseModel) demoFindOne() {
 	var b BaseModel
 	ret := cls.
 		SetModel(BaseModel{}).
-		SetWheres(tools.Map{}).
+		SetWheresMap(tools.Map{}).
 		SetNotWheres(tools.Map{}).
 		Prepare().
 		First(b)
@@ -98,8 +98,8 @@ func (cls *BaseModel) SetIgnoreFields(ignoreFields []string) *BaseModel {
 	return cls
 }
 
-// SetWheres 设置Wheres
-func (cls *BaseModel) SetWheres(wheres map[string]interface{}) *BaseModel {
+// SetWheresMap 通过Map设置Wheres
+func (cls *BaseModel) SetWheresMap(wheres map[string]interface{}) *BaseModel {
 	cls.wheres = wheres
 	return cls
 }
@@ -111,14 +111,14 @@ func (cls *BaseModel) SetNotWheres(notWheres map[string]interface{}) *BaseModel 
 }
 
 // BeforeCreate 插入数据前
-func (cls *BaseModel) BeforeCreate(tx *gorm.DB) (err error) {
+func (cls *BaseModel) BeforeCreate(db *gorm.DB) (err error) {
 	cls.CreatedAt = time.Now()
 	cls.UpdatedAt = time.Now()
 	return
 }
 
 // BeforeSave 修改数据前
-func (cls *BaseModel) BeforeSave(tx *gorm.DB) (err error) {
+func (cls *BaseModel) BeforeSave(db *gorm.DB) (err error) {
 	cls.UpdatedAt = time.Now()
 	return
 }
@@ -192,18 +192,18 @@ func (cls *BaseModel) PrepareQuery(ctx *gin.Context) *gorm.DB {
 	dbSession = dbSession.Where(wheres).Not(notWheres)
 
 	// 排序
-	if order, ok := ctx.GetQuery("order"); ok {
+	if order, ok := ctx.GetQuery("__order__"); ok {
 		dbSession.Order(order)
 	}
 
 	// offset
-	if offset, ok := ctx.GetQuery("offset"); ok {
+	if offset, ok := ctx.GetQuery("__offset__"); ok {
 		offset := tools.ThrowErrorWhenIsNotInt(offset, "offset参数只能填写整数")
 		dbSession.Offset(offset)
 	}
 
 	// limit
-	if limit, ok := ctx.GetQuery("limit"); ok {
+	if limit, ok := ctx.GetQuery("__limit__"); ok {
 		limit := tools.ThrowErrorWhenIsNotInt(limit, "limit参数只能填写整数")
 		dbSession.Limit(limit)
 	}

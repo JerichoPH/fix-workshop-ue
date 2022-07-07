@@ -25,8 +25,7 @@ type AuthorizationLoginForm struct {
 	Password string `form:"password" binding:"required"`
 }
 
-type AuthorizationRouter struct {
-}
+type AuthorizationRouter struct{}
 
 func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 	r := router.Group("/api/v1/authorization")
@@ -47,12 +46,12 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 			var repeat models.AccountModel
 			var ret *gorm.DB
 			ret = (&models.BaseModel{}).
-				SetWheres(tools.Map{"username": authorizationRegisterForm.Username}).
+				SetWheresMap(tools.Map{"username": authorizationRegisterForm.Username}).
 				Prepare().
 				First(&repeat)
 			tools.ThrowErrorWhenIsRepeatByDB(ret, "用户名")
 			ret = (&models.BaseModel{}).
-				SetWheres(tools.Map{"nickname": authorizationRegisterForm.Nickname}).
+				SetWheresMap(tools.Map{"nickname": authorizationRegisterForm.Nickname}).
 				Prepare().
 				First(&repeat)
 			tools.ThrowErrorWhenIsRepeatByDB(ret, "昵称")
@@ -88,7 +87,7 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 			var ret *gorm.DB
 			ret = (&models.BaseModel{}).
 				SetPreloads(tools.Strings{clause.Associations}).
-				SetWheres(tools.Map{"username": form.Username}).
+				SetWheresMap(tools.Map{"username": form.Username}).
 				Prepare().
 				First(&account)
 			tools.ThrowErrorWhenIsEmptyByDB(ret, "用户")

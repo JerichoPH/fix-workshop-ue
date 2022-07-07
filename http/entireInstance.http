@@ -1,4 +1,0 @@
-GET http://localhost:8080/api/v1/entireInstance/Q010101B0481234567H
-Accept: application/json
-
-### 器材详情

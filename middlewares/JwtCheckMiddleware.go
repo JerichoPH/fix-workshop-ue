@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-func CheckJWT() gin.HandlerFunc {
+func CheckJwt() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var account map[string]interface{}
 
@@ -47,7 +47,7 @@ func CheckJWT() gin.HandlerFunc {
 					var account = make(map[string]interface{})
 					var ret *gorm.DB
 					ret = (&models.BaseModel{}).
-						SetWheres(tools.Map{"uuid": claims.UUID}).
+						SetWheresMap(tools.Map{"uuid": claims.UUID}).
 						Prepare().
 						First(&account)
 					tools.ThrowErrorWhenIsEmptyByDB(ret, "用户")

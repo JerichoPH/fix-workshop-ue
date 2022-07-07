@@ -9,13 +9,27 @@ import (
 	"gorm.io/gorm"
 )
 
-type RbacRoleRouter struct {
+type RbacRoleRouter struct{}
+
+// RbacRoleStoreForm 创建角色表单
+type RbacRoleStoreForm struct {
+	Name string `form:"name" json:"name"`
+}
+
+// RbacRoleUpdateForm 编辑角色表单
+type RbacRoleUpdateForm struct {
+	Name string `form:"name" json:"name"`
+}
+
+// RbacRoleBindAccountsForm 角色绑定用户表单
+type RbacRoleBindAccountsForm struct {
+	AccountUUIDs []string `form:"account_uuids[]" json:"account_uuids[]"`
 }
 
 func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 	r := router.Group(
 		"/api/v1/rbacRole",
-		middlewares.CheckJWT(),
+		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),
 	)
 	{
@@ -24,16 +38,16 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 			var ret *gorm.DB
 
 			// 表单
-			var form models.RbacRoleStoreForm
+			var form RbacRoleStoreForm
 			if err := ctx.ShouldBind(&form); err != nil {
 				panic(err)
 			}
 
 			// 查重
-			var repeat models.RbacRoleStoreForm
+			var repeat RbacRoleStoreForm
 			ret = (&models.BaseModel{}).
 				SetModel(models.RbacRoleModel{}).
-				SetWheres(tools.Map{"name": form.Name}).
+				SetWheresMap(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
 			tools.ThrowErrorWhenIsRepeatByDB(ret, "角色名称")
@@ -49,17 +63,104 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 	}
 
 	// 编辑角色
-	r.POST(":id", func(ctx *gin.Context) {
+	r.PUT(":id", func(ctx *gin.Context) {
 		var ret *gorm.DB
-		id:=tools.ThrowErrorWhenIsNotInt(ctx.Param("id"))
+		id := tools.ThrowErrorWhenIsNotInt(ctx.Param("id"), "角色编号必须是数字")
 
 		// 表单
-		var form models.RbacRoleStoreForm
+		var form RbacRoleUpdateForm
+		if err := ctx.ShouldBind(&form); err != nil {
+			panic(err)
+		}
+
+		// 查重
+		var repeat models.RbacRoleModel
+		ret = (&models.BaseModel{}).
+			SetModel(models.RbacRoleModel{}).
+			SetWheresMap(tools.Map{"name": form.Name}).
+			SetNotWheres(tools.Map{"id": id}).
+			Prepare().
+			First(&repeat)
+		tools.ThrowErrorWhenIsRepeatByDB(ret, "角色名称")
+
+		// 查询
+		var rbacRole models.RbacRoleModel
+		ret = (&models.BaseModel{}).
+			SetModel(models.RbacRoleModel{}).
+			SetWheresMap(tools.Map{"id": id}).
+			Prepare().
+			First(&rbacRole)
+		tools.ThrowErrorWhenIsEmptyByDB(ret, "角色")
+
+		// 修改
+		if form.Name != "" {
+			rbacRole.Name = form.Name
+		}
+		(&models.BaseModel{}).SetModel(models.RbacRoleModel{}).DB().Save(&rbacRole)
+
+		ctx.JSON(tools.CorrectIns("").Updated(tools.Map{}))
+	})
+
+	// 绑定用户
+	r.PUT(":id/bindAccounts", func(ctx *gin.Context) {
+		var ret *gorm.DB
+		id := tools.ThrowErrorWhenIsNotInt(ctx.Param("id"), "角色编号必须是数字")
+
+		// 表单
+		var rbacRoleBindAccountsForm RbacRoleBindAccountsForm
+		if err := ctx.ShouldBind(&rbacRoleBindAccountsForm); err != nil {
+			panic(err)
+		}
+
+		// 获取角色
+		var rbacRole models.RbacRoleModel
+		ret = (&models.BaseModel{}).
+			SetModel(models.RbacRoleModel{}).
+			SetWheresMap(tools.Map{"id": id}).
+			Prepare().
+			First(&rbacRole)
+		tools.ThrowErrorWhenIsEmptyByDB(ret, "角色")
+
+		// 获取用户
+		var accounts []*models.AccountModel
+		ret = (&models.BaseModel{}).
+			SetModel(models.AccountModel{}).
+			Prepare().
+			Where("uuid in ?", rbacRoleBindAccountsForm.AccountUUIDs).
+			Find(&accounts)
+		if len(accounts) == 0 {
+			panic(errors.ThrowEmpty("用户不存在"))
+		}
+
+		// 添加绑定关系
+		rbacRole.Accounts = accounts
+		(&models.BaseModel{}).
+			SetModel(models.RbacRoleModel{}).
+			DB().
+			Save(&rbacRole)
+
+		ctx.JSON(tools.CorrectIns("绑定成功").Updated(tools.Map{}))
+	})
+
+	// 角色详情
+	r.GET(":id", func(ctx *gin.Context) {
+		var ret *gorm.DB
+		var rbacRole models.RbacRoleModel
+		id := tools.ThrowErrorWhenIsNotInt(ctx.Param("id"), "角色编号必须是数字")
+
+		ret = (&models.BaseModel{}).
+			SetModel(models.RbacRoleModel{}).
+			SetWheresMap(tools.Map{"id": id}).
+			Prepare().
+			First(&rbacRole)
+		tools.ThrowErrorWhenIsEmptyByDB(ret, "角色")
+
+		ctx.JSON(tools.CorrectIns("").OK(tools.Map{"rbac_role": rbacRole}))
 	})
 
 	// 角色列表
 	r.GET("", func(ctx *gin.Context) {
-		var rbacRoles models.RbacRoleModel
+		var rbacRoles []models.RbacRoleModel
 		(&models.BaseModel{}).
 			SetModel(models.RbacRoleModel{}).
 			PrepareQuery(ctx).

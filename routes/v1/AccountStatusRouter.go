@@ -9,20 +9,30 @@ import (
 	"gorm.io/gorm"
 )
 
-type AccountStatusRouter struct {
+type AccountStatusRouter struct{}
+
+// AccountStatusStoreForm 用户状态创建表单
+type AccountStatusStoreForm struct {
+	UniqueCode string `form:"unique_code" json:"unique_code" uri:"unique_code"`
+	Name       string `form:"name" json:"name" uri:"name"`
+}
+
+// AccountStatusUpdateForm 用户状态编辑表单
+type AccountStatusUpdateForm struct {
+	Name string `form:"name" json:"name" uri:"name"`
 }
 
 func (cls *AccountStatusRouter) Load(router *gin.Engine) {
 	r := router.Group(
 		"/api/v1/accountStatus",
-		middlewares.CheckJWT(),
+		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),
 	)
 	{
 		// 新建用户状态
 		r.POST("", func(ctx *gin.Context) {
 			// 表单验证
-			var form models.AccountStatusStoreForm
+			var form AccountStatusStoreForm
 			if err := ctx.ShouldBind(&form); err != nil {
 				panic(err)
 			}
@@ -31,12 +41,12 @@ func (cls *AccountStatusRouter) Load(router *gin.Engine) {
 			var repeat models.AccountStatusModel
 			var ret *gorm.DB
 			ret = (&models.BaseModel{}).
-				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
+				SetWheresMap(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
 				First(&repeat)
 			tools.ThrowErrorWhenIsRepeatByDB(ret, "用户代码")
 			ret = (&models.BaseModel{}).
-				SetWheres(tools.Map{"name": form.Name}).
+				SetWheresMap(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
 			tools.ThrowErrorWhenIsRepeatByDB(ret, "用户状态名称")
@@ -59,7 +69,7 @@ func (cls *AccountStatusRouter) Load(router *gin.Engine) {
 			var accountStatus models.AccountStatusModel
 			var ret *gorm.DB
 			ret = (&models.BaseModel{}).
-				SetWheres(tools.Map{"unique_code": uniqueCode}).
+				SetWheresMap(tools.Map{"unique_code": uniqueCode}).
 				Prepare().
 				First(&accountStatus)
 			tools.ThrowErrorWhenIsEmptyByDB(ret, "用户状态")
@@ -76,7 +86,7 @@ func (cls *AccountStatusRouter) Load(router *gin.Engine) {
 			uniqueCode := ctx.Param("unique_code")
 
 			// 表单
-			var form models.AccountStatusUpdateForm
+			var form AccountStatusUpdateForm
 			if err := ctx.ShouldBind(&form); err != nil {
 				panic(err)
 			}
@@ -84,7 +94,7 @@ func (cls *AccountStatusRouter) Load(router *gin.Engine) {
 			// 查重
 			var repeat models.AccountStatusModel
 			ret = (&models.BaseModel{}).
-				SetWheres(tools.Map{"name": form.Name}).
+				SetWheresMap(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"unique_code": uniqueCode}).
 				Prepare().
 				First(&repeat)
@@ -93,7 +103,7 @@ func (cls *AccountStatusRouter) Load(router *gin.Engine) {
 			// 查询
 			var accountStatus models.AccountStatusModel
 			ret = (&models.BaseModel{}).
-				SetWheres(tools.Map{"unique_code": uniqueCode}).
+				SetWheresMap(tools.Map{"unique_code": uniqueCode}).
 				Prepare().
 				First(&accountStatus)
 			tools.ThrowErrorWhenIsEmptyByDB(ret, "用户状态")
@@ -126,7 +136,7 @@ func (cls *AccountStatusRouter) Load(router *gin.Engine) {
 
 			var accountStatus models.AccountStatusModel
 			if ret := (&models.BaseModel{}).
-				SetWheres(tools.Map{"unique_code": uniqueCode}).
+				SetWheresMap(tools.Map{"unique_code": uniqueCode}).
 				Prepare().
 				First(&accountStatus);
 				ret.Error != nil {

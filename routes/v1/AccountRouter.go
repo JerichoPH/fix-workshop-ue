@@ -4,29 +4,34 @@ import (
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
-type AccountRouter struct {
+type AccountRouter struct{}
+
+// AccountUpdateForm 用户编辑表单
+type AccountUpdateForm struct {
+	Username                string `form:"username" json:"string" uri:"username"`
+	Nickname                string `form:"nickname" json:"nickname" uri:"nickname"`
+	AccountStatusUniqueCode string `form:"account_status_unique_code" json:"account_status_unique_code" uri:"account_status_unique_code"`
 }
 
 // Load 加载路由
 func (cls *AccountRouter) Load(router *gin.Engine) {
 	r := router.Group(
 		"/api/v1/account",
-		middlewares.CheckJWT(),
+		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),
 	)
 	{
-		// 修改用户
+		// 编辑用户
 		r.PUT(":uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
 			uuid := ctx.Param("uuid")
 
 			// 表单
-			var form models.AccountUpdateForm
+			var form AccountUpdateForm
 			if err := ctx.ShouldBind(&form); err != nil {
 				panic(err)
 			}
@@ -35,30 +40,29 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 			var repeat models.AccountModel
 			ret = (&models.BaseModel{}).
 				SetModel(models.AccountModel{}).
-				SetWheres(tools.Map{"username": form.Username}).
+				SetWheresMap(tools.Map{"username": form.Username}).
 				SetNotWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&repeat)
 			tools.ThrowErrorWhenIsRepeatByDB(ret, "用户账号")
 			ret = (&models.BaseModel{}).
 				SetModel(models.AccountModel{}).
-				SetWheres(tools.Map{"nickname": form.Nickname}).
+				SetWheresMap(tools.Map{"nickname": form.Nickname}).
 				SetNotWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowErrorWhenIsRepeatByDB(ret, "用户账号")
+			tools.ThrowErrorWhenIsRepeatByDB(ret, "用户昵称")
 
 			// 查询
 			var account models.AccountModel
 			ret = (&models.BaseModel{}).
 				SetModel(models.AccountModel{}).
-				SetWheres(tools.Map{"uuid": uuid}).
+				SetWheresMap(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&account)
 			tools.ThrowErrorWhenIsEmptyByDB(ret, "用户")
 
-			// 修改
-			fmt.Println(form)
+			// 编辑
 			if form.Username != "" {
 				account.Username = form.Username
 			}
@@ -74,6 +78,23 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{}))
 		})
 
+		// 用户详情
+		r.GET(":uuid", func(ctx *gin.Context) {
+			uuid := ctx.Param("uuid")
+
+			var account models.AccountModel
+			var ret *gorm.DB
+			ret = (&models.BaseModel{}).
+				SetModel(models.AccountModel{}).
+				SetPreloads(tools.Strings{"AccountStatus"}).
+				SetWheresMap(tools.Map{"uuid": uuid}).
+				Prepare().
+				First(&account)
+			tools.ThrowErrorWhenIsEmptyByDB(ret, "用户")
+
+			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"account": account}))
+		})
+
 		// 用户列表
 		r.GET("", func(ctx *gin.Context) {
 			var accounts models.AccountModel
@@ -84,23 +105,6 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 				Find(&accounts)
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"accounts": accounts}))
-		})
-
-		// 用户详情
-		r.GET(":uuid", func(ctx *gin.Context) {
-			uuid := ctx.Param("uuid")
-
-			var account models.AccountModel
-			var ret *gorm.DB
-			ret = (&models.BaseModel{}).
-				SetModel(models.AccountModel{}).
-				SetPreloads(tools.Strings{"AccountStatus"}).
-				SetWheres(tools.Map{"uuid": uuid}).
-				Prepare().
-				First(&account)
-			tools.ThrowErrorWhenIsEmptyByDB(ret, "用户")
-
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"account": account}))
 		})
 	}
 }
