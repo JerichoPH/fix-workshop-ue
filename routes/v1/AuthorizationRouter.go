@@ -26,11 +26,10 @@ type AuthorizationLoginForm struct {
 }
 
 type AuthorizationRouter struct {
-	Router *gin.Engine
 }
 
-func (cls *AuthorizationRouter) Load() {
-	r := cls.Router.Group("/api/v1/authorization")
+func (cls *AuthorizationRouter) Load(router *gin.Engine) {
+	r := router.Group("/api/v1/authorization")
 	{
 		// 注册
 		r.POST("/register", func(ctx *gin.Context) {

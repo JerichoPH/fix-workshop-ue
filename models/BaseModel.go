@@ -124,42 +124,42 @@ func (cls *BaseModel) BeforeSave(tx *gorm.DB) (err error) {
 }
 
 // DB 获取对象
-func (cls *BaseModel) DB() (tx *gorm.DB) {
-	tx = (&databases.MySql{}).GetMySqlConn()
+func (cls *BaseModel) DB() (dbSession *gorm.DB) {
+	dbSession = (&databases.MySql{}).GetMySqlConn()
 	return
 }
 
 // Prepare 初始化
-func (cls *BaseModel) Prepare() (tx *gorm.DB) {
-	tx = (&databases.MySql{}).GetMySqlConn().Where(cls.wheres).Not(cls.notWheres)
+func (cls *BaseModel) Prepare() (dbSession *gorm.DB) {
+	dbSession = (&databases.MySql{}).GetMySqlConn().Where(cls.wheres).Not(cls.notWheres)
 
 	if cls.model != nil {
-		tx = tx.Model(&cls.model)
+		dbSession = dbSession.Model(&cls.model)
 	}
 
 	// 拼接preloads关系
 	if cls.preloads != nil && len(cls.preloads) > 0 {
 		for _, v := range cls.preloads {
-			tx = tx.Preload(v)
+			dbSession = dbSession.Preload(v)
 		}
 	}
 
 	// 拼接selects字段
 	if cls.selects != nil && len(cls.selects) > 0 {
-		tx = tx.Select(cls.selects)
+		dbSession = dbSession.Select(cls.selects)
 	}
 
 	// 拼接omits字段
 	if cls.omits != nil && len(cls.omits) > 0 {
-		tx = tx.Omit(cls.omits...)
+		dbSession = dbSession.Omit(cls.omits...)
 	}
 
-	return tx
+	return dbSession
 }
 
 // PrepareQuery 根据Query参数初始化
 func (cls *BaseModel) PrepareQuery(ctx *gin.Context) *gorm.DB {
-	tx := cls.Prepare()
+	dbSession := cls.Prepare()
 
 	wheres := make(map[string]interface{})
 	notWheres := make(map[string]interface{})
@@ -189,24 +189,24 @@ func (cls *BaseModel) PrepareQuery(ctx *gin.Context) *gorm.DB {
 			}
 		}
 	}
-	tx = tx.Where(wheres).Not(notWheres)
+	dbSession = dbSession.Where(wheres).Not(notWheres)
 
 	// 排序
 	if order, ok := ctx.GetQuery("order"); ok {
-		tx.Order(order)
+		dbSession.Order(order)
 	}
 
 	// offset
 	if offset, ok := ctx.GetQuery("offset"); ok {
 		offset := tools.ThrowErrorWhenIsNotInt(offset, "offset参数只能填写整数")
-		tx.Offset(offset)
+		dbSession.Offset(offset)
 	}
 
 	// limit
 	if limit, ok := ctx.GetQuery("limit"); ok {
 		limit := tools.ThrowErrorWhenIsNotInt(limit, "limit参数只能填写整数")
-		tx.Limit(limit)
+		dbSession.Limit(limit)
 	}
 
-	return tx
+	return dbSession
 }

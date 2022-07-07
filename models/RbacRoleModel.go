@@ -8,6 +8,11 @@ type RbacRoleModel struct {
 	Accounts        []*AccountModel        `gorm:"many2many:pivot_rbac_role_and_accounts;foreignKey:id;joinForeignKey:rbac_role_id;References:id;joinReferences:account_id;COMMENT:角色与用户多对多;" json:"accounts"`
 }
 
+// RbacRoleStoreForm 角色绑定
+type RbacRoleStoreForm struct {
+	Name string `form:"name" json:"name"`
+}
+
 // TableName 表名称
 func (cls RbacRoleModel) TableName() string {
 	return "rbac_roles"

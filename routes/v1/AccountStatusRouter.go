@@ -10,11 +10,10 @@ import (
 )
 
 type AccountStatusRouter struct {
-	Router *gin.Engine
 }
 
-func (cls *AccountStatusRouter) Load() {
-	r := cls.Router.Group(
+func (cls *AccountStatusRouter) Load(router *gin.Engine) {
+	r := router.Group(
 		"/api/v1/accountStatus",
 		middlewares.CheckJWT(),
 		middlewares.CheckPermission(),

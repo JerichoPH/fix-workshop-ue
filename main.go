@@ -86,11 +86,10 @@ func main() {
 	router := gin.Default()
 	router.Use(errors.RecoverHandler) // 异常处理
 
-	(&v1.AuthorizationRouter{Router: router}).Load() // 权鉴
-	(&v1.AccountRouter{Router: router}).Load()       // 用户                                                                                                                                                          // 用户
-	(&v1.AccountStatusRouter{Router: router}).Load() // 用户状态
-
-	//(&v1.V1Router{Router: router}).Load() // 加载v1路由
+	(&v1.AuthorizationRouter{}).Load(router) // 权鉴
+	(&v1.AccountRouter{}).Load(router)       // 用户                                                                                                                                                          // 用户
+	(&v1.AccountStatusRouter{}).Load(router) // 用户状态
+	(&v1.RbacRoleRouter{}).Load(router)      // 角色
 
 	initServer(router, config.App.Section("app").Key("addr").MustString(":8080")) // 启动服务
 }

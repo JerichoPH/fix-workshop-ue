@@ -10,12 +10,11 @@ import (
 )
 
 type AccountRouter struct {
-	Router *gin.Engine
 }
 
 // Load 加载路由
-func (cls *AccountRouter) Load() {
-	r := cls.Router.Group(
+func (cls *AccountRouter) Load(router *gin.Engine) {
+	r := router.Group(
 		"/api/v1/account",
 		middlewares.CheckJWT(),
 		middlewares.CheckPermission(),
