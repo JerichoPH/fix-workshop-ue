@@ -4,6 +4,7 @@ import (
 	"context"
 	"fix-workshop-ue/configs"
 	"fix-workshop-ue/databases"
+	"fix-workshop-ue/models"
 	v1 "fix-workshop-ue/routes/v1"
 	"fmt"
 	"log"
@@ -70,13 +71,13 @@ func main() {
 		//Set("gorm:table_options", "ENGINE=Distributed(cluster, default, hits)").
 		Set("gorm:table_options", "ENGINE=InnoDB").
 		AutoMigrate(
-			//// 用户
-			//&models.AccountModel{},       // 用户主表
-			//&models.AccountStatusModel{}, // 用户状态
-			//
-			//// RBAC
-			//&models.RbacRoleModel{},       // 角色
-			//&models.RbacPermissionModel{}, // 权限
+			// 用户
+			&models.AccountModel{},       // 用户主表
+			&models.AccountStatusModel{}, // 用户状态
+
+			// RBAC
+			&models.RbacRoleModel{},       // 角色
+			&models.RbacPermissionModel{}, // 权限
 			//
 			//// 种类型
 			//&models.KindCategoryModel{},   // 种类
