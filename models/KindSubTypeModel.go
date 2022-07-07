@@ -15,12 +15,3 @@ type KindSubTypeModel struct {
 func (cls *KindSubTypeModel) TableName() string {
 	return "kind_sub_types"
 }
-
-// FindOneByUniqueCode 根据unique_code获取单条数据
-func (cls *KindSubTypeModel) FindOneByUniqueCode(uniqueCode string) (kindSubModel KindSubTypeModel) {
-	cls.Preare().
-		Where(map[string]interface{}{"unique_code": uniqueCode}).
-		First(&kindSubModel)
-
-	return
-}

@@ -16,12 +16,3 @@ type OrganizationParagraphModel struct {
 func (cls *OrganizationParagraphModel) TableName() string {
 	return "organization_paragraphs"
 }
-
-// FindOneByUniqueCode 根据unique_code获取单条数据
-func (cls *OrganizationParagraphModel) FindOneByUniqueCode(uniqueCode string) (organizationParagraph OrganizationParagraphModel) {
-	cls.Preare().
-		Where(map[string]interface{}{"unique_code": uniqueCode}).
-		Find(&organizationParagraph)
-
-	return
-}

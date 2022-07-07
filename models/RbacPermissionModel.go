@@ -12,9 +12,3 @@ type RbacPermissionModel struct {
 func (cls RbacPermissionModel) TableName() string {
 	return "rbac_permissions"
 }
-
-// FindOneByURI 根据uri和method获取一条数据
-func (cls *RbacPermissionModel) FindOneByURIAndMethod(uri string, method string) (rbacPermissionModel RbacPermissionModel) {
-	cls.BaseModel.Preare().Where(map[string]interface{}{"uri": uri, "method": method}).First(&rbacPermissionModel)
-	return
-}

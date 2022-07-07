@@ -13,10 +13,3 @@ type OrganizationWorkshopTypeModel struct {
 func (cls *OrganizationWorkshopTypeModel) TableName() string {
 	return "organization_workshop_types"
 }
-
-// FindOneByUniqueCode 根据unique_code获取单条数据
-func (cls *OrganizationWorkshopTypeModel) FindOneByUniqueCode(uniqueCode string) (organizationWorkshopType OrganizationWorkshopTypeModel) {
-	cls.Preare().Where(map[string]interface{}{"unique_code": uniqueCode}).First(&organizationWorkshopType)
-
-	return
-}

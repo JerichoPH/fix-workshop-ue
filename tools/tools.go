@@ -2,8 +2,7 @@ package tools
 
 import (
 	"fix-workshop-ue/errors"
-	"fmt"
-	"reflect"
+	"gorm.io/gorm"
 	"strconv"
 )
 
@@ -23,24 +22,29 @@ func ThrowErrorWhenIsNotUint(v string, errMsg string) (uintValue uint) {
 	return
 }
 
-// ThrowErrorWhenIsEmpty 判断是否为空
-func ThrowErrorWhenIsEmpty(ins interface{}, class interface{}, name string) (isEmpty bool) {
-	isEmpty = reflect.DeepEqual(ins, class)
-
-	if name != "" && isEmpty {
-		panic(errors.ThrowEmpty(fmt.Sprintf("%v不存在", name)))
+// ThrowErrorWhenIsEmptyByDB 当数据库返回空则报错
+func ThrowErrorWhenIsEmptyByDB(db *gorm.DB, name string) bool {
+	switch db.Error.Error() {
+	case "record not found":
+		if name != "" {
+			panic(errors.ThrowEmpty(name + "不存在"))
+			return false
+		} else {
+			return false
+		}
 	}
-
-	return
+	return true
 }
 
-// ThrowErrorWhenIsRepeat 判断是否重复
-func ThrowErrorWhenIsRepeat(ins interface{}, class interface{}, name string) (isRepeat bool) {
-	isRepeat = !reflect.DeepEqual(ins, class)
-
-	if name != "" && isRepeat {
-		panic(errors.ThrowForbidden(fmt.Sprintf("%v重复", name)))
+// ThrowErrorWhenIsRepeatByDB 当数据库返回不空则报错
+func ThrowErrorWhenIsRepeatByDB(db *gorm.DB, name string) bool {
+	if db.Error == nil {
+		if name != "" {
+			panic(errors.ThrowForbidden(name + "重复"))
+			return false
+		} else {
+			return false
+		}
 	}
-
-	return
+	return true
 }

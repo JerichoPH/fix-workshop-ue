@@ -7,21 +7,17 @@ type AccountStatusModel struct {
 	Accounts   []AccountModel `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:AccountStatusUniqueCode;references:UniqueCode;COMMENT:相关账号;" json:"accounts"`
 }
 
+type AccountStatusStoreForm struct {
+	UniqueCode string `form:"unique_code" json:"unique_code"`
+	Name       string `form:"name" json:"name"`
+}
+
+type AccountStatusUpdateForm struct {
+	UniqueCode string `form:"unique_code" json:"unique_code"`
+	Name       string `form:"name" json:"name"`
+}
+
 // TableName 表名称
 func (cls *AccountStatusModel) TableName() string {
 	return "account_statuses"
-}
-
-// FindOneByUniqueCode 根据unique_code获取单条数据
-func (cls *AccountStatusModel) FindOneByUniqueCode(uniqueCode string) (accountStatus AccountStatusModel) {
-	cls.Preare().
-		Where(map[string]interface{}{"unique_code": uniqueCode}).
-		First(&accountStatus)
-	return
-}
-
-// FindMany 根据query获取多条数据
-func (cls *AccountStatusModel) FindManyByQuery() (accountStatuses []AccountStatusModel) {
-	cls.PreareQuery().Find(&accountStatuses)
-	return
 }

@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"fix-workshop-ue/errors"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -24,15 +25,15 @@ func (cls *AccountRouter) Load() {
 			func(ctx *gin.Context) {
 				id := tools.ThrowErrorWhenIsNotInt(ctx.Param("id"), "id必须填写整数")
 
-				account := (&models.AccountModel{
-					BaseModel: models.BaseModel{
-						Preloads: []string{
-							"AccountStatus",
-						},
-					},
+				var account models.AccountModel
+				if ret := (&models.BaseModel{
+					Preloads: []string{"AccountStatus"},
+					Wheres:   map[string]interface{}{"id": id},
 				}).
-					FindOneById(id)
-				tools.ThrowErrorWhenIsEmpty(account, models.AccountModel{}, "用户")
+					Prepare().
+					First(&account); ret.Error != nil {
+					panic(errors.ThrowEmpty("用户不存在"))
+				}
 
 				ctx.JSON(tools.CorrectIns("").OK(gin.H{"account": account}))
 			})

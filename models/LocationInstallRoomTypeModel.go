@@ -11,12 +11,3 @@ type LocationInstallRoomTypeModel struct {
 func (cls *LocationInstallRoomTypeModel) TableName() string {
 	return "location_install_room_types"
 }
-
-// FindOneByUniqueCode 根据unique_code
-func (cls *LocationInstallRoomTypeModel) FindOneByUniqueCode(uniqueCode string) (locationInstallRoomType LocationInstallRoomTypeModel) {
-	cls.Preare().
-		Where(map[string]interface{}{"unique_code": uniqueCode}).
-		First(&locationInstallRoomType)
-
-	return
-}

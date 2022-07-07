@@ -7,6 +7,7 @@ import (
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
@@ -44,15 +45,20 @@ func (cls *AuthorizationRouter) Load() {
 			}
 
 			// 检查重复项（用户名）
-			accountRepeat := (&models.AccountModel{
-				BaseModel: models.BaseModel{},
-			}).FindOneByUsername(authorizationRegisterForm.Username)
-			tools.ThrowErrorWhenIsRepeat(accountRepeat, models.AccountModel{}, "用户名")
-			// 检查重复项（昵称）
-			accountRepeat = (&models.AccountModel{
-				BaseModel: models.BaseModel{},
-			}).FindOneByUsername(authorizationRegisterForm.Nickname)
-			tools.ThrowErrorWhenIsRepeat(accountRepeat, models.AccountModel{}, "昵称")
+			var repeat models.AccountModel
+			var ret *gorm.DB
+			ret = (&models.BaseModel{
+				Wheres: map[string]interface{}{"username": authorizationRegisterForm.Username},
+			}).
+				Prepare().
+				First(&repeat)
+			tools.ThrowErrorWhenIsRepeatByDB(ret, "用户名")
+			ret = (&models.BaseModel{
+				Wheres: map[string]interface{}{"nickname": authorizationRegisterForm.Nickname},
+			}).
+				Prepare().
+				First(&repeat)
+			tools.ThrowErrorWhenIsRepeatByDB(ret, "昵称")
 
 			// 密码加密
 			bytes, _ := bcrypt.GenerateFromPassword([]byte(authorizationRegisterForm.Password), 14)
@@ -81,12 +87,15 @@ func (cls *AuthorizationRouter) Load() {
 			}
 
 			// 获取用户
-			account := (&models.AccountModel{
-				BaseModel: models.BaseModel{
-					Preloads: []string{clause.Associations},
-				},
-			}).FindOneByUsername(authorizationLoginForm.Username)
-			tools.ThrowErrorWhenIsEmpty(account, models.AccountModel{}, "用户")
+			var account models.AccountModel
+			var ret *gorm.DB
+			ret = (&models.BaseModel{
+				Preloads: []string{clause.Associations},
+				Wheres:   map[string]interface{}{"username": authorizationLoginForm.Username},
+			}).
+				Prepare().
+				First(&account)
+			tools.ThrowErrorWhenIsEmptyByDB(ret, "用户")
 
 			// 验证密码
 			if err := bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(authorizationLoginForm.Password)); err != nil {

@@ -15,12 +15,3 @@ type OrganizationRailwayModel struct {
 func (cls *OrganizationRailwayModel) TableName() string {
 	return "organization_railways"
 }
-
-// FindOneByUniqueCode 根据unique_code获取单条数据
-func (cls *OrganizationRailwayModel) FindOneByUniqueCode(uniqueCode string) (organizationRailway OrganizationRailwayModel) {
-	cls.Preare().
-		Where(map[string]interface{}{"unique_code": uniqueCode}).
-		First(&organizationRailway)
-
-	return
-}

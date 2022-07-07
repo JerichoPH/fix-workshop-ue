@@ -16,10 +16,3 @@ type KindEntireTypeModel struct {
 func (cls *KindEntireTypeModel) TableName() string {
 	return "kind_entire_types"
 }
-
-// FindOneByUniqueCode 根据unique_code获取单条数据
-func (cls *KindEntireTypeModel) FindOneByUniqueCode(uniqueCode string) (kindEntireModel KindEntireTypeModel) {
-	cls.Preare().Where(map[string]interface{}{"unique_code": uniqueCode}).First(&kindEntireModel)
-
-	return
-}

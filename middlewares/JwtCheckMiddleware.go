@@ -6,6 +6,7 @@ import (
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"reflect"
 	"strings"
 	"time"
@@ -43,10 +44,14 @@ func CheckJWT() gin.HandlerFunc {
 					}
 
 					// 获取用户信息
-					account = (&models.AccountModel{}).FindOneByUUIDAsMap(claims.UUID)
-					if reflect.DeepEqual(account, models.AccountModel{}) {
-						panic(errors.ThrowUnAuthorization("用户不存在"))
-					}
+					var account = make(map[string]interface{})
+					var ret *gorm.DB
+					ret = (&models.BaseModel{
+						Wheres: map[string]interface{}{"uuid": claims.UUID},
+					}).
+						Prepare().
+						First(&account)
+					tools.ThrowErrorWhenIsEmptyByDB(ret, "用户")
 				default:
 					panic(errors.ThrowForbidden("权鉴认证方式不支持"))
 

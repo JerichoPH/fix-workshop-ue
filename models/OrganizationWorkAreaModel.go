@@ -18,12 +18,3 @@ type OrganizationWorkAreaModel struct {
 func (cls *OrganizationWorkAreaModel) TableName() string {
 	return "organization_work_areas"
 }
-
-// FindOneByUniqueCode 根据unique_code获取单条数据
-func (cls *OrganizationWorkAreaModel) FindOneByUniqueCode(uniqueCode string) (organizationWorkArea OrganizationWorkAreaModel) {
-	cls.Preare().
-		Where(map[string]interface{}{"unique_code": uniqueCode}).
-		First(&organizationWorkArea)
-
-	return
-}

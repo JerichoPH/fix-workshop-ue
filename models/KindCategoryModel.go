@@ -14,11 +14,3 @@ type KindCategoryModel struct {
 func (cls *KindCategoryModel) TableName() string {
 	return "kind_categories"
 }
-
-// FindOneByUniqueCode 根据unique_code获取单条数据
-func (cls *KindCategoryModel) FindOneByUniqueCode(uniqueCode string) (kindCategory KindCategoryModel) {
-	cls.Preare().
-		Where(map[string]interface{}{"unique_code": uniqueCode}).
-		First(&kindCategory)
-	return
-}
