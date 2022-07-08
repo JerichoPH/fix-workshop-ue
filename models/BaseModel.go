@@ -14,7 +14,7 @@ type BaseModel struct {
 	ID             uint           `gorm:"primaryKey" json:"id"`
 	CreatedAt      time.Time      `gorm:"type:DATETIME;auto_now_add;" json:"created_at"`
 	UpdatedAt      time.Time      `gorm:"type:DATETIME;" json:"updated_at"`
-	DeletedAt      gorm.DeletedAt `gorm:"index"`
+	DeletedAt      gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 	preloads       []string
 	selects        []string
 	omits          []string

@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"fix-workshop-ue/databases"
 	"fix-workshop-ue/errors"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -21,8 +20,8 @@ type AuthorizationRegisterForm struct {
 
 // AuthorizationLoginForm 登录表单
 type AuthorizationLoginForm struct {
-	Username string `form:"username" binding:"required"`
-	Password string `form:"password" binding:"required"`
+	Username string `form:"username" json:"username" binding:"required"`
+	Password string `form:"password" json:"password" binding:"required"`
 }
 
 type AuthorizationRouter struct{}
@@ -31,7 +30,7 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 	r := router.Group("/api/v1/authorization")
 	{
 		// 注册
-		r.POST("/register", func(ctx *gin.Context) {
+		r.POST("register", func(ctx *gin.Context) {
 			// 表单验证
 			var authorizationRegisterForm AuthorizationRegisterForm
 			if err := ctx.ShouldBind(&authorizationRegisterForm); err != nil {
@@ -60,22 +59,24 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 			bytes, _ := bcrypt.GenerateFromPassword([]byte(authorizationRegisterForm.Password), 14)
 
 			// 保存新用户
-			account := models.AccountModel{
-				Username:                authorizationRegisterForm.Username,
-				Password:                string(bytes),
-				Nickname:                authorizationRegisterForm.Nickname,
-				AccountStatusUniqueCode: "DEFAULT",
+			if ret = (&models.BaseModel{}).
+				SetModel(models.AccountModel{}).
+				SetOmits(tools.Strings{clause.Associations}).
+				DB().
+				Create(&models.AccountModel{
+					Username:                authorizationRegisterForm.Username,
+					Password:                string(bytes),
+					Nickname:                authorizationRegisterForm.Nickname,
+					AccountStatusUniqueCode: "DEFAULT",
+				}); ret.Error != nil {
+				panic(errors.ThrowForbidden("创建失败：" + ret.Error.Error()))
 			}
 
-			if ret := (&databases.MySql{}).GetMySqlConn().Omit(clause.Associations).Create(&account); ret.Error != nil {
-				panic(ret.Error)
-			}
-
-			ctx.JSON(tools.CorrectIns("注册成功").Created(gin.H{"account": account}))
+			ctx.JSON(tools.CorrectIns("注册成功").Created(tools.Map{}))
 		})
 
 		// 登录
-		r.POST("/login", func(ctx *gin.Context) {
+		r.POST("login", func(ctx *gin.Context) {
 			// 表单验证
 			var form AuthorizationLoginForm
 			if err := ctx.ShouldBind(&form); err != nil {
@@ -103,7 +104,7 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 				// 生成jwt错误
 				panic(err)
 			}
-			ctx.JSON(tools.CorrectIns("登陆成功").OK(gin.H{"token": token}))
+			ctx.JSON(tools.CorrectIns("登陆成功").OK(tools.Map{"token": token}))
 		})
 	}
 }

@@ -18,6 +18,9 @@ func CheckJwt() gin.HandlerFunc {
 
 		// 获取令牌
 		split := strings.Split(tools.GetJwtFromHeader(ctx), " ")
+		if len(split) != 2 {
+			panic(errors.ThrowUnAuthorization("令牌格式错误"))
+		}
 		tokenType := split[0]
 		token := split[1]
 
