@@ -23,7 +23,12 @@ type RbacRoleUpdateForm struct {
 
 // RbacRoleBindAccountsForm 角色绑定用户表单
 type RbacRoleBindAccountsForm struct {
-	AccountUUIDs []string `form:"account_uuids[]" json:"account_uuids[]"`
+	AccountUUIDs []string `form:"account_uuids[]" json:"account_uuids"`
+}
+
+// RbacRoleBindPermissionsForm 角色绑定权限表单
+type RbacRoleBindPermissionsForm struct {
+	RbacPermissionIDs []string `form:"permission_ids[]" json:"permission_ids"`
 }
 
 func (cls *RbacRoleRouter) Load(router *gin.Engine) {
@@ -47,7 +52,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 			var repeat RbacRoleStoreForm
 			ret = (&models.BaseModel{}).
 				SetModel(models.RbacRoleModel{}).
-				SetWheresMap(tools.Map{"name": form.Name}).
+				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
 			tools.ThrowErrorWhenIsRepeatByDB(ret, "角色名称")
@@ -77,7 +82,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 		var repeat models.RbacRoleModel
 		ret = (&models.BaseModel{}).
 			SetModel(models.RbacRoleModel{}).
-			SetWheresMap(tools.Map{"name": form.Name}).
+			SetWheres(tools.Map{"name": form.Name}).
 			SetNotWheres(tools.Map{"id": id}).
 			Prepare().
 			First(&repeat)
@@ -87,7 +92,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 		var rbacRole models.RbacRoleModel
 		ret = (&models.BaseModel{}).
 			SetModel(models.RbacRoleModel{}).
-			SetWheresMap(tools.Map{"id": id}).
+			SetWheres(tools.Map{"id": id}).
 			Prepare().
 			First(&rbacRole)
 		tools.ThrowErrorWhenIsEmptyByDB(ret, "角色")
@@ -116,7 +121,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 		var rbacRole models.RbacRoleModel
 		ret = (&models.BaseModel{}).
 			SetModel(models.RbacRoleModel{}).
-			SetWheresMap(tools.Map{"id": id}).
+			SetWheres(tools.Map{"id": id}).
 			Prepare().
 			First(&rbacRole)
 		tools.ThrowErrorWhenIsEmptyByDB(ret, "角色")
@@ -142,6 +147,44 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 		ctx.JSON(tools.CorrectIns("绑定成功").Updated(tools.Map{}))
 	})
 
+	// 绑定权限
+	r.PUT(":id/bindPermissions", func(ctx *gin.Context) {
+		var ret *gorm.DB
+		id := tools.ThrowErrorWhenIsNotInt(ctx.Param("id"), "角色编号必须是数字")
+
+		// 表单
+		var form RbacRoleBindPermissionsForm
+		if err := ctx.ShouldBind(&form); err != nil {
+			panic(err)
+		}
+
+		// 查询角色
+		var rbacRole models.RbacRoleModel
+		ret = (&models.BaseModel{}).
+			SetModel(models.RbacRoleModel{}).
+			SetWheres(tools.Map{"id": id}).
+			Prepare().
+			First(&rbacRole)
+		tools.ThrowErrorWhenIsEmptyByDB(ret, "角色")
+
+		// 查询权限
+		var rbacPermissions []*models.RbacPermissionModel
+		(&models.BaseModel{}).
+			SetModel(models.RbacPermissionModel{}).
+			DB().
+			Where("id IN ?", form.RbacPermissionIDs).
+			Find(&rbacPermissions)
+		if len(rbacPermissions) == 0 {
+			panic(errors.ThrowForbidden("没有找到权限"))
+		}
+
+		// 绑定
+		rbacRole.RbacPermissions = rbacPermissions
+		(&models.BaseModel{}).SetModel(models.RbacRoleModel{}).DB().Save(&rbacRole)
+
+		ctx.JSON(tools.CorrectIns("绑定成功").Updated(tools.Map{}))
+	})
+
 	// 角色详情
 	r.GET(":id", func(ctx *gin.Context) {
 		var ret *gorm.DB
@@ -150,7 +193,8 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 
 		ret = (&models.BaseModel{}).
 			SetModel(models.RbacRoleModel{}).
-			SetWheresMap(tools.Map{"id": id}).
+			SetWheres(tools.Map{"id": id}).
+			SetPreloads(tools.Strings{"RbacPermissions", "Accounts"}).
 			Prepare().
 			First(&rbacRole)
 		tools.ThrowErrorWhenIsEmptyByDB(ret, "角色")

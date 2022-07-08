@@ -20,12 +20,13 @@ func CheckPermission() gin.HandlerFunc {
 		cfg := (&configs.Config{}).Init()
 
 		if cfg.App.Section("app").Key("production").MustBool(true) {
+			var ret *gorm.DB
+
 			// 获取权限
 			var rbacPermission models.RbacPermissionModel
-			var ret *gorm.DB
 			ret = (&models.BaseModel{}).
 				SetPreloads(tools.Strings{"RbacRoles"}).
-				SetWheresMap(tools.Map{
+				SetWheres(tools.Map{
 					"uri":    ctx.FullPath(),
 					"method": ctx.Request.Method,
 				}).
@@ -38,7 +39,7 @@ func CheckPermission() gin.HandlerFunc {
 				for _, rbacRole := range rbacPermission.RbacRoles {
 					if len(rbacRole.Accounts) > 0 {
 						for _, account := range rbacRole.Accounts {
-							if account.UUID == currentAccount.(map[string]interface{})["uuid"] {
+							if account.UUID == currentAccount.(tools.Map)["uuid"] {
 								ok = true
 							}
 						}

@@ -41,7 +41,7 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 			// 查重
 			var repeat models.RbacPermissionGroupModel
 			ret = (&models.BaseModel{}).
-				SetWheresMap(tools.Map{"name": form.Name}).
+				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
 			tools.ThrowErrorWhenIsRepeatByDB(ret, "权限分组名称")
@@ -64,7 +64,7 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 		var rbacPermissionGroup models.RbacPermissionGroupModel
 		ret = (&models.BaseModel{}).
 			SetModel(models.RbacPermissionGroupModel{}).
-			SetWheresMap(tools.Map{"uuid": uuid}).
+			SetWheres(tools.Map{"uuid": uuid}).
 			SetPreloads(tools.Strings{"RbacPermissions"}).
 			Prepare().
 			First(&rbacPermissionGroup)
@@ -96,7 +96,7 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 		var repeat models.RbacPermissionGroupModel
 		ret = (&models.BaseModel{}).
 			SetModel(models.RbacPermissionGroupModel{}).
-			SetWheresMap(tools.Map{"name": form.Name}).
+			SetWheres(tools.Map{"name": form.Name}).
 			SetNotWheres(tools.Map{"uuid": uuid}).
 			Prepare().
 			First(&repeat)
@@ -106,7 +106,7 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 		var rbacPermissionGroup models.RbacPermissionGroupModel
 		ret = (&models.BaseModel{}).
 			SetModel(models.RbacPermissionGroupModel{}).
-			SetWheresMap(tools.Map{"uuid": uuid}).
+			SetWheres(tools.Map{"uuid": uuid}).
 			Prepare().
 			First(&rbacPermissionGroup)
 		tools.ThrowErrorWhenIsEmptyByDB(ret, "权限分组")
@@ -129,7 +129,7 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 		var rbacPermissionGroup models.RbacPermissionGroupModel
 		ret = (&models.BaseModel{}).
 			SetModel(models.RbacPermissionGroupModel{}).
-			SetWheresMap(tools.Map{"uuid": uuid}).
+			SetWheres(tools.Map{"uuid": uuid}).
 			Prepare().
 			First(&rbacPermissionGroup)
 		tools.ThrowErrorWhenIsEmptyByDB(ret, "权限分组")

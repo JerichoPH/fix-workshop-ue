@@ -41,12 +41,12 @@ func (cls *AccountStatusRouter) Load(router *gin.Engine) {
 			var repeat models.AccountStatusModel
 			var ret *gorm.DB
 			ret = (&models.BaseModel{}).
-				SetWheresMap(tools.Map{"unique_code": form.UniqueCode}).
+				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
 				First(&repeat)
 			tools.ThrowErrorWhenIsRepeatByDB(ret, "用户代码")
 			ret = (&models.BaseModel{}).
-				SetWheresMap(tools.Map{"name": form.Name}).
+				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
 			tools.ThrowErrorWhenIsRepeatByDB(ret, "用户状态名称")
@@ -69,7 +69,7 @@ func (cls *AccountStatusRouter) Load(router *gin.Engine) {
 			var accountStatus models.AccountStatusModel
 			var ret *gorm.DB
 			ret = (&models.BaseModel{}).
-				SetWheresMap(tools.Map{"unique_code": uniqueCode}).
+				SetWheres(tools.Map{"unique_code": uniqueCode}).
 				Prepare().
 				First(&accountStatus)
 			tools.ThrowErrorWhenIsEmptyByDB(ret, "用户状态")
@@ -94,7 +94,7 @@ func (cls *AccountStatusRouter) Load(router *gin.Engine) {
 			// 查重
 			var repeat models.AccountStatusModel
 			ret = (&models.BaseModel{}).
-				SetWheresMap(tools.Map{"name": form.Name}).
+				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"unique_code": uniqueCode}).
 				Prepare().
 				First(&repeat)
@@ -103,7 +103,7 @@ func (cls *AccountStatusRouter) Load(router *gin.Engine) {
 			// 查询
 			var accountStatus models.AccountStatusModel
 			ret = (&models.BaseModel{}).
-				SetWheresMap(tools.Map{"unique_code": uniqueCode}).
+				SetWheres(tools.Map{"unique_code": uniqueCode}).
 				Prepare().
 				First(&accountStatus)
 			tools.ThrowErrorWhenIsEmptyByDB(ret, "用户状态")
@@ -136,7 +136,7 @@ func (cls *AccountStatusRouter) Load(router *gin.Engine) {
 
 			var accountStatus models.AccountStatusModel
 			if ret := (&models.BaseModel{}).
-				SetWheresMap(tools.Map{"unique_code": uniqueCode}).
+				SetWheres(tools.Map{"unique_code": uniqueCode}).
 				Prepare().
 				First(&accountStatus);
 				ret.Error != nil {

@@ -46,12 +46,12 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 			var repeat models.AccountModel
 			var ret *gorm.DB
 			ret = (&models.BaseModel{}).
-				SetWheresMap(tools.Map{"username": authorizationRegisterForm.Username}).
+				SetWheres(tools.Map{"username": authorizationRegisterForm.Username}).
 				Prepare().
 				First(&repeat)
 			tools.ThrowErrorWhenIsRepeatByDB(ret, "用户名")
 			ret = (&models.BaseModel{}).
-				SetWheresMap(tools.Map{"nickname": authorizationRegisterForm.Nickname}).
+				SetWheres(tools.Map{"nickname": authorizationRegisterForm.Nickname}).
 				Prepare().
 				First(&repeat)
 			tools.ThrowErrorWhenIsRepeatByDB(ret, "昵称")
@@ -87,7 +87,7 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 			var ret *gorm.DB
 			ret = (&models.BaseModel{}).
 				SetPreloads(tools.Strings{clause.Associations}).
-				SetWheresMap(tools.Map{"username": form.Username}).
+				SetWheres(tools.Map{"username": form.Username}).
 				Prepare().
 				First(&account)
 			tools.ThrowErrorWhenIsEmptyByDB(ret, "用户")

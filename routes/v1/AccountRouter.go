@@ -40,14 +40,14 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 			var repeat models.AccountModel
 			ret = (&models.BaseModel{}).
 				SetModel(models.AccountModel{}).
-				SetWheresMap(tools.Map{"username": form.Username}).
+				SetWheres(tools.Map{"username": form.Username}).
 				SetNotWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&repeat)
 			tools.ThrowErrorWhenIsRepeatByDB(ret, "用户账号")
 			ret = (&models.BaseModel{}).
 				SetModel(models.AccountModel{}).
-				SetWheresMap(tools.Map{"nickname": form.Nickname}).
+				SetWheres(tools.Map{"nickname": form.Nickname}).
 				SetNotWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&repeat)
@@ -57,7 +57,7 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 			var account models.AccountModel
 			ret = (&models.BaseModel{}).
 				SetModel(models.AccountModel{}).
-				SetWheresMap(tools.Map{"uuid": uuid}).
+				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&account)
 			tools.ThrowErrorWhenIsEmptyByDB(ret, "用户")
@@ -87,7 +87,7 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 			ret = (&models.BaseModel{}).
 				SetModel(models.AccountModel{}).
 				SetPreloads(tools.Strings{"AccountStatus"}).
-				SetWheresMap(tools.Map{"uuid": uuid}).
+				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&account)
 			tools.ThrowErrorWhenIsEmptyByDB(ret, "用户")

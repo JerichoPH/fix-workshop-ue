@@ -1,7 +1,6 @@
 package models
 
 import (
-	"database/sql"
 	"fix-workshop-ue/databases"
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
@@ -12,10 +11,10 @@ import (
 
 // BaseModel 出厂数据、财务数据、检修数据、仓储数据、流转数据、运用数据
 type BaseModel struct {
-	ID             uint         `gorm:"primaryKey" json:"id"`
-	CreatedAt      time.Time    `gorm:"type:DATETIME;auto_now_add;" json:"created_at"`
-	UpdatedAt      time.Time    `gorm:"type:DATETIME;" json:"updated_at"`
-	DeletedAt      sql.NullTime `gorm:"index" json:"deleted_at"`
+	ID             uint           `gorm:"primaryKey" json:"id"`
+	CreatedAt      time.Time      `gorm:"type:DATETIME;auto_now_add;" json:"created_at"`
+	UpdatedAt      time.Time      `gorm:"type:DATETIME;" json:"updated_at"`
+	DeletedAt      gorm.DeletedAt `gorm:"index"`
 	preloads       []string
 	selects        []string
 	omits          []string
@@ -32,7 +31,7 @@ func (cls *BaseModel) demoFindOne() {
 	var b BaseModel
 	ret := cls.
 		SetModel(BaseModel{}).
-		SetWheresMap(tools.Map{}).
+		SetWheres(tools.Map{}).
 		SetNotWheres(tools.Map{}).
 		Prepare().
 		First(b)
@@ -98,8 +97,8 @@ func (cls *BaseModel) SetIgnoreFields(ignoreFields []string) *BaseModel {
 	return cls
 }
 
-// SetWheresMap 通过Map设置Wheres
-func (cls *BaseModel) SetWheresMap(wheres map[string]interface{}) *BaseModel {
+// SetWheres 通过Map设置Wheres
+func (cls *BaseModel) SetWheres(wheres map[string]interface{}) *BaseModel {
 	cls.wheres = wheres
 	return cls
 }
