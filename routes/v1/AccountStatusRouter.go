@@ -34,7 +34,7 @@ func (cls *AccountStatusRouter) Load(router *gin.Engine) {
 			// 表单验证
 			var form AccountStatusStoreForm
 			if err := ctx.ShouldBind(&form); err != nil {
-				panic(err)
+				panic(errors.ThrowForbidden(err.Error()))
 			}
 
 			// 重复验证
@@ -88,7 +88,7 @@ func (cls *AccountStatusRouter) Load(router *gin.Engine) {
 			// 表单
 			var form AccountStatusUpdateForm
 			if err := ctx.ShouldBind(&form); err != nil {
-				panic(err)
+				panic(errors.ThrowForbidden(err.Error()))
 			}
 
 			// 查重

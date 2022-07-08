@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"fix-workshop-ue/errors"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -35,7 +36,7 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 			// 表单
 			var form RbacPermissionGroupStoreForm
 			if err := ctx.ShouldBind(&form); err != nil {
-				panic(err)
+				panic(errors.ThrowForbidden(err.Error()))
 			}
 
 			// 查重
@@ -89,7 +90,7 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 		// 表单
 		var form RbacPermissionGroupUpdateForm
 		if err := ctx.ShouldBind(&form); err != nil {
-			panic(err)
+			panic(errors.ThrowForbidden(err.Error()))
 		}
 
 		// 查重

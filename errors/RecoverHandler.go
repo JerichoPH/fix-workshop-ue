@@ -18,22 +18,22 @@ func RecoverHandler(c *gin.Context) {
 			switch fmt.Sprintf("%T", reco) {
 			case "*validator.Validationerrors":
 				// 表单验证错误
-				c.JSON(Ins().Validate("", errorToString(reco)))
+				c.JSON(InCorrectIns().Validate("", errorToString(reco)))
 			case "*errors.ForbiddenError":
 				// 禁止操作
-				c.JSON(Ins().Forbidden(errorToString(reco)))
+				c.JSON(InCorrectIns().Forbidden(errorToString(reco)))
 			case "*errors.EmptyError":
 				// 空数据
-				c.JSON(Ins().Empty(errorToString(reco)))
+				c.JSON(InCorrectIns().Empty(errorToString(reco)))
 			case "*errors.UnAuthorizationError":
 				// 未授权
-				c.JSON(Ins().UnAuthorization(errorToString(reco)))
+				c.JSON(InCorrectIns().UnAuthorization(errorToString(reco)))
 			case "*errors.UnLoginError":
 				// 未登录
-				c.JSON(Ins().ErrUnLogin())
+				c.JSON(InCorrectIns().ErrUnLogin())
 			default:
 				// 其他错误
-				c.JSON(Ins().Accident(errorToString(reco), reco))
+				c.JSON(InCorrectIns().Accident(errorToString(reco), reco))
 				debug.PrintStack() // 打印堆栈信息
 			}
 

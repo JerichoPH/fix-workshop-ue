@@ -1,7 +1,13 @@
 package models
 
+import (
+	uuid "github.com/satori/go.uuid"
+	"gorm.io/gorm"
+)
+
 type RbacPermissionModel struct {
 	BaseModel
+	UUID                    string                   `gorm:"type:CHAR(36);UNIQUE;NOT NULL;COMMENT:uuid;" json:"uuid"`
 	Name                    string                   `gorm:"type:VARCHAR(64);UNIQUE;NOT NULL;COMMENT:权限名称;" json:"name"`
 	URI                     string                   `gorm:"type:VARCHAR(128);NOT NULL;COMMENT:指向路由;" json:"uri"`
 	Method                  string                   `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:请求方法;" json:"method"`
@@ -11,6 +17,12 @@ type RbacPermissionModel struct {
 }
 
 // TableName 表名称
-func (cls RbacPermissionModel) TableName() string {
+func (cls *RbacPermissionModel) TableName() string {
 	return "rbac_permissions"
+}
+
+// BeforeCreate 新建前
+func (cls *RbacPermissionModel) BeforeCreate(db *gorm.DB) (err error) {
+	cls.UUID = uuid.NewV4().String()
+	return
 }

@@ -32,12 +32,11 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 		// 注册
 		r.POST("register", func(ctx *gin.Context) {
 			// 表单验证
-			var authorizationRegisterForm AuthorizationRegisterForm
-			if err := ctx.ShouldBind(&authorizationRegisterForm); err != nil {
-				panic(err)
+			var form AuthorizationRegisterForm
+			if err := ctx.ShouldBind(&form); err != nil {
+				panic(errors.ThrowForbidden(err.Error()))
 			}
-
-			if authorizationRegisterForm.Password != authorizationRegisterForm.PasswordConfirmation {
+			if form.Password != form.PasswordConfirmation {
 				panic(errors.ThrowForbidden("两次密码输入不一致"))
 			}
 
@@ -45,18 +44,18 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 			var repeat models.AccountModel
 			var ret *gorm.DB
 			ret = (&models.BaseModel{}).
-				SetWheres(tools.Map{"username": authorizationRegisterForm.Username}).
+				SetWheres(tools.Map{"username": form.Username}).
 				Prepare().
 				First(&repeat)
 			tools.ThrowErrorWhenIsRepeatByDB(ret, "用户名")
 			ret = (&models.BaseModel{}).
-				SetWheres(tools.Map{"nickname": authorizationRegisterForm.Nickname}).
+				SetWheres(tools.Map{"nickname": form.Nickname}).
 				Prepare().
 				First(&repeat)
 			tools.ThrowErrorWhenIsRepeatByDB(ret, "昵称")
 
 			// 密码加密
-			bytes, _ := bcrypt.GenerateFromPassword([]byte(authorizationRegisterForm.Password), 14)
+			bytes, _ := bcrypt.GenerateFromPassword([]byte(form.Password), 14)
 
 			// 保存新用户
 			if ret = (&models.BaseModel{}).
@@ -64,9 +63,9 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 				SetOmits(tools.Strings{clause.Associations}).
 				DB().
 				Create(&models.AccountModel{
-					Username:                authorizationRegisterForm.Username,
+					Username:                form.Username,
 					Password:                string(bytes),
-					Nickname:                authorizationRegisterForm.Nickname,
+					Nickname:                form.Nickname,
 					AccountStatusUniqueCode: "DEFAULT",
 				}); ret.Error != nil {
 				panic(errors.ThrowForbidden("创建失败：" + ret.Error.Error()))
@@ -80,7 +79,7 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 			// 表单验证
 			var form AuthorizationLoginForm
 			if err := ctx.ShouldBind(&form); err != nil {
-				panic(err)
+				panic(errors.ThrowForbidden(err.Error()))
 			}
 
 			// 获取用户
@@ -99,12 +98,17 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 			}
 
 			// 生成Jwt
-			token, err := tools.GenerateJwt(account.UUID)
+			token, err := tools.GenerateJwt(account.UUID, account.Password)
 			if err != nil {
 				// 生成jwt错误
-				panic(err)
+				panic(errors.ThrowForbidden(err.Error()))
 			}
-			ctx.JSON(tools.CorrectIns("登陆成功").OK(tools.Map{"token": token}))
+			ctx.JSON(tools.CorrectIns("登陆成功").OK(tools.Map{
+				"token":    token,
+				"username": account.Username,
+				"nickname": account.Nickname,
+				"uuid":     account.UUID,
+			}))
 		})
 	}
 }

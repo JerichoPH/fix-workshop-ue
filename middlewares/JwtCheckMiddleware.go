@@ -50,9 +50,11 @@ func CheckJwt() gin.HandlerFunc {
 					var account = make(map[string]interface{})
 					var ret *gorm.DB
 					ret = (&models.BaseModel{}).
+						SetModel(models.AccountModel{}).
 						SetWheres(tools.Map{"uuid": claims.UUID}).
 						Prepare().
 						First(&account)
+
 					tools.ThrowErrorWhenIsEmptyByDB(ret, "用户")
 				default:
 					panic(errors.ThrowForbidden("权鉴认证方式不支持"))

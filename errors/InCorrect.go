@@ -1,6 +1,8 @@
 package errors
 
-import "sync"
+import (
+	"sync"
+)
 
 type inCorrect struct {
 	msg       string
@@ -12,17 +14,17 @@ type inCorrect struct {
 var responseIns *inCorrect
 var once sync.Once
 
-func Ins() *inCorrect {
+func InCorrectIns() *inCorrect {
 	once.Do(func() { responseIns = &inCorrect{} })
 	return responseIns
 }
 
 func (cls *inCorrect) Get() map[string]interface{} {
 	ret := map[string]interface{}{
-		"msg":      cls.msg,
-		"content":  cls.content,
-		"status":   cls.status,
-		"erroCode": cls.errorCode,
+		"msg":        cls.msg,
+		"content":    cls.content,
+		"status":     cls.status,
+		"error_code": cls.errorCode,
 	}
 	return ret
 }
@@ -43,11 +45,11 @@ func (cls *inCorrect) UnAuthorization(msg string) (int, interface{}) {
 	if msg == "" {
 		msg = "未授权"
 	}
-	return 406, cls.Set(msg, nil, 406, 1).Get()
+	return 406, cls.Set(msg, map[string]interface{}{}, 406, 1).Get()
 }
 
 func (cls *inCorrect) ErrUnLogin() (int, map[string]interface{}) {
-	return 401, cls.Set("未登录", nil, 401, 2).Get()
+	return 401, cls.Set("未登录", map[string]interface{}{}, 401, 2).Get()
 }
 
 func (cls *inCorrect) Forbidden(msg string) (int, interface{}) {
@@ -55,7 +57,7 @@ func (cls *inCorrect) Forbidden(msg string) (int, interface{}) {
 		msg = "禁止操作"
 	}
 
-	return 403, cls.Set(msg, nil, 403, 3).Get()
+	return 403, cls.Set(msg, map[string]interface{}{}, 403, 3).Get()
 }
 
 func (cls *inCorrect) Empty(msg string) (int, interface{}) {
@@ -63,7 +65,7 @@ func (cls *inCorrect) Empty(msg string) (int, interface{}) {
 		msg = "数不存在"
 	}
 
-	return 404, cls.Set(msg, nil, 404, 4).Get()
+	return 404, cls.Set(msg, map[string]interface{}{}, 404, 4).Get()
 }
 
 func (cls *inCorrect) Validate(msg string, content interface{}) (int, map[string]interface{}) {

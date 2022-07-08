@@ -16,13 +16,13 @@ type Claims struct {
 }
 
 // GenerateJwt 生成Jwt
-func GenerateJwt(uuid string) (string, error) {
+func GenerateJwt(uuid, password string) (string, error) {
 	// 设置token有效时间
 	nowTime := time.Now()
 	expireTime := nowTime.Add(168 * time.Hour)
 
 	claims := Claims{
-		UUID: uuid,
+		UUID:     uuid,
 		StandardClaims: jwt.StandardClaims{
 			// 过期时间
 			ExpiresAt: expireTime.Unix(),
