@@ -1,7 +1,7 @@
 package tools
 
 import (
-	"fix-workshop-ue/errors"
+	"fix-workshop-ue/exceptions"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"time"
@@ -60,7 +60,7 @@ func GetJwtFromHeader(ctx *gin.Context) string {
 	tokens := ctx.Request.Header["Authorization"]
 
 	if len(tokens) == 0 {
-		panic(errors.ThrowUnAuthorization("令牌不存在"))
+		panic(exceptions.ThrowUnAuthorization("令牌不存在"))
 	}
 	return tokens[0]
 }

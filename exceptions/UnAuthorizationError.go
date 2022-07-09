@@ -1,4 +1,4 @@
-package errors
+package exceptions
 
 type UnAuthorizationError struct{ s string }
 

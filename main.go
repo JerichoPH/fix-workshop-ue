@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
-	"fix-workshop-ue/configs"
 	"fix-workshop-ue/databases"
 	"fix-workshop-ue/models"
 	v1 "fix-workshop-ue/routes/v1"
+	"fix-workshop-ue/settings"
 	"fmt"
 	"log"
 	"net/http"
@@ -13,7 +13,7 @@ import (
 	"os/signal"
 	"time"
 
-	"fix-workshop-ue/errors"
+	"fix-workshop-ue/exceptions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,8 +26,7 @@ func initServer(router *gin.Engine, addr string) {
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-	serverErr := server.ListenAndServe()
-	if serverErr != nil {
+	if serverErr := server.ListenAndServe(); serverErr!=nil{
 		log.Println("服务器启动错误：", serverErr)
 	}
 
@@ -50,12 +49,11 @@ func initServer(router *gin.Engine, addr string) {
 		log.Fatal("服务无法关闭", err)
 	}
 	log.Println("服务关闭")
-
 }
 
 func main() {
 	// 获取参数
-	config := (&configs.Config{}).Init()
+	setting := (&settings.Setting{}).Init()
 
 	//mssqlConn := (&MsSql{
 	//	Schema:   "sqlserver",
@@ -66,8 +64,7 @@ func main() {
 	//}).
 	//	InitDB() // 创建mssql链接
 
-	mySqlConn := (&databases.MySql{}).GetMySqlConn()
-	errAutoMigrate := mySqlConn.
+	if errAutoMigrate := (&databases.MySql{}).GetMySqlConn().
 		Set("gorm:table_options", "ENGINE=Distributed(cluster, default, hits)").
 		Set("gorm:table_options", "ENGINE=InnoDB").
 		AutoMigrate(
@@ -78,14 +75,13 @@ func main() {
 			&models.RbacPermissionModel{},      // 权限
 			&models.RbacPermissionGroupModel{}, //权限分组
 
-		)
-	if errAutoMigrate != nil {
+		); errAutoMigrate != nil {
 		fmt.Println("自动迁移错误：", errAutoMigrate)
 		os.Exit(1)
 	}
 
 	router := gin.Default()
-	router.Use(errors.RecoverHandler) // 异常处理
+	router.Use(exceptions.RecoverHandler) // 异常处理
 
 	(&v1.AuthorizationRouter{}).Load(router)       // 权鉴
 	(&v1.AccountRouter{}).Load(router)             // 用户                                                                                                                                                          // 用户
@@ -94,5 +90,5 @@ func main() {
 	(&v1.RbacPermissionGroupRouter{}).Load(router) //权限分组
 	(&v1.RbacPermissionRouter{}).Load(router)      // 权限
 
-	initServer(router, config.App.Section("app").Key("addr").MustString(":8080")) // 启动服务
+	initServer(router, setting.App.Section("app").Key("addr").MustString(":8080")) // 启动服务
 }

@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"fix-workshop-ue/errors"
+	"fix-workshop-ue/exceptions"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -48,11 +48,11 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 			// 表单验证
 			var form AccountStoreForm
 			if err := ctx.ShouldBind(&form); err != nil {
-				panic(errors.ThrowForbidden(err.Error()))
+				panic(exceptions.ThrowForbidden(err.Error()))
 			}
 
 			if form.Password != form.PasswordConfirmation {
-				panic(errors.ThrowForbidden("两次密码输入不一致"))
+				panic(exceptions.ThrowForbidden("两次密码输入不一致"))
 			}
 
 			// 检查重复项（用户名）
@@ -62,12 +62,12 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"username": form.Username}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowErrorWhenIsRepeatByDB(ret, "用户名")
+			tools.ThrowExceptionWhenIsRepeatByDB(ret, "用户名")
 			ret = (&models.BaseModel{}).
 				SetWheres(tools.Map{"nickname": form.Nickname}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowErrorWhenIsRepeatByDB(ret, "昵称")
+			tools.ThrowExceptionWhenIsRepeatByDB(ret, "昵称")
 
 			// 密码加密
 			bytes, _ := bcrypt.GenerateFromPassword([]byte(form.Password), 14)
@@ -96,7 +96,7 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 			// 表单
 			var form AccountUpdateForm
 			if err := ctx.ShouldBind(&form); err != nil {
-				panic(errors.ThrowForbidden(err.Error()))
+				panic(exceptions.ThrowForbidden(err.Error()))
 			}
 
 			// 查重
@@ -107,14 +107,14 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowErrorWhenIsRepeatByDB(ret, "用户账号")
+			tools.ThrowExceptionWhenIsRepeatByDB(ret, "用户账号")
 			ret = (&models.BaseModel{}).
 				SetModel(models.AccountModel{}).
 				SetWheres(tools.Map{"nickname": form.Nickname}).
 				SetNotWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowErrorWhenIsRepeatByDB(ret, "用户昵称")
+			tools.ThrowExceptionWhenIsRepeatByDB(ret, "用户昵称")
 
 			// 查询
 			var account models.AccountModel
@@ -123,7 +123,7 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&account)
-			tools.ThrowErrorWhenIsEmptyByDB(ret, "用户")
+			tools.ThrowExceptionWhenIsEmptyByDB(ret, "用户")
 
 			// 编辑
 			if form.Username != "" {
@@ -150,10 +150,10 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 			// 表单
 			var form AccountUpdatePasswordForm
 			if err := ctx.ShouldBind(&form); err != nil {
-				panic(errors.ThrowForbidden(err.Error()))
+				panic(exceptions.ThrowForbidden(err.Error()))
 			}
 			if form.NewPassword != form.PasswordConfirmation {
-				panic(errors.ThrowForbidden("两次密码输入不一致"))
+				panic(exceptions.ThrowForbidden("两次密码输入不一致"))
 			}
 
 			ret = (&models.BaseModel{}).
@@ -161,11 +161,11 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&account)
-			tools.ThrowErrorWhenIsEmptyByDB(ret, "用户")
+			tools.ThrowExceptionWhenIsEmptyByDB(ret, "用户")
 
 			// 验证密码
 			if err := bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(form.OldPassword)); err != nil {
-				panic(errors.ThrowUnAuthorization("旧密码输入错误"))
+				panic(exceptions.ThrowUnAuthorization("旧密码输入错误"))
 			}
 
 			// 修改密码
@@ -176,7 +176,7 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 				SetModel(models.AccountModel{}).
 				DB().
 				Save(&account); ret.Error != nil {
-				panic(errors.ThrowForbidden("编辑失败：" + ret.Error.Error()))
+				panic(exceptions.ThrowForbidden("编辑失败：" + ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("密码修改成功").Updated(tools.Map{}))
@@ -194,7 +194,7 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&account)
-			tools.ThrowErrorWhenIsEmptyByDB(ret, "用户")
+			tools.ThrowExceptionWhenIsEmptyByDB(ret, "用户")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"account": account}))
 		})

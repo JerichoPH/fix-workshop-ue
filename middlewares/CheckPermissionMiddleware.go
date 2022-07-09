@@ -1,8 +1,8 @@
 package middlewares
 
 import (
-	"fix-workshop-ue/configs"
-	"fix-workshop-ue/errors"
+	"fix-workshop-ue/settings"
+	"fix-workshop-ue/exceptions"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
@@ -14,10 +14,10 @@ func CheckPermission() gin.HandlerFunc {
 		// 获取上下文中的用户
 		currentAccount, exists := ctx.Get("__currentAccount")
 		if !exists {
-			panic(errors.ThrowUnLogin("未登录"))
+			panic(exceptions.ThrowUnLogin("未登录"))
 		}
 
-		cfg := (&configs.Config{}).Init()
+		cfg := (&settings.Setting{}).Init()
 
 		if cfg.App.Section("app").Key("production").MustBool(true) {
 			var ret *gorm.DB
@@ -32,7 +32,7 @@ func CheckPermission() gin.HandlerFunc {
 				}).
 				Prepare().
 				First(&rbacPermission)
-			tools.ThrowErrorWhenIsEmptyByDB(ret, "权限")
+			tools.ThrowExceptionWhenIsEmptyByDB(ret, "权限")
 
 			ok := false
 			if len(rbacPermission.RbacRoles) > 0 {
@@ -48,7 +48,7 @@ func CheckPermission() gin.HandlerFunc {
 			}
 
 			if !ok {
-				panic(errors.ThrowUnAuthorization("未授权"))
+				panic(exceptions.ThrowUnAuthorization("未授权"))
 			}
 		}
 

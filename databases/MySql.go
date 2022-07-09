@@ -1,7 +1,7 @@
 package databases
 
 import (
-	"fix-workshop-ue/configs"
+	"fix-workshop-ue/settings"
 	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -20,7 +20,7 @@ type MySql struct {
 var mySqlConn *gorm.DB
 
 func (cls *MySql) getMySqlConn() (tx *gorm.DB) {
-	ctf := configs.Config{}
+	ctf := settings.Setting{}
 	config := ctf.Init()
 
 	cls.Username = config.DB.Section("mysql").Key("username").MustString("root")

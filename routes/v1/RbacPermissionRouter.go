@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"fix-workshop-ue/errors"
+	"fix-workshop-ue/exceptions"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -42,7 +42,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 			// 表单
 			var form RbacPermissionStoreForm
 			if err := ctx.ShouldBind(&form); err != nil {
-				panic(errors.ThrowForbidden(err.Error()))
+				panic(exceptions.ThrowForbidden(err.Error()))
 			}
 
 			// 查重
@@ -52,7 +52,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uri": form.URI}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowErrorWhenIsRepeatByDB(ret, "权限名称")
+			tools.ThrowExceptionWhenIsRepeatByDB(ret, "权限名称")
 
 			// 保存
 			(&models.BaseModel{}).
@@ -72,7 +72,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 		// 删除权限
 		r.DELETE(":id", func(ctx *gin.Context) {
 			var ret *gorm.DB
-			id := tools.ThrowErrorWhenIsNotInt(ctx.Param("id"), "权限编号必须是数字")
+			id := tools.ThrowExceptionWhenIsNotInt(ctx.Param("id"), "权限编号必须是数字")
 			var rbacPermission models.RbacPermissionModel
 
 			// 查询
@@ -81,7 +81,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"id": id}).
 				Prepare().
 				Find(&rbacPermission)
-			tools.ThrowErrorWhenIsEmptyByDB(ret, "权限")
+			tools.ThrowExceptionWhenIsEmptyByDB(ret, "权限")
 
 			// 删除
 			(&models.BaseModel{}).
@@ -95,12 +95,12 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 		// 编辑权限
 		r.PUT(":id", func(ctx *gin.Context) {
 			var ret *gorm.DB
-			id := tools.ThrowErrorWhenIsNotInt(ctx.Param("id"), "权限编号必须是数字")
+			id := tools.ThrowExceptionWhenIsNotInt(ctx.Param("id"), "权限编号必须是数字")
 
 			// 表单
 			var form RbacPermissionUpdateForm
 			if err := ctx.ShouldBind(&form); err != nil {
-				panic(errors.ThrowForbidden(err.Error()))
+				panic(exceptions.ThrowForbidden(err.Error()))
 			}
 
 			// 查重
@@ -111,7 +111,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"id": id}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowErrorWhenIsRepeatByDB(ret, "权限URI")
+			tools.ThrowExceptionWhenIsRepeatByDB(ret, "权限URI")
 
 			// 查询
 			var rbacPermission models.RbacPermissionModel
@@ -144,7 +144,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 		// 权限详情
 		r.GET(":id", func(ctx *gin.Context) {
 			var ret *gorm.DB
-			id := tools.ThrowErrorWhenIsNotInt(ctx.Param("id"), "权限编号必须是数字")
+			id := tools.ThrowExceptionWhenIsNotInt(ctx.Param("id"), "权限编号必须是数字")
 
 			var rbacPermission models.RbacPermissionModel
 			ret = (&models.BaseModel{}).
@@ -153,7 +153,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 				SetPreloads(tools.Strings{"RbacPermissionGroup"}).
 				Prepare().
 				First(&rbacPermission)
-			tools.ThrowErrorWhenIsEmptyByDB(ret, "权限")
+			tools.ThrowExceptionWhenIsEmptyByDB(ret, "权限")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"rbac_permission": rbacPermission}))
 		})

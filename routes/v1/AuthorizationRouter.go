@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"fix-workshop-ue/errors"
+	"fix-workshop-ue/exceptions"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
@@ -34,10 +34,10 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 			// 表单验证
 			var form AuthorizationRegisterForm
 			if err := ctx.ShouldBind(&form); err != nil {
-				panic(errors.ThrowForbidden(err.Error()))
+				panic(exceptions.ThrowForbidden(err.Error()))
 			}
 			if form.Password != form.PasswordConfirmation {
-				panic(errors.ThrowForbidden("两次密码输入不一致"))
+				panic(exceptions.ThrowForbidden("两次密码输入不一致"))
 			}
 
 			// 检查重复项（用户名）
@@ -47,12 +47,12 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"username": form.Username}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowErrorWhenIsRepeatByDB(ret, "用户名")
+			tools.ThrowExceptionWhenIsRepeatByDB(ret, "用户名")
 			ret = (&models.BaseModel{}).
 				SetWheres(tools.Map{"nickname": form.Nickname}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowErrorWhenIsRepeatByDB(ret, "昵称")
+			tools.ThrowExceptionWhenIsRepeatByDB(ret, "昵称")
 
 			// 密码加密
 			bytes, _ := bcrypt.GenerateFromPassword([]byte(form.Password), 14)
@@ -68,7 +68,7 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 					Nickname:                form.Nickname,
 					AccountStatusUniqueCode: "DEFAULT",
 				}); ret.Error != nil {
-				panic(errors.ThrowForbidden("创建失败：" + ret.Error.Error()))
+				panic(exceptions.ThrowForbidden("创建失败：" + ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("注册成功").Created(tools.Map{}))
@@ -79,7 +79,7 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 			// 表单验证
 			var form AuthorizationLoginForm
 			if err := ctx.ShouldBind(&form); err != nil {
-				panic(errors.ThrowForbidden(err.Error()))
+				panic(exceptions.ThrowForbidden(err.Error()))
 			}
 
 			// 获取用户
@@ -90,18 +90,18 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"username": form.Username}).
 				Prepare().
 				First(&account)
-			tools.ThrowErrorWhenIsEmptyByDB(ret, "用户")
+			tools.ThrowExceptionWhenIsEmptyByDB(ret, "用户")
 
 			// 验证密码
 			if err := bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(form.Password)); err != nil {
-				panic(errors.ThrowUnAuthorization("账号或密码错误"))
+				panic(exceptions.ThrowUnAuthorization("账号或密码错误"))
 			}
 
 			// 生成Jwt
 			token, err := tools.GenerateJwt(account.UUID, account.Password)
 			if err != nil {
 				// 生成jwt错误
-				panic(errors.ThrowForbidden(err.Error()))
+				panic(exceptions.ThrowForbidden(err.Error()))
 			}
 			ctx.JSON(tools.CorrectIns("登陆成功").OK(tools.Map{
 				"token":    token,

@@ -1,4 +1,4 @@
-package errors
+package exceptions
 
 type EmptyError struct{ s string }
 

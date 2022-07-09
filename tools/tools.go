@@ -1,7 +1,8 @@
 package tools
 
 import (
-	"fix-workshop-ue/errors"
+	"errors"
+	"fix-workshop-ue/exceptions"
 	"gorm.io/gorm"
 	"strconv"
 )
@@ -9,30 +10,28 @@ import (
 type Map map[string]interface{}
 type Strings []string
 
-// ThrowErrorWhenIsNotInt 文字转整型
-func ThrowErrorWhenIsNotInt(v string, errMsg string) (intValue int) {
+// ThrowExceptionWhenIsNotInt 文字转整型
+func ThrowExceptionWhenIsNotInt(v string, errMsg string) (intValue int) {
 	intValue, err := strconv.Atoi(v)
 	if err != nil && errMsg != "" {
-		panic(errors.ThrowForbidden(errMsg))
+		panic(exceptions.ThrowForbidden(errMsg))
 	}
 	return
 }
 
-// ThrowErrorWhenIsNotUint 文字转无符号整型
-func ThrowErrorWhenIsNotUint(v string, errMsg string) (uintValue uint) {
-	intValue := ThrowErrorWhenIsNotInt(v, errMsg)
+// ThrowExceptionWhenIsNotUint 文字转无符号整型
+func ThrowExceptionWhenIsNotUint(v string, errMsg string) (uintValue uint) {
+	intValue := ThrowExceptionWhenIsNotInt(v, errMsg)
 	uintValue = uint(intValue)
 	return
 }
 
-// ThrowErrorWhenIsEmptyByDB 当数据库返回空则报错
-func ThrowErrorWhenIsEmptyByDB(db *gorm.DB, name string) bool {
+// ThrowExceptionWhenIsEmptyByDB 当数据库返回空则报错
+func ThrowExceptionWhenIsEmptyByDB(db *gorm.DB, name string) bool {
 	if db.Error != nil {
-		switch db.Error.Error() {
-		default:
-		case "record not found":
+		if errors.Is(db.Error,gorm.ErrRecordNotFound){
 			if name != "" {
-				panic(errors.ThrowEmpty(name + "不存在"))
+				panic(exceptions.ThrowEmpty(name + "不存在"))
 				return false
 			} else {
 				return false
@@ -42,11 +41,11 @@ func ThrowErrorWhenIsEmptyByDB(db *gorm.DB, name string) bool {
 	return true
 }
 
-// ThrowErrorWhenIsRepeatByDB 当数据库返回不空则报错
-func ThrowErrorWhenIsRepeatByDB(db *gorm.DB, name string) bool {
+// ThrowExceptionWhenIsRepeatByDB 当数据库返回不空则报错
+func ThrowExceptionWhenIsRepeatByDB(db *gorm.DB, name string) bool {
 	if db.Error == nil {
 		if name != "" {
-			panic(errors.ThrowForbidden(name + "重复"))
+			panic(exceptions.ThrowForbidden(name + "重复"))
 			return false
 		} else {
 			return false

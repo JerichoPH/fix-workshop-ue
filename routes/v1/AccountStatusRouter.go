@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"fix-workshop-ue/errors"
+	"fix-workshop-ue/exceptions"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -34,7 +34,7 @@ func (cls *AccountStatusRouter) Load(router *gin.Engine) {
 			// 表单验证
 			var form AccountStatusStoreForm
 			if err := ctx.ShouldBind(&form); err != nil {
-				panic(errors.ThrowForbidden(err.Error()))
+				panic(exceptions.ThrowForbidden(err.Error()))
 			}
 
 			// 重复验证
@@ -44,12 +44,12 @@ func (cls *AccountStatusRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowErrorWhenIsRepeatByDB(ret, "用户代码")
+			tools.ThrowExceptionWhenIsRepeatByDB(ret, "用户代码")
 			ret = (&models.BaseModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowErrorWhenIsRepeatByDB(ret, "用户状态名称")
+			tools.ThrowExceptionWhenIsRepeatByDB(ret, "用户状态名称")
 
 			ret = (&models.BaseModel{}).DB().Create(&models.AccountStatusModel{
 				UniqueCode: form.UniqueCode,
@@ -72,7 +72,7 @@ func (cls *AccountStatusRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"unique_code": uniqueCode}).
 				Prepare().
 				First(&accountStatus)
-			tools.ThrowErrorWhenIsEmptyByDB(ret, "用户状态")
+			tools.ThrowExceptionWhenIsEmptyByDB(ret, "用户状态")
 
 			// 删除
 			(&models.BaseModel{}).DB().Delete(&accountStatus)
@@ -88,7 +88,7 @@ func (cls *AccountStatusRouter) Load(router *gin.Engine) {
 			// 表单
 			var form AccountStatusUpdateForm
 			if err := ctx.ShouldBind(&form); err != nil {
-				panic(errors.ThrowForbidden(err.Error()))
+				panic(exceptions.ThrowForbidden(err.Error()))
 			}
 
 			// 查重
@@ -98,7 +98,7 @@ func (cls *AccountStatusRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"unique_code": uniqueCode}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowErrorWhenIsRepeatByDB(ret, "用户状态名称")
+			tools.ThrowExceptionWhenIsRepeatByDB(ret, "用户状态名称")
 
 			// 查询
 			var accountStatus models.AccountStatusModel
@@ -106,13 +106,13 @@ func (cls *AccountStatusRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"unique_code": uniqueCode}).
 				Prepare().
 				First(&accountStatus)
-			tools.ThrowErrorWhenIsEmptyByDB(ret, "用户状态")
+			tools.ThrowExceptionWhenIsEmptyByDB(ret, "用户状态")
 
 			// 修改
 			accountStatus.Name = form.Name
 			ret = (&models.BaseModel{}).DB().Save(&accountStatus)
 			if ret.Error != nil {
-				panic(errors.ThrowForbidden(ret.Error.Error()))
+				panic(exceptions.ThrowForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(nil))
@@ -140,7 +140,7 @@ func (cls *AccountStatusRouter) Load(router *gin.Engine) {
 				Prepare().
 				First(&accountStatus);
 				ret.Error != nil {
-				panic(errors.ThrowEmpty(""))
+				panic(exceptions.ThrowEmpty(""))
 			}
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"account_status": accountStatus}))

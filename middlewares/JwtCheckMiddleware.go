@@ -1,8 +1,8 @@
 package middlewares
 
 import (
-	"fix-workshop-ue/configs"
-	"fix-workshop-ue/errors"
+	"fix-workshop-ue/settings"
+	"fix-workshop-ue/exceptions"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
@@ -19,16 +19,16 @@ func CheckJwt() gin.HandlerFunc {
 		// 获取令牌
 		split := strings.Split(tools.GetJwtFromHeader(ctx), " ")
 		if len(split) != 2 {
-			panic(errors.ThrowUnAuthorization("令牌格式错误"))
+			panic(exceptions.ThrowUnAuthorization("令牌格式错误"))
 		}
 		tokenType := split[0]
 		token := split[1]
 
-		cfg := (&configs.Config{}).Init()
+		cfg := (&settings.Setting{}).Init()
 
 		if cfg.App.Section("app").Key("production").MustBool(true) {
 			if token == "" {
-				panic(errors.ThrowUnAuthorization("令牌不存在"))
+				panic(exceptions.ThrowUnAuthorization("令牌不存在"))
 			} else {
 				switch tokenType {
 				case "JWT":
@@ -36,14 +36,14 @@ func CheckJwt() gin.HandlerFunc {
 
 					// 判断令牌是否有效
 					if err != nil {
-						panic(errors.ThrowUnAuthorization("令牌解析失败"))
+						panic(exceptions.ThrowUnAuthorization("令牌解析失败"))
 					} else if time.Now().Unix() > claims.ExpiresAt {
-						panic(errors.ThrowUnAuthorization("令牌过期"))
+						panic(exceptions.ThrowUnAuthorization("令牌过期"))
 					}
 
 					// 判断用户是否存在
 					if reflect.DeepEqual(claims, tools.Claims{}) {
-						panic(errors.ThrowUnAuthorization("令牌解析失败：用户不存在"))
+						panic(exceptions.ThrowUnAuthorization("令牌解析失败：用户不存在"))
 					}
 
 					// 获取用户信息
@@ -55,9 +55,9 @@ func CheckJwt() gin.HandlerFunc {
 						Prepare().
 						First(&account)
 
-					tools.ThrowErrorWhenIsEmptyByDB(ret, "用户")
+					tools.ThrowExceptionWhenIsEmptyByDB(ret, "用户")
 				default:
-					panic(errors.ThrowForbidden("权鉴认证方式不支持"))
+					panic(exceptions.ThrowForbidden("权鉴认证方式不支持"))
 
 				}
 			}

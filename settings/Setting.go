@@ -1,20 +1,20 @@
-package configs
+package settings
 
 import "gopkg.in/ini.v1"
 
-type Config struct {
+type Setting struct {
 	App *ini.File
 	DB  *ini.File
 }
 
-func (cls *Config) Init() *Config {
+func (cls *Setting) Init() *Setting {
 
-	appConfigFile, appConfigErr := ini.Load("./configs/app.ini")
+	appConfigFile, appConfigErr := ini.Load("./settings/app.ini")
 	if appConfigErr != nil {
 		panic(appConfigErr)
 	}
 
-	dbConfigFile, dbConfigErr := ini.Load("./configs/db.ini")
+	dbConfigFile, dbConfigErr := ini.Load("./settings/db.ini")
 	if dbConfigErr != nil {
 		panic(dbConfigErr)
 	}

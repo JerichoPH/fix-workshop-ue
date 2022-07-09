@@ -35,7 +35,7 @@ func (cls *BaseModel) demoFindOne() {
 		SetNotWheres(tools.Map{}).
 		Prepare().
 		First(b)
-	tools.ThrowErrorWhenIsEmptyByDB(ret, "XX")
+	tools.ThrowExceptionWhenIsEmptyByDB(ret, "XX")
 }
 
 // demoFind 获取多条数据演示
@@ -197,13 +197,13 @@ func (cls *BaseModel) PrepareQuery(ctx *gin.Context) *gorm.DB {
 
 	// offset
 	if offset, ok := ctx.GetQuery("__offset__"); ok {
-		offset := tools.ThrowErrorWhenIsNotInt(offset, "offset参数只能填写整数")
+		offset := tools.ThrowExceptionWhenIsNotInt(offset, "offset参数只能填写整数")
 		dbSession.Offset(offset)
 	}
 
 	// limit
 	if limit, ok := ctx.GetQuery("__limit__"); ok {
-		limit := tools.ThrowErrorWhenIsNotInt(limit, "limit参数只能填写整数")
+		limit := tools.ThrowExceptionWhenIsNotInt(limit, "limit参数只能填写整数")
 		dbSession.Limit(limit)
 	}
 

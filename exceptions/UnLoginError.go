@@ -1,4 +1,4 @@
-package errors
+package exceptions
 
 type UnLoginError struct{ s string }
 
