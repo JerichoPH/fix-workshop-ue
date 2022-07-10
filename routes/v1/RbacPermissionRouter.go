@@ -15,7 +15,7 @@ type RbacPermissionRouter struct{}
 // RbacPermissionStoreForm 创建权限表单
 type RbacPermissionStoreForm struct {
 	Name                    string `form:"name" json:"name"`
-	URI                     string `form:"uri" json:"uri"`
+	Uri                     string `form:"uri" json:"uri"`
 	Method                  string `form:"method" json:"method"`
 	RbacPermissionGroupUUID string `form:"rbac_permission_group_uuid" json:"rbac_permission_group_uuid"`
 }
@@ -23,7 +23,7 @@ type RbacPermissionStoreForm struct {
 // RbacPermissionUpdateForm 编辑权限表单
 type RbacPermissionUpdateForm struct {
 	Name                    string `form:"name" json:"name"`
-	URI                     string `form:"uri" json:"uri"`
+	Uri                     string `form:"uri" json:"uri"`
 	Method                  string `form:"method" json:"method"`
 	RbacPermissionGroupUUID string `form:"rbac_permission_group_uuid" json:"rbac_permission_group_uuid"`
 }
@@ -44,15 +44,33 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 			if err := ctx.ShouldBind(&form); err != nil {
 				panic(exceptions.ThrowForbidden(err.Error()))
 			}
+			if form.Name == "" {
+				panic(exceptions.ThrowForbidden("名称必填"))
+			}
+			if form.Uri == "" {
+				panic(exceptions.ThrowForbidden("URI必填"))
+			}
+			if form.Method == "" {
+				panic(exceptions.ThrowForbidden("访问方法必选"))
+			}
+			if form.RbacPermissionGroupUUID == "" {
+				panic(exceptions.ThrowForbidden("所属权限分组必选"))
+			}
+			ret = (&models.BaseModel{}).
+				SetModel(&models.RbacPermissionGroupModel{}).
+				SetWheres(tools.Map{"uuid": form.RbacPermissionGroupUUID}).
+				Prepare().
+				First(&models.RbacPermissionGroupModel{})
+			tools.ThrowExceptionWhenIsEmptyByDB(ret, "所属权限分组")
 
 			// 查重
 			var repeat models.RbacPermissionModel
 			ret = (&models.BaseModel{}).
 				SetModel(&models.RbacPermissionModel{}).
-				SetWheres(tools.Map{"uri": form.URI}).
+				SetWheres(tools.Map{"uri": form.Uri, "method": form.Method}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowExceptionWhenIsRepeatByDB(ret, "权限名称")
+			tools.ThrowExceptionWhenIsRepeatByDB(ret, "权限Uri和访问方法")
 
 			// 保存
 			(&models.BaseModel{}).
@@ -61,7 +79,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 				Create(&models.RbacPermissionModel{
 					BaseModel:               models.BaseModel{},
 					Name:                    form.Name,
-					URI:                     form.URI,
+					URI:                     form.Uri,
 					Method:                  form.Method,
 					RbacPermissionGroupUUID: form.RbacPermissionGroupUUID,
 				})
@@ -93,22 +111,40 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 		})
 
 		// 编辑权限
-		r.PUT(":id", func(ctx *gin.Context) {
+		r.PUT(":uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
-			id := tools.ThrowExceptionWhenIsNotInt(ctx.Param("id"), "权限编号必须是数字")
+			uuid := ctx.Param("uuid")
 
 			// 表单
 			var form RbacPermissionUpdateForm
 			if err := ctx.ShouldBind(&form); err != nil {
 				panic(exceptions.ThrowForbidden(err.Error()))
 			}
+			if form.Name == "" {
+				panic(exceptions.ThrowForbidden("名称必填"))
+			}
+			if form.Uri == "" {
+				panic(exceptions.ThrowForbidden("URI必填"))
+			}
+			if form.Method == "" {
+				panic(exceptions.ThrowForbidden("访问方法必选"))
+			}
+			if form.RbacPermissionGroupUUID == "" {
+				panic(exceptions.ThrowForbidden("所属权限分组必选"))
+			}
+			ret = (&models.BaseModel{}).
+				SetModel(&models.RbacPermissionGroupModel{}).
+				SetWheres(tools.Map{"uuid": form.RbacPermissionGroupUUID}).
+				Prepare().
+				First(&models.RbacPermissionGroupModel{})
+			tools.ThrowExceptionWhenIsEmptyByDB(ret, "所属权限分组")
 
 			// 查重
 			var repeat models.RbacPermissionModel
 			ret = (&models.BaseModel{}).
 				SetModel(&models.RbacPermissionModel{}).
-				SetWheres(tools.Map{"uri": form.URI}).
-				SetNotWheres(tools.Map{"id": id}).
+				SetWheres(tools.Map{"uri": form.Uri, "method": form.Method}).
+				SetNotWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&repeat)
 			tools.ThrowExceptionWhenIsRepeatByDB(ret, "权限URI")
@@ -117,7 +153,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 			var rbacPermission models.RbacPermissionModel
 			ret = (&models.BaseModel{}).
 				SetModel(&models.RbacPermissionModel{}).
-				SetWheres(tools.Map{"id": id}).
+				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&rbacPermission)
 
@@ -125,8 +161,8 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 			if form.Name != "" {
 				rbacPermission.Name = form.Name
 			}
-			if form.URI != "" {
-				rbacPermission.URI = form.URI
+			if form.Uri != "" {
+				rbacPermission.URI = form.Uri
 			}
 			if form.Method != "" {
 				rbacPermission.Method = form.Method
@@ -142,14 +178,14 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 		})
 
 		// 权限详情
-		r.GET(":id", func(ctx *gin.Context) {
+		r.GET(":uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
-			id := tools.ThrowExceptionWhenIsNotInt(ctx.Param("id"), "权限编号必须是数字")
+			uuid := ctx.Param("uuid")
 
 			var rbacPermission models.RbacPermissionModel
 			ret = (&models.BaseModel{}).
 				SetModel(&models.RbacPermissionModel{}).
-				SetWheres(tools.Map{"id": id}).
+				SetWheres(tools.Map{"uuid": uuid}).
 				SetPreloads(tools.Strings{"RbacPermissionGroup"}).
 				Prepare().
 				First(&rbacPermission)
@@ -163,6 +199,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 			var rbacPermissions []models.RbacPermissionModel
 			(&models.BaseModel{}).
 				SetModel(models.RbacPermissionModel{}).
+				SetPreloads(tools.Strings{"RbacPermissionGroup"}).
 				SetWhereFields(tools.Strings{"name", "uri", "method", "rbac_permission_group_uuid"}).
 				PrepareQuery(ctx).
 				Find(&rbacPermissions)

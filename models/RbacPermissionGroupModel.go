@@ -8,7 +8,7 @@ import (
 type RbacPermissionGroupModel struct {
 	BaseModel
 	UUID            string                 `gorm:"type:CHAR(36);UNIQUE;NOT NULL;COMMENT:uuid;" json:"uuid"`
-	Name            string                 `gorm:"type:VARCHAR(64);UNIQUE;NOT NULL;COMMENT:权限分组名称;" json:"name"`
+	Name            string                 `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:权限分组名称;" json:"name"`
 	RbacPermissions []*RbacPermissionModel `gorm:"constraint:OnUpdate:CASCADE;foreignKey:RbacPermissionGroupUUID;references:UUID;COMMENT:相关权限;" json:"rbac_permissions"`
 }
 

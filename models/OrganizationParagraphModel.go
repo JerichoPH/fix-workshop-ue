@@ -3,7 +3,7 @@ package models
 type OrganizationParagraphModel struct {
 	BaseModel
 	UniqueCode                    string                      `gorm:"type:CHAR(4);UNIQUE;NOT NULL;COMMENT:站段代码;" json:"unique_code"` // B049
-	Name                          string                      `gorm:"type:VARCHAR(64);UNIQUE;NOT NULL;COMMENT:站段名称;" json:"name"`
+	Name                          string                      `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:站段名称;" json:"name"`
 	ShotName                      string                      `gorm:"type:VARCHAR(64);COMMENT:站段简称;" json:"shot_name"`
 	BeEnable                      bool                        `gorm:"type:BOOLEAN;DEFAULT:1;COMMENT:是否启用;" json:"be_enable"`
 	OrganizationRailwayUniqueCode string                      `gorm:"type:CHAR(3);COMMENT:所属路局;" json:"organization_railway_unique_code"`

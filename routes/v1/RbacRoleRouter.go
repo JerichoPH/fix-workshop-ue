@@ -5,6 +5,7 @@ import (
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -28,7 +29,7 @@ type RbacRoleBindAccountsForm struct {
 
 // RbacRoleBindPermissionsForm 角色绑定权限表单
 type RbacRoleBindPermissionsForm struct {
-	RbacPermissionIDs []string `form:"permission_ids[]" json:"permission_ids"`
+	RbacPermissionUUIDs []string `form:"rbac_permission_uuids" json:"rbac_permission_uuids"`
 }
 
 func (cls *RbacRoleRouter) Load(router *gin.Engine) {
@@ -46,6 +47,9 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 			var form RbacRoleStoreForm
 			if err := ctx.ShouldBind(&form); err != nil {
 				panic(exceptions.ThrowForbidden(err.Error()))
+			}
+			if form.Name == "" {
+				panic(exceptions.ThrowForbidden("名称必填"))
 			}
 
 			// 查重
@@ -100,6 +104,9 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 			var form RbacRoleUpdateForm
 			if err := ctx.ShouldBind(&form); err != nil {
 				panic(exceptions.ThrowForbidden(err.Error()))
+			}
+			if form.Name == "" {
+				panic(exceptions.ThrowForbidden("名称必填"))
 			}
 
 			// 查重
@@ -193,10 +200,11 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 
 			// 查询权限
 			var rbacPermissions []*models.RbacPermissionModel
+			fmt.Println(form.RbacPermissionUUIDs)
 			(&models.BaseModel{}).
 				SetModel(models.RbacPermissionModel{}).
 				DB().
-				Where("uuid IN ?", form.RbacPermissionIDs).
+				Where("uuid IN ?", form.RbacPermissionUUIDs).
 				Find(&rbacPermissions)
 			if len(rbacPermissions) == 0 {
 				panic(exceptions.ThrowForbidden("没有找到权限"))
@@ -218,7 +226,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 			ret = (&models.BaseModel{}).
 				SetModel(models.RbacRoleModel{}).
 				SetWheres(tools.Map{"uuid": uuid}).
-				SetPreloads(tools.Strings{"RbacPermissions", "Accounts"}).
+				SetPreloads(tools.Strings{"RbacPermissions", "RbacPermissions.RbacPermissionGroup", "Accounts", "Accounts.AccountStatus"}).
 				Prepare().
 				First(&rbacRole)
 			tools.ThrowExceptionWhenIsEmptyByDB(ret, "角色")

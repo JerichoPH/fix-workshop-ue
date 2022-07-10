@@ -4,7 +4,7 @@ package models
 type OrganizationWorkshopModel struct {
 	BaseModel
 	UniqueCode                         string                        `gorm:"type:CHAR(7);UNIQUE;NOT NULL;COMMENT:车间代码;" json:"unique_code"`
-	Name                               string                        `gorm:"type:VARCHAR(64);UNIQUE;NOT NULL;COMMENT:车间名称;" json:"name"`
+	Name                               string                        `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:车间名称;" json:"name"`
 	BeEnable                           bool                          `gorm:"type:BOOLEAN;DEFAULT:1;COMMENT:是否启用;" json:"be_enable"`
 	OrganizationWorkshopTypeUniqueCode string                        `gorm:"type:VARCHAR(64);COMMENT:车间类型;" json:"organization_workshop_type_unique_code"`
 	OrganizationWorkshopType           OrganizationWorkshopTypeModel `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OrganizationWorkshopTypeUniqueCode;references:UniqueCode;COMMENT:所属类型;" json:"organization_workshop_type"`

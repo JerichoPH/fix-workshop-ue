@@ -20,7 +20,7 @@ func CorrectIns(msg string) *correct {
 
 func (cls *correct) get() map[string]interface{} {
 	ret := map[string]interface{}{
-		"message":    cls.m,
+		"msg":    cls.m,
 		"content":    cls.c,
 		"status":     cls.s,
 		"error_code": cls.ec,
