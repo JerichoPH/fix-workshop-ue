@@ -5,6 +5,7 @@ import (
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -12,17 +13,19 @@ import (
 type MenuRouter struct{}
 
 type MenuStoreForm struct {
-	Name       string `form:"name" json:"name"`
-	URL        string `form:"url" json:"url"`
-	URIName    string `form:"uri_name" json:"uri_name"`
-	ParentUUID string `form:"parent_uuid" json:"parent_uuid"`
+	Name          string `form:"name" json:"name"`
+	URL           string `form:"url" json:"url"`
+	URIName       string `form:"uri_name" json:"uri_name"`
+	ParentUUID    string `form:"parent_uuid" json:"parent_uuid"`
+	RbacRoleUUIDs []string `form:"rbac_role_uuids" json:"rbac_role_uuids"`
 }
 
 type MenuUpdateForm struct {
-	Name       string `form:"name" json:"name"`
-	URL        string `form:"url" json:"url"`
-	URIName    string `form:"uri_name" json:"uri_name"`
-	ParentUUID string `form:"parent_uuid" json:"parent_uuid"`
+	Name          string   `form:"name" json:"name"`
+	URL           string   `form:"url" json:"url"`
+	URIName       string   `form:"uri_name" json:"uri_name"`
+	ParentUUID    string   `form:"parent_uuid" json:"parent_uuid"`
+	RbacRoleUUIDs []string `form:"rbac_role_uuids" json:"rbac_role_uuids"`
 }
 
 func (cls *MenuRouter) Load(router *gin.Engine) {
@@ -44,6 +47,9 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 			if form.Name == "" {
 				panic(exceptions.ThrowForbidden("名称必填"))
 			}
+			if len(form.RbacRoleUUIDs) == 0 {
+				panic(exceptions.ThrowEmpty("所属角色必选"))
+			}
 
 			// 查重
 			var repeat models.MenuModel
@@ -54,7 +60,17 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 				First(&repeat)
 			tools.ThrowExceptionWhenIsRepeatByDB(ret, "菜单名称和URL")
 
-			// 查询
+			// 查询角色
+			fmt.Println(form.RbacRoleUUIDs)
+			var rbacRoles []models.RbacRoleModel
+			(&models.BaseModel{}).
+				SetModel(models.RbacRoleModel{}).
+				DB().
+				Where("uuid in ?", form.RbacRoleUUIDs).
+				Find(&rbacRoles)
+			if len(rbacRoles) == 0 {
+				panic(exceptions.ThrowEmpty("所选角色不存在"))
+			}
 
 			// 新建
 			if ret = (&models.BaseModel{}).
@@ -65,6 +81,7 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 					URL:        form.URL,
 					URIName:    form.URIName,
 					ParentUUID: form.ParentUUID,
+					RbacRoles:  rbacRoles,
 				}); ret.Error != nil {
 				panic(exceptions.ThrowForbidden(ret.Error.Error()))
 			}

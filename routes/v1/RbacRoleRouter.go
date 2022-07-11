@@ -143,8 +143,8 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 			uuid := ctx.Param("uuid")
 
 			// 表单
-			var rbacRoleBindAccountsForm RbacRoleBindAccountsForm
-			if err := ctx.ShouldBind(&rbacRoleBindAccountsForm); err != nil {
+			var form RbacRoleBindAccountsForm
+			if err := ctx.ShouldBind(&form); err != nil {
 				panic(exceptions.ThrowForbidden(err.Error()))
 			}
 
@@ -162,7 +162,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 			ret = (&models.BaseModel{}).
 				SetModel(models.AccountModel{}).
 				Prepare().
-				Where("uuid in ?", rbacRoleBindAccountsForm.AccountUUIDs).
+				Where("uuid in ?", form.AccountUUIDs).
 				Find(&accounts)
 			if len(accounts) == 0 {
 				panic(exceptions.ThrowEmpty("用户不存在"))
