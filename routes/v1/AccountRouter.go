@@ -82,7 +82,7 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 					Nickname:                form.Nickname,
 					AccountStatusUniqueCode: "DEFAULT",
 				}); ret.Error != nil {
-				panic(ret.Error)
+				panic(exceptions.ThrowForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("新建成功").Created(tools.Map{}))

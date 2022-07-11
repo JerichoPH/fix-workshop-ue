@@ -124,13 +124,13 @@ func (cls *BaseModel) BeforeSave(db *gorm.DB) (err error) {
 
 // DB 获取对象
 func (cls *BaseModel) DB() (dbSession *gorm.DB) {
-	dbSession = (&databases.MySql{}).GetMySqlConn()
+	dbSession = (&databases.MySql{}).GetConn()
 	return
 }
 
 // Prepare 初始化
 func (cls *BaseModel) Prepare() (dbSession *gorm.DB) {
-	dbSession = (&databases.MySql{}).GetMySqlConn().Where(cls.wheres).Not(cls.notWheres)
+	dbSession = (&databases.MySql{}).GetConn().Where(cls.wheres).Not(cls.notWheres)
 
 	if cls.model != nil {
 		dbSession = dbSession.Model(&cls.model)

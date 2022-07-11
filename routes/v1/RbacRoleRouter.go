@@ -226,7 +226,13 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 			ret = (&models.BaseModel{}).
 				SetModel(models.RbacRoleModel{}).
 				SetWheres(tools.Map{"uuid": uuid}).
-				SetPreloads(tools.Strings{"RbacPermissions", "RbacPermissions.RbacPermissionGroup", "Accounts", "Accounts.AccountStatus"}).
+				SetPreloads(tools.Strings{
+					"RbacPermissions",
+					"RbacPermissions.RbacPermissionGroup",
+					"Accounts",
+					"Accounts.AccountStatus",
+					"Menus",
+				}).
 				Prepare().
 				First(&rbacRole)
 			tools.ThrowExceptionWhenIsEmptyByDB(ret, "角色")

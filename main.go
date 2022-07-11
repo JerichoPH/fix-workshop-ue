@@ -26,7 +26,7 @@ func initServer(router *gin.Engine, addr string) {
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-	if serverErr := server.ListenAndServe(); serverErr!=nil{
+	if serverErr := server.ListenAndServe(); serverErr != nil {
 		log.Println("服务器启动错误：", serverErr)
 	}
 
@@ -64,7 +64,7 @@ func main() {
 	//}).
 	//	InitDB() // 创建mssql链接
 
-	if errAutoMigrate := (&databases.MySql{}).GetMySqlConn().
+	if errAutoMigrate := (&databases.MySql{}).GetConn().
 		Set("gorm:table_options", "ENGINE=Distributed(cluster, default, hits)").
 		Set("gorm:table_options", "ENGINE=InnoDB").
 		AutoMigrate(
@@ -89,6 +89,7 @@ func main() {
 	(&v1.RbacRoleRouter{}).Load(router)            // 角色
 	(&v1.RbacPermissionGroupRouter{}).Load(router) //权限分组
 	(&v1.RbacPermissionRouter{}).Load(router)      // 权限
+	(&v1.MenuRouter{}).Load(router)                // 菜单
 
 	initServer(router, setting.App.Section("app").Key("addr").MustString(":8080")) // 启动服务
 }

@@ -42,8 +42,7 @@ func (cls *MySql) getMySqlConn() (tx *gorm.DB) {
 
 	mySqlConn, _ := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		CreateBatchSize: 1000,
-		//SkipDefaultTransaction: true,
-		//PrepareStmt:            true,
+		DisableForeignKeyConstraintWhenMigrating: true,
 	})
 
 	tx = mySqlConn.Session(&gorm.Session{
@@ -55,15 +54,15 @@ func (cls *MySql) getMySqlConn() (tx *gorm.DB) {
 	return
 }
 
-// GetMySqlConn 获取数据库链接
-func (cls *MySql) GetMySqlConn() *gorm.DB {
+// GetConn 获取数据库链接
+func (cls *MySql) GetConn() *gorm.DB {
 	if mySqlConn == nil {
 		mySqlConn = cls.getMySqlConn()
 	}
 	return mySqlConn
 }
 
-// GetNewMySqlConn 获取新数据库链接
-func (cls *MySql) GetNewMySqlConn() *gorm.DB {
+// GetNewConn 获取新数据库链接
+func (cls *MySql) GetNewConn() *gorm.DB {
 	return cls.getMySqlConn()
 }
