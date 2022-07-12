@@ -7,6 +7,7 @@ import (
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"strconv"
 )
 
 // 权限路由
@@ -25,6 +26,12 @@ type RbacPermissionUpdateForm struct {
 	Name                    string `form:"name" json:"name"`
 	Uri                     string `form:"uri" json:"uri"`
 	Method                  string `form:"method" json:"method"`
+	RbacPermissionGroupUUID string `form:"rbac_permission_group_uuid" json:"rbac_permission_group_uuid"`
+}
+
+// RbacPermissionStoreResourceForm 批量添加资源权限
+type RbacPermissionStoreResourceForm struct {
+	Uri                     string `form:"uri" json:"uri"`
 	RbacPermissionGroupUUID string `form:"rbac_permission_group_uuid" json:"rbac_permission_group_uuid"`
 }
 
@@ -63,15 +70,6 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 				First(&models.RbacPermissionGroupModel{})
 			tools.ThrowExceptionWhenIsEmptyByDB(ret, "所属权限分组")
 
-			// 查重
-			var repeat models.RbacPermissionModel
-			ret = (&models.BaseModel{}).
-				SetModel(&models.RbacPermissionModel{}).
-				SetWheres(tools.Map{"uri": form.Uri, "method": form.Method}).
-				Prepare().
-				First(&repeat)
-			tools.ThrowExceptionWhenIsRepeatByDB(ret, "权限Uri和访问方法")
-
 			// 保存
 			(&models.BaseModel{}).
 				SetModel(&models.RbacPermissionModel{}).
@@ -88,15 +86,15 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 		})
 
 		// 删除权限
-		r.DELETE(":id", func(ctx *gin.Context) {
+		r.DELETE(":uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
-			id := tools.ThrowExceptionWhenIsNotInt(ctx.Param("id"), "权限编号必须是数字")
+			uuid := ctx.Param("uuid")
 			var rbacPermission models.RbacPermissionModel
 
 			// 查询
 			ret = (&models.BaseModel{}).
 				SetModel(models.RbacPermissionModel{}).
-				SetWheres(tools.Map{"id": id}).
+				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				Find(&rbacPermission)
 			tools.ThrowExceptionWhenIsEmptyByDB(ret, "权限")
@@ -139,16 +137,6 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 				First(&models.RbacPermissionGroupModel{})
 			tools.ThrowExceptionWhenIsEmptyByDB(ret, "所属权限分组")
 
-			// 查重
-			var repeat models.RbacPermissionModel
-			ret = (&models.BaseModel{}).
-				SetModel(&models.RbacPermissionModel{}).
-				SetWheres(tools.Map{"uri": form.Uri, "method": form.Method}).
-				SetNotWheres(tools.Map{"uuid": uuid}).
-				Prepare().
-				First(&repeat)
-			tools.ThrowExceptionWhenIsRepeatByDB(ret, "权限URI")
-
 			// 查询
 			var rbacPermission models.RbacPermissionModel
 			ret = (&models.BaseModel{}).
@@ -175,6 +163,62 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 			(&models.BaseModel{}).SetModel(models.RbacPermissionModel{}).DB().Save(&rbacPermission)
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{}))
+		})
+
+		// 批量添加资源权限
+		r.POST("resource", func(ctx *gin.Context) {
+			var ret *gorm.DB
+			resourceRbacPermission := map[string]string{"列表": "GET", "新建页面": "GET", "新建": "POST", "详情页面": "GET", "编辑页面": "GET", "编辑": "PUT", "删除": "DELETE"}
+
+			// 表单
+			var form RbacPermissionStoreResourceForm
+			if err := ctx.ShouldBind(&form); err != nil {
+				panic(exceptions.ThrowForbidden(err.Error()))
+			}
+			if form.Uri == "" {
+				panic(exceptions.ThrowForbidden("URI必填"))
+			}
+			if form.RbacPermissionGroupUUID == "" {
+				panic(exceptions.ThrowForbidden("所属权限分组必选"))
+			}
+
+			// 查询权限分组
+			var rbacPermissionGroup models.RbacPermissionGroupModel
+			ret = (&models.BaseModel{}).
+				SetModel(models.RbacPermissionGroupModel{}).
+				SetWheres(tools.Map{"uuid": form.RbacPermissionGroupUUID}).
+				Prepare().
+				First(&rbacPermissionGroup)
+			tools.ThrowExceptionWhenIsEmptyByDB(ret, "权限分组")
+
+			// 批量新建
+			successCount := 0
+			for name, method := range resourceRbacPermission {
+				// 如果不重复则新建
+				var repeat models.RbacPermissionModel
+				ret = (&models.BaseModel{}).
+					SetModel(models.RbacPermissionModel{}).
+					SetWheres(tools.Map{"name": name, "method": method, "uri": form.Uri}).
+					Prepare().
+					First(&repeat)
+				if !tools.ThrowExceptionWhenIsEmptyByDB(ret, "") {
+					if ret = (&models.BaseModel{}).
+						SetModel(models.RbacPermissionModel{}).
+						DB().
+						Create(&models.RbacPermissionModel{
+							Name:                    name,
+							URI:                     form.Uri,
+							Method:                  method,
+							RbacPermissionGroupUUID: form.RbacPermissionGroupUUID,
+						}); ret.Error != nil {
+						panic(exceptions.ThrowForbidden("批量添加资源权限时错误：" + ret.Error.Error()))
+					} else {
+						successCount += 1
+					}
+				}
+			}
+
+			ctx.JSON(tools.CorrectIns("成功添加权限：" + strconv.Itoa(successCount) + "个").Created(tools.Map{}))
 		})
 
 		// 权限详情

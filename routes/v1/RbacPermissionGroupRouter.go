@@ -136,6 +136,7 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 			ret = (&models.BaseModel{}).
 				SetModel(models.RbacPermissionGroupModel{}).
 				SetWheres(tools.Map{"uuid": uuid}).
+				SetPreloads(tools.Strings{"RbacPermissions"}).
 				Prepare().
 				First(&rbacPermissionGroup)
 			tools.ThrowExceptionWhenIsEmptyByDB(ret, "权限分组")
@@ -148,6 +149,7 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 			var rbacPermissionGroups []models.RbacPermissionGroupModel
 			(&models.BaseModel{}).
 				SetModel(models.RbacPermissionGroupModel{}).
+				SetPreloads(tools.Strings{"RbacPermissions"}).
 				PrepareQuery(ctx).
 				Find(&rbacPermissionGroups)
 
