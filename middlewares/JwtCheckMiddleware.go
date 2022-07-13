@@ -1,9 +1,9 @@
 package middlewares
 
 import (
-	"fix-workshop-ue/settings"
 	"fix-workshop-ue/exceptions"
 	"fix-workshop-ue/models"
+	"fix-workshop-ue/settings"
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -14,8 +14,6 @@ import (
 
 func CheckJwt() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var account map[string]interface{}
-
 		// 获取令牌
 		split := strings.Split(tools.GetJwtFromHeader(ctx), " ")
 		if len(split) != 2 {
@@ -26,7 +24,8 @@ func CheckJwt() gin.HandlerFunc {
 
 		cfg := (&settings.Setting{}).Init()
 
-		if cfg.App.Section("app").Key("production").MustBool(true) {
+		if cfg.App.Section("app").Key("production").MustBool(false) {
+			var account map[string]interface{}
 			if token == "" {
 				panic(exceptions.ThrowUnAuthorization("令牌不存在"))
 			} else {
@@ -58,12 +57,11 @@ func CheckJwt() gin.HandlerFunc {
 					tools.ThrowExceptionWhenIsEmptyByDB(ret, "用户")
 				default:
 					panic(exceptions.ThrowForbidden("权鉴认证方式不支持"))
-
 				}
 			}
+			ctx.Set("__ACCOUNT__", account)
 		}
 
-		ctx.Set("__currentAccount", account)
 		ctx.Next()
 	}
 }

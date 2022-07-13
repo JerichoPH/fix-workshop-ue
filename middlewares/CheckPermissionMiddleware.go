@@ -1,9 +1,9 @@
 package middlewares
 
 import (
-	"fix-workshop-ue/settings"
 	"fix-workshop-ue/exceptions"
 	"fix-workshop-ue/models"
+	"fix-workshop-ue/settings"
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -12,14 +12,14 @@ import (
 func CheckPermission() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// 获取上下文中的用户
-		currentAccount, exists := ctx.Get("__currentAccount")
+		currentAccount, exists := ctx.Get("__ACCOUNT__")
 		if !exists {
 			panic(exceptions.ThrowUnLogin("未登录"))
 		}
 
 		cfg := (&settings.Setting{}).Init()
 
-		if cfg.App.Section("app").Key("production").MustBool(true) {
+		if !cfg.App.Section("app").Key("production").MustBool(true) {
 			var ret *gorm.DB
 
 			// 获取权限

@@ -4,6 +4,7 @@ import (
 	"fix-workshop-ue/exceptions"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -110,5 +111,19 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 				"uuid":     account.UUID,
 			}))
 		})
+
+		// 获取当前账号相关菜单
+		r.GET(
+			"menus",
+			func(ctx *gin.Context) {
+				if account,exists := ctx.Get("__ACCOUNT__");!exists{
+					panic(exceptions.ThrowUnLogin("用户未登录"))
+				}
+
+
+
+				fmt.Println(ctx.Get("__ACCOUNT__"))
+			},
+		)
 	}
 }

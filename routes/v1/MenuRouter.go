@@ -17,6 +17,7 @@ type MenuStoreForm struct {
 	URL           string   `form:"url" json:"url"`
 	URIName       string   `form:"uri_name" json:"uri_name"`
 	ParentUUID    string   `form:"parent_uuid" json:"parent_uuid"`
+	Icon          string   `form:"icon" json:"icon"`
 	RbacRoleUUIDs []string `form:"rbac_role_uuids" json:"rbac_role_uuids"`
 }
 
@@ -25,6 +26,7 @@ type MenuUpdateForm struct {
 	URL           string   `form:"url" json:"url"`
 	URIName       string   `form:"uri_name" json:"uri_name"`
 	ParentUUID    string   `form:"parent_uuid" json:"parent_uuid"`
+	Icon          string   `form:"icon" json:"icon"`
 	RbacRoleUUIDs []string `form:"rbac_role_uuids" json:"rbac_role_uuids"`
 }
 
