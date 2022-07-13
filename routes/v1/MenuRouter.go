@@ -13,10 +13,10 @@ import (
 type MenuRouter struct{}
 
 type MenuStoreForm struct {
-	Name          string `form:"name" json:"name"`
-	URL           string `form:"url" json:"url"`
-	URIName       string `form:"uri_name" json:"uri_name"`
-	ParentUUID    string `form:"parent_uuid" json:"parent_uuid"`
+	Name          string   `form:"name" json:"name"`
+	URL           string   `form:"url" json:"url"`
+	URIName       string   `form:"uri_name" json:"uri_name"`
+	ParentUUID    string   `form:"parent_uuid" json:"parent_uuid"`
 	RbacRoleUUIDs []string `form:"rbac_role_uuids" json:"rbac_role_uuids"`
 }
 
@@ -36,11 +36,11 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 	)
 	{
 		// 新建菜单
-		var form MenuStoreForm
 		r.POST("", func(ctx *gin.Context) {
 			var ret *gorm.DB
 
 			// 表单
+			var form MenuStoreForm
 			if err := ctx.ShouldBind(&form); err != nil {
 				panic(exceptions.ThrowForbidden(err.Error()))
 			}
@@ -73,6 +73,7 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 			}
 
 			// 新建
+			fmt.Println(form)
 			if ret = (&models.BaseModel{}).
 				SetModel(models.MenuModel{}).
 				DB().
@@ -172,7 +173,7 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 			var menu models.MenuModel
 			ret = (&models.BaseModel{}).
 				SetModel(models.MenuModel{}).
-				SetPreloads(tools.Strings{"Parent", "Subs"}).
+				SetPreloads(tools.Strings{"Parent", "Subs", "RbacRoles"}).
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&menu)
@@ -187,7 +188,7 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 			(&models.BaseModel{}).
 				SetModel(models.MenuModel{}).
 				SetWhereFields(tools.Strings{"uuid", "name", "url", "parent_uuid"}).
-				SetPreloads(tools.Strings{"Parent"}).
+				SetPreloads(tools.Strings{"Parent", "Subs", "RbacRoles"}).
 				PrepareQuery(ctx).
 				Find(&menus)
 

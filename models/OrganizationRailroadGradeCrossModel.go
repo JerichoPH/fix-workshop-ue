@@ -13,3 +13,4 @@ type OrganizationRailroadGradeCrossModel struct {
 func (cls *OrganizationRailroadGradeCrossModel) TableName() string {
 	return "organization_railroad_grade_crosses"
 }
+
