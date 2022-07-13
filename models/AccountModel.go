@@ -1,14 +1,8 @@
 package models
 
-import (
-	uuid "github.com/satori/go.uuid"
-	"gorm.io/gorm"
-)
-
 // AccountModel 用户模型
 type AccountModel struct {
 	BaseModel
-	UUID                    string                 `gorm:"type:CHAR(36);UNIQUE;NOT NULL;COMMENT:UUID;" json:"uuid"`
 	Username                string                 `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:登录账号;" json:"username"`
 	Password                string                 `gorm:"type:VARCHAR(128);NOT NULL;COMMENT:登录密码;" json:"password"`
 	Nickname                string                 `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:昵称;" json:"nickname"`
@@ -21,10 +15,4 @@ type AccountModel struct {
 // TableName 表名称
 func (cls *AccountModel) TableName() string {
 	return "accounts"
-}
-
-// BeforeCreate 插入数据前
-func (cls *AccountModel) BeforeCreate(db *gorm.DB) (err error) {
-	cls.UUID = uuid.NewV4().String()
-	return
 }

@@ -4,6 +4,7 @@ import (
 	"fix-workshop-ue/databases"
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
+	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"time"
@@ -11,10 +12,9 @@ import (
 
 // BaseModel 出厂数据、财务数据、检修数据、仓储数据、流转数据、运用数据
 type BaseModel struct {
-	ID             uint           `gorm:"primaryKey" json:"id"`
-	CreatedAt      time.Time      `gorm:"type:DATETIME;auto_now_add;" json:"created_at"`
-	UpdatedAt      time.Time      `gorm:"type:DATETIME;" json:"updated_at"`
-	DeletedAt      gorm.DeletedAt `gorm:"index" json:"deleted_at"`
+	gorm.Model
+	UUID           string `gorm:"type:CHAR(36);UNIQUE;NOT NULL;COMMENT:uuid;" json:"uuid"`
+	Sort           int64  `gorm:"type:BIGINT;DEFAULT:0;NOT NULL;COMMENT:排序;" json:"sort"`
 	preloads       []string
 	selects        []string
 	omits          []string
@@ -113,6 +113,7 @@ func (cls *BaseModel) SetNotWheres(notWheres map[string]interface{}) *BaseModel 
 func (cls *BaseModel) BeforeCreate(db *gorm.DB) (err error) {
 	cls.CreatedAt = time.Now()
 	cls.UpdatedAt = time.Now()
+	cls.UUID = uuid.NewV4().String()
 	return
 }
 

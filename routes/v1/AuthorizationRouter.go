@@ -4,7 +4,6 @@ import (
 	"fix-workshop-ue/exceptions"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -116,13 +115,41 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 		r.GET(
 			"menus",
 			func(ctx *gin.Context) {
-				if account,exists := ctx.Get("__ACCOUNT__");!exists{
+				var ret *gorm.DB
+				if accountUUID, exists := ctx.Get("__ACCOUNT__"); !exists {
 					panic(exceptions.ThrowUnLogin("用户未登录"))
+				} else {
+					// 获取当前用户信息
+					var account models.AccountModel
+					ret = (&models.BaseModel{}).
+						SetModel(models.AccountModel{}).
+						SetWheres(tools.Map{"uuid": accountUUID}).
+						SetPreloads(tools.Strings{"RbacRoles", "RbacRoles.Menus"}).
+						Prepare().
+						First(&account)
+					tools.ThrowExceptionWhenIsEmptyByDB(ret, "当前令牌指向用户")
+
+					menuUUIDs := make([]string, 50)
+					if len(account.RbacRoles) > 0 {
+						for _, rbacRole := range account.RbacRoles {
+							if len(rbacRole.Menus) > 0 {
+								for _, menu := range rbacRole.Menus {
+									menuUUIDs = append(menuUUIDs, menu.UUID)
+								}
+							}
+						}
+					}
+
+					var menus []models.MenuModel
+					(&models.BaseModel{}).
+						SetModel(models.MenuModel{}).
+						SetPreloads(tools.Strings{"Parent", "Subs"}).
+						DB().
+						Where("uuid in ?", menuUUIDs).
+						Find(&menus)
+
+					ctx.JSON(tools.CorrectIns("").OK(tools.Map{"menus": menus}))
 				}
-
-
-
-				fmt.Println(ctx.Get("__ACCOUNT__"))
 			},
 		)
 	}

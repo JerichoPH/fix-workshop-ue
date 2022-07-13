@@ -25,7 +25,7 @@ func CheckJwt() gin.HandlerFunc {
 		cfg := (&settings.Setting{}).Init()
 
 		if cfg.App.Section("app").Key("production").MustBool(false) {
-			var account map[string]interface{}
+			var account = make(map[string]interface{})
 			if token == "" {
 				panic(exceptions.ThrowUnAuthorization("令牌不存在"))
 			} else {
@@ -46,7 +46,6 @@ func CheckJwt() gin.HandlerFunc {
 					}
 
 					// 获取用户信息
-					var account = make(map[string]interface{})
 					var ret *gorm.DB
 					ret = (&models.BaseModel{}).
 						SetModel(models.AccountModel{}).
@@ -59,7 +58,7 @@ func CheckJwt() gin.HandlerFunc {
 					panic(exceptions.ThrowForbidden("权鉴认证方式不支持"))
 				}
 			}
-			ctx.Set("__ACCOUNT__", account)
+			ctx.Set("__ACCOUNT__", account["uuid"])
 		}
 
 		ctx.Next()
