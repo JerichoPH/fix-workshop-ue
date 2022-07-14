@@ -75,7 +75,6 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 			}
 
 			// 新建
-			fmt.Println(form)
 			if ret = (&models.BaseModel{}).
 				SetModel(models.MenuModel{}).
 				DB().

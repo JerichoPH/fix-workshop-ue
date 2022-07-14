@@ -1,5 +1,7 @@
 package models
 
+import "gorm.io/gorm"
+
 // OrganizationRailwayModel 路局
 type OrganizationRailwayModel struct {
 	BaseModel
@@ -14,4 +16,9 @@ type OrganizationRailwayModel struct {
 // TableName 表名称
 func (cls *OrganizationRailwayModel) TableName() string {
 	return "organization_railways"
+}
+
+// ScopeBeEnable 获取启用的数据
+func (cls *OrganizationRailwayModel) ScopeBeEnable(db *gorm.DB) *gorm.DB {
+	return db.Where("be_enable is ?", true)
 }

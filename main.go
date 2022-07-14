@@ -74,6 +74,19 @@ func main() {
 			&models.RbacPermissionModel{},      // 权限
 			&models.RbacPermissionGroupModel{}, //权限分组
 
+			// 组织机构
+			&models.OrganizationRailwayModel{},            //路局
+			&models.OrganizationParagraphModel{},          // 站段
+			&models.OrganizationLineModel{},               // 线别
+			&models.OrganizationWorkshopTypeModel{},       // 车间类型
+			&models.OrganizationWorkshopModel{},           // 车间
+			&models.OrganizationWorkAreaTypeModel{},       // 工区类型
+			&models.OrganizationWorkAreaModel{},           // 工区
+			&models.OrganizationStationModel{},            // 站场
+			&models.OrganizationRailroadGradeCrossModel{}, // 道口
+			&models.OrganizationSectionModel{},            // 区间
+			&models.OrganizationCenterModel{},             // 中心
+
 		); errAutoMigrate != nil {
 		fmt.Println("自动迁移错误：", errAutoMigrate)
 		os.Exit(1)
@@ -82,12 +95,16 @@ func main() {
 	router := gin.Default()
 	router.Use(exceptions.RecoverHandler) // 异常处理
 
+	// 用户与权鉴
 	(&v1.AuthorizationRouter{}).Load(router)       // 权鉴
 	(&v1.AccountRouter{}).Load(router)             // 用户                                                                                                                                                          // 用户
 	(&v1.RbacRoleRouter{}).Load(router)            // 角色
 	(&v1.RbacPermissionGroupRouter{}).Load(router) //权限分组
 	(&v1.RbacPermissionRouter{}).Load(router)      // 权限
 	(&v1.MenuRouter{}).Load(router)                // 菜单
+
+	// 组织机构
+	(&v1.OrganizationLineRouter{}).Load(router) // 线别
 
 	initServer(router, setting.App.Section("app").Key("addr").MustString(":8080")) // 启动服务
 }

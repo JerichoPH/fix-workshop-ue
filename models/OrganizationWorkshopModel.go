@@ -1,5 +1,7 @@
 package models
 
+import "gorm.io/gorm"
+
 // OrganizationWorkshopModel 车间
 type OrganizationWorkshopModel struct {
 	BaseModel
@@ -19,4 +21,9 @@ type OrganizationWorkshopModel struct {
 // TableName 表名称
 func (cls *OrganizationWorkshopModel) TableName() string {
 	return "organization_workshops"
+}
+
+// ScopeBeEnable 获取启用的数据
+func (cls *OrganizationWorkshopModel) ScopeBeEnable(db *gorm.DB) *gorm.DB {
+	return db.Where("be_enable is ?", true)
 }

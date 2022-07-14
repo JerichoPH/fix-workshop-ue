@@ -1,5 +1,7 @@
 package models
 
+import "gorm.io/gorm"
+
 // OrganizationSectionModel 区间
 type OrganizationSectionModel struct {
 	BaseModel
@@ -13,4 +15,9 @@ type OrganizationSectionModel struct {
 // TableName 表名称
 func (cls *OrganizationSectionModel) TableName() string {
 	return "organization_sections"
+}
+
+// ScopeBeEnable 获取启用的数据
+func (cls *OrganizationSectionModel) ScopeBeEnable(db *gorm.DB) *gorm.DB {
+	return db.Where("be_enable is ?", true)
 }

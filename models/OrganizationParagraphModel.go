@@ -1,5 +1,7 @@
 package models
 
+import "gorm.io/gorm"
+
 type OrganizationParagraphModel struct {
 	BaseModel
 	UniqueCode                    string                      `gorm:"type:CHAR(4);UNIQUE;NOT NULL;COMMENT:站段代码;" json:"unique_code"` // B049
@@ -15,4 +17,9 @@ type OrganizationParagraphModel struct {
 // TableName 表名称
 func (cls *OrganizationParagraphModel) TableName() string {
 	return "organization_paragraphs"
+}
+
+// ScopeBeEnable 获取启用的数据
+func (cls *OrganizationParagraphModel) ScopeBeEnable(db *gorm.DB) *gorm.DB {
+	return db.Where("be_enable is ?", true)
 }
