@@ -69,7 +69,6 @@ func main() {
 		Set("gorm:table_options", "ENGINE=InnoDB").
 		AutoMigrate(
 			// 用户与权鉴
-			&models.AccountStatusModel{},       // 用户状态
 			&models.AccountModel{},             // 用户
 			&models.RbacRoleModel{},            // 角色
 			&models.RbacPermissionModel{},      // 权限
@@ -85,7 +84,6 @@ func main() {
 
 	(&v1.AuthorizationRouter{}).Load(router)       // 权鉴
 	(&v1.AccountRouter{}).Load(router)             // 用户                                                                                                                                                          // 用户
-	(&v1.AccountStatusRouter{}).Load(router)       // 用户状态
 	(&v1.RbacRoleRouter{}).Load(router)            // 角色
 	(&v1.RbacPermissionGroupRouter{}).Load(router) //权限分组
 	(&v1.RbacPermissionRouter{}).Load(router)      // 权限

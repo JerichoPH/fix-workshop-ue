@@ -12,7 +12,7 @@ import (
 func CheckPermission() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// 获取上下文中的用户
-		currentAccount, exists := ctx.Get("__ACCOUNT__")
+		currentAccountUUID, exists := ctx.Get("__ACCOUNT__")
 		if !exists {
 			panic(exceptions.ThrowUnLogin("未登录"))
 		}
@@ -39,7 +39,7 @@ func CheckPermission() gin.HandlerFunc {
 				for _, rbacRole := range rbacPermission.RbacRoles {
 					if len(rbacRole.Accounts) > 0 {
 						for _, account := range rbacRole.Accounts {
-							if account.UUID == currentAccount.(tools.Map)["uuid"] {
+							if account.UUID == currentAccountUUID {
 								ok = true
 							}
 						}

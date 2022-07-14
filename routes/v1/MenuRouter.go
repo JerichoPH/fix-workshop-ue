@@ -83,6 +83,7 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 					Name:       form.Name,
 					URL:        form.URL,
 					URIName:    form.URIName,
+					Icon:       form.Icon,
 					ParentUUID: form.ParentUUID,
 					RbacRoles:  rbacRoles,
 				}); ret.Error != nil {
@@ -156,6 +157,7 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 			}
 			menu.URL = form.URL
 			menu.URIName = form.URIName
+			menu.Icon = form.Icon
 			menu.ParentUUID = form.ParentUUID
 			if ret = (&models.BaseModel{}).
 				SetModel(models.MenuModel{}).

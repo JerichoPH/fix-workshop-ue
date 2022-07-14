@@ -2,6 +2,7 @@ package v1
 
 import (
 	"fix-workshop-ue/exceptions"
+	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
@@ -63,10 +64,9 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 				SetOmits(tools.Strings{clause.Associations}).
 				DB().
 				Create(&models.AccountModel{
-					Username:                form.Username,
-					Password:                string(bytes),
-					Nickname:                form.Nickname,
-					AccountStatusUniqueCode: "DEFAULT",
+					Username: form.Username,
+					Password: string(bytes),
+					Nickname: form.Nickname,
 				}); ret.Error != nil {
 				panic(exceptions.ThrowForbidden("创建失败：" + ret.Error.Error()))
 			}
@@ -114,6 +114,7 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 		// 获取当前账号相关菜单
 		r.GET(
 			"menus",
+			middlewares.CheckJwt(),
 			func(ctx *gin.Context) {
 				var ret *gorm.DB
 				if accountUUID, exists := ctx.Get("__ACCOUNT__"); !exists {
@@ -143,9 +144,10 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 					var menus []models.MenuModel
 					(&models.BaseModel{}).
 						SetModel(models.MenuModel{}).
-						SetPreloads(tools.Strings{"Parent", "Subs"}).
 						DB().
 						Where("uuid in ?", menuUUIDs).
+						Where("parent_uuid is null").
+						Preload("Subs").
 						Find(&menus)
 
 					ctx.JSON(tools.CorrectIns("").OK(tools.Map{"menus": menus}))

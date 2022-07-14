@@ -80,7 +80,6 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 					Username:                form.Username,
 					Password:                string(bytes),
 					Nickname:                form.Nickname,
-					AccountStatusUniqueCode: "DEFAULT",
 				}); ret.Error != nil {
 				panic(exceptions.ThrowForbidden(ret.Error.Error()))
 			}
