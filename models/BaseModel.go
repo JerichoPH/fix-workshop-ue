@@ -16,8 +16,8 @@ type BaseModel struct {
 	CreatedAt      time.Time      `gorm:"type:DATETIME;auto_now_add;" json:"created_at"`
 	UpdatedAt      time.Time      `gorm:"type:DATETIME;" json:"updated_at"`
 	DeletedAt      gorm.DeletedAt `gorm:"index" json:"deleted_at"`
-	UUID           string `gorm:"type:CHAR(36);UNIQUE;NOT NULL;COMMENT:uuid;" json:"uuid"`
-	Sort           int64  `gorm:"type:BIGINT;DEFAULT:0;NOT NULL;COMMENT:排序;" json:"sort"`
+	UUID           string         `gorm:"type:CHAR(36);UNIQUE;NOT NULL;COMMENT:uuid;" json:"uuid"`
+	Sort           int64          `gorm:"type:BIGINT;DEFAULT:0;NOT NULL;COMMENT:排序;" json:"sort"`
 	preloads       []string
 	selects        []string
 	omits          []string
@@ -26,6 +26,7 @@ type BaseModel struct {
 	ignoreFields   []string
 	wheres         map[string]interface{}
 	notWheres      map[string]interface{}
+	scopes         []func(*gorm.DB) *gorm.DB
 	model          interface{}
 }
 
@@ -47,7 +48,7 @@ func (cls *BaseModel) demoFind() {
 	var ctx *gin.Context
 	cls.
 		SetModel(BaseModel{}).
-		SetWhereFields(tools.Strings{"a", "b", "c"}).
+		SetWhereFields("a", "b", "c").
 		PrepareQuery(ctx).
 		Find(&b)
 }
@@ -71,31 +72,31 @@ func (cls *BaseModel) SetPreloadsDefault() *BaseModel {
 }
 
 // SetSelects 设置Selects
-func (cls *BaseModel) SetSelects(selects []string) *BaseModel {
+func (cls *BaseModel) SetSelects(selects ...string) *BaseModel {
 	cls.selects = selects
 	return cls
 }
 
 // SetOmits 设置Omits
-func (cls *BaseModel) SetOmits(omits []string) *BaseModel {
+func (cls *BaseModel) SetOmits(omits ...string) *BaseModel {
 	cls.omits = omits
 	return cls
 }
 
 // SetWhereFields 设置WhereFields
-func (cls *BaseModel) SetWhereFields(whereFields []string) *BaseModel {
+func (cls *BaseModel) SetWhereFields(whereFields ...string) *BaseModel {
 	cls.whereFields = whereFields
 	return cls
 }
 
 // SetNotWhereFields 设置NotWhereFields
-func (cls *BaseModel) SetNotWhereFields(notWhereFields []string) *BaseModel {
+func (cls *BaseModel) SetNotWhereFields(notWhereFields ...string) *BaseModel {
 	cls.notWhereFields = notWhereFields
 	return cls
 }
 
 // SetIgnoreFields 设置IgnoreFields
-func (cls *BaseModel) SetIgnoreFields(ignoreFields []string) *BaseModel {
+func (cls *BaseModel) SetIgnoreFields(ignoreFields ...string) *BaseModel {
 	cls.ignoreFields = ignoreFields
 	return cls
 }
@@ -109,6 +110,12 @@ func (cls *BaseModel) SetWheres(wheres map[string]interface{}) *BaseModel {
 // SetNotWheres 设置NotWheres
 func (cls *BaseModel) SetNotWheres(notWheres map[string]interface{}) *BaseModel {
 	cls.notWheres = notWheres
+	return cls
+}
+
+// SetScopes 设置Scopes
+func (cls *BaseModel) SetScopes(scopes ...func(*gorm.DB) *gorm.DB) *BaseModel {
+	cls.scopes = scopes
 	return cls
 }
 
@@ -138,6 +145,11 @@ func (cls *BaseModel) Prepare() (dbSession *gorm.DB) {
 
 	if cls.model != nil {
 		dbSession = dbSession.Model(&cls.model)
+	}
+
+	// 设置scopes
+	if len(cls.scopes) > 0 {
+		dbSession = dbSession.Scopes(cls.scopes...)
 	}
 
 	// 拼接preloads关系

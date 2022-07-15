@@ -74,7 +74,7 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 
 			if ret = (&models.BaseModel{}).
 				SetModel(models.AccountModel{}).
-				SetOmits(tools.Strings{clause.Associations}).
+				SetOmits(clause.Associations).
 				DB().
 				Create(&models.AccountModel{
 					Username:                form.Username,

@@ -61,7 +61,7 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 			// 保存新用户
 			if ret = (&models.BaseModel{}).
 				SetModel(models.AccountModel{}).
-				SetOmits(tools.Strings{clause.Associations}).
+				SetOmits(clause.Associations).
 				DB().
 				Create(&models.AccountModel{
 					Username: form.Username,

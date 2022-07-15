@@ -190,7 +190,7 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 			var menus []models.MenuModel
 			(&models.BaseModel{}).
 				SetModel(models.MenuModel{}).
-				SetWhereFields(tools.Strings{"uuid", "name", "url", "parent_uuid"}).
+				SetWhereFields("uuid", "name", "url", "parent_uuid").
 				SetPreloads(tools.Strings{"Parent", "Subs", "RbacRoles"}).
 				PrepareQuery(ctx).
 				Find(&menus)

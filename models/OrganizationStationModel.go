@@ -11,7 +11,7 @@ type OrganizationStationModel struct {
 	OrganizationWorkshop           OrganizationWorkshopModel  `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OrganizationWorkshopUniqueCode;references:UniqueCode;COMMENT:所属车间;" json:"organization_workshop"`
 	OrganizationWorkAreaUniqueCode string                     `gorm:"type:CHAR(8);COMMENT:所属工区代码;" json:"organization_work_area_unique_code"`
 	OrganizationWorkArea           OrganizationWorkAreaModel  `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OrganizationWorkAreaUniqueCode;references:UniqueCode;COMMENT:所属工区;" json:"organization_work_area"`
-	OrganizationLines              []*OrganizationLineModel   `gorm:"many2many:pivot_line_stations;COMMENT:线别与车站多对多;"`
+	OrganizationLines              []*OrganizationLineModel   `gorm:"many2many:pivot_organization_line_and_organization_stations;foreignKey:id;joinForeignKey:organization_station_id;references:id;joinReferences:organization_line_id;COMMENT:线别与车站多对多;" json:"organization_lines"`
 	LocationInstallRooms           []LocationInstallRoomModel `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OrganizationStationUniqueCode;references:UniqueCode;COMMENT:相关机房;" json:"location_install_rooms"`
 }
 

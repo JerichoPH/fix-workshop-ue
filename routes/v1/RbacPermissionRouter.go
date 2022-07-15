@@ -244,7 +244,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 			(&models.BaseModel{}).
 				SetModel(models.RbacPermissionModel{}).
 				SetPreloads(tools.Strings{"RbacPermissionGroup"}).
-				SetWhereFields(tools.Strings{"name", "uri", "method", "rbac_permission_group_uuid"}).
+				SetWhereFields("name", "uri", "method", "rbac_permission_group_uuid").
 				PrepareQuery(ctx).
 				Find(&rbacPermissions)
 
