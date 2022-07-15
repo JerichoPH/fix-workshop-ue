@@ -89,13 +89,13 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 		})
 
 		// 删除
-		r.DELETE("railway/:unique_code", func(ctx *gin.Context) {
+		r.DELETE("railway/:uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
 			uuid := ctx.Param("uuid")
 
 			// 查询
 			var organizationRailway models.OrganizationRailwayModel
-			(&models.BaseModel{}).
+			ret = (&models.BaseModel{}).
 				SetModel(models.OrganizationRailwayModel{}).
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
@@ -112,7 +112,7 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 		})
 
 		// 编辑
-		r.PUT("railway/:unique_code", func(ctx *gin.Context) {
+		r.PUT("railway/:uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
 			uuid := ctx.Param("uuid")
 
@@ -172,7 +172,7 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 		})
 
 		// 详情
-		r.GET("railway/:unique_code", func(ctx *gin.Context) {
+		r.GET("railway/:uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
 			uuid := ctx.Param("uuid")
 

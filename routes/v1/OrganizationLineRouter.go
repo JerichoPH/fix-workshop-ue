@@ -159,7 +159,7 @@ func (cls *OrganizationLineRouter) Load(router *gin.Engine) {
 			}
 			// 查询路局
 			var organizationRailways []*models.OrganizationRailwayModel
-			if len(form.OrganizationParagraphUUIDs) > 0 {
+			if len(form.OrganizationRailwayUUIDs) > 0 {
 				(&models.BaseModel{}).
 					SetModel(models.OrganizationRailwayModel{}).
 					SetScopes((&models.OrganizationRailwayModel{}).ScopeBeEnable).
@@ -240,6 +240,7 @@ func (cls *OrganizationLineRouter) Load(router *gin.Engine) {
 			var organizationLine models.OrganizationLineModel
 			ret = (&models.BaseModel{}).
 				SetModel(models.OrganizationLineModel{}).
+				SetScopes((&models.OrganizationLineModel{}).ScopeBeEnable).
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&organizationLine)
@@ -253,6 +254,7 @@ func (cls *OrganizationLineRouter) Load(router *gin.Engine) {
 			var organizationLines []models.OrganizationLineModel
 			(&models.BaseModel{}).
 				SetModel(models.OrganizationLineModel{}).
+				SetScopes((&models.OrganizationLineModel{}).ScopeBeEnable).
 				SetWhereFields("unique_code", "name", "be_enable", "sort").
 				PrepareQuery(ctx).
 				Find(&organizationLines)

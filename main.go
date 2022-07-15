@@ -104,7 +104,8 @@ func main() {
 	(&v1.MenuRouter{}).Load(router)                // 菜单
 
 	// 组织机构
-	(&v1.OrganizationLineRouter{}).Load(router) // 线别
+	(&v1.OrganizationLineRouter{}).Load(router)    // 线别
+	(&v1.OrganizationRailwayRouter{}).Load(router) // 路局
 
 	initServer(router, setting.App.Section("app").Key("addr").MustString(":8080")) // 启动服务
 }

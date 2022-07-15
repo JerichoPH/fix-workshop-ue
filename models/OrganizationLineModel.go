@@ -19,5 +19,5 @@ func (cls *OrganizationLineModel) TableName() string {
 
 // ScopeBeEnable 获取启用的数据
 func (cls *OrganizationLineModel) ScopeBeEnable(db *gorm.DB) *gorm.DB {
-	return db.Where("be_enable is ?", true)
+	return db.Where("be_enable = ?", 1)
 }

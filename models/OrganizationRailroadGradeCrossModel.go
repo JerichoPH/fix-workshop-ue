@@ -1,5 +1,7 @@
 package models
 
+import "gorm.io/gorm"
+
 // OrganizationRailroadGradeCrossModel 道口
 type OrganizationRailroadGradeCrossModel struct {
 	BaseModel
@@ -13,4 +15,9 @@ type OrganizationRailroadGradeCrossModel struct {
 // TableName 表名称
 func (cls *OrganizationRailroadGradeCrossModel) TableName() string {
 	return "organization_railroad_grade_crosses"
+}
+
+// ScopeBeEnable 获取启用的数据
+func (cls *OrganizationRailroadGradeCrossModel) ScopeBeEnable(db *gorm.DB) *gorm.DB {
+	return db.Where("be_enable = ?", 1)
 }

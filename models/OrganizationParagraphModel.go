@@ -22,5 +22,5 @@ func (cls *OrganizationParagraphModel) TableName() string {
 
 // ScopeBeEnable 获取启用的数据
 func (cls *OrganizationParagraphModel) ScopeBeEnable(db *gorm.DB) *gorm.DB {
-	return db.Where("be_enable is ?", true)
+	return db.Where("be_enable = ?", 1)
 }
