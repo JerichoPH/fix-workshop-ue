@@ -16,7 +16,7 @@ type RbacPermissionRouter struct{}
 
 // RbacPermissionStoreForm 新建权限表单
 type RbacPermissionStoreForm struct {
-	Sort                    int64 `form:"sort" json:"sort"`
+	Sort                    int64  `form:"sort" json:"sort"`
 	Name                    string `form:"name" json:"name"`
 	Uri                     string `form:"uri" json:"uri"`
 	Method                  string `form:"method" json:"method"`
@@ -29,27 +29,22 @@ type RbacPermissionStoreForm struct {
 //  @param ctx
 //  @return RbacPermissionStoreForm
 func (cls RbacPermissionStoreForm) ShouldBind(ctx *gin.Context) RbacPermissionStoreForm {
-	var ret *gorm.DB
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(abnormals.BombForbidden(err.Error()))
+		abnormals.BombForbidden(err.Error())
 	}
 	if cls.Name == "" {
-		panic(abnormals.BombForbidden("名称必填"))
+		abnormals.BombForbidden("名称必填")
 	}
 	if cls.Uri == "" {
-		panic(abnormals.BombForbidden("URI必填"))
+		abnormals.BombForbidden("URI必填")
 	}
 	if cls.Method == "" {
-		panic(abnormals.BombForbidden("访问方法必选"))
+		abnormals.BombForbidden("访问方法必选")
 	}
 	if cls.RbacPermissionGroupUUID == "" {
-		panic(abnormals.BombForbidden("所属权限分组必选"))
+		abnormals.BombForbidden("所属权限分组必选")
 	}
-	ret = models.Init(&models.RbacPermissionGroupModel{}).
-		SetWheres(tools.Map{"uuid": cls.RbacPermissionGroupUUID}).
-		Prepare().
-		First(&cls.RbacPermissionGroup)
-	abnormals.BombWhenIsEmptyByDB(ret, "所属权限分组")
+	cls.RbacPermissionGroup = (&models.RbacPermissionGroupModel{}).FindOneByUUID(cls.RbacPermissionGroupUUID)
 
 	return cls
 }
@@ -66,13 +61,13 @@ type RbacPermissionStoreResourceForm struct {
 //  @return RbacPermissionStoreResourceForm
 func (cls RbacPermissionStoreResourceForm) ShouldBind(ctx *gin.Context) RbacPermissionStoreResourceForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(abnormals.BombForbidden(err.Error()))
+		abnormals.BombForbidden(err.Error())
 	}
 	if cls.Uri == "" {
-		panic(abnormals.BombForbidden("URI必填"))
+		abnormals.BombForbidden("URI必填")
 	}
 	if cls.RbacPermissionGroupUUID == "" {
-		panic(abnormals.BombForbidden("权限分组必选"))
+		abnormals.BombForbidden("权限分组必选")
 	}
 
 	return cls
@@ -106,7 +101,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 			if ret = models.Init(&models.RbacPermissionModel{}).
 				DB().
 				Create(&rbacPermission); ret.Error != nil {
-				panic(abnormals.BombForbidden(ret.Error.Error()))
+				abnormals.BombForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"rbac_permission": rbacPermission}))
@@ -139,7 +134,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 							Method:                  method,
 							RbacPermissionGroupUUID: form.RbacPermissionGroupUUID,
 						}); ret.Error != nil {
-						panic(abnormals.BombForbidden("批量添加资源权限时错误：" + ret.Error.Error()))
+						abnormals.BombForbidden("批量添加资源权限时错误：" + ret.Error.Error())
 					} else {
 						successCount += 1
 					}
@@ -160,7 +155,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 			if ret = models.Init(&models.RbacPermissionModel{}).
 				DB().
 				Delete(&rbacPermission); ret.Error != nil {
-				panic(abnormals.BombForbidden(ret.Error.Error()))
+				abnormals.BombForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
@@ -184,7 +179,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 			if ret = models.Init(models.RbacPermissionModel{}).
 				DB().
 				Save(&rbacPermission); ret.Error != nil {
-				panic(abnormals.BombForbidden(ret.Error.Error()))
+				abnormals.BombForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"rbac_permission": rbacPermission}))
@@ -193,11 +188,10 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 		// 权限详情
 		r.GET(":uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
-			uuid := ctx.Param("uuid")
 
 			var rbacPermission models.RbacPermissionModel
 			ret = models.Init(&models.RbacPermissionModel{}).
-				SetWheres(tools.Map{"uuid": uuid}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				SetPreloads(tools.Strings{"RbacPermissionGroup"}).
 				Prepare().
 				First(&rbacPermission)

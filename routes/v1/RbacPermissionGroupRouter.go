@@ -23,10 +23,10 @@ type RbacPermissionGroupStoreForm struct {
 //  @return RbacPermissionGroupStoreForm
 func (cls RbacPermissionGroupStoreForm) ShouldBind(ctx *gin.Context) RbacPermissionGroupStoreForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(abnormals.BombForbidden(err.Error()))
+		abnormals.BombForbidden(err.Error())
 	}
 	if cls.Name == "" {
-		panic(abnormals.BombForbidden("名称必填"))
+		abnormals.BombForbidden("名称必填")
 	}
 
 	return cls
@@ -62,7 +62,7 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 			if ret = models.Init(models.RbacPermissionGroupModel{}).
 				DB().
 				Create(&rbacPermissionGroup); ret.Error != nil {
-				panic(abnormals.BombForbidden(ret.Error.Error()))
+				abnormals.BombForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"rbac_permission_group": rbacPermissionGroup}))
@@ -82,7 +82,7 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 
 			// 删除
 			if ret = models.Init(models.RbacPermissionGroupModel{}).DB().Delete(&rbacPermissionGroup); ret.Error != nil {
-				panic(abnormals.BombForbidden(ret.Error.Error()))
+				abnormals.BombForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())

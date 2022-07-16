@@ -27,13 +27,13 @@ type OrganizationWorkshopTypeStoreForm struct {
 //  @return OrganizationWorkshopTypeStoreForm
 func (cls OrganizationWorkshopTypeStoreForm) ShouldBind(ctx *gin.Context) OrganizationWorkshopTypeStoreForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(abnormals.BombForbidden(err.Error()))
+		abnormals.BombForbidden(err.Error())
 	}
 	if cls.UniqueCode == "" {
-		panic(abnormals.BombForbidden("车间类型代码必填"))
+		abnormals.BombForbidden("车间类型代码必填")
 	}
 	if cls.Name == "" {
-		panic(abnormals.BombForbidden("车间类型名称必填"))
+		abnormals.BombForbidden("车间类型名称必填")
 	}
 
 	return cls
@@ -75,10 +75,8 @@ func (OrganizationWorkshopTypeRouter) Load(router *gin.Engine) {
 				Name:       form.Name,
 				Number:     form.Number,
 			}
-			if ret = models.Init(models.OrganizationWorkshopTypeModel{}).
-				DB().
-				Create(&organizationWorkshopType); ret.Error != nil {
-				panic(abnormals.BombForbidden(ret.Error.Error()))
+			if ret = models.Init(models.OrganizationWorkshopTypeModel{}).DB().Create(&organizationWorkshopType); ret.Error != nil {
+				abnormals.BombForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"organization_workshop_type": organizationWorkshopType}))
@@ -93,7 +91,7 @@ func (OrganizationWorkshopTypeRouter) Load(router *gin.Engine) {
 
 			// 删除
 			if ret = models.Init(models.OrganizationWorkshopTypeModel{}).DB().Delete(&organizationWorkshopType); ret.Error != nil {
-				panic(abnormals.BombForbidden(ret.Error.Error()))
+				abnormals.BombForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
@@ -128,9 +126,7 @@ func (OrganizationWorkshopTypeRouter) Load(router *gin.Engine) {
 			organizationWorkshopType.UniqueCode = form.UniqueCode
 			organizationWorkshopType.Name = form.Name
 			organizationWorkshopType.Number = form.Number
-			models.Init(models.OrganizationWorkshopTypeModel{}).
-				DB().
-				Save(&organizationWorkshopType)
+			models.Init(models.OrganizationWorkshopTypeModel{}).DB().Save(&organizationWorkshopType)
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"organization_workshop_type": organizationWorkshopType}))
 		})

@@ -87,6 +87,15 @@ func main() {
 			&models.OrganizationSectionModel{},            // 区间
 			&models.OrganizationCenterModel{},             // 中心
 
+			// 位置
+			&models.LocationIndoorRoomTypeModel{}, // 机房类型
+			&models.LocationIndoorRoomModel{},     // 机房
+			&models.LocationIndoorRowModel{},      // 排
+			&models.LocationIndoorCabinetModel{},  // 架
+			&models.LocationIndoorTierModel{},     // 层
+			&models.LocationIndoorCellModel{},     // 位
+
+
 		); errAutoMigrate != nil {
 		fmt.Println("自动迁移错误：", errAutoMigrate)
 		os.Exit(1)
@@ -104,11 +113,11 @@ func main() {
 	(&v1.MenuRouter{}).Load(router)                // 菜单
 
 	// 组织机构
-	(&v1.OrganizationLineRouter{}).Load(router)         // 线别
-	(&v1.OrganizationRailwayRouter{}).Load(router)      // 路局
-	(&v1.OrganizationParagraphRouter{}).Load(router)    // 站段
-	(&v1.OrganizationWorkshopTypeRouter{}).Load(router) // 车间类型
-	(&v1.OrganizationWorkshopRouter{}).Load(router)     // 车间
+	//(&v1.OrganizationLineRouter{}).Load(router)         // 线别
+	//(&v1.OrganizationRailwayRouter{}).Load(router)      // 路局
+	//(&v1.OrganizationParagraphRouter{}).Load(router)    // 站段
+	//(&v1.OrganizationWorkshopTypeRouter{}).Load(router) // 车间类型
+	//(&v1.OrganizationWorkshopRouter{}).Load(router)     // 车间
 
 	initServer(router, setting.App.Section("app").Key("addr").MustString(":8080")) // 启动服务
 }

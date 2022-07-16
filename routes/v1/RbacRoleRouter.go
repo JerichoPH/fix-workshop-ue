@@ -24,10 +24,10 @@ type RbacRoleStoreForm struct {
 //  @return RbacRoleStoreForm
 func (cls RbacRoleStoreForm) ShouldBind(ctx *gin.Context) RbacRoleStoreForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(abnormals.BombForbidden(err.Error()))
+		abnormals.BombForbidden(err.Error())
 	}
 	if cls.Name == "" {
-		panic(abnormals.BombForbidden("名称必填"))
+		abnormals.BombForbidden("名称必填")
 	}
 
 	return cls
@@ -50,7 +50,7 @@ type RbacRoleBindAccountsForm struct {
 //  @return RbacRoleBindAccountsForm
 func (cls RbacRoleBindAccountsForm) ShouldBind(ctx *gin.Context) RbacRoleBindAccountsForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(abnormals.BombForbidden(err.Error()))
+		abnormals.BombForbidden(err.Error())
 	}
 
 	if len(cls.AccountUUIDs) > 0 {
@@ -75,7 +75,7 @@ type RbacRoleBindPermissionsForm struct {
 //  @return RbacRoleBindPermissionsForm
 func (cls RbacRoleBindPermissionsForm) ShouldBind(ctx *gin.Context) RbacRoleBindPermissionsForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(abnormals.BombForbidden(err.Error()))
+		abnormals.BombForbidden(err.Error())
 	}
 
 	if len(cls.RbacPermissionUUIDs) > 0 {
@@ -115,10 +115,8 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 				BaseModel: models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
 				Name:      form.Name,
 			}
-			if ret = models.Init(models.RbacRoleModel{}).
-				DB().
-				Create(rbacRole); ret.Error != nil {
-				panic(abnormals.BombForbidden(ret.Error.Error()))
+			if ret = models.Init(models.RbacRoleModel{}).DB().Create(rbacRole); ret.Error != nil {
+				abnormals.BombForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"rbac_role": rbacRole}))
@@ -131,10 +129,8 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 			rbacRole := (&models.RbacRoleModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 删除
-			if ret = models.Init(models.RbacRoleModel{}).
-				DB().
-				Delete(&rbacRole); ret.Error != nil {
-				panic(abnormals.BombForbidden(ret.Error.Error()))
+			if ret = models.Init(models.RbacRoleModel{}).DB().Delete(&rbacRole); ret.Error != nil {
+				abnormals.BombForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
@@ -178,10 +174,8 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 
 			// 添加绑定关系
 			rbacRole.Accounts = form.Accounts
-			if ret = models.Init(models.RbacRoleModel{}).
-				DB().
-				Save(&rbacRole); ret.Error != nil {
-				panic(abnormals.BombForbidden(ret.Error.Error()))
+			if ret = models.Init(models.RbacRoleModel{}).DB().Save(&rbacRole); ret.Error != nil {
+				abnormals.BombForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("绑定成功").Updated(tools.Map{}))
@@ -199,10 +193,8 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 
 			// 绑定
 			rbacRole.RbacPermissions = form.RbacPermissions
-			if ret = models.Init(models.RbacRoleModel{}).
-				DB().
-				Save(&rbacRole); ret.Error != nil {
-				panic(abnormals.BombForbidden(ret.Error.Error()))
+			if ret = models.Init(models.RbacRoleModel{}).DB().Save(&rbacRole); ret.Error != nil {
+				abnormals.BombForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("绑定成功").Updated(tools.Map{}))

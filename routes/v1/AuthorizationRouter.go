@@ -26,19 +26,19 @@ type AuthorizationRegisterForm struct {
 //  @return AuthorizationRegisterForm
 func (cls AuthorizationRegisterForm) ShouldBind(ctx *gin.Context) AuthorizationRegisterForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(abnormals.BombForbidden(err.Error()))
+		abnormals.BombForbidden(err.Error())
 	}
 	if cls.Username == "" {
-		panic(abnormals.BombForbidden("账号必填"))
+		abnormals.BombForbidden("账号必填")
 	}
 	if cls.Password == "" {
-		panic(abnormals.BombForbidden("密码必填"))
+		abnormals.BombForbidden("密码必填")
 	}
 	if len(cls.Password) < 6 || len(cls.Password) > 18 {
-		panic(abnormals.BombForbidden("密码不可小于6位或大于18位"))
+		abnormals.BombForbidden("密码不可小于6位或大于18位")
 	}
 	if cls.Password != cls.PasswordConfirmation {
-		panic(abnormals.BombForbidden("两次密码输入不一致"))
+		abnormals.BombForbidden("两次密码输入不一致")
 	}
 
 	return cls
@@ -52,16 +52,16 @@ type AuthorizationLoginForm struct {
 
 func (cls AuthorizationLoginForm) ShouldBind(ctx *gin.Context) AuthorizationLoginForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(abnormals.BombForbidden(err.Error()))
+		abnormals.BombForbidden(err.Error())
 	}
 	if cls.Username == "" {
-		panic(abnormals.BombForbidden("账号必填"))
+		abnormals.BombForbidden("账号必填")
 	}
 	if cls.Password == "" {
-		panic(abnormals.BombForbidden("密码必填"))
+		abnormals.BombForbidden("密码必填")
 	}
 	if len(cls.Password) < 6 || len(cls.Password) > 18 {
-		panic(abnormals.BombForbidden("密码不可小于6位或大于18位"))
+		abnormals.BombForbidden("密码不可小于6位或大于18位")
 	}
 
 	return cls
@@ -98,19 +98,20 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 			bytes, _ := bcrypt.GenerateFromPassword([]byte(form.Password), 14)
 
 			// 保存新用户
+			account := &models.AccountModel{
+				BaseModel: models.BaseModel{UUID: uuid.NewV4().String()},
+				Username:  form.Username,
+				Password:  string(bytes),
+				Nickname:  form.Nickname,
+			}
 			if ret = models.Init(models.AccountModel{}).
 				SetOmits(clause.Associations).
 				DB().
-				Create(&models.AccountModel{
-					BaseModel: models.BaseModel{UUID: uuid.NewV4().String()},
-					Username:  form.Username,
-					Password:  string(bytes),
-					Nickname:  form.Nickname,
-				}); ret.Error != nil {
-				panic(abnormals.BombForbidden("创建失败：" + ret.Error.Error()))
+				Create(&account); ret.Error != nil {
+				abnormals.BombForbidden("创建失败：" + ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("注册成功").Created(tools.Map{}))
+			ctx.JSON(tools.CorrectIns("注册成功").Created(tools.Map{"account": account}))
 		})
 
 		// 登录
@@ -130,13 +131,13 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 
 			// 验证密码
 			if err := bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(form.Password)); err != nil {
-				panic(abnormals.BombUnAuth("账号或密码错误"))
+				abnormals.BombUnAuth("账号或密码错误")
 			}
 
 			// 生成Jwt
 			if token, err := tools.GenerateJwt(account.UUID, account.Password); err != nil {
 				// 生成jwt错误
-				panic(abnormals.BombForbidden(err.Error()))
+				abnormals.BombForbidden(err.Error())
 			} else {
 				ctx.JSON(tools.CorrectIns("登陆成功").OK(tools.Map{
 					"token":    token,

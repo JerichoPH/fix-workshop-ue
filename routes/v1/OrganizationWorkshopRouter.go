@@ -37,20 +37,20 @@ type OrganizationWorkshopStoreForm struct {
 //  @return OrganizationWorkshopStoreForm
 func (cls OrganizationWorkshopStoreForm) ShouldBind(ctx *gin.Context) OrganizationWorkshopStoreForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(abnormals.BombForbidden(err.Error()))
+		abnormals.BombForbidden(err.Error())
 	}
 	if cls.UniqueCode == "" {
-		panic(abnormals.BombForbidden("车间代码必填"))
+		abnormals.BombForbidden("车间代码必填")
 	}
 	if cls.Name == "" {
-		panic(abnormals.BombForbidden("车间名称必填"))
+		abnormals.BombForbidden("车间名称必填")
 	}
 	if cls.OrganizationWorkshopTypeUUID == "" {
-		panic(abnormals.BombForbidden("车间类型必选"))
+		abnormals.BombForbidden("车间类型必选")
 	}
 	cls.OrganizationWorkshopType = (&models.OrganizationWorkshopTypeModel{}).FindOneByUUID(cls.OrganizationWorkshopTypeUUID)
 	if cls.OrganizationParagraphUUID == "" {
-		panic(abnormals.BombForbidden("所属站段必选"))
+		abnormals.BombForbidden("所属站段必选")
 	}
 	cls.OrganizationParagraph = (&models.OrganizationParagraphModel{}).FindOneByUUID(cls.OrganizationParagraphUUID)
 	if len(cls.OrganizationSectionUUIDs) > 0 {
@@ -108,15 +108,63 @@ func (OrganizationWorkshopRouter) Load(router *gin.Engine) {
 				OrganizationStations:     form.OrganizationStations,
 			}
 			if ret = models.Init(models.OrganizationWorkshopModel{}).DB().Create(&organizationWorkshop); ret.Error != nil {
-				panic(abnormals.BombForbidden(ret.Error.Error()))
+				abnormals.BombForbidden(ret.Error.Error())
 			}
 		})
 
 		// 删除
-		r.DELETE("workshop/:uuid", func(ctx *gin.Context) {})
+		r.DELETE("workshop/:uuid", func(ctx *gin.Context) {
+			var ret *gorm.DB
+
+			// 查询
+			organizationWorkshop := (&models.OrganizationWorkshopModel{}).FindOneByUUID(ctx.Param("uuid"))
+
+			// 删除
+			if ret = models.Init(models.OrganizationWorkshopModel{}).DB().Delete(&organizationWorkshop); ret.Error != nil {
+				abnormals.BombForbidden(ret.Error.Error())
+			}
+
+			ctx.JSON(tools.CorrectIns("").Deleted())
+		})
 
 		// 编辑
-		r.PUT("workshop/:uuid", func(ctx *gin.Context) {})
+		r.PUT("workshop/:uuid", func(ctx *gin.Context) {
+			var ret *gorm.DB
+
+			// 表单
+			form := (&OrganizationWorkshopStoreForm{}).ShouldBind(ctx)
+
+			// 查重
+			var repeat models.OrganizationWorkshopModel
+			ret = models.Init(models.OrganizationWorkshopModel{}).
+				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
+				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&repeat)
+			abnormals.BombWhenIsRepeatByDB(ret, "车间代码")
+			ret = models.Init(models.OrganizationWorkshopModel{}).
+				SetWheres(tools.Map{"name": form.Name}).
+				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&repeat)
+			abnormals.BombWhenIsRepeatByDB(ret, "车间名称")
+
+			// 查询
+			organizationWorkshop := (&models.OrganizationWorkshopModel{}).FindOneByUUID(ctx.Param("uuid"))
+
+			// 编辑
+			organizationWorkshop.UniqueCode = form.UniqueCode
+			organizationWorkshop.Name = form.Name
+			organizationWorkshop.BeEnable = form.BeEnable
+			organizationWorkshop.OrganizationWorkshopType = form.OrganizationWorkshopType
+			organizationWorkshop.OrganizationParagraph = form.OrganizationParagraph
+			organizationWorkshop.OrganizationSections = form.OrganizationSections
+			organizationWorkshop.OrganizationWorkAreas = form.OrganizationWorkAreas
+			organizationWorkshop.OrganizationStations = form.OrganizationStations
+			if ret = models.Init(models.OrganizationWorkshopModel{}).DB().Save(&organizationWorkshop); ret.Error != nil {
+				abnormals.BombForbidden(ret.Error.Error())
+			}
+		})
 
 		// 详情
 		r.GET("workshop/:uuid", func(ctx *gin.Context) {})

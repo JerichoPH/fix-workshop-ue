@@ -33,38 +33,26 @@ type OrganizationParagraphStoreForm struct {
 //  @param ctx
 //  @return OrganizationParagraphStoreForm
 func (cls OrganizationParagraphStoreForm) ShouldBind(ctx *gin.Context) OrganizationParagraphStoreForm {
+	var ret *gorm.DB
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(abnormals.BombForbidden(err.Error()))
+		abnormals.BombForbidden(err.Error())
 	}
 	if cls.UniqueCode == "" {
-		panic(abnormals.BombForbidden("站段代码必填"))
+		abnormals.BombForbidden("站段代码必填")
 	}
 	if cls.Name == "" {
-		panic(abnormals.BombForbidden("站段名称必填"))
+		abnormals.BombForbidden("站段名称必填")
 	}
 	if cls.OrganizationRailwayUUID == "" {
-		panic(abnormals.BombForbidden("所属路局必选"))
+		abnormals.BombForbidden("所属路局必选")
 	}
-	var ret *gorm.DB
-	ret = models.Init(models.OrganizationRailwayModel{}).
-		SetScopes((&models.OrganizationRailwayModel{}).ScopeBeEnable).
-		SetWheres(tools.Map{"uuid": cls.OrganizationRailwayUUID}).
-		Prepare().
-		First(&cls.OrganizationRailway)
+	ret = models.Init(models.OrganizationRailwayModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationRailwayUUID}).Prepare().First(&cls.OrganizationRailway)
 	abnormals.BombWhenIsEmptyByDB(ret, "路局")
 	if len(cls.OrganizationWorkshopUUIDs) > 0 {
-		models.Init(models.OrganizationWorkshopModel{}).
-			SetScopes((&models.OrganizationWorkshopModel{}).ScopeBeEnable).
-			DB().
-			Where("uuid in ?", cls.OrganizationWorkshopUUIDs).
-			Find(cls.OrganizationWorkshops)
+		models.Init(models.OrganizationWorkshopModel{}).DB().Where("uuid in ?", cls.OrganizationWorkshopUUIDs).Find(cls.OrganizationWorkshops)
 	}
 	if len(cls.OrganizationLineUUIDs) > 0 {
-		models.Init(models.OrganizationLineModel{}).
-			SetScopes((&models.OrganizationLineModel{}).ScopeBeEnable).
-			DB().
-			Where("uuid in ?", cls.OrganizationLineUUIDs).
-			Find(&cls.OrganizationLines)
+		models.Init(models.OrganizationLineModel{}).DB().Where("uuid in ?", cls.OrganizationLineUUIDs).Find(&cls.OrganizationLines)
 	}
 
 	return cls
@@ -107,19 +95,17 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 
 			// 新建
 			organizationParagraph := &models.OrganizationParagraphModel{
-				BaseModel:             models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
-				UniqueCode:            form.UniqueCode,
-				Name:                  form.Name,
-				ShortName:             form.ShortName,
-				BeEnable:              form.BeEnable,
-				OrganizationRailway:   form.OrganizationRailway,
-				OrganizationWorkshops: form.OrganizationWorkshops,
-				OrganizationLines:     form.OrganizationLines,
+				BaseModel:           models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
+				UniqueCode:          form.UniqueCode,
+				Name:                form.Name,
+				ShortName:           form.ShortName,
+				BeEnable:            form.BeEnable,
+				OrganizationRailway: form.OrganizationRailway,
+				//OrganizationWorkshops: form.OrganizationWorkshops,
+				//OrganizationLines:     form.OrganizationLines,
 			}
-			if ret = models.Init(models.OrganizationParagraphModel{}).
-				DB().
-				Create(&organizationParagraph); ret.Error != nil {
-				panic(abnormals.BombForbidden(ret.Error.Error()))
+			if ret = models.Init(models.OrganizationParagraphModel{}).DB().Create(&organizationParagraph); ret.Error != nil {
+				abnormals.BombForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"organization_paragraph": organizationParagraph}))
@@ -133,10 +119,8 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 			organizationParagraph := (&models.OrganizationParagraphModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 删除
-			if ret = models.Init(models.OrganizationParagraphModel{}).
-				DB().
-				Delete(&organizationParagraph); ret.Error != nil {
-				panic(abnormals.BombForbidden(ret.Error.Error()))
+			if ret = models.Init(models.OrganizationParagraphModel{}).DB().Delete(&organizationParagraph); ret.Error != nil {
+				abnormals.BombForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
@@ -176,10 +160,8 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 			organizationParagraph.OrganizationRailway = form.OrganizationRailway
 			organizationParagraph.OrganizationWorkshops = form.OrganizationWorkshops
 			organizationParagraph.OrganizationLines = form.OrganizationLines
-			if ret = models.Init(models.OrganizationParagraphModel{}).
-				DB().
-				Save(&organizationParagraph); ret.Error != nil {
-				panic(abnormals.BombForbidden(ret.Error.Error()))
+			if ret = models.Init(models.OrganizationParagraphModel{}).DB().Save(&organizationParagraph); ret.Error != nil {
+				abnormals.BombForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"organization_paragraph": organizationParagraph}))

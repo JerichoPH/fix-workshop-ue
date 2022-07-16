@@ -31,21 +31,13 @@ type MenuStoreForm struct {
 //  @return MenuStoreForm
 func (cls MenuStoreForm) ShouldBind(ctx *gin.Context) MenuStoreForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(abnormals.BombForbidden(err.Error()))
+		abnormals.BombForbidden(err.Error())
 	}
 	if cls.Name == "" {
-		panic(abnormals.BombForbidden("名称必填"))
+		abnormals.BombForbidden("名称必填")
 	}
-	if len(cls.RbacRoleUUIDs) == 0 {
-		panic(abnormals.BombEmpty("所属角色必选"))
-	}
-	// 查询角色
-	models.Init(models.RbacRoleModel{}).
-		DB().
-		Where("uuid in ?", cls.RbacRoleUUIDs).
-		Find(&cls.RbacRoles)
-	if len(cls.RbacRoles) == 0 {
-		panic(abnormals.BombEmpty("所选角色不存在"))
+	if len(cls.RbacRoleUUIDs) > 0 {
+		models.Init(models.RbacRoleModel{}).DB().Where("uuid in ?", cls.RbacRoleUUIDs).Find(&cls.RbacRoles)
 	}
 
 	return cls
@@ -87,11 +79,8 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 				ParentUUID: form.ParentUUID,
 				RbacRoles:  form.RbacRoles,
 			}
-			if ret = (&models.BaseModel{}).
-				SetModel(models.MenuModel{}).
-				DB().
-				Create(&menu); ret.Error != nil {
-				panic(abnormals.BombForbidden(ret.Error.Error()))
+			if ret = (&models.BaseModel{}).SetModel(models.MenuModel{}).DB().Create(&menu); ret.Error != nil {
+				abnormals.BombForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"menu": menu}))
@@ -105,10 +94,8 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 			menu := (&models.MenuModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 删除
-			if ret = models.Init(models.MenuModel{}).
-				DB().
-				Delete(&menu); ret.Error != nil {
-				panic(abnormals.BombForbidden(ret.Error.Error()))
+			if ret = models.Init(models.MenuModel{}).DB().Delete(&menu); ret.Error != nil {
+				abnormals.BombForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
@@ -134,17 +121,15 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 			// 查询
 			menu := (&models.MenuModel{}).FindOneByUUID(ctx.Param("uuid"))
 
-			// 修改
+			// 编辑
 			menu.Name = form.Name
 			menu.URL = form.URL
 			menu.URIName = form.URIName
 			menu.Icon = form.Icon
 			menu.ParentUUID = form.ParentUUID
 			menu.RbacRoles = form.RbacRoles
-			if ret = models.Init(models.MenuModel{}).
-				DB().
-				Save(&menu); ret.Error != nil {
-				panic(abnormals.BombForbidden(ret.Error.Error()))
+			if ret = models.Init(models.MenuModel{}).DB().Save(&menu); ret.Error != nil {
+				abnormals.BombForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"menu": menu}))

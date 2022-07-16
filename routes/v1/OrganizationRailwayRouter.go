@@ -32,25 +32,19 @@ type OrganizationRailwayStoreForm struct {
 //  @return OrganizationRailwayStoreForm
 func (cls OrganizationRailwayStoreForm) ShouldBind(ctx *gin.Context) OrganizationRailwayStoreForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(abnormals.BombForbidden(err.Error()))
+		abnormals.BombForbidden(err.Error())
 	}
 	if cls.UniqueCode == "" {
-		panic(abnormals.BombForbidden("路局代码必填"))
+		abnormals.BombForbidden("路局代码必填")
 	}
 	if cls.Name == "" {
-		panic(abnormals.BombForbidden("路局名称必填"))
+		abnormals.BombForbidden("路局名称必填")
 	}
 	if len(cls.OrganizationLineUUIDs) > 0 {
-		models.Init(models.OrganizationLineModel{}).
-			DB().
-			Where("uuid in ?", cls.OrganizationLineUUIDs).
-			Find(&cls.OrganizationLines)
+		models.Init(models.OrganizationLineModel{}).DB().Where("uuid in ?", cls.OrganizationLineUUIDs).Find(&cls.OrganizationLines)
 	}
 	if len(cls.OrganizationParagraphUUIDs) > 0 {
-		models.Init(models.OrganizationParagraphModel{}).
-			DB().
-			Where("uuid in ?", cls.OrganizationParagraphUUIDs).
-			Find(&cls.OrganizationParagraphs)
+		models.Init(models.OrganizationParagraphModel{}).DB().Where("uuid in ?", cls.OrganizationParagraphUUIDs).Find(&cls.OrganizationParagraphs)
 	}
 
 	return cls
@@ -75,7 +69,7 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 
 			// 新建
 			organizationRailway := &models.OrganizationRailwayModel{
-				BaseModel:  models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
+				BaseModel:              models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
 				UniqueCode:             form.UniqueCode,
 				Name:                   form.Name,
 				ShortName:              form.ShortName,
@@ -83,11 +77,8 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 				OrganizationLines:      form.OrganizationLines,
 				OrganizationParagraphs: form.OrganizationParagraphs,
 			}
-			if ret = (&models.BaseModel{}).
-				SetModel(models.OrganizationRailwayModel{}).
-				DB().
-				Create(&organizationRailway); ret.Error != nil {
-				panic(abnormals.BombForbidden(ret.Error.Error()))
+			if ret = (&models.BaseModel{}).SetModel(models.OrganizationRailwayModel{}).DB().Create(&organizationRailway); ret.Error != nil {
+				abnormals.BombForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"organization_railway": organizationRailway}))
@@ -101,10 +92,8 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 			organizationRailway := (&models.OrganizationRailwayModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 删除
-			if ret = models.Init(models.OrganizationRailwayModel{}).
-				DB().
-				Delete(&organizationRailway); ret.Error != nil {
-				panic(abnormals.BombForbidden(ret.Error.Error()))
+			if ret = models.Init(models.OrganizationRailwayModel{}).DB().Delete(&organizationRailway); ret.Error != nil {
+				abnormals.BombForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
@@ -128,10 +117,8 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 			organizationRailway.BeEnable = form.BeEnable
 			organizationRailway.OrganizationLines = form.OrganizationLines
 			organizationRailway.OrganizationParagraphs = form.OrganizationParagraphs
-			if ret = models.Init(models.OrganizationRailwayModel{}).
-				DB().
-				Save(&organizationRailway); ret.Error != nil {
-				panic(ret.Error.Error())
+			if ret = models.Init(models.OrganizationRailwayModel{}).DB().Save(&organizationRailway); ret.Error != nil {
+				abnormals.BombForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"organization_railway": organizationRailway}))

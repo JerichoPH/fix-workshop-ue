@@ -29,16 +29,16 @@ type AccountStoreForm struct {
 //  @return AccountStoreForm
 func (cls AccountStoreForm) ShouldBind(ctx *gin.Context) AccountStoreForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(abnormals.BombForbidden(err.Error()))
+		abnormals.BombForbidden(err.Error())
 	}
 	if cls.Username == "" {
-		panic(abnormals.BombForbidden("账号必填"))
+		abnormals.BombForbidden("账号必填")
 	}
 	if cls.Nickname == "" {
-		panic(abnormals.BombForbidden("昵称必填"))
+		abnormals.BombForbidden("昵称必填")
 	}
 	if cls.Password != cls.PasswordConfirmation {
-		panic(abnormals.BombForbidden("两次密码输入不一致"))
+		abnormals.BombForbidden("两次密码输入不一致")
 	}
 
 	return cls
@@ -57,13 +57,13 @@ type AccountUpdateForm struct {
 //  @return AccountUpdateForm
 func (cls AccountUpdateForm) ShouldBind(ctx *gin.Context) AccountUpdateForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(abnormals.BombForbidden(err.Error()))
+		abnormals.BombForbidden(err.Error())
 	}
 	if cls.Username == "" {
-		panic(abnormals.BombForbidden("账号必填"))
+		abnormals.BombForbidden("账号必填")
 	}
 	if cls.Nickname == "" {
-		panic(abnormals.BombForbidden("昵称必填"))
+		abnormals.BombForbidden("昵称必填")
 	}
 
 	return cls
@@ -82,19 +82,19 @@ type AccountUpdatePasswordForm struct {
 //  @return AccountUpdatePasswordForm
 func (cls AccountUpdatePasswordForm) ShouldBind(ctx *gin.Context) AccountUpdatePasswordForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(abnormals.BombForbidden(err.Error()))
+		abnormals.BombForbidden(err.Error())
 	}
 	if cls.OldPassword == "" {
-		panic(abnormals.BombForbidden("原始密码必填"))
+		abnormals.BombForbidden("原始密码必填")
 	}
 	if cls.NewPassword == "" {
-		panic(abnormals.BombForbidden("新密码必填"))
+		abnormals.BombForbidden("新密码必填")
 	}
 	if cls.PasswordConfirmation == "" {
-		panic(abnormals.BombForbidden("确认密码必填"))
+		abnormals.BombForbidden("确认密码必填")
 	}
 	if cls.NewPassword != cls.PasswordConfirmation {
-		panic(abnormals.BombForbidden("两次密码输入不一致"))
+		abnormals.BombForbidden("两次密码输入不一致")
 	}
 
 	return cls
@@ -138,17 +138,14 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 				Password:  string(bytes),
 				Nickname:  form.Nickname,
 			}
-			if ret = models.Init(models.AccountModel{}).
-				SetOmits(clause.Associations).
-				DB().
-				Create(&account); ret.Error != nil {
-				panic(abnormals.BombForbidden(ret.Error.Error()))
+			if ret = models.Init(models.AccountModel{}).SetOmits(clause.Associations).DB().Create(&account); ret.Error != nil {
+				abnormals.BombForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("新建成功").Created(tools.Map{"account": account}))
 		})
 
-		// 编辑用户
+		// 编辑
 		r.PUT(":uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
 
@@ -176,10 +173,8 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 			// 编辑
 			account.Username = form.Username
 			account.Nickname = form.Nickname
-			if ret = models.Init(models.AccountModel{}).
-				DB().
-				Save(&account); ret.Error != nil {
-				panic(abnormals.BombForbidden(ret.Error.Error()))
+			if ret = models.Init(models.AccountModel{}).DB().Save(&account); ret.Error != nil {
+				abnormals.BombForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{}))
@@ -197,17 +192,15 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 
 			// 验证密码
 			if err := bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(form.OldPassword)); err != nil {
-				panic(abnormals.BombUnAuth("旧密码输入错误"))
+				abnormals.BombUnAuth("旧密码输入错误")
 			}
 
 			// 修改密码
 			bytes, _ := bcrypt.GenerateFromPassword([]byte(form.NewPassword), 14)
 			account.Password = string(bytes)
 
-			if ret = models.Init(models.AccountModel{}).
-				DB().
-				Save(&account); ret.Error != nil {
-				panic(abnormals.BombForbidden("编辑失败：" + ret.Error.Error()))
+			if ret = models.Init(models.AccountModel{}).DB().Save(&account); ret.Error != nil {
+				abnormals.BombForbidden("编辑失败：" + ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("密码修改成功").Updated(tools.Map{}))
