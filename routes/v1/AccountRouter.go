@@ -21,6 +21,27 @@ type AccountStoreForm struct {
 	Nickname             string `form:"nickname" json:"nickname" binding:"required"`
 }
 
+// ShouldBind 绑定表单
+//  @receiver cls
+//  @param ctx
+//  @return AccountStoreForm
+func (cls AccountStoreForm) ShouldBind(ctx *gin.Context) AccountStoreForm {
+	if err := ctx.ShouldBind(&cls); err != nil {
+		panic(exceptions.ThrowForbidden(err.Error()))
+	}
+	if cls.Username == "" {
+		panic(exceptions.ThrowForbidden("账号必填"))
+	}
+	if cls.Nickname == "" {
+		panic(exceptions.ThrowForbidden("昵称必填"))
+	}
+	if cls.Password != cls.PasswordConfirmation {
+		panic(exceptions.ThrowForbidden("两次密码输入不一致"))
+	}
+
+	return cls
+}
+
 // AccountUpdateForm 编辑用户表单
 type AccountUpdateForm struct {
 	Username                string `form:"username" json:"string" uri:"username"`
@@ -28,11 +49,53 @@ type AccountUpdateForm struct {
 	AccountStatusUniqueCode string `form:"account_status_unique_code" json:"account_status_unique_code" uri:"account_status_unique_code"`
 }
 
+// ShouldBind 绑定表单
+//  @receiver cls
+//  @param ctx
+//  @return AccountUpdateForm
+func (cls AccountUpdateForm) ShouldBind(ctx *gin.Context) AccountUpdateForm {
+	if err := ctx.ShouldBind(&cls); err != nil {
+		panic(exceptions.ThrowForbidden(err.Error()))
+	}
+	if cls.Username == "" {
+		panic(exceptions.ThrowForbidden("账号必填"))
+	}
+	if cls.Nickname == "" {
+		panic(exceptions.ThrowForbidden("昵称必填"))
+	}
+
+	return cls
+}
+
 // AccountUpdatePasswordForm 修改密码表单
 type AccountUpdatePasswordForm struct {
 	OldPassword          string `form:"old_password" binding:"required"`
 	NewPassword          string `form:"new_password" binding:"required"`
 	PasswordConfirmation string `form:"password_confirmation" binding:"required"`
+}
+
+// ShouldBind 绑定表单
+//  @receiver cls
+//  @param ctx
+//  @return AccountUpdatePasswordForm
+func (cls AccountUpdatePasswordForm) ShouldBind(ctx *gin.Context) AccountUpdatePasswordForm {
+	if err := ctx.ShouldBind(&cls); err != nil {
+		panic(exceptions.ThrowForbidden(err.Error()))
+	}
+	if cls.OldPassword == "" {
+		panic(exceptions.ThrowForbidden("原始密码必填"))
+	}
+	if cls.NewPassword == "" {
+		panic(exceptions.ThrowForbidden("新密码必填"))
+	}
+	if cls.PasswordConfirmation == "" {
+		panic(exceptions.ThrowForbidden("确认密码必填"))
+	}
+	if cls.NewPassword != cls.PasswordConfirmation {
+		panic(exceptions.ThrowForbidden("两次密码输入不一致"))
+	}
+
+	return cls
 }
 
 // Load 加载路由
@@ -46,16 +109,9 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 		// 新建用户
 		r.POST("", func(ctx *gin.Context) {
 			// 表单验证
-			var form AccountStoreForm
-			if err := ctx.ShouldBind(&form); err != nil {
-				panic(exceptions.ThrowForbidden(err.Error()))
-			}
+			form := (&AccountStoreForm{}).ShouldBind(ctx)
 
-			if form.Password != form.PasswordConfirmation {
-				panic(exceptions.ThrowForbidden("两次密码输入不一致"))
-			}
-
-			// 检查重复项（用户名）
+			// 查重
 			var repeat models.AccountModel
 			var ret *gorm.DB
 			ret = (&models.BaseModel{}).
@@ -72,14 +128,13 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 			// 密码加密
 			bytes, _ := bcrypt.GenerateFromPassword([]byte(form.Password), 14)
 
-			if ret = (&models.BaseModel{}).
-				SetModel(models.AccountModel{}).
+			if ret = models.Init(models.AccountModel{}).
 				SetOmits(clause.Associations).
 				DB().
 				Create(&models.AccountModel{
-					Username:                form.Username,
-					Password:                string(bytes),
-					Nickname:                form.Nickname,
+					Username: form.Username,
+					Password: string(bytes),
+					Nickname: form.Nickname,
 				}); ret.Error != nil {
 				panic(exceptions.ThrowForbidden(ret.Error.Error()))
 			}
@@ -93,22 +148,17 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 			uuid := ctx.Param("uuid")
 
 			// 表单
-			var form AccountUpdateForm
-			if err := ctx.ShouldBind(&form); err != nil {
-				panic(exceptions.ThrowForbidden(err.Error()))
-			}
+			form := (&AccountUpdateForm{}).ShouldBind(ctx)
 
 			// 查重
 			var repeat models.AccountModel
-			ret = (&models.BaseModel{}).
-				SetModel(models.AccountModel{}).
+			ret = models.Init(models.AccountModel{}).
 				SetWheres(tools.Map{"username": form.Username}).
 				SetNotWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&repeat)
 			tools.ThrowExceptionWhenIsRepeatByDB(ret, "用户账号")
-			ret = (&models.BaseModel{}).
-				SetModel(models.AccountModel{}).
+			ret = models.Init(models.AccountModel{}).
 				SetWheres(tools.Map{"nickname": form.Nickname}).
 				SetNotWheres(tools.Map{"uuid": uuid}).
 				Prepare().
@@ -117,25 +167,20 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 
 			// 查询
 			var account models.AccountModel
-			ret = (&models.BaseModel{}).
-				SetModel(models.AccountModel{}).
+			ret = models.Init(models.AccountModel{}).
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&account)
 			tools.ThrowExceptionWhenIsEmptyByDB(ret, "用户")
 
 			// 编辑
-			if form.Username != "" {
-				account.Username = form.Username
-			}
-			if form.Nickname != "" {
-				account.Nickname = form.Nickname
-			}
-
-			(&models.BaseModel{}).
-				SetModel(models.AccountModel{}).
+			account.Username = form.Username
+			account.Nickname = form.Nickname
+			if ret = models.Init(models.AccountModel{}).
 				DB().
-				Save(&account)
+				Save(&account); ret.Error != nil {
+				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{}))
 		})
@@ -147,16 +192,10 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 			uuid := ctx.Param("uuid")
 
 			// 表单
-			var form AccountUpdatePasswordForm
-			if err := ctx.ShouldBind(&form); err != nil {
-				panic(exceptions.ThrowForbidden(err.Error()))
-			}
-			if form.NewPassword != form.PasswordConfirmation {
-				panic(exceptions.ThrowForbidden("两次密码输入不一致"))
-			}
+			form := (&AccountUpdatePasswordForm{}).ShouldBind(ctx)
 
-			ret = (&models.BaseModel{}).
-				SetModel(models.AccountModel{}).
+			// 查询
+			ret = models.Init(models.AccountModel{}).
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&account)
@@ -171,8 +210,7 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 			bytes, _ := bcrypt.GenerateFromPassword([]byte(form.NewPassword), 14)
 			account.Password = string(bytes)
 
-			if ret = (&models.BaseModel{}).
-				SetModel(models.AccountModel{}).
+			if ret = models.Init(models.AccountModel{}).
 				DB().
 				Save(&account); ret.Error != nil {
 				panic(exceptions.ThrowForbidden("编辑失败：" + ret.Error.Error()))
@@ -187,8 +225,7 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 
 			var account models.AccountModel
 			var ret *gorm.DB
-			ret = (&models.BaseModel{}).
-				SetModel(models.AccountModel{}).
+			ret = models.Init(models.AccountModel{}).
 				SetPreloads(tools.Strings{"AccountStatus"}).
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
@@ -201,8 +238,7 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 		// 用户列表
 		r.GET("", func(ctx *gin.Context) {
 			var accounts []models.AccountModel
-			(&models.BaseModel{}).
-				SetModel(models.AccountModel{}).
+			models.Init(models.AccountModel{}).
 				SetPreloads(tools.Strings{"AccountStatus"}).
 				PrepareQuery(ctx).
 				Find(&accounts)

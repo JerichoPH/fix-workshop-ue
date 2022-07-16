@@ -19,10 +19,51 @@ type AuthorizationRegisterForm struct {
 	Nickname             string `form:"nickname" json:"nickname" binding:"required"`
 }
 
+// ShouldBind 绑定表单
+//  @receiver cls
+//  @param ctx
+//  @return AuthorizationRegisterForm
+func (cls AuthorizationRegisterForm) ShouldBind(ctx *gin.Context) AuthorizationRegisterForm {
+	if err := ctx.ShouldBind(&cls); err != nil {
+		panic(exceptions.ThrowForbidden(err.Error()))
+	}
+	if cls.Username == "" {
+		panic(exceptions.ThrowForbidden("账号必填"))
+	}
+	if cls.Password == "" {
+		panic(exceptions.ThrowForbidden("密码必填"))
+	}
+	if len(cls.Password) < 6 || len(cls.Password) > 18 {
+		panic(exceptions.ThrowForbidden("密码不可小于6位或大于18位"))
+	}
+	if cls.Password != cls.PasswordConfirmation {
+		panic(exceptions.ThrowForbidden("两次密码输入不一致"))
+	}
+
+	return cls
+}
+
 // AuthorizationLoginForm 登录表单
 type AuthorizationLoginForm struct {
 	Username string `form:"username" json:"username" binding:"required"`
 	Password string `form:"password" json:"password" binding:"required"`
+}
+
+func (cls AuthorizationLoginForm) ShouldBind(ctx *gin.Context) AuthorizationLoginForm {
+	if err := ctx.ShouldBind(&cls); err != nil {
+		panic(exceptions.ThrowForbidden(err.Error()))
+	}
+	if cls.Username == "" {
+		panic(exceptions.ThrowForbidden("账号必填"))
+	}
+	if cls.Password == "" {
+		panic(exceptions.ThrowForbidden("密码必填"))
+	}
+	if len(cls.Password) < 6 || len(cls.Password) > 18 {
+		panic(exceptions.ThrowForbidden("密码不可小于6位或大于18位"))
+	}
+
+	return cls
 }
 
 type AuthorizationRouter struct{}
@@ -33,13 +74,7 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 		// 注册
 		r.POST("register", func(ctx *gin.Context) {
 			// 表单验证
-			var form AuthorizationRegisterForm
-			if err := ctx.ShouldBind(&form); err != nil {
-				panic(exceptions.ThrowForbidden(err.Error()))
-			}
-			if form.Password != form.PasswordConfirmation {
-				panic(exceptions.ThrowForbidden("两次密码输入不一致"))
-			}
+			form := (&AuthorizationRegisterForm{}).ShouldBind(ctx)
 
 			// 检查重复项（用户名）
 			var repeat models.AccountModel
@@ -59,8 +94,7 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 			bytes, _ := bcrypt.GenerateFromPassword([]byte(form.Password), 14)
 
 			// 保存新用户
-			if ret = (&models.BaseModel{}).
-				SetModel(models.AccountModel{}).
+			if ret = models.Init(models.AccountModel{}).
 				SetOmits(clause.Associations).
 				DB().
 				Create(&models.AccountModel{
@@ -77,15 +111,12 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 		// 登录
 		r.POST("login", func(ctx *gin.Context) {
 			// 表单验证
-			var form AuthorizationLoginForm
-			if err := ctx.ShouldBind(&form); err != nil {
-				panic(exceptions.ThrowForbidden(err.Error()))
-			}
+			form := (&AuthorizationLoginForm{}).ShouldBind(ctx)
 
 			// 获取用户
 			var account models.AccountModel
 			var ret *gorm.DB
-			ret = (&models.BaseModel{}).
+			ret = models.Init(models.AccountModel{}).
 				SetPreloads(tools.Strings{clause.Associations}).
 				SetWheres(tools.Map{"username": form.Username}).
 				Prepare().
@@ -98,17 +129,17 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 			}
 
 			// 生成Jwt
-			token, err := tools.GenerateJwt(account.UUID, account.Password)
-			if err != nil {
+			if token, err := tools.GenerateJwt(account.UUID, account.Password); err != nil {
 				// 生成jwt错误
 				panic(exceptions.ThrowForbidden(err.Error()))
+			} else {
+				ctx.JSON(tools.CorrectIns("登陆成功").OK(tools.Map{
+					"token":    token,
+					"username": account.Username,
+					"nickname": account.Nickname,
+					"uuid":     account.UUID,
+				}))
 			}
-			ctx.JSON(tools.CorrectIns("登陆成功").OK(tools.Map{
-				"token":    token,
-				"username": account.Username,
-				"nickname": account.Nickname,
-				"uuid":     account.UUID,
-			}))
 		})
 
 		// 获取当前账号相关菜单
@@ -122,8 +153,7 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 				} else {
 					// 获取当前用户信息
 					var account models.AccountModel
-					ret = (&models.BaseModel{}).
-						SetModel(models.AccountModel{}).
+					ret = models.Init(models.AccountModel{}).
 						SetWheres(tools.Map{"uuid": accountUUID}).
 						SetPreloads(tools.Strings{"RbacRoles", "RbacRoles.Menus"}).
 						Prepare().
@@ -142,8 +172,7 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 					}
 
 					var menus []models.MenuModel
-					(&models.BaseModel{}).
-						SetModel(models.MenuModel{}).
+					models.Init(models.MenuModel{}).
 						DB().
 						Where("uuid in ?", menuUUIDs).
 						Where("parent_uuid is null").
