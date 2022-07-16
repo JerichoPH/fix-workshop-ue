@@ -2,9 +2,9 @@ package models
 
 import (
 	"fix-workshop-ue/databases"
+	"fix-workshop-ue/exceptions"
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
-	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"time"
@@ -31,6 +31,8 @@ type BaseModel struct {
 }
 
 // Init 获取数据库查询对象
+//  @param model
+//  @return *BaseModel
 func Init(model interface{}) *BaseModel {
 	return (&BaseModel{}).SetModel(model)
 }
@@ -44,7 +46,7 @@ func (cls *BaseModel) demoFindOne() {
 		SetNotWheres(tools.Map{}).
 		Prepare().
 		First(b)
-	exceptions.ThrowExceptionWhenIsEmptyByDB(ret, "XX")
+	exceptions.ThrowWhenIsEmptyByDB(ret, "XX")
 }
 
 // demoFind 获取多条数据演示
@@ -128,7 +130,6 @@ func (cls *BaseModel) SetScopes(scopes ...func(*gorm.DB) *gorm.DB) *BaseModel {
 func (cls *BaseModel) BeforeCreate(db *gorm.DB) (err error) {
 	cls.CreatedAt = time.Now()
 	cls.UpdatedAt = time.Now()
-	cls.UUID = uuid.NewV4().String()
 	return
 }
 
@@ -214,17 +215,19 @@ func (cls *BaseModel) PrepareQuery(ctx *gin.Context) *gorm.DB {
 	// 排序
 	if order, ok := ctx.GetQuery("__order__"); ok {
 		dbSession.Order(order)
+	} else {
+		dbSession.Order("id asc, sort asc")
 	}
 
 	// offset
 	if offset, ok := ctx.GetQuery("__offset__"); ok {
-		offset := tools.ThrowExceptionWhenIsNotInt(offset, "offset参数只能填写整数")
+		offset := exceptions.ThrowWhenIsNotInt(offset, "偏移参数只能填写整数")
 		dbSession.Offset(offset)
 	}
 
 	// limit
 	if limit, ok := ctx.GetQuery("__limit__"); ok {
-		limit := tools.ThrowExceptionWhenIsNotInt(limit, "limit参数只能填写整数")
+		limit := exceptions.ThrowWhenIsNotInt(limit, "分页参数只能填写整数")
 		dbSession.Limit(limit)
 	}
 

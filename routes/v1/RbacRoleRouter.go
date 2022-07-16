@@ -6,6 +6,7 @@ import (
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
+	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
 )
 
@@ -13,6 +14,7 @@ type RbacRoleRouter struct{}
 
 // RbacRoleStoreForm 创建角色表单
 type RbacRoleStoreForm struct {
+	Sort int64  `form:"sort" json:"sort"`
 	Name string `form:"name" json:"name"`
 }
 
@@ -108,28 +110,25 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 				First(&repeat)
 			exceptions.ThrowWhenIsRepeatByDB(ret, "角色名称")
 
-			// 保存
+			// 新建
+			rbacRole := &models.RbacRoleModel{
+				BaseModel: models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
+				Name:      form.Name,
+			}
 			if ret = models.Init(models.RbacRoleModel{}).
 				DB().
-				Create(&models.RbacRoleModel{Name: form.Name}); ret.Error != nil {
+				Create(rbacRole); ret.Error != nil {
 				panic(exceptions.ThrowForbidden(ret.Error.Error()))
 			}
 
-			ctx.JSON(tools.CorrectIns("").Created(tools.Map{}))
+			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"rbac_role": rbacRole}))
 		})
 
 		// 删除角色
 		r.DELETE(":uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
-			uuid := ctx.Param("uuid")
-			var rbacRole models.RbacRoleModel
-
 			// 查询
-			ret = models.Init(models.RbacRoleModel{}).
-				SetWheres(tools.Map{"uuid": uuid}).
-				Prepare().
-				First(&rbacRole)
-			exceptions.ThrowWhenIsEmptyByDB(ret, "角色")
+			rbacRole := (&models.RbacRoleModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 删除
 			if ret = models.Init(models.RbacRoleModel{}).
@@ -144,7 +143,6 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 		// 编辑角色
 		r.PUT(":uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
-			uuid := ctx.Param("uuid")
 
 			// 表单
 			form := (&RbacRoleStoreForm{}).ShouldBind(ctx)
@@ -153,43 +151,30 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 			var repeat models.RbacRoleModel
 			ret = models.Init(models.RbacRoleModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
-				SetNotWheres(tools.Map{"uuid": uuid}).
+				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
 			exceptions.ThrowWhenIsRepeatByDB(ret, "角色名称")
 
 			// 查询
-			var rbacRole models.RbacRoleModel
-			ret = models.Init(models.RbacRoleModel{}).
-				SetWheres(tools.Map{"uuid": uuid}).
-				Prepare().
-				First(&rbacRole)
-			exceptions.ThrowWhenIsEmptyByDB(ret, "角色")
+			rbacRole := (&models.RbacRoleModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 修改
-			if form.Name != "" {
-				rbacRole.Name = form.Name
-			}
+			rbacRole.Name = form.Name
 			models.Init(models.RbacRoleModel{}).DB().Save(&rbacRole)
 
-			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{}))
+			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"rbac_role": rbacRole}))
 		})
 
 		// 绑定用户
 		r.PUT(":uuid/bindAccounts", func(ctx *gin.Context) {
 			var ret *gorm.DB
-			uuid := ctx.Param("uuid")
 
 			// 表单
 			form := (&RbacRoleBindAccountsForm{}).ShouldBind(ctx)
 
 			// 获取角色
-			var rbacRole models.RbacRoleModel
-			ret = models.Init(models.RbacRoleModel{}).
-				SetWheres(tools.Map{"uuid": uuid}).
-				Prepare().
-				First(&rbacRole)
-			exceptions.ThrowWhenIsEmptyByDB(ret, "角色")
+			rbacRole := (&models.RbacRoleModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 添加绑定关系
 			rbacRole.Accounts = form.Accounts
@@ -205,18 +190,12 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 		// 绑定权限
 		r.PUT(":uuid/bindPermissions", func(ctx *gin.Context) {
 			var ret *gorm.DB
-			uuid := ctx.Param("uuid")
 
 			// 表单
 			form := (&RbacRoleBindPermissionsForm{}).ShouldBind(ctx)
 
 			// 查询角色
-			var rbacRole models.RbacRoleModel
-			ret = models.Init(models.RbacRoleModel{}).
-				SetWheres(tools.Map{"uuid": uuid}).
-				Prepare().
-				First(&rbacRole)
-			exceptions.ThrowWhenIsEmptyByDB(ret, "角色")
+			rbacRole := (&models.RbacRoleModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 绑定
 			rbacRole.RbacPermissions = form.RbacPermissions
@@ -233,10 +212,9 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 		r.GET(":uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
 			var rbacRole models.RbacRoleModel
-			uuid := ctx.Param("uuid")
 
 			ret = models.Init(models.RbacRoleModel{}).
-				SetWheres(tools.Map{"uuid": uuid}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				SetPreloads(tools.Strings{
 					"RbacPermissions",
 					"RbacPermissions.RbacPermissionGroup",

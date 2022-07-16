@@ -1,6 +1,10 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"fix-workshop-ue/exceptions"
+	"fix-workshop-ue/tools"
+	"gorm.io/gorm"
+)
 
 type OrganizationLineModel struct {
 	BaseModel
@@ -20,4 +24,16 @@ func (cls *OrganizationLineModel) TableName() string {
 // ScopeBeEnable 获取启用的数据
 func (cls *OrganizationLineModel) ScopeBeEnable(db *gorm.DB) *gorm.DB {
 	return db.Where("be_enable = ?", 1)
+}
+
+// FindOneByUUID 根据UUID获取单条数据
+//  @receiver cls
+//  @param uuid
+//  @return OrganizationLineModel
+func (cls OrganizationLineModel) FindOneByUUID(uuid string) OrganizationLineModel {
+	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
+		panic(exceptions.ThrowWhenIsEmptyByDB(ret, "线别"))
+	}
+
+	return cls
 }

@@ -1,5 +1,10 @@
 package models
 
+import (
+	"fix-workshop-ue/exceptions"
+	"fix-workshop-ue/tools"
+)
+
 type RbacPermissionModel struct {
 	BaseModel
 	Name                    string                   `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:权限名称;" json:"name"`
@@ -13,4 +18,16 @@ type RbacPermissionModel struct {
 // TableName 表名称
 func (cls *RbacPermissionModel) TableName() string {
 	return "rbac_permissions"
+}
+
+// FindOneByUUID 根据UUID获取单条数据
+//  @receiver cls
+//  @param uuid
+//  @return RbacPermissionModel
+func (cls RbacPermissionModel) FindOneByUUID(uuid string) RbacPermissionModel {
+	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
+		panic(exceptions.ThrowWhenIsEmptyByDB(ret, "权限"))
+	}
+
+	return cls
 }

@@ -6,6 +6,7 @@ import (
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
+	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -109,9 +110,9 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 		middlewares.CheckPermission(),
 	)
 	{
-		// 新建用户
+		// 新建
 		r.POST("", func(ctx *gin.Context) {
-			// 表单验证
+			// 表单
 			form := (&AccountStoreForm{}).ShouldBind(ctx)
 
 			// 查重
@@ -131,24 +132,25 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 			// 密码加密
 			bytes, _ := bcrypt.GenerateFromPassword([]byte(form.Password), 14)
 
+			account := &models.AccountModel{
+				BaseModel: models.BaseModel{UUID: uuid.NewV4().String()},
+				Username:  form.Username,
+				Password:  string(bytes),
+				Nickname:  form.Nickname,
+			}
 			if ret = models.Init(models.AccountModel{}).
 				SetOmits(clause.Associations).
 				DB().
-				Create(&models.AccountModel{
-					Username: form.Username,
-					Password: string(bytes),
-					Nickname: form.Nickname,
-				}); ret.Error != nil {
+				Create(&account); ret.Error != nil {
 				panic(exceptions.ThrowForbidden(ret.Error.Error()))
 			}
 
-			ctx.JSON(tools.CorrectIns("新建成功").Created(tools.Map{}))
+			ctx.JSON(tools.CorrectIns("新建成功").Created(tools.Map{"account": account}))
 		})
 
 		// 编辑用户
 		r.PUT(":uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
-			uuid := ctx.Param("uuid")
 
 			// 表单
 			form := (&AccountUpdateForm{}).ShouldBind(ctx)
@@ -157,24 +159,19 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 			var repeat models.AccountModel
 			ret = models.Init(models.AccountModel{}).
 				SetWheres(tools.Map{"username": form.Username}).
-				SetNotWheres(tools.Map{"uuid": uuid}).
+				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
 			exceptions.ThrowWhenIsRepeatByDB(ret, "用户账号")
 			ret = models.Init(models.AccountModel{}).
 				SetWheres(tools.Map{"nickname": form.Nickname}).
-				SetNotWheres(tools.Map{"uuid": uuid}).
+				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
 			exceptions.ThrowWhenIsRepeatByDB(ret, "用户昵称")
 
 			// 查询
-			var account models.AccountModel
-			ret = models.Init(models.AccountModel{}).
-				SetWheres(tools.Map{"uuid": uuid}).
-				Prepare().
-				First(&account)
-			exceptions.ThrowWhenIsEmptyByDB(ret, "用户")
+			account := (&models.AccountModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 编辑
 			account.Username = form.Username
@@ -191,18 +188,12 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 		// 修改密码
 		r.PUT(":uuid/updatePassword", func(ctx *gin.Context) {
 			var ret *gorm.DB
-			var account models.AccountModel
-			uuid := ctx.Param("uuid")
 
 			// 表单
 			form := (&AccountUpdatePasswordForm{}).ShouldBind(ctx)
 
 			// 查询
-			ret = models.Init(models.AccountModel{}).
-				SetWheres(tools.Map{"uuid": uuid}).
-				Prepare().
-				First(&account)
-			exceptions.ThrowWhenIsEmptyByDB(ret, "用户")
+			account := (&models.AccountModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 验证密码
 			if err := bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(form.OldPassword)); err != nil {
@@ -224,17 +215,7 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 
 		// 用户详情
 		r.GET(":uuid", func(ctx *gin.Context) {
-			uuid := ctx.Param("uuid")
-
-			var account models.AccountModel
-			var ret *gorm.DB
-			ret = models.Init(models.AccountModel{}).
-				SetPreloads(tools.Strings{"AccountStatus"}).
-				SetWheres(tools.Map{"uuid": uuid}).
-				Prepare().
-				First(&account)
-			exceptions.ThrowWhenIsEmptyByDB(ret, "用户")
-
+			account := (&models.AccountModel{}).FindOneByUUID(ctx.Param("uuid"))
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"account": account}))
 		})
 

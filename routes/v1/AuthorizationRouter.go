@@ -6,6 +6,7 @@ import (
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
+	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -101,9 +102,10 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 				SetOmits(clause.Associations).
 				DB().
 				Create(&models.AccountModel{
-					Username: form.Username,
-					Password: string(bytes),
-					Nickname: form.Nickname,
+					BaseModel: models.BaseModel{UUID: uuid.NewV4().String()},
+					Username:  form.Username,
+					Password:  string(bytes),
+					Nickname:  form.Nickname,
 				}); ret.Error != nil {
 				panic(exceptions.ThrowForbidden("创建失败：" + ret.Error.Error()))
 			}

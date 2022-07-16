@@ -6,6 +6,7 @@ import (
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
+	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
 )
 
@@ -102,35 +103,32 @@ func (cls *OrganizationLineRouter) Load(router *gin.Engine) {
 			exceptions.ThrowWhenIsRepeatByDB(ret, "线别名称")
 
 			// 新建
+			organizationLine := &models.OrganizationLineModel{
+				BaseModel:              models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
+				UniqueCode:             form.UniqueCode,
+				Name:                   form.Name,
+				BeEnable:               form.BeEnable,
+				OrganizationRailways:   form.OrganizationRailways,
+				OrganizationParagraphs: form.OrganizationParagraphs,
+				OrganizationStations:   form.OrganizationStations,
+			}
 			if ret = models.Init(models.OrganizationLineModel{}).
 				DB().
-				Create(&models.OrganizationLineModel{
-					BaseModel:              models.BaseModel{Sort: form.Sort},
-					UniqueCode:             form.UniqueCode,
-					Name:                   form.Name,
-					BeEnable:               form.BeEnable,
-					OrganizationRailways:   form.OrganizationRailways,
-					OrganizationParagraphs: form.OrganizationParagraphs,
-					OrganizationStations:   form.OrganizationStations,
-				}); ret.Error != nil {
+				Create(organizationLine); ret.Error != nil {
 				panic(exceptions.ThrowForbidden(ret.Error.Error()))
 			}
 
-			ctx.JSON(tools.CorrectIns("").Created(tools.Map{}))
+			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"organization_line": organizationLine}))
 		})
 
 		// 删除
 		r.DELETE("line/:uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
-			uuid := ctx.Param("uuid")
 
-			var organizationLine models.OrganizationLineModel
-			ret = models.Init(models.OrganizationLineModel{}).
-				SetWheres(tools.Map{"uuid": uuid}).
-				Prepare().
-				First(&organizationLine)
-			exceptions.ThrowWhenIsEmptyByDB(ret, "线别")
+			// 查询
+			organizationLine := (&models.OrganizationLineModel{}).FindOneByUUID(ctx.Param("uuid"))
 
+			// 删除
 			if ret = models.Init(models.OrganizationLineModel{}).
 				DB().
 				Delete(&organizationLine); ret.Error != nil {
@@ -143,7 +141,6 @@ func (cls *OrganizationLineRouter) Load(router *gin.Engine) {
 		// 编辑
 		r.PUT("line/:uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
-			uuid := ctx.Param("uuid")
 
 			// 表单
 			form := (&OrganizationLineStoreForm{}).ShouldBind(ctx)
@@ -152,24 +149,19 @@ func (cls *OrganizationLineRouter) Load(router *gin.Engine) {
 			var repeat models.OrganizationLineModel
 			ret = models.Init(models.OrganizationLineModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-				SetNotWheres(tools.Map{"uuid": uuid}).
+				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
 			exceptions.ThrowWhenIsRepeatByDB(ret, "线别代码")
 			ret = models.Init(models.OrganizationLineModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
-				SetNotWheres(tools.Map{"uuid": uuid}).
+				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
 			exceptions.ThrowWhenIsRepeatByDB(ret, "线别名称")
 
 			// 查询
-			var organizationLine models.OrganizationLineModel
-			ret = models.Init(models.OrganizationLineModel{}).
-				SetWheres(tools.Map{"uuid": uuid}).
-				Prepare().
-				First(&organizationLine)
-			exceptions.ThrowWhenIsEmptyByDB(ret, "线别")
+			organizationLine := (&models.OrganizationLineModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 修改
 			organizationLine.UniqueCode = form.UniqueCode
@@ -186,22 +178,12 @@ func (cls *OrganizationLineRouter) Load(router *gin.Engine) {
 				panic(exceptions.ThrowForbidden(ret.Error.Error()))
 			}
 
-			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{}))
+			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"organization_line": organizationLine}))
 		})
 
 		// 详情
 		r.GET("line/:uuid", func(ctx *gin.Context) {
-			var ret *gorm.DB
-			uuid := ctx.Param("uuid")
-
-			var organizationLine models.OrganizationLineModel
-			ret = models.Init(models.OrganizationLineModel{}).
-				SetScopes((&models.OrganizationLineModel{}).ScopeBeEnable).
-				SetWheres(tools.Map{"uuid": uuid}).
-				Prepare().
-				First(&organizationLine)
-			exceptions.ThrowWhenIsEmptyByDB(ret, "线别")
-
+			organizationLine := (&models.OrganizationLineModel{}).FindOneByUUID(ctx.Param("uuid"))
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_line": organizationLine}))
 		})
 

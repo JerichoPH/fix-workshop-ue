@@ -6,6 +6,7 @@ import (
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
+	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
 )
 
@@ -45,24 +46,21 @@ func (cls OrganizationParagraphStoreForm) ShouldBind(ctx *gin.Context) Organizat
 		panic(exceptions.ThrowForbidden("所属路局必选"))
 	}
 	var ret *gorm.DB
-	(&models.BaseModel{}).
-		SetModel(models.OrganizationParagraphModel{}).
+	ret = models.Init(models.OrganizationRailwayModel{}).
 		SetScopes((&models.OrganizationRailwayModel{}).ScopeBeEnable).
 		SetWheres(tools.Map{"uuid": cls.OrganizationRailwayUUID}).
 		Prepare().
 		First(&cls.OrganizationRailway)
-	exceptions.ThrowWhenIsEmptyByDB(ret, "路局不存在")
+	exceptions.ThrowWhenIsEmptyByDB(ret, "路局")
 	if len(cls.OrganizationWorkshopUUIDs) > 0 {
-		(&models.BaseModel{}).
-			SetModel(models.OrganizationWorkshopModel{}).
+		models.Init(models.OrganizationWorkshopModel{}).
 			SetScopes((&models.OrganizationWorkshopModel{}).ScopeBeEnable).
 			DB().
 			Where("uuid in ?", cls.OrganizationWorkshopUUIDs).
 			Find(cls.OrganizationWorkshops)
 	}
 	if len(cls.OrganizationLineUUIDs) > 0 {
-		(&models.BaseModel{}).
-			SetModel(models.OrganizationLineModel{}).
+		models.Init(models.OrganizationLineModel{}).
 			SetScopes((&models.OrganizationLineModel{}).ScopeBeEnable).
 			DB().
 			Where("uuid in ?", cls.OrganizationLineUUIDs).
@@ -107,42 +105,39 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 				First(&repeat)
 			exceptions.ThrowWhenIsRepeatByDB(ret, "站段简称")
 
-			// 保存
+			// 新建
+			organizationParagraph := &models.OrganizationParagraphModel{
+				BaseModel:               models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
+				UniqueCode:              form.UniqueCode,
+				Name:                    form.Name,
+				ShortName:               form.ShortName,
+				BeEnable:                form.BeEnable,
+				OrganizationRailwayUUID: form.OrganizationRailwayUUID,
+				OrganizationWorkshops:   form.OrganizationWorkshops,
+				OrganizationLines:       form.OrganizationLines,
+			}
 			if ret = models.Init(models.OrganizationParagraphModel{}).
 				DB().
-				Create(&models.OrganizationParagraphModel{
-					BaseModel:             models.BaseModel{Sort: form.Sort},
-					UniqueCode:            form.UniqueCode,
-					Name:                  form.Name,
-					ShortName:             form.ShortName,
-					BeEnable:              form.BeEnable,
-					OrganizationRailway:   form.OrganizationRailway,
-					OrganizationWorkshops: form.OrganizationWorkshops,
-					OrganizationLines:     form.OrganizationLines,
-				}); ret.Error != nil {
+				Create(&organizationParagraph); ret.Error != nil {
 				panic(exceptions.ThrowForbidden(ret.Error.Error()))
 			}
 
-			ctx.JSON(tools.CorrectIns("").Created(tools.Map{}))
+			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"organization_paragraph": organizationParagraph}))
 		})
 
 		// 删除
 		r.DELETE("paragraph/:uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
-			uuid := ctx.Param("uuid")
 
 			// 查询
-			var organizationParagraph models.OrganizationParagraphModel
-			models.Init(models.OrganizationParagraphModel{}).
-				SetWheres(tools.Map{"uuid": uuid}).
-				Prepare().
-				First(&organizationParagraph)
-			exceptions.ThrowWhenIsEmptyByDB(ret, "站段")
+			organizationParagraph := (&models.OrganizationParagraphModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 删除
-			models.Init(models.OrganizationParagraphModel{}).
+			if ret = models.Init(models.OrganizationParagraphModel{}).
 				DB().
-				Delete(&organizationParagraph)
+				Delete(&organizationParagraph); ret.Error != nil {
+				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
 		})
@@ -150,7 +145,6 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 		// 编辑
 		r.PUT("paragraph/:uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
-			uuid := ctx.Param("uuid")
 
 			// 表单
 			form := (&OrganizationParagraphStoreForm{}).ShouldBind(ctx)
@@ -159,24 +153,19 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 			var repeat models.OrganizationParagraphModel
 			ret = models.Init(models.OrganizationParagraphModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-				SetNotWheres(tools.Map{"uuid": uuid}).
+				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
 			exceptions.ThrowWhenIsRepeatByDB(ret, "站段代码")
 			ret = models.Init(models.OrganizationParagraphModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
-				SetNotWheres(tools.Map{"uuid": uuid}).
+				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
 			exceptions.ThrowWhenIsRepeatByDB(ret, "站段名称")
 
 			// 查询
-			var organizationParagraph models.OrganizationParagraphModel
-			models.Init(models.OrganizationParagraphModel{}).
-				SetWheres(tools.Map{"uuid": uuid}).
-				Prepare().
-				First(&organizationParagraph)
-			exceptions.ThrowWhenIsEmptyByDB(ret, "站段")
+			organizationParagraph := (&models.OrganizationParagraphModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 编辑
 			organizationParagraph.BaseModel.Sort = form.Sort
@@ -193,21 +182,12 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 				panic(exceptions.ThrowForbidden(ret.Error.Error()))
 			}
 
-			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{}))
+			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"organization_paragraph": organizationParagraph}))
 		})
 
 		// 详情
 		r.GET("paragraph/:uuid", func(ctx *gin.Context) {
-			var ret *gorm.DB
-			uuid := ctx.Param("uuid")
-			var organizationParagraph models.OrganizationParagraphModel
-
-			ret = models.Init(models.OrganizationParagraphModel{}).
-				SetWheres(tools.Map{"uuid": uuid}).
-				Prepare().
-				First(&organizationParagraph)
-			exceptions.ThrowWhenIsEmptyByDB(ret, "站段")
-
+			organizationParagraph := (&models.OrganizationParagraphModel{}).FindOneByUUID(ctx.Param("uuid"))
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_paragraph": organizationParagraph}))
 		})
 

@@ -6,6 +6,7 @@ import (
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
+	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
 )
 
@@ -14,6 +15,7 @@ type MenuRouter struct{}
 
 // MenuStoreForm 新建菜单表单
 type MenuStoreForm struct {
+	Sort          int64    `form:"sort" json:"sort"`
 	Name          string   `form:"name" json:"name"`
 	URL           string   `form:"url" json:"url"`
 	URIName       string   `form:"uri_name" json:"uri_name"`
@@ -76,35 +78,31 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 			exceptions.ThrowWhenIsRepeatByDB(ret, "菜单名称和URL")
 
 			// 新建
+			menu := &models.MenuModel{
+				BaseModel:  models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
+				Name:       form.Name,
+				URL:        form.URL,
+				URIName:    form.URIName,
+				Icon:       form.Icon,
+				ParentUUID: form.ParentUUID,
+				RbacRoles:  form.RbacRoles,
+			}
 			if ret = (&models.BaseModel{}).
 				SetModel(models.MenuModel{}).
 				DB().
-				Create(&models.MenuModel{
-					Name:       form.Name,
-					URL:        form.URL,
-					URIName:    form.URIName,
-					Icon:       form.Icon,
-					ParentUUID: form.ParentUUID,
-					RbacRoles:  form.RbacRoles,
-				}); ret.Error != nil {
+				Create(&menu); ret.Error != nil {
 				panic(exceptions.ThrowForbidden(ret.Error.Error()))
 			}
 
-			ctx.JSON(tools.CorrectIns("").Created(tools.Map{}))
+			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"menu": menu}))
 		})
 
 		// 删除
 		r.DELETE(":uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
-			uuid := ctx.Param("uuid")
 
 			// 查询
-			var menu models.MenuModel
-			ret = models.Init(models.MenuModel{}).
-				SetWheres(tools.Map{"uuid": uuid}).
-				Prepare().
-				First(&menu)
-			exceptions.ThrowWhenIsEmptyByDB(ret, "菜单")
+			menu := (&models.MenuModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 删除
 			if ret = models.Init(models.MenuModel{}).
@@ -119,7 +117,6 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 		// 编辑
 		r.PUT(":uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
-			uuid := ctx.Param("uuid")
 
 			// 表单
 			form := (&MenuStoreForm{}).ShouldBind(ctx)
@@ -129,19 +126,13 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 			ret = (&models.BaseModel{}).
 				SetModel(models.MenuModel{}).
 				SetWheres(tools.Map{"name": form.Name, "url": form.URL}).
-				SetNotWheres(tools.Map{"uuid": uuid}).
+				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
 			exceptions.ThrowWhenIsRepeatByDB(ret, "菜单名称和URL")
 
 			// 查询
-			var menu models.MenuModel
-			ret = (&models.BaseModel{}).
-				SetModel(models.MenuModel{}).
-				SetWheres(tools.Map{"uuid": uuid}).
-				Prepare().
-				First(&menu)
-			exceptions.ThrowWhenIsEmptyByDB(ret, "菜单")
+			menu := (&models.MenuModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 修改
 			menu.Name = form.Name
@@ -156,22 +147,12 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 				panic(exceptions.ThrowForbidden(ret.Error.Error()))
 			}
 
-			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{}))
+			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"menu": menu}))
 		})
 
 		// 详情
 		r.GET(":uuid", func(ctx *gin.Context) {
-			var ret *gorm.DB
-			uuid := ctx.Param("uuid")
-
-			var menu models.MenuModel
-			ret = models.Init(models.MenuModel{}).
-				SetPreloads(tools.Strings{"Parent", "Subs", "RbacRoles"}).
-				SetWheres(tools.Map{"uuid": uuid}).
-				Prepare().
-				First(&menu)
-			exceptions.ThrowWhenIsEmptyByDB(ret, "菜单")
-
+			menu := (&models.MenuModel{}).FindOneByUUID(ctx.Param("uuid"))
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"menu": menu}))
 		})
 

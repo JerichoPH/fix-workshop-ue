@@ -58,30 +58,22 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 			exceptions.ThrowWhenIsRepeatByDB(ret, "权限分组名称")
 
 			// 保存
-			var rbacPermissionGroup models.RbacPermissionGroupModel
-			rbacPermissionGroup.Name = form.Name
+			rbacPermissionGroup := &models.RbacPermissionGroupModel{Name: form.Name}
 			if ret = models.Init(models.RbacPermissionGroupModel{}).
 				DB().
 				Create(&rbacPermissionGroup); ret.Error != nil {
 				panic(exceptions.ThrowForbidden(ret.Error.Error()))
 			}
 
-			ctx.JSON(tools.CorrectIns("").Created(tools.Map{}))
+			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"rbac_permission_group": rbacPermissionGroup}))
 		})
 
 		// 删除用户分组
 		r.DELETE(":uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
-			uuid := ctx.Param("uuid")
 
 			// 查询
-			var rbacPermissionGroup models.RbacPermissionGroupModel
-			ret = models.Init(models.RbacPermissionGroupModel{}).
-				SetWheres(tools.Map{"uuid": uuid}).
-				SetPreloads(tools.Strings{"RbacPermissions"}).
-				Prepare().
-				First(&rbacPermissionGroup)
-			exceptions.ThrowWhenIsEmptyByDB(ret, "权限分组")
+			rbacPermissionGroup := (&models.RbacPermissionGroupModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 删除权限
 			if len(rbacPermissionGroup.RbacPermissions) > 0 {
@@ -89,7 +81,9 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 			}
 
 			// 删除
-			models.Init(models.RbacPermissionGroupModel{}).DB().Delete(&rbacPermissionGroup)
+			if ret = models.Init(models.RbacPermissionGroupModel{}).DB().Delete(&rbacPermissionGroup); ret.Error != nil {
+				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
 		})
@@ -112,18 +106,13 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 			exceptions.ThrowWhenIsRepeatByDB(ret, "权限分组名称")
 
 			// 查询
-			var rbacPermissionGroup models.RbacPermissionGroupModel
-			ret = models.Init(models.RbacPermissionGroupModel{}).
-				SetWheres(tools.Map{"uuid": uuid}).
-				Prepare().
-				First(&rbacPermissionGroup)
-			exceptions.ThrowWhenIsEmptyByDB(ret, "权限分组")
+			rbacPermissionGroup := (&models.RbacPermissionGroupModel{}).FindOneByUUID(uuid)
 
 			// 修改
 			rbacPermissionGroup.Name = form.Name
 			models.Init(models.RbacPermissionGroupModel{}).DB().Save(&rbacPermissionGroup)
 
-			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{}))
+			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"rbac_permission_group": rbacPermissionGroup}))
 		})
 
 		// 权限分组详情

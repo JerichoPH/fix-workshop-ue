@@ -6,6 +6,7 @@ import (
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
+	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
 )
 
@@ -73,40 +74,38 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 			form := (&OrganizationRailwayStoreForm{}).ShouldBind(ctx)
 
 			// 新建
+			organizationRailway := &models.OrganizationRailwayModel{
+				BaseModel:  models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
+				UniqueCode:             form.UniqueCode,
+				Name:                   form.Name,
+				ShortName:              form.ShortName,
+				BeEnable:               form.BeEnable,
+				OrganizationLines:      form.OrganizationLines,
+				OrganizationParagraphs: form.OrganizationParagraphs,
+			}
 			if ret = (&models.BaseModel{}).
 				SetModel(models.OrganizationRailwayModel{}).
 				DB().
-				Create(&models.OrganizationRailwayModel{
-					UniqueCode:             form.UniqueCode,
-					Name:                   form.Name,
-					ShortName:              form.ShortName,
-					BeEnable:               form.BeEnable,
-					OrganizationLines:      form.OrganizationLines,
-					OrganizationParagraphs: form.OrganizationParagraphs,
-				}); ret.Error != nil {
+				Create(&organizationRailway); ret.Error != nil {
 				panic(exceptions.ThrowForbidden(ret.Error.Error()))
 			}
 
-			ctx.JSON(tools.CorrectIns("").Created(tools.Map{}))
+			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"organization_railway": organizationRailway}))
 		})
 
 		// 删除
 		r.DELETE("railway/:uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
-			uuid := ctx.Param("uuid")
 
 			// 查询
-			var organizationRailway models.OrganizationRailwayModel
-			ret = models.Init(models.OrganizationRailwayModel{}).
-				SetWheres(tools.Map{"uuid": uuid}).
-				Prepare().
-				First(&organizationRailway)
-			exceptions.ThrowWhenIsEmptyByDB(ret, "路局")
+			organizationRailway := (&models.OrganizationRailwayModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 删除
-			models.Init(models.OrganizationRailwayModel{}).
+			if ret = models.Init(models.OrganizationRailwayModel{}).
 				DB().
-				Delete(&organizationRailway)
+				Delete(&organizationRailway); ret.Error != nil {
+				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
 		})
@@ -114,18 +113,12 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 		// 编辑
 		r.PUT("railway/:uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
-			uuid := ctx.Param("uuid")
 
 			// 表单
 			form := (&OrganizationRailwayStoreForm{}).ShouldBind(ctx)
 
 			// 查询
-			var organizationRailway models.OrganizationRailwayModel
-			ret = models.Init(models.OrganizationRailwayModel{}).
-				SetWheres(tools.Map{"uuid": uuid}).
-				Prepare().
-				First(&organizationRailway)
-			exceptions.ThrowWhenIsEmptyByDB(ret, "路局")
+			organizationRailway := (&models.OrganizationRailwayModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 修改
 			organizationRailway.Sort = form.Sort
@@ -141,20 +134,12 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 				panic(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{}))
+			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"organization_railway": organizationRailway}))
 		})
 
 		// 详情
 		r.GET("railway/:uuid", func(ctx *gin.Context) {
-			var ret *gorm.DB
-			uuid := ctx.Param("uuid")
-
-			var organizationRailway models.OrganizationRailwayModel
-			ret = models.Init(models.OrganizationRailwayModel{}).
-				SetWheres(tools.Map{"uuid": uuid}).
-				Prepare().
-				First(&organizationRailway)
-			exceptions.ThrowWhenIsEmptyByDB(ret, "路局")
+			organizationRailway := (&models.OrganizationRailwayModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_railway": organizationRailway}))
 		})
