@@ -30,6 +30,11 @@ type BaseModel struct {
 	model          interface{}
 }
 
+// Init 获取数据库查询对象
+func Init(model interface{}) *BaseModel {
+	return (&BaseModel{}).SetModel(model)
+}
+
 // demoFindOne 获取单条数据演示
 func (cls *BaseModel) demoFindOne() {
 	var b BaseModel

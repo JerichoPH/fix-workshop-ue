@@ -11,6 +11,7 @@ import (
 
 type OrganizationRailwayRouter struct{}
 
+// OrganizationRailwayStoreForm 路局新建表单
 type OrganizationRailwayStoreForm struct {
 	Sort                       int64    `form:"sort" json:"sort"`
 	UniqueCode                 string   `form:"unique_code" json:"unique_code"`
@@ -18,9 +19,42 @@ type OrganizationRailwayStoreForm struct {
 	ShortName                  string   `form:"short_name" json:"short_name"`
 	BeEnable                   bool     `form:"be_enable" json:"be_enable"`
 	OrganizationLineUUIDs      []string `form:"organization_line_uuids" json:"organization_line_uuids"`
+	OrganizationLines          []*models.OrganizationLineModel
 	OrganizationParagraphUUIDs []string `form:"organization_paragraph_uuids" json:"organization_paragraph_uuids"`
+	OrganizationParagraphs     []models.OrganizationParagraphModel
 }
 
+// ShouldBind 绑定表单
+//  @receiver cls
+//  @param ctx
+//  @return OrganizationRailwayStoreForm
+func (cls OrganizationRailwayStoreForm) ShouldBind(ctx *gin.Context) OrganizationRailwayStoreForm {
+	if err := ctx.ShouldBind(&cls); err != nil {
+		panic(exceptions.ThrowForbidden(err.Error()))
+	}
+	if cls.UniqueCode == "" {
+		panic(exceptions.ThrowForbidden("路局代码必填"))
+	}
+	if cls.Name == "" {
+		panic(exceptions.ThrowForbidden("路局名称必填"))
+	}
+	if len(cls.OrganizationLineUUIDs) > 0 {
+		models.Init(models.OrganizationLineModel{}).
+			DB().
+			Where("uuid in ?", cls.OrganizationLineUUIDs).
+			Find(&cls.OrganizationLines)
+	}
+	if len(cls.OrganizationParagraphUUIDs) > 0 {
+		models.Init(models.OrganizationParagraphModel{}).
+			DB().
+			Where("uuid in ?", cls.OrganizationParagraphUUIDs).
+			Find(&cls.OrganizationParagraphs)
+	}
+
+	return cls
+}
+
+// OrganizationRailwayUpdateForm 编辑表单
 type OrganizationRailwayUpdateForm struct {
 	Sort                       int64    `form:"sort" json:"sort"`
 	UniqueCode                 string   `form:"unique_code" json:"unique_code"`
@@ -31,6 +65,9 @@ type OrganizationRailwayUpdateForm struct {
 	OrganizationParagraphUUIDs []string `form:"organization_paragraph_uuids" json:"organization_paragraph_uuids"`
 }
 
+// Load 加载路由
+//  @receiver cls
+//  @param router
 func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 	r := router.Group(
 		"/api/v1/organization",
@@ -43,32 +80,7 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 			var ret *gorm.DB
 
 			// 表单
-			var form OrganizationRailwayStoreForm
-			if err := ctx.ShouldBind(&form); err != nil {
-				panic(exceptions.ThrowForbidden(err.Error()))
-			}
-			if form.UniqueCode == "" {
-				panic(exceptions.ThrowForbidden("路局代码必填"))
-			}
-			if form.Name == "" {
-				panic(exceptions.ThrowForbidden("路局名称必填"))
-			}
-			var organizationLines []*models.OrganizationLineModel
-			if len(form.OrganizationLineUUIDs) > 0 {
-				(&models.BaseModel{}).
-					SetModel(models.OrganizationLineModel{}).
-					DB().
-					Where("uuid in ?", form.OrganizationLineUUIDs).
-					Find(&organizationLines)
-			}
-			var organizationParagraphs []models.OrganizationParagraphModel
-			if len(form.OrganizationParagraphUUIDs) > 0 {
-				(&models.BaseModel{}).
-					SetModel(models.OrganizationParagraphModel{}).
-					DB().
-					Where("uuid in ?", form.OrganizationParagraphUUIDs).
-					Find(&organizationParagraphs)
-			}
+			form := (&OrganizationRailwayStoreForm{}).ShouldBind(ctx)
 
 			// 新建
 			if ret = (&models.BaseModel{}).
@@ -79,8 +91,8 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 					Name:                   form.Name,
 					ShortName:              form.ShortName,
 					BeEnable:               form.BeEnable,
-					OrganizationLines:      organizationLines,
-					OrganizationParagraphs: organizationParagraphs,
+					OrganizationLines:      form.OrganizationLines,
+					OrganizationParagraphs: form.OrganizationParagraphs,
 				}); ret.Error != nil {
 				panic(exceptions.ThrowForbidden(ret.Error.Error()))
 			}
@@ -95,16 +107,14 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 
 			// 查询
 			var organizationRailway models.OrganizationRailwayModel
-			ret = (&models.BaseModel{}).
-				SetModel(models.OrganizationRailwayModel{}).
+			ret = models.Init(models.OrganizationRailwayModel{}).
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&organizationRailway)
 			tools.ThrowExceptionWhenIsEmptyByDB(ret, "路局")
 
 			// 删除
-			(&models.BaseModel{}).
-				SetModel(models.OrganizationRailwayModel{}).
+			models.Init(models.OrganizationRailwayModel{}).
 				DB().
 				Delete(&organizationRailway)
 
@@ -117,37 +127,11 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 			uuid := ctx.Param("uuid")
 
 			// 表单
-			var form OrganizationRailwayUpdateForm
-			if err := ctx.ShouldBind(&form); err != nil {
-				panic(exceptions.ThrowForbidden(err.Error()))
-			}
-			if form.UniqueCode == "" {
-				panic(exceptions.ThrowForbidden("路局代码必填"))
-			}
-			if form.Name == "" {
-				panic(exceptions.ThrowForbidden("路局名称必填"))
-			}
-			var organizationLines []*models.OrganizationLineModel
-			if len(form.OrganizationLineUUIDs) > 0 {
-				(&models.BaseModel{}).
-					SetModel(models.OrganizationLineModel{}).
-					DB().
-					Where("uuid in ?", form.OrganizationLineUUIDs).
-					Find(&organizationLines)
-			}
-			var organizationParagraphs []models.OrganizationParagraphModel
-			if len(form.OrganizationParagraphUUIDs) > 0 {
-				(&models.BaseModel{}).
-					SetModel(models.OrganizationParagraphModel{}).
-					DB().
-					Where("uuid in ?", form.OrganizationParagraphUUIDs).
-					Find(&organizationParagraphs)
-			}
+			form := (&OrganizationRailwayStoreForm{}).ShouldBind(ctx)
 
 			// 查询
 			var organizationRailway models.OrganizationRailwayModel
-			ret = (&models.BaseModel{}).
-				SetModel(models.OrganizationRailwayModel{}).
+			ret = models.Init(models.OrganizationRailwayModel{}).
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&organizationRailway)
@@ -159,10 +143,9 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 			organizationRailway.Name = form.Name
 			organizationRailway.ShortName = form.ShortName
 			organizationRailway.BeEnable = form.BeEnable
-			organizationRailway.OrganizationLines = organizationLines
-			organizationRailway.OrganizationParagraphs = organizationParagraphs
-			if ret = (&models.BaseModel{}).
-				SetModel(models.OrganizationRailwayModel{}).
+			organizationRailway.OrganizationLines = form.OrganizationLines
+			organizationRailway.OrganizationParagraphs = form.OrganizationParagraphs
+			if ret = models.Init(models.OrganizationRailwayModel{}).
 				DB().
 				Save(&organizationRailway); ret.Error != nil {
 				panic(ret.Error.Error())
@@ -177,8 +160,7 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 			uuid := ctx.Param("uuid")
 
 			var organizationRailway models.OrganizationRailwayModel
-			ret = (&models.BaseModel{}).
-				SetModel(models.OrganizationRailwayModel{}).
+			ret = models.Init(models.OrganizationRailwayModel{}).
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&organizationRailway)
@@ -190,10 +172,8 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 		// 列表
 		r.GET("railway", func(ctx *gin.Context) {
 			var organizationRailways []models.OrganizationRailwayModel
-			{
-			}
-			(&models.BaseModel{}).
-				SetModel(models.OrganizationRailwayModel{}).
+
+			models.Init(models.OrganizationRailwayModel{}).
 				SetWhereFields("uuid", "sort", "unique_code", "name", "short_name", "be_enable").
 				PrepareQuery(ctx).
 				Find(&organizationRailways)

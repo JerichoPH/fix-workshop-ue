@@ -7,5 +7,5 @@ func (cls *ForbiddenError) Error() string {
 }
 
 func ThrowForbidden(text string) error {
-	return &ForbiddenError{text}
+	return &ForbiddenError{s: text}
 }
