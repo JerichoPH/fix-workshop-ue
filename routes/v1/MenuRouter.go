@@ -73,7 +73,7 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"name": form.Name, "url": form.URL}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowExceptionWhenIsRepeatByDB(ret, "菜单名称和URL")
+			exceptions.ThrowWhenIsRepeatByDB(ret, "菜单名称和URL")
 
 			// 新建
 			if ret = (&models.BaseModel{}).
@@ -104,7 +104,7 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&menu)
-			tools.ThrowExceptionWhenIsEmptyByDB(ret, "菜单")
+			exceptions.ThrowWhenIsEmptyByDB(ret, "菜单")
 
 			// 删除
 			if ret = models.Init(models.MenuModel{}).
@@ -132,7 +132,7 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowExceptionWhenIsRepeatByDB(ret, "菜单名称和URL")
+			exceptions.ThrowWhenIsRepeatByDB(ret, "菜单名称和URL")
 
 			// 查询
 			var menu models.MenuModel
@@ -141,7 +141,7 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&menu)
-			tools.ThrowExceptionWhenIsEmptyByDB(ret, "菜单")
+			exceptions.ThrowWhenIsEmptyByDB(ret, "菜单")
 
 			// 修改
 			menu.Name = form.Name
@@ -170,7 +170,7 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&menu)
-			tools.ThrowExceptionWhenIsEmptyByDB(ret, "菜单")
+			exceptions.ThrowWhenIsEmptyByDB(ret, "菜单")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"menu": menu}))
 		})

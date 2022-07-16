@@ -94,12 +94,12 @@ func (cls *OrganizationLineRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowExceptionWhenIsRepeatByDB(ret, "线别代码")
+			exceptions.ThrowWhenIsRepeatByDB(ret, "线别代码")
 			ret = models.Init(models.OrganizationLineModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowExceptionWhenIsRepeatByDB(ret, "线别名称")
+			exceptions.ThrowWhenIsRepeatByDB(ret, "线别名称")
 
 			// 新建
 			if ret = models.Init(models.OrganizationLineModel{}).
@@ -129,7 +129,7 @@ func (cls *OrganizationLineRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&organizationLine)
-			tools.ThrowExceptionWhenIsEmptyByDB(ret, "线别")
+			exceptions.ThrowWhenIsEmptyByDB(ret, "线别")
 
 			if ret = models.Init(models.OrganizationLineModel{}).
 				DB().
@@ -155,13 +155,13 @@ func (cls *OrganizationLineRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowExceptionWhenIsRepeatByDB(ret, "线别代码")
+			exceptions.ThrowWhenIsRepeatByDB(ret, "线别代码")
 			ret = models.Init(models.OrganizationLineModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowExceptionWhenIsRepeatByDB(ret, "线别名称")
+			exceptions.ThrowWhenIsRepeatByDB(ret, "线别名称")
 
 			// 查询
 			var organizationLine models.OrganizationLineModel
@@ -169,7 +169,7 @@ func (cls *OrganizationLineRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&organizationLine)
-			tools.ThrowExceptionWhenIsEmptyByDB(ret, "线别")
+			exceptions.ThrowWhenIsEmptyByDB(ret, "线别")
 
 			// 修改
 			organizationLine.UniqueCode = form.UniqueCode
@@ -200,7 +200,7 @@ func (cls *OrganizationLineRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&organizationLine)
-			tools.ThrowExceptionWhenIsEmptyByDB(ret, "线别")
+			exceptions.ThrowWhenIsEmptyByDB(ret, "线别")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_line": organizationLine}))
 		})

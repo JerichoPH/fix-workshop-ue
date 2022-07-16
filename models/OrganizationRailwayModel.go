@@ -10,8 +10,8 @@ type OrganizationRailwayModel struct {
 	ShortName              string                       `gorm:"type:VARCHAR(64);COMMENT:路局简称;" json:"short_name"`
 	BeEnable               bool                         `gorm:"type:BOOLEAN;DEFAULT:1;COMMENT:是否启用;" json:"be_enable"`
 	OrganizationLines      []*OrganizationLineModel     `gorm:"many2many:pivot_organization_line_and_organization_railways;foreignKey:id;joinForeignKey:organization_railway_id;references:id;joinReferences:organization_line_id;COMMENT:线别与站段多对多;" json:"organization_lines"`
-	OrganizationParagraphs []OrganizationParagraphModel `gorm:"foreignKey:OrganizationRailwayUniqueCode;references:UniqueCode;COMMENT:相关站段;" json:"organization_paragraphs"`
-	EntireInstances        []EntireInstanceModel        `gorm:"foreignKey:OrganizationRailwayUniqueCode;references:UniqueCode;COMMENT:相关器材;" json:"entire_instances"`
+	OrganizationParagraphs []OrganizationParagraphModel `gorm:"foreignKey:OrganizationRailwayUUID;references:UniqueCode;COMMENT:相关站段;" json:"organization_paragraphs"`
+	EntireInstances        []EntireInstanceModel        `gorm:"foreignKey:OrganizationRailwayUUID;references:UniqueCode;COMMENT:相关器材;" json:"entire_instances"`
 }
 
 // TableName 表名称

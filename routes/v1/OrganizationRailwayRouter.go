@@ -101,7 +101,7 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&organizationRailway)
-			tools.ThrowExceptionWhenIsEmptyByDB(ret, "路局")
+			exceptions.ThrowWhenIsEmptyByDB(ret, "路局")
 
 			// 删除
 			models.Init(models.OrganizationRailwayModel{}).
@@ -125,7 +125,7 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&organizationRailway)
-			tools.ThrowExceptionWhenIsEmptyByDB(ret, "路局")
+			exceptions.ThrowWhenIsEmptyByDB(ret, "路局")
 
 			// 修改
 			organizationRailway.Sort = form.Sort
@@ -154,7 +154,7 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&organizationRailway)
-			tools.ThrowExceptionWhenIsEmptyByDB(ret, "路局")
+			exceptions.ThrowWhenIsEmptyByDB(ret, "路局")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_railway": organizationRailway}))
 		})

@@ -51,7 +51,7 @@ func (cls OrganizationParagraphStoreForm) ShouldBind(ctx *gin.Context) Organizat
 		SetWheres(tools.Map{"uuid": cls.OrganizationRailwayUUID}).
 		Prepare().
 		First(&cls.OrganizationRailway)
-	tools.ThrowExceptionWhenIsEmptyByDB(ret, "路局不存在")
+	exceptions.ThrowWhenIsEmptyByDB(ret, "路局不存在")
 	if len(cls.OrganizationWorkshopUUIDs) > 0 {
 		(&models.BaseModel{}).
 			SetModel(models.OrganizationWorkshopModel{}).
@@ -95,35 +95,131 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowExceptionWhenIsRepeatByDB(ret, "站段代码")
+			exceptions.ThrowWhenIsRepeatByDB(ret, "站段代码")
 			ret = models.Init(models.OrganizationParagraphModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowExceptionWhenIsRepeatByDB(ret, "站段名称")
+			exceptions.ThrowWhenIsRepeatByDB(ret, "站段名称")
 			ret = models.Init(models.OrganizationParagraphModel{}).
 				SetWheres(tools.Map{"short_name": form.ShortName}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowExceptionWhenIsRepeatByDB(ret, "站段简称")
+			exceptions.ThrowWhenIsRepeatByDB(ret, "站段简称")
 
 			// 保存
 			if ret = models.Init(models.OrganizationParagraphModel{}).
 				DB().
 				Create(&models.OrganizationParagraphModel{
-					BaseModel:                     models.BaseModel{Sort: form.Sort},
-					UniqueCode:                    form.UniqueCode,
-					Name:                          form.Name,
-					ShortName:                     form.ShortName,
-					BeEnable:                      form.BeEnable,
-					OrganizationRailwayUniqueCode: form.OrganizationRailway.UniqueCode,
-					OrganizationWorkshops:         form.OrganizationWorkshops,
-					OrganizationLines:             form.OrganizationLines,
+					BaseModel:             models.BaseModel{Sort: form.Sort},
+					UniqueCode:            form.UniqueCode,
+					Name:                  form.Name,
+					ShortName:             form.ShortName,
+					BeEnable:              form.BeEnable,
+					OrganizationRailway:   form.OrganizationRailway,
+					OrganizationWorkshops: form.OrganizationWorkshops,
+					OrganizationLines:     form.OrganizationLines,
 				}); ret.Error != nil {
 				panic(exceptions.ThrowForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{}))
+		})
+
+		// 删除
+		r.DELETE("paragraph/:uuid", func(ctx *gin.Context) {
+			var ret *gorm.DB
+			uuid := ctx.Param("uuid")
+
+			// 查询
+			var organizationParagraph models.OrganizationParagraphModel
+			models.Init(models.OrganizationParagraphModel{}).
+				SetWheres(tools.Map{"uuid": uuid}).
+				Prepare().
+				First(&organizationParagraph)
+			exceptions.ThrowWhenIsEmptyByDB(ret, "站段")
+
+			// 删除
+			models.Init(models.OrganizationParagraphModel{}).
+				DB().
+				Delete(&organizationParagraph)
+
+			ctx.JSON(tools.CorrectIns("").Deleted())
+		})
+
+		// 编辑
+		r.PUT("paragraph/:uuid", func(ctx *gin.Context) {
+			var ret *gorm.DB
+			uuid := ctx.Param("uuid")
+
+			// 表单
+			form := (&OrganizationParagraphStoreForm{}).ShouldBind(ctx)
+
+			// 查重
+			var repeat models.OrganizationParagraphModel
+			ret = models.Init(models.OrganizationParagraphModel{}).
+				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
+				SetNotWheres(tools.Map{"uuid": uuid}).
+				Prepare().
+				First(&repeat)
+			exceptions.ThrowWhenIsRepeatByDB(ret, "站段代码")
+			ret = models.Init(models.OrganizationParagraphModel{}).
+				SetWheres(tools.Map{"name": form.Name}).
+				SetNotWheres(tools.Map{"uuid": uuid}).
+				Prepare().
+				First(&repeat)
+			exceptions.ThrowWhenIsRepeatByDB(ret, "站段名称")
+
+			// 查询
+			var organizationParagraph models.OrganizationParagraphModel
+			models.Init(models.OrganizationParagraphModel{}).
+				SetWheres(tools.Map{"uuid": uuid}).
+				Prepare().
+				First(&organizationParagraph)
+			exceptions.ThrowWhenIsEmptyByDB(ret, "站段")
+
+			// 编辑
+			organizationParagraph.BaseModel.Sort = form.Sort
+			organizationParagraph.UniqueCode = form.UniqueCode
+			organizationParagraph.Name = form.Name
+			organizationParagraph.ShortName = form.ShortName
+			organizationParagraph.BeEnable = form.BeEnable
+			organizationParagraph.OrganizationRailway = form.OrganizationRailway
+			organizationParagraph.OrganizationWorkshops = form.OrganizationWorkshops
+			organizationParagraph.OrganizationLines = form.OrganizationLines
+			if ret = models.Init(models.OrganizationParagraphModel{}).
+				DB().
+				Save(&organizationParagraph); ret.Error != nil {
+				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+			}
+
+			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{}))
+		})
+
+		// 详情
+		r.GET("paragraph/:uuid", func(ctx *gin.Context) {
+			var ret *gorm.DB
+			uuid := ctx.Param("uuid")
+			var organizationParagraph models.OrganizationParagraphModel
+
+			ret = models.Init(models.OrganizationParagraphModel{}).
+				SetWheres(tools.Map{"uuid": uuid}).
+				Prepare().
+				First(&organizationParagraph)
+			exceptions.ThrowWhenIsEmptyByDB(ret, "站段")
+
+			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_paragraph": organizationParagraph}))
+		})
+
+		// 列表
+		r.GET("paragraph", func(ctx *gin.Context) {
+			var organizationParagraphs []models.OrganizationParagraphModel
+			models.Init(models.OrganizationParagraphModel{}).
+				SetWhereFields("uuid", "sort", "unique_code", "name", "shot_name", "be_enable", "organization_railway_uuid").
+				PrepareQuery(ctx).
+				Find(&organizationParagraphs)
+
+			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_paragraphs": organizationParagraphs}))
 		})
 	}
 }

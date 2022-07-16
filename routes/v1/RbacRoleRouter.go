@@ -106,7 +106,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowExceptionWhenIsRepeatByDB(ret, "角色名称")
+			exceptions.ThrowWhenIsRepeatByDB(ret, "角色名称")
 
 			// 保存
 			if ret = models.Init(models.RbacRoleModel{}).
@@ -129,7 +129,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&rbacRole)
-			tools.ThrowExceptionWhenIsEmptyByDB(ret, "角色")
+			exceptions.ThrowWhenIsEmptyByDB(ret, "角色")
 
 			// 删除
 			if ret = models.Init(models.RbacRoleModel{}).
@@ -156,7 +156,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowExceptionWhenIsRepeatByDB(ret, "角色名称")
+			exceptions.ThrowWhenIsRepeatByDB(ret, "角色名称")
 
 			// 查询
 			var rbacRole models.RbacRoleModel
@@ -164,7 +164,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&rbacRole)
-			tools.ThrowExceptionWhenIsEmptyByDB(ret, "角色")
+			exceptions.ThrowWhenIsEmptyByDB(ret, "角色")
 
 			// 修改
 			if form.Name != "" {
@@ -189,7 +189,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&rbacRole)
-			tools.ThrowExceptionWhenIsEmptyByDB(ret, "角色")
+			exceptions.ThrowWhenIsEmptyByDB(ret, "角色")
 
 			// 添加绑定关系
 			rbacRole.Accounts = form.Accounts
@@ -216,7 +216,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&rbacRole)
-			tools.ThrowExceptionWhenIsEmptyByDB(ret, "角色")
+			exceptions.ThrowWhenIsEmptyByDB(ret, "角色")
 
 			// 绑定
 			rbacRole.RbacPermissions = form.RbacPermissions
@@ -246,7 +246,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 				}).
 				Prepare().
 				First(&rbacRole)
-			tools.ThrowExceptionWhenIsEmptyByDB(ret, "角色")
+			exceptions.ThrowWhenIsEmptyByDB(ret, "角色")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"rbac_role": rbacRole}))
 		})

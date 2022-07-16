@@ -32,7 +32,7 @@ func CheckPermission() gin.HandlerFunc {
 				}).
 				Prepare().
 				First(&rbacPermission)
-			tools.ThrowExceptionWhenIsEmptyByDB(ret, "权限")
+			exceptions.ThrowWhenIsEmptyByDB(ret, "权限")
 
 			ok := false
 			if len(rbacPermission.RbacRoles) > 0 {

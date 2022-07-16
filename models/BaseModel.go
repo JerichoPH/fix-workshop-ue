@@ -44,7 +44,7 @@ func (cls *BaseModel) demoFindOne() {
 		SetNotWheres(tools.Map{}).
 		Prepare().
 		First(b)
-	tools.ThrowExceptionWhenIsEmptyByDB(ret, "XX")
+	exceptions.ThrowExceptionWhenIsEmptyByDB(ret, "XX")
 }
 
 // demoFind 获取多条数据演示

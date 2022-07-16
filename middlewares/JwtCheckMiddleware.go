@@ -53,7 +53,7 @@ func CheckJwt() gin.HandlerFunc {
 						Prepare().
 						First(&account)
 
-					tools.ThrowExceptionWhenIsEmptyByDB(ret, "用户")
+					exceptions.ThrowWhenIsEmptyByDB(ret, "用户")
 				default:
 					panic(exceptions.ThrowForbidden("权鉴认证方式不支持"))
 				}

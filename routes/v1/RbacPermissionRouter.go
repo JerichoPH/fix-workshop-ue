@@ -47,7 +47,7 @@ func (cls RbacPermissionStoreForm) ShouldBind(ctx *gin.Context) RbacPermissionSt
 		SetWheres(tools.Map{"uuid": cls.RbacPermissionGroupUUID}).
 		Prepare().
 		First(&cls.RbacPermissionGroup)
-	tools.ThrowExceptionWhenIsEmptyByDB(ret, "所属权限分组")
+	exceptions.ThrowWhenIsEmptyByDB(ret, "所属权限分组")
 
 	return cls
 }
@@ -119,7 +119,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 					SetWheres(tools.Map{"name": name, "method": method, "uri": form.Uri}).
 					Prepare().
 					First(&repeat)
-				if !tools.ThrowExceptionWhenIsEmptyByDB(ret, "") {
+				if !exceptions.ThrowWhenIsEmptyByDB(ret, "") {
 					if ret = models.Init(models.RbacPermissionModel{}).
 
 						DB().
@@ -150,7 +150,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				Find(&rbacPermission)
-			tools.ThrowExceptionWhenIsEmptyByDB(ret, "权限")
+			exceptions.ThrowWhenIsEmptyByDB(ret, "权限")
 
 			// 删除
 			models.Init(&models.RbacPermissionModel{}).
@@ -201,7 +201,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 				SetPreloads(tools.Strings{"RbacPermissionGroup"}).
 				Prepare().
 				First(&rbacPermission)
-			tools.ThrowExceptionWhenIsEmptyByDB(ret, "权限")
+			exceptions.ThrowWhenIsEmptyByDB(ret, "权限")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"rbac_permission": rbacPermission}))
 		})

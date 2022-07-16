@@ -86,12 +86,12 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"username": form.Username}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowExceptionWhenIsRepeatByDB(ret, "用户名")
+			exceptions.ThrowWhenIsRepeatByDB(ret, "用户名")
 			ret = (&models.BaseModel{}).
 				SetWheres(tools.Map{"nickname": form.Nickname}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowExceptionWhenIsRepeatByDB(ret, "昵称")
+			exceptions.ThrowWhenIsRepeatByDB(ret, "昵称")
 
 			// 密码加密
 			bytes, _ := bcrypt.GenerateFromPassword([]byte(form.Password), 14)
@@ -124,7 +124,7 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"username": form.Username}).
 				Prepare().
 				First(&account)
-			tools.ThrowExceptionWhenIsEmptyByDB(ret, "用户")
+			exceptions.ThrowWhenIsEmptyByDB(ret, "用户")
 
 			// 验证密码
 			if err := bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(form.Password)); err != nil {
@@ -161,7 +161,7 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 						SetPreloads(tools.Strings{"RbacRoles", "RbacRoles.Menus"}).
 						Prepare().
 						First(&account)
-					tools.ThrowExceptionWhenIsEmptyByDB(ret, "当前令牌指向用户")
+					exceptions.ThrowWhenIsEmptyByDB(ret, "当前令牌指向用户")
 
 					menuUUIDs := make([]string, 50)
 					if len(account.RbacRoles) > 0 {

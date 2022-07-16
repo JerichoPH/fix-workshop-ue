@@ -121,12 +121,12 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"username": form.Username}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowExceptionWhenIsRepeatByDB(ret, "用户名")
+			exceptions.ThrowWhenIsRepeatByDB(ret, "用户名")
 			ret = (&models.BaseModel{}).
 				SetWheres(tools.Map{"nickname": form.Nickname}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowExceptionWhenIsRepeatByDB(ret, "昵称")
+			exceptions.ThrowWhenIsRepeatByDB(ret, "昵称")
 
 			// 密码加密
 			bytes, _ := bcrypt.GenerateFromPassword([]byte(form.Password), 14)
@@ -160,13 +160,13 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowExceptionWhenIsRepeatByDB(ret, "用户账号")
+			exceptions.ThrowWhenIsRepeatByDB(ret, "用户账号")
 			ret = models.Init(models.AccountModel{}).
 				SetWheres(tools.Map{"nickname": form.Nickname}).
 				SetNotWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowExceptionWhenIsRepeatByDB(ret, "用户昵称")
+			exceptions.ThrowWhenIsRepeatByDB(ret, "用户昵称")
 
 			// 查询
 			var account models.AccountModel
@@ -174,7 +174,7 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&account)
-			tools.ThrowExceptionWhenIsEmptyByDB(ret, "用户")
+			exceptions.ThrowWhenIsEmptyByDB(ret, "用户")
 
 			// 编辑
 			account.Username = form.Username
@@ -202,7 +202,7 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&account)
-			tools.ThrowExceptionWhenIsEmptyByDB(ret, "用户")
+			exceptions.ThrowWhenIsEmptyByDB(ret, "用户")
 
 			// 验证密码
 			if err := bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(form.OldPassword)); err != nil {
@@ -233,7 +233,7 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&account)
-			tools.ThrowExceptionWhenIsEmptyByDB(ret, "用户")
+			exceptions.ThrowWhenIsEmptyByDB(ret, "用户")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"account": account}))
 		})

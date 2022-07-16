@@ -23,7 +23,7 @@ type EntireInstanceModel struct {
 	SaidRod                         string                     `gorm:"type:VARCHAR(64);COMMENT:表示杆特征;" json:"said_rod"`
 	FixCycleYear                    int16                      `gorm:"type:TINYINT;COMMENT:周期修年;" json:"fix_cycle_year"`
 	OrganizationRailwayUniqueCode   string                     `gorm:"type:CHAR(3);COMMENT:所属路局;" json:"organization_railway_unique_code"`
-	OrganizationRailway             OrganizationRailwayModel   `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OrganizationRailwayUniqueCode;references:UniqueCode;COMMENT:所属路局;" json:"organization_railway"`
+	OrganizationRailway             OrganizationRailwayModel   `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OrganizationRailwayUUID;references:UniqueCode;COMMENT:所属路局;" json:"organization_railway"`
 	OrganizationParagraphUniqueCode string                     `gorm:"type:CHAR(4);COMMENT:所属站段;" json:"organization_paragraph_unique_code"`
 	OrganizationParagraph           OrganizationParagraphModel `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OrganizationParagraphUniqueCode;references:UniqueCode;COMMENT:所属站段;" json:"organization_paragraph"`
 	OrganizationWorkshopUniqueCode  string                     `gorm:"type:CHAR(7);COMMENT:所属车间;" json:"organization_workshop_unique_code"`

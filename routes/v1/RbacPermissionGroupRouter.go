@@ -55,7 +55,7 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowExceptionWhenIsRepeatByDB(ret, "权限分组名称")
+			exceptions.ThrowWhenIsRepeatByDB(ret, "权限分组名称")
 
 			// 保存
 			var rbacPermissionGroup models.RbacPermissionGroupModel
@@ -81,7 +81,7 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 				SetPreloads(tools.Strings{"RbacPermissions"}).
 				Prepare().
 				First(&rbacPermissionGroup)
-			tools.ThrowExceptionWhenIsEmptyByDB(ret, "权限分组")
+			exceptions.ThrowWhenIsEmptyByDB(ret, "权限分组")
 
 			// 删除权限
 			if len(rbacPermissionGroup.RbacPermissions) > 0 {
@@ -109,7 +109,7 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&repeat)
-			tools.ThrowExceptionWhenIsRepeatByDB(ret, "权限分组名称")
+			exceptions.ThrowWhenIsRepeatByDB(ret, "权限分组名称")
 
 			// 查询
 			var rbacPermissionGroup models.RbacPermissionGroupModel
@@ -117,7 +117,7 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&rbacPermissionGroup)
-			tools.ThrowExceptionWhenIsEmptyByDB(ret, "权限分组")
+			exceptions.ThrowWhenIsEmptyByDB(ret, "权限分组")
 
 			// 修改
 			rbacPermissionGroup.Name = form.Name
@@ -138,7 +138,7 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 				SetPreloads(tools.Strings{"RbacPermissions"}).
 				Prepare().
 				First(&rbacPermissionGroup)
-			tools.ThrowExceptionWhenIsEmptyByDB(ret, "权限分组")
+			exceptions.ThrowWhenIsEmptyByDB(ret, "权限分组")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"rbac_permission_group": rbacPermissionGroup}))
 		})
