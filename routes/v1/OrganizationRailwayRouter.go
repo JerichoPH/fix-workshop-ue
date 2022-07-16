@@ -9,9 +9,10 @@ import (
 	"gorm.io/gorm"
 )
 
+// OrganizationRailwayRouter 路局路由
 type OrganizationRailwayRouter struct{}
 
-// OrganizationRailwayStoreForm 路局新建表单
+// OrganizationRailwayStoreForm 新建路局表单
 type OrganizationRailwayStoreForm struct {
 	Sort                       int64    `form:"sort" json:"sort"`
 	UniqueCode                 string   `form:"unique_code" json:"unique_code"`
@@ -52,17 +53,6 @@ func (cls OrganizationRailwayStoreForm) ShouldBind(ctx *gin.Context) Organizatio
 	}
 
 	return cls
-}
-
-// OrganizationRailwayUpdateForm 编辑表单
-type OrganizationRailwayUpdateForm struct {
-	Sort                       int64    `form:"sort" json:"sort"`
-	UniqueCode                 string   `form:"unique_code" json:"unique_code"`
-	Name                       string   `form:"name" json:"name"`
-	ShortName                  string   `form:"short_name" json:"short_name"`
-	BeEnable                   bool     `form:"be_enable" json:"be_enable"`
-	OrganizationLineUUIDs      []string `form:"organization_line_uuids" json:"organization_line_uuids"`
-	OrganizationParagraphUUIDs []string `form:"organization_paragraph_uuids" json:"organization_paragraph_uuids"`
 }
 
 // Load 加载路由

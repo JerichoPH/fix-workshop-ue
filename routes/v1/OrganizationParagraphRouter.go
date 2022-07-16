@@ -12,7 +12,7 @@ import (
 // OrganizationParagraphRouter 站段路由
 type OrganizationParagraphRouter struct{}
 
-// OrganizationParagraphStoreForm
+// OrganizationParagraphStoreForm 新建站段表单
 type OrganizationParagraphStoreForm struct {
 	Sort                      int64  `form:"sort" json:"sort"`
 	UniqueCode                string `form:"unique_code" json:"unique_code"`

@@ -9,8 +9,10 @@ import (
 	"gorm.io/gorm"
 )
 
+// OrganizationLineRouter 线别路由
 type OrganizationLineRouter struct{}
 
+// OrganizationLineStoreForm 新建线别表单
 type OrganizationLineStoreForm struct {
 	Sort                       int64    `form:"sort" json:"sort"`
 	UniqueCode                 string   `form:"unique_code" json:"unique_code"`
@@ -25,6 +27,9 @@ type OrganizationLineStoreForm struct {
 }
 
 // ShouldBind 绑定表单
+//  @receiver cls
+//  @param ctx
+//  @return OrganizationLineStoreForm
 func (cls OrganizationLineStoreForm) ShouldBind(ctx *gin.Context) OrganizationLineStoreForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
 		panic(exceptions.ThrowForbidden(err.Error()))
@@ -66,7 +71,9 @@ func (cls OrganizationLineStoreForm) ShouldBind(ctx *gin.Context) OrganizationLi
 	return cls
 }
 
-// 加载路由
+// Load 加载路由
+//  @receiver cls
+//  @param router
 func (cls *OrganizationLineRouter) Load(router *gin.Engine) {
 	r := router.Group(
 		"/api/v1/organization",

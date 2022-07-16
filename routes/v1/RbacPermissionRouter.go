@@ -10,10 +10,10 @@ import (
 	"strconv"
 )
 
-// 权限路由
+// RbacPermissionRouter 权限路由
 type RbacPermissionRouter struct{}
 
-// RbacPermissionStoreForm 创建权限表单
+// RbacPermissionStoreForm 新建权限表单
 type RbacPermissionStoreForm struct {
 	Name                    string `form:"name" json:"name"`
 	Uri                     string `form:"uri" json:"uri"`
@@ -22,6 +22,10 @@ type RbacPermissionStoreForm struct {
 	RbacPermissionGroup     models.RbacPermissionGroupModel
 }
 
+// ShouldBind 绑定表单
+//  @receiver cls
+//  @param ctx
+//  @return RbacPermissionStoreForm
 func (cls RbacPermissionStoreForm) ShouldBind(ctx *gin.Context) RbacPermissionStoreForm {
 	var ret *gorm.DB
 	if err := ctx.ShouldBind(&cls); err != nil {
@@ -48,18 +52,28 @@ func (cls RbacPermissionStoreForm) ShouldBind(ctx *gin.Context) RbacPermissionSt
 	return cls
 }
 
-// RbacPermissionUpdateForm 编辑权限表单
-type RbacPermissionUpdateForm struct {
-	Name                    string `form:"name" json:"name"`
-	Uri                     string `form:"uri" json:"uri"`
-	Method                  string `form:"method" json:"method"`
-	RbacPermissionGroupUUID string `form:"rbac_permission_group_uuid" json:"rbac_permission_group_uuid"`
-}
-
 // RbacPermissionStoreResourceForm 批量添加资源权限
 type RbacPermissionStoreResourceForm struct {
 	Uri                     string `form:"uri" json:"uri"`
 	RbacPermissionGroupUUID string `form:"rbac_permission_group_uuid" json:"rbac_permission_group_uuid"`
+}
+
+// ShouldBind 绑定表单
+//  @receiver cls
+//  @param ctx
+//  @return RbacPermissionStoreResourceForm
+func (cls RbacPermissionStoreResourceForm) ShouldBind(ctx *gin.Context) RbacPermissionStoreResourceForm {
+	if err := ctx.ShouldBind(&cls); err != nil {
+		panic(exceptions.ThrowForbidden(err.Error()))
+	}
+	if cls.Uri == "" {
+		panic(exceptions.ThrowForbidden("URI必填"))
+	}
+	if cls.RbacPermissionGroupUUID == "" {
+		panic(exceptions.ThrowForbidden("权限分组必选"))
+	}
+
+	return cls
 }
 
 func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
@@ -94,7 +108,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 			resourceRbacPermission := map[string]string{"列表": "GET", "新建页面": "GET", "新建": "POST", "详情页面": "GET", "编辑页面": "GET", "编辑": "PUT", "删除": "DELETE"}
 
 			// 表单
-			form := (&RbacPermissionStoreForm{}).ShouldBind(ctx)
+			form := (&RbacPermissionStoreResourceForm{}).ShouldBind(ctx)
 
 			// 批量新建
 			successCount := 0
@@ -107,12 +121,13 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 					First(&repeat)
 				if !tools.ThrowExceptionWhenIsEmptyByDB(ret, "") {
 					if ret = models.Init(models.RbacPermissionModel{}).
+
 						DB().
 						Create(&models.RbacPermissionModel{
 							Name:                    name,
 							URI:                     form.Uri,
 							Method:                  method,
-							RbacPermissionGroupUUID: form.RbacPermissionGroup.UUID,
+							RbacPermissionGroupUUID: form.RbacPermissionGroupUUID,
 						}); ret.Error != nil {
 						panic(exceptions.ThrowForbidden("批量添加资源权限时错误：" + ret.Error.Error()))
 					} else {
@@ -151,27 +166,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 			uuid := ctx.Param("uuid")
 
 			// 表单
-			var form RbacPermissionUpdateForm
-			if err := ctx.ShouldBind(&form); err != nil {
-				panic(exceptions.ThrowForbidden(err.Error()))
-			}
-			if form.Name == "" {
-				panic(exceptions.ThrowForbidden("名称必填"))
-			}
-			if form.Uri == "" {
-				panic(exceptions.ThrowForbidden("URI必填"))
-			}
-			if form.Method == "" {
-				panic(exceptions.ThrowForbidden("访问方法必选"))
-			}
-			if form.RbacPermissionGroupUUID == "" {
-				panic(exceptions.ThrowForbidden("所属权限分组必选"))
-			}
-			ret = models.Init(&models.RbacPermissionGroupModel{}).
-				SetWheres(tools.Map{"uuid": form.RbacPermissionGroupUUID}).
-				Prepare().
-				First(&models.RbacPermissionGroupModel{})
-			tools.ThrowExceptionWhenIsEmptyByDB(ret, "所属权限分组")
+			form := (&RbacPermissionStoreForm{}).ShouldBind(ctx)
 
 			// 查询
 			var rbacPermission models.RbacPermissionModel
@@ -181,21 +176,16 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 				First(&rbacPermission)
 
 			// 修改
-			if form.Name != "" {
-				rbacPermission.Name = form.Name
-			}
-			if form.Uri != "" {
-				rbacPermission.URI = form.Uri
-			}
-			if form.Method != "" {
-				rbacPermission.Method = form.Method
-			}
-			if form.RbacPermissionGroupUUID != "" {
-				rbacPermission.RbacPermissionGroupUUID = form.RbacPermissionGroupUUID
-			}
-
+			rbacPermission.Name = form.Name
+			rbacPermission.URI = form.Uri
+			rbacPermission.Method = form.Method
+			rbacPermission.RbacPermissionGroupUUID = form.RbacPermissionGroupUUID
 			// 保存
-			(&models.BaseModel{}).SetModel(models.RbacPermissionModel{}).DB().Save(&rbacPermission)
+			if ret = models.Init(models.RbacPermissionModel{}).
+				DB().
+				Save(&rbacPermission); ret.Error != nil {
+				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{}))
 		})

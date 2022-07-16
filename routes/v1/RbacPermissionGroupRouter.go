@@ -12,11 +12,15 @@ import (
 // RbacPermissionGroupRouter 权限分组路由
 type RbacPermissionGroupRouter struct{}
 
-// RbacPermissionGroupStoreForm 创建权限分组表单
+// RbacPermissionGroupStoreForm 新建权限分组表单
 type RbacPermissionGroupStoreForm struct {
 	Name string `form:"name" json:"name"`
 }
 
+// ShouldBind 绑定表单
+//  @receiver cls
+//  @param ctx
+//  @return RbacPermissionGroupStoreForm
 func (cls RbacPermissionGroupStoreForm) ShouldBind(ctx *gin.Context) RbacPermissionGroupStoreForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
 		panic(exceptions.ThrowForbidden(err.Error()))
@@ -28,6 +32,9 @@ func (cls RbacPermissionGroupStoreForm) ShouldBind(ctx *gin.Context) RbacPermiss
 	return cls
 }
 
+// Load 加载路由
+//  @receiver cls
+//  @param router
 func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 	r := router.Group(
 		"api/v1/rbacPermissionGroup",
