@@ -11,6 +11,7 @@ import (
 	"gorm.io/gorm/clause"
 )
 
+// AccountRouter 用户路由
 type AccountRouter struct{}
 
 // AccountStoreForm 新建用户表单
@@ -99,6 +100,8 @@ func (cls AccountUpdatePasswordForm) ShouldBind(ctx *gin.Context) AccountUpdateP
 }
 
 // Load 加载路由
+//  @receiver cls
+//  @param router
 func (cls *AccountRouter) Load(router *gin.Engine) {
 	r := router.Group(
 		"/api/v1/account",

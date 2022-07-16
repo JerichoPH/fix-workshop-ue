@@ -68,6 +68,9 @@ func (cls AuthorizationLoginForm) ShouldBind(ctx *gin.Context) AuthorizationLogi
 
 type AuthorizationRouter struct{}
 
+// Load 加载路由
+//  @receiver cls
+//  @param router
 func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 	r := router.Group("/api/v1/authorization")
 	{

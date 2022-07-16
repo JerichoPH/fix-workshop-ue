@@ -9,8 +9,10 @@ import (
 	"gorm.io/gorm"
 )
 
+// OrganizationParagraphRouter 站段路由
 type OrganizationParagraphRouter struct{}
 
+// OrganizationParagraphStoreForm
 type OrganizationParagraphStoreForm struct {
 	Sort                      int64  `form:"sort" json:"sort"`
 	UniqueCode                string `form:"unique_code" json:"unique_code"`
@@ -26,6 +28,9 @@ type OrganizationParagraphStoreForm struct {
 }
 
 // ShouldBind 绑定表单
+//  @receiver cls
+//  @param ctx
+//  @return OrganizationParagraphStoreForm
 func (cls OrganizationParagraphStoreForm) ShouldBind(ctx *gin.Context) OrganizationParagraphStoreForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
 		panic(exceptions.ThrowForbidden(err.Error()))
@@ -67,18 +72,9 @@ func (cls OrganizationParagraphStoreForm) ShouldBind(ctx *gin.Context) Organizat
 	return cls
 }
 
-// 加载路由
-type OrganizationParagraphUpdateForm struct {
-	Sort                          int64    `form:"sort" json:"sort"`
-	UniqueCode                    string   `form:"unique_code" json:"unique_code"`
-	Name                          string   `form:"name" json:"name"`
-	ShortName                     string   `form:"short_name" json:"short_name"`
-	BeEnable                      bool     `form:"be_enable" json:"be_enable"`
-	OrganizationRailwayUniqueCode string   `form:"organization_railway_unique_code" json:"organization_railway_unique_code"`
-	OrganizationWorkshopUUIDs     []string `form:"organization_workshop_uuids" json:"organization_workshop_uuids"`
-	OrganizationLineUUIDs         []string `form:"organization_line_uuids" json:"organization_line_uuids"`
-}
-
+// Load 加载路由
+//  @receiver cls
+//  @param router
 func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 	r := router.Group(
 		"/api/v1/organization",
