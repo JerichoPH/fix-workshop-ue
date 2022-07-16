@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"fix-workshop-ue/exceptions"
+	"fix-workshop-ue/abnormals"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -33,13 +33,13 @@ type OrganizationLineStoreForm struct {
 //  @return OrganizationLineStoreForm
 func (cls OrganizationLineStoreForm) ShouldBind(ctx *gin.Context) OrganizationLineStoreForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(exceptions.ThrowForbidden(err.Error()))
+		panic(abnormals.BombForbidden(err.Error()))
 	}
 	if cls.UniqueCode == "" {
-		panic(exceptions.ThrowForbidden("线别代码必填"))
+		panic(abnormals.BombForbidden("线别代码必填"))
 	}
 	if cls.Name == "" {
-		panic(exceptions.ThrowForbidden("线别名称必填"))
+		panic(abnormals.BombForbidden("线别名称必填"))
 	}
 	// 查询路局
 	if len(cls.OrganizationParagraphUUIDs) > 0 {
@@ -95,12 +95,12 @@ func (cls *OrganizationLineRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
 				First(&repeat)
-			exceptions.ThrowWhenIsRepeatByDB(ret, "线别代码")
+			abnormals.BombWhenIsRepeatByDB(ret, "线别代码")
 			ret = models.Init(models.OrganizationLineModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
-			exceptions.ThrowWhenIsRepeatByDB(ret, "线别名称")
+			abnormals.BombWhenIsRepeatByDB(ret, "线别名称")
 
 			// 新建
 			organizationLine := &models.OrganizationLineModel{
@@ -115,7 +115,7 @@ func (cls *OrganizationLineRouter) Load(router *gin.Engine) {
 			if ret = models.Init(models.OrganizationLineModel{}).
 				DB().
 				Create(organizationLine); ret.Error != nil {
-				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+				panic(abnormals.BombForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"organization_line": organizationLine}))
@@ -132,7 +132,7 @@ func (cls *OrganizationLineRouter) Load(router *gin.Engine) {
 			if ret = models.Init(models.OrganizationLineModel{}).
 				DB().
 				Delete(&organizationLine); ret.Error != nil {
-				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+				panic(abnormals.BombForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
@@ -152,13 +152,13 @@ func (cls *OrganizationLineRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			exceptions.ThrowWhenIsRepeatByDB(ret, "线别代码")
+			abnormals.BombWhenIsRepeatByDB(ret, "线别代码")
 			ret = models.Init(models.OrganizationLineModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			exceptions.ThrowWhenIsRepeatByDB(ret, "线别名称")
+			abnormals.BombWhenIsRepeatByDB(ret, "线别名称")
 
 			// 查询
 			organizationLine := (&models.OrganizationLineModel{}).FindOneByUUID(ctx.Param("uuid"))
@@ -175,7 +175,7 @@ func (cls *OrganizationLineRouter) Load(router *gin.Engine) {
 				SetModel(&models.OrganizationLineModel{}).
 				DB().
 				Save(&organizationLine); ret.Error != nil {
-				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+				panic(abnormals.BombForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"organization_line": organizationLine}))

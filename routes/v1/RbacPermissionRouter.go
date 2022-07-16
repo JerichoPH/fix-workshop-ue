@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"fix-workshop-ue/exceptions"
+	"fix-workshop-ue/abnormals"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -31,25 +31,25 @@ type RbacPermissionStoreForm struct {
 func (cls RbacPermissionStoreForm) ShouldBind(ctx *gin.Context) RbacPermissionStoreForm {
 	var ret *gorm.DB
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(exceptions.ThrowForbidden(err.Error()))
+		panic(abnormals.BombForbidden(err.Error()))
 	}
 	if cls.Name == "" {
-		panic(exceptions.ThrowForbidden("名称必填"))
+		panic(abnormals.BombForbidden("名称必填"))
 	}
 	if cls.Uri == "" {
-		panic(exceptions.ThrowForbidden("URI必填"))
+		panic(abnormals.BombForbidden("URI必填"))
 	}
 	if cls.Method == "" {
-		panic(exceptions.ThrowForbidden("访问方法必选"))
+		panic(abnormals.BombForbidden("访问方法必选"))
 	}
 	if cls.RbacPermissionGroupUUID == "" {
-		panic(exceptions.ThrowForbidden("所属权限分组必选"))
+		panic(abnormals.BombForbidden("所属权限分组必选"))
 	}
 	ret = models.Init(&models.RbacPermissionGroupModel{}).
 		SetWheres(tools.Map{"uuid": cls.RbacPermissionGroupUUID}).
 		Prepare().
 		First(&cls.RbacPermissionGroup)
-	exceptions.ThrowWhenIsEmptyByDB(ret, "所属权限分组")
+	abnormals.BombWhenIsEmptyByDB(ret, "所属权限分组")
 
 	return cls
 }
@@ -66,13 +66,13 @@ type RbacPermissionStoreResourceForm struct {
 //  @return RbacPermissionStoreResourceForm
 func (cls RbacPermissionStoreResourceForm) ShouldBind(ctx *gin.Context) RbacPermissionStoreResourceForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(exceptions.ThrowForbidden(err.Error()))
+		panic(abnormals.BombForbidden(err.Error()))
 	}
 	if cls.Uri == "" {
-		panic(exceptions.ThrowForbidden("URI必填"))
+		panic(abnormals.BombForbidden("URI必填"))
 	}
 	if cls.RbacPermissionGroupUUID == "" {
-		panic(exceptions.ThrowForbidden("权限分组必选"))
+		panic(abnormals.BombForbidden("权限分组必选"))
 	}
 
 	return cls
@@ -106,7 +106,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 			if ret = models.Init(&models.RbacPermissionModel{}).
 				DB().
 				Create(&rbacPermission); ret.Error != nil {
-				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+				panic(abnormals.BombForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"rbac_permission": rbacPermission}))
@@ -129,7 +129,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 					SetWheres(tools.Map{"name": name, "method": method, "uri": form.Uri}).
 					Prepare().
 					First(&repeat)
-				if !exceptions.ThrowWhenIsEmptyByDB(ret, "") {
+				if !abnormals.BombWhenIsEmptyByDB(ret, "") {
 					if ret = models.Init(models.RbacPermissionModel{}).
 						DB().
 						Create(&models.RbacPermissionModel{
@@ -139,7 +139,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 							Method:                  method,
 							RbacPermissionGroupUUID: form.RbacPermissionGroupUUID,
 						}); ret.Error != nil {
-						panic(exceptions.ThrowForbidden("批量添加资源权限时错误：" + ret.Error.Error()))
+						panic(abnormals.BombForbidden("批量添加资源权限时错误：" + ret.Error.Error()))
 					} else {
 						successCount += 1
 					}
@@ -160,7 +160,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 			if ret = models.Init(&models.RbacPermissionModel{}).
 				DB().
 				Delete(&rbacPermission); ret.Error != nil {
-				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+				panic(abnormals.BombForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
@@ -184,7 +184,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 			if ret = models.Init(models.RbacPermissionModel{}).
 				DB().
 				Save(&rbacPermission); ret.Error != nil {
-				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+				panic(abnormals.BombForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"rbac_permission": rbacPermission}))
@@ -201,7 +201,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 				SetPreloads(tools.Strings{"RbacPermissionGroup"}).
 				Prepare().
 				First(&rbacPermission)
-			exceptions.ThrowWhenIsEmptyByDB(ret, "权限")
+			abnormals.BombWhenIsEmptyByDB(ret, "权限")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"rbac_permission": rbacPermission}))
 		})

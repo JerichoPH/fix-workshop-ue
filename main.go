@@ -13,7 +13,7 @@ import (
 	"os/signal"
 	"time"
 
-	"fix-workshop-ue/exceptions"
+	"fix-workshop-ue/abnormals"
 	"github.com/gin-gonic/gin"
 )
 
@@ -93,7 +93,7 @@ func main() {
 	}
 
 	router := gin.Default()
-	router.Use(exceptions.RecoverHandler) // 异常处理
+	router.Use(abnormals.RecoverHandler) // 异常处理
 
 	// 用户与权鉴
 	(&v1.AuthorizationRouter{}).Load(router)       // 权鉴

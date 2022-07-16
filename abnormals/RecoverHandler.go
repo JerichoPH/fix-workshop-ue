@@ -1,4 +1,4 @@
-package exceptions
+package abnormals
 
 import (
 	"fmt"
@@ -19,16 +19,16 @@ func RecoverHandler(c *gin.Context) {
 			case "*validator.Validationerrors":
 				// 表单验证错误
 				c.JSON(InCorrectIns().Validate("", errorToString(reco)))
-			case "*exceptions.ForbiddenError":
+			case "*abnormals.ForbiddenAbnormal":
 				// 禁止操作
 				c.JSON(InCorrectIns().Forbidden(errorToString(reco)))
-			case "*exceptions.EmptyError":
+			case "*abnormals.EmptyAbnormal":
 				// 空数据
 				c.JSON(InCorrectIns().Empty(errorToString(reco)))
-			case "*exceptions.UnAuthorizationError":
+			case "*abnormals.UnAuthAbnormal":
 				// 未授权
 				c.JSON(InCorrectIns().UnAuthorization(errorToString(reco)))
-			case "*exceptions.UnLoginError":
+			case "*abnormals.UnLoginAbnormal":
 				// 未登录
 				c.JSON(InCorrectIns().ErrUnLogin())
 			default:

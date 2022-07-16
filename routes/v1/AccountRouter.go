@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"fix-workshop-ue/exceptions"
+	"fix-workshop-ue/abnormals"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -29,16 +29,16 @@ type AccountStoreForm struct {
 //  @return AccountStoreForm
 func (cls AccountStoreForm) ShouldBind(ctx *gin.Context) AccountStoreForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(exceptions.ThrowForbidden(err.Error()))
+		panic(abnormals.BombForbidden(err.Error()))
 	}
 	if cls.Username == "" {
-		panic(exceptions.ThrowForbidden("账号必填"))
+		panic(abnormals.BombForbidden("账号必填"))
 	}
 	if cls.Nickname == "" {
-		panic(exceptions.ThrowForbidden("昵称必填"))
+		panic(abnormals.BombForbidden("昵称必填"))
 	}
 	if cls.Password != cls.PasswordConfirmation {
-		panic(exceptions.ThrowForbidden("两次密码输入不一致"))
+		panic(abnormals.BombForbidden("两次密码输入不一致"))
 	}
 
 	return cls
@@ -57,13 +57,13 @@ type AccountUpdateForm struct {
 //  @return AccountUpdateForm
 func (cls AccountUpdateForm) ShouldBind(ctx *gin.Context) AccountUpdateForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(exceptions.ThrowForbidden(err.Error()))
+		panic(abnormals.BombForbidden(err.Error()))
 	}
 	if cls.Username == "" {
-		panic(exceptions.ThrowForbidden("账号必填"))
+		panic(abnormals.BombForbidden("账号必填"))
 	}
 	if cls.Nickname == "" {
-		panic(exceptions.ThrowForbidden("昵称必填"))
+		panic(abnormals.BombForbidden("昵称必填"))
 	}
 
 	return cls
@@ -82,19 +82,19 @@ type AccountUpdatePasswordForm struct {
 //  @return AccountUpdatePasswordForm
 func (cls AccountUpdatePasswordForm) ShouldBind(ctx *gin.Context) AccountUpdatePasswordForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(exceptions.ThrowForbidden(err.Error()))
+		panic(abnormals.BombForbidden(err.Error()))
 	}
 	if cls.OldPassword == "" {
-		panic(exceptions.ThrowForbidden("原始密码必填"))
+		panic(abnormals.BombForbidden("原始密码必填"))
 	}
 	if cls.NewPassword == "" {
-		panic(exceptions.ThrowForbidden("新密码必填"))
+		panic(abnormals.BombForbidden("新密码必填"))
 	}
 	if cls.PasswordConfirmation == "" {
-		panic(exceptions.ThrowForbidden("确认密码必填"))
+		panic(abnormals.BombForbidden("确认密码必填"))
 	}
 	if cls.NewPassword != cls.PasswordConfirmation {
-		panic(exceptions.ThrowForbidden("两次密码输入不一致"))
+		panic(abnormals.BombForbidden("两次密码输入不一致"))
 	}
 
 	return cls
@@ -122,12 +122,12 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"username": form.Username}).
 				Prepare().
 				First(&repeat)
-			exceptions.ThrowWhenIsRepeatByDB(ret, "用户名")
+			abnormals.BombWhenIsRepeatByDB(ret, "用户名")
 			ret = (&models.BaseModel{}).
 				SetWheres(tools.Map{"nickname": form.Nickname}).
 				Prepare().
 				First(&repeat)
-			exceptions.ThrowWhenIsRepeatByDB(ret, "昵称")
+			abnormals.BombWhenIsRepeatByDB(ret, "昵称")
 
 			// 密码加密
 			bytes, _ := bcrypt.GenerateFromPassword([]byte(form.Password), 14)
@@ -142,7 +142,7 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 				SetOmits(clause.Associations).
 				DB().
 				Create(&account); ret.Error != nil {
-				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+				panic(abnormals.BombForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("新建成功").Created(tools.Map{"account": account}))
@@ -162,13 +162,13 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			exceptions.ThrowWhenIsRepeatByDB(ret, "用户账号")
+			abnormals.BombWhenIsRepeatByDB(ret, "用户账号")
 			ret = models.Init(models.AccountModel{}).
 				SetWheres(tools.Map{"nickname": form.Nickname}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			exceptions.ThrowWhenIsRepeatByDB(ret, "用户昵称")
+			abnormals.BombWhenIsRepeatByDB(ret, "用户昵称")
 
 			// 查询
 			account := (&models.AccountModel{}).FindOneByUUID(ctx.Param("uuid"))
@@ -179,7 +179,7 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 			if ret = models.Init(models.AccountModel{}).
 				DB().
 				Save(&account); ret.Error != nil {
-				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+				panic(abnormals.BombForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{}))
@@ -197,7 +197,7 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 
 			// 验证密码
 			if err := bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(form.OldPassword)); err != nil {
-				panic(exceptions.ThrowUnAuthorization("旧密码输入错误"))
+				panic(abnormals.BombUnAuth("旧密码输入错误"))
 			}
 
 			// 修改密码
@@ -207,7 +207,7 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 			if ret = models.Init(models.AccountModel{}).
 				DB().
 				Save(&account); ret.Error != nil {
-				panic(exceptions.ThrowForbidden("编辑失败：" + ret.Error.Error()))
+				panic(abnormals.BombForbidden("编辑失败：" + ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("密码修改成功").Updated(tools.Map{}))

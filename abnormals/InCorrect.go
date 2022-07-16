@@ -1,4 +1,4 @@
-package exceptions
+package abnormals
 
 import (
 	"sync"

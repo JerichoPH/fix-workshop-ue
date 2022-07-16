@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"fix-workshop-ue/exceptions"
+	"fix-workshop-ue/abnormals"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -27,13 +27,13 @@ type OrganizationWorkshopTypeStoreForm struct {
 //  @return OrganizationWorkshopTypeStoreForm
 func (cls OrganizationWorkshopTypeStoreForm) ShouldBind(ctx *gin.Context) OrganizationWorkshopTypeStoreForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(exceptions.ThrowForbidden(err.Error()))
+		panic(abnormals.BombForbidden(err.Error()))
 	}
 	if cls.UniqueCode == "" {
-		panic(exceptions.ThrowForbidden("车间类型代码必填"))
+		panic(abnormals.BombForbidden("车间类型代码必填"))
 	}
 	if cls.Name == "" {
-		panic(exceptions.ThrowForbidden("车间类型名称必填"))
+		panic(abnormals.BombForbidden("车间类型名称必填"))
 	}
 
 	return cls
@@ -61,12 +61,12 @@ func (OrganizationWorkshopTypeRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
 				First(&models.OrganizationWorkAreaTypeModel{})
-			exceptions.ThrowWhenIsRepeatByDB(ret, "车间类型代码")
+			abnormals.BombWhenIsRepeatByDB(ret, "车间类型代码")
 			ret = models.Init(models.OrganizationWorkshopTypeModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&models.OrganizationWorkshopTypeModel{})
-			exceptions.ThrowWhenIsRepeatByDB(ret, "车间类型名称")
+			abnormals.BombWhenIsRepeatByDB(ret, "车间类型名称")
 
 			// 新建
 			organizationWorkshopType := &models.OrganizationWorkshopTypeModel{
@@ -78,7 +78,7 @@ func (OrganizationWorkshopTypeRouter) Load(router *gin.Engine) {
 			if ret = models.Init(models.OrganizationWorkshopTypeModel{}).
 				DB().
 				Create(&organizationWorkshopType); ret.Error != nil {
-				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+				panic(abnormals.BombForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"organization_workshop_type": organizationWorkshopType}))
@@ -93,7 +93,7 @@ func (OrganizationWorkshopTypeRouter) Load(router *gin.Engine) {
 
 			// 删除
 			if ret = models.Init(models.OrganizationWorkshopTypeModel{}).DB().Delete(&organizationWorkshopType); ret.Error != nil {
-				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+				panic(abnormals.BombForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
@@ -112,13 +112,13 @@ func (OrganizationWorkshopTypeRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&models.OrganizationWorkAreaTypeModel{})
-			exceptions.ThrowWhenIsRepeatByDB(ret, "车间类型代码")
+			abnormals.BombWhenIsRepeatByDB(ret, "车间类型代码")
 			ret = models.Init(models.OrganizationWorkshopTypeModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&models.OrganizationWorkshopTypeModel{})
-			exceptions.ThrowWhenIsRepeatByDB(ret, "车间类型名称")
+			abnormals.BombWhenIsRepeatByDB(ret, "车间类型名称")
 
 			// 查询
 			organizationWorkshopType := (&models.OrganizationWorkshopTypeModel{}).FindOneByUUID(ctx.Param("uuid"))

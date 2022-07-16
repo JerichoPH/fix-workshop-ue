@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"fix-workshop-ue/exceptions"
+	"fix-workshop-ue/abnormals"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -24,10 +24,10 @@ type RbacRoleStoreForm struct {
 //  @return RbacRoleStoreForm
 func (cls RbacRoleStoreForm) ShouldBind(ctx *gin.Context) RbacRoleStoreForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(exceptions.ThrowForbidden(err.Error()))
+		panic(abnormals.BombForbidden(err.Error()))
 	}
 	if cls.Name == "" {
-		panic(exceptions.ThrowForbidden("名称必填"))
+		panic(abnormals.BombForbidden("名称必填"))
 	}
 
 	return cls
@@ -50,7 +50,7 @@ type RbacRoleBindAccountsForm struct {
 //  @return RbacRoleBindAccountsForm
 func (cls RbacRoleBindAccountsForm) ShouldBind(ctx *gin.Context) RbacRoleBindAccountsForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(exceptions.ThrowForbidden(err.Error()))
+		panic(abnormals.BombForbidden(err.Error()))
 	}
 
 	if len(cls.AccountUUIDs) > 0 {
@@ -75,7 +75,7 @@ type RbacRoleBindPermissionsForm struct {
 //  @return RbacRoleBindPermissionsForm
 func (cls RbacRoleBindPermissionsForm) ShouldBind(ctx *gin.Context) RbacRoleBindPermissionsForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(exceptions.ThrowForbidden(err.Error()))
+		panic(abnormals.BombForbidden(err.Error()))
 	}
 
 	if len(cls.RbacPermissionUUIDs) > 0 {
@@ -108,7 +108,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
-			exceptions.ThrowWhenIsRepeatByDB(ret, "角色名称")
+			abnormals.BombWhenIsRepeatByDB(ret, "角色名称")
 
 			// 新建
 			rbacRole := &models.RbacRoleModel{
@@ -118,7 +118,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 			if ret = models.Init(models.RbacRoleModel{}).
 				DB().
 				Create(rbacRole); ret.Error != nil {
-				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+				panic(abnormals.BombForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"rbac_role": rbacRole}))
@@ -134,7 +134,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 			if ret = models.Init(models.RbacRoleModel{}).
 				DB().
 				Delete(&rbacRole); ret.Error != nil {
-				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+				panic(abnormals.BombForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
@@ -154,7 +154,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			exceptions.ThrowWhenIsRepeatByDB(ret, "角色名称")
+			abnormals.BombWhenIsRepeatByDB(ret, "角色名称")
 
 			// 查询
 			rbacRole := (&models.RbacRoleModel{}).FindOneByUUID(ctx.Param("uuid"))
@@ -181,7 +181,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 			if ret = models.Init(models.RbacRoleModel{}).
 				DB().
 				Save(&rbacRole); ret.Error != nil {
-				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+				panic(abnormals.BombForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("绑定成功").Updated(tools.Map{}))
@@ -202,7 +202,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 			if ret = models.Init(models.RbacRoleModel{}).
 				DB().
 				Save(&rbacRole); ret.Error != nil {
-				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+				panic(abnormals.BombForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("绑定成功").Updated(tools.Map{}))
@@ -224,7 +224,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 				}).
 				Prepare().
 				First(&rbacRole)
-			exceptions.ThrowWhenIsEmptyByDB(ret, "角色")
+			abnormals.BombWhenIsEmptyByDB(ret, "角色")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"rbac_role": rbacRole}))
 		})

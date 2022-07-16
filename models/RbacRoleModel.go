@@ -1,7 +1,7 @@
 package models
 
 import (
-	"fix-workshop-ue/exceptions"
+	"fix-workshop-ue/abnormals"
 	"fix-workshop-ue/tools"
 )
 
@@ -25,7 +25,7 @@ func (cls *RbacRoleModel) TableName() string {
 //  @return RbacRoleModel
 func (cls RbacRoleModel) FindOneByUUID(uuid string) RbacRoleModel {
 	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
-		panic(exceptions.ThrowWhenIsEmptyByDB(ret, "角色"))
+		panic(abnormals.BombWhenIsEmptyByDB(ret, "角色"))
 	}
 
 	return cls

@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"fix-workshop-ue/exceptions"
+	"fix-workshop-ue/abnormals"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -26,19 +26,19 @@ type AuthorizationRegisterForm struct {
 //  @return AuthorizationRegisterForm
 func (cls AuthorizationRegisterForm) ShouldBind(ctx *gin.Context) AuthorizationRegisterForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(exceptions.ThrowForbidden(err.Error()))
+		panic(abnormals.BombForbidden(err.Error()))
 	}
 	if cls.Username == "" {
-		panic(exceptions.ThrowForbidden("账号必填"))
+		panic(abnormals.BombForbidden("账号必填"))
 	}
 	if cls.Password == "" {
-		panic(exceptions.ThrowForbidden("密码必填"))
+		panic(abnormals.BombForbidden("密码必填"))
 	}
 	if len(cls.Password) < 6 || len(cls.Password) > 18 {
-		panic(exceptions.ThrowForbidden("密码不可小于6位或大于18位"))
+		panic(abnormals.BombForbidden("密码不可小于6位或大于18位"))
 	}
 	if cls.Password != cls.PasswordConfirmation {
-		panic(exceptions.ThrowForbidden("两次密码输入不一致"))
+		panic(abnormals.BombForbidden("两次密码输入不一致"))
 	}
 
 	return cls
@@ -52,16 +52,16 @@ type AuthorizationLoginForm struct {
 
 func (cls AuthorizationLoginForm) ShouldBind(ctx *gin.Context) AuthorizationLoginForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(exceptions.ThrowForbidden(err.Error()))
+		panic(abnormals.BombForbidden(err.Error()))
 	}
 	if cls.Username == "" {
-		panic(exceptions.ThrowForbidden("账号必填"))
+		panic(abnormals.BombForbidden("账号必填"))
 	}
 	if cls.Password == "" {
-		panic(exceptions.ThrowForbidden("密码必填"))
+		panic(abnormals.BombForbidden("密码必填"))
 	}
 	if len(cls.Password) < 6 || len(cls.Password) > 18 {
-		panic(exceptions.ThrowForbidden("密码不可小于6位或大于18位"))
+		panic(abnormals.BombForbidden("密码不可小于6位或大于18位"))
 	}
 
 	return cls
@@ -87,12 +87,12 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"username": form.Username}).
 				Prepare().
 				First(&repeat)
-			exceptions.ThrowWhenIsRepeatByDB(ret, "用户名")
+			abnormals.BombWhenIsRepeatByDB(ret, "用户名")
 			ret = (&models.BaseModel{}).
 				SetWheres(tools.Map{"nickname": form.Nickname}).
 				Prepare().
 				First(&repeat)
-			exceptions.ThrowWhenIsRepeatByDB(ret, "昵称")
+			abnormals.BombWhenIsRepeatByDB(ret, "昵称")
 
 			// 密码加密
 			bytes, _ := bcrypt.GenerateFromPassword([]byte(form.Password), 14)
@@ -107,7 +107,7 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 					Password:  string(bytes),
 					Nickname:  form.Nickname,
 				}); ret.Error != nil {
-				panic(exceptions.ThrowForbidden("创建失败：" + ret.Error.Error()))
+				panic(abnormals.BombForbidden("创建失败：" + ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("注册成功").Created(tools.Map{}))
@@ -126,17 +126,17 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"username": form.Username}).
 				Prepare().
 				First(&account)
-			exceptions.ThrowWhenIsEmptyByDB(ret, "用户")
+			abnormals.BombWhenIsEmptyByDB(ret, "用户")
 
 			// 验证密码
 			if err := bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(form.Password)); err != nil {
-				panic(exceptions.ThrowUnAuthorization("账号或密码错误"))
+				panic(abnormals.BombUnAuth("账号或密码错误"))
 			}
 
 			// 生成Jwt
 			if token, err := tools.GenerateJwt(account.UUID, account.Password); err != nil {
 				// 生成jwt错误
-				panic(exceptions.ThrowForbidden(err.Error()))
+				panic(abnormals.BombForbidden(err.Error()))
 			} else {
 				ctx.JSON(tools.CorrectIns("登陆成功").OK(tools.Map{
 					"token":    token,
@@ -154,7 +154,7 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 			func(ctx *gin.Context) {
 				var ret *gorm.DB
 				if accountUUID, exists := ctx.Get("__ACCOUNT__"); !exists {
-					panic(exceptions.ThrowUnLogin("用户未登录"))
+					panic(abnormals.BombUnLogin("用户未登录"))
 				} else {
 					// 获取当前用户信息
 					var account models.AccountModel
@@ -163,7 +163,7 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 						SetPreloads(tools.Strings{"RbacRoles", "RbacRoles.Menus"}).
 						Prepare().
 						First(&account)
-					exceptions.ThrowWhenIsEmptyByDB(ret, "当前令牌指向用户")
+					abnormals.BombWhenIsEmptyByDB(ret, "当前令牌指向用户")
 
 					menuUUIDs := make([]string, 50)
 					if len(account.RbacRoles) > 0 {

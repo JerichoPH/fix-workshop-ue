@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"fix-workshop-ue/exceptions"
+	"fix-workshop-ue/abnormals"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -31,13 +31,13 @@ type MenuStoreForm struct {
 //  @return MenuStoreForm
 func (cls MenuStoreForm) ShouldBind(ctx *gin.Context) MenuStoreForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(exceptions.ThrowForbidden(err.Error()))
+		panic(abnormals.BombForbidden(err.Error()))
 	}
 	if cls.Name == "" {
-		panic(exceptions.ThrowForbidden("名称必填"))
+		panic(abnormals.BombForbidden("名称必填"))
 	}
 	if len(cls.RbacRoleUUIDs) == 0 {
-		panic(exceptions.ThrowEmpty("所属角色必选"))
+		panic(abnormals.BombEmpty("所属角色必选"))
 	}
 	// 查询角色
 	models.Init(models.RbacRoleModel{}).
@@ -45,7 +45,7 @@ func (cls MenuStoreForm) ShouldBind(ctx *gin.Context) MenuStoreForm {
 		Where("uuid in ?", cls.RbacRoleUUIDs).
 		Find(&cls.RbacRoles)
 	if len(cls.RbacRoles) == 0 {
-		panic(exceptions.ThrowEmpty("所选角色不存在"))
+		panic(abnormals.BombEmpty("所选角色不存在"))
 	}
 
 	return cls
@@ -75,7 +75,7 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"name": form.Name, "url": form.URL}).
 				Prepare().
 				First(&repeat)
-			exceptions.ThrowWhenIsRepeatByDB(ret, "菜单名称和URL")
+			abnormals.BombWhenIsRepeatByDB(ret, "菜单名称和URL")
 
 			// 新建
 			menu := &models.MenuModel{
@@ -91,7 +91,7 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 				SetModel(models.MenuModel{}).
 				DB().
 				Create(&menu); ret.Error != nil {
-				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+				panic(abnormals.BombForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"menu": menu}))
@@ -108,7 +108,7 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 			if ret = models.Init(models.MenuModel{}).
 				DB().
 				Delete(&menu); ret.Error != nil {
-				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+				panic(abnormals.BombForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
@@ -129,7 +129,7 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			exceptions.ThrowWhenIsRepeatByDB(ret, "菜单名称和URL")
+			abnormals.BombWhenIsRepeatByDB(ret, "菜单名称和URL")
 
 			// 查询
 			menu := (&models.MenuModel{}).FindOneByUUID(ctx.Param("uuid"))
@@ -144,7 +144,7 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 			if ret = models.Init(models.MenuModel{}).
 				DB().
 				Save(&menu); ret.Error != nil {
-				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+				panic(abnormals.BombForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"menu": menu}))

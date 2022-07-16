@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"fix-workshop-ue/exceptions"
+	"fix-workshop-ue/abnormals"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -23,10 +23,10 @@ type RbacPermissionGroupStoreForm struct {
 //  @return RbacPermissionGroupStoreForm
 func (cls RbacPermissionGroupStoreForm) ShouldBind(ctx *gin.Context) RbacPermissionGroupStoreForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(exceptions.ThrowForbidden(err.Error()))
+		panic(abnormals.BombForbidden(err.Error()))
 	}
 	if cls.Name == "" {
-		panic(exceptions.ThrowForbidden("名称必填"))
+		panic(abnormals.BombForbidden("名称必填"))
 	}
 
 	return cls
@@ -55,14 +55,14 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
-			exceptions.ThrowWhenIsRepeatByDB(ret, "权限分组名称")
+			abnormals.BombWhenIsRepeatByDB(ret, "权限分组名称")
 
 			// 保存
 			rbacPermissionGroup := &models.RbacPermissionGroupModel{Name: form.Name}
 			if ret = models.Init(models.RbacPermissionGroupModel{}).
 				DB().
 				Create(&rbacPermissionGroup); ret.Error != nil {
-				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+				panic(abnormals.BombForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"rbac_permission_group": rbacPermissionGroup}))
@@ -82,7 +82,7 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 
 			// 删除
 			if ret = models.Init(models.RbacPermissionGroupModel{}).DB().Delete(&rbacPermissionGroup); ret.Error != nil {
-				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+				panic(abnormals.BombForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
@@ -103,7 +103,7 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&repeat)
-			exceptions.ThrowWhenIsRepeatByDB(ret, "权限分组名称")
+			abnormals.BombWhenIsRepeatByDB(ret, "权限分组名称")
 
 			// 查询
 			rbacPermissionGroup := (&models.RbacPermissionGroupModel{}).FindOneByUUID(uuid)
@@ -127,7 +127,7 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 				SetPreloads(tools.Strings{"RbacPermissions"}).
 				Prepare().
 				First(&rbacPermissionGroup)
-			exceptions.ThrowWhenIsEmptyByDB(ret, "权限分组")
+			abnormals.BombWhenIsEmptyByDB(ret, "权限分组")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"rbac_permission_group": rbacPermissionGroup}))
 		})

@@ -1,7 +1,7 @@
 package models
 
 import (
-	"fix-workshop-ue/exceptions"
+	"fix-workshop-ue/abnormals"
 	"fix-workshop-ue/tools"
 )
 
@@ -22,7 +22,7 @@ func (cls *RbacPermissionGroupModel) TableName() string {
 //  @return OrganizationLineModel
 func (cls RbacPermissionGroupModel) FindOneByUUID(uuid string) RbacPermissionGroupModel {
 	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
-		panic(exceptions.ThrowWhenIsEmptyByDB(ret, "权限分组"))
+		panic(abnormals.BombWhenIsEmptyByDB(ret, "权限分组"))
 	}
 
 	return cls

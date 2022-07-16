@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"fix-workshop-ue/exceptions"
+	"fix-workshop-ue/abnormals"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -32,13 +32,13 @@ type OrganizationRailwayStoreForm struct {
 //  @return OrganizationRailwayStoreForm
 func (cls OrganizationRailwayStoreForm) ShouldBind(ctx *gin.Context) OrganizationRailwayStoreForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(exceptions.ThrowForbidden(err.Error()))
+		panic(abnormals.BombForbidden(err.Error()))
 	}
 	if cls.UniqueCode == "" {
-		panic(exceptions.ThrowForbidden("路局代码必填"))
+		panic(abnormals.BombForbidden("路局代码必填"))
 	}
 	if cls.Name == "" {
-		panic(exceptions.ThrowForbidden("路局名称必填"))
+		panic(abnormals.BombForbidden("路局名称必填"))
 	}
 	if len(cls.OrganizationLineUUIDs) > 0 {
 		models.Init(models.OrganizationLineModel{}).
@@ -87,7 +87,7 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 				SetModel(models.OrganizationRailwayModel{}).
 				DB().
 				Create(&organizationRailway); ret.Error != nil {
-				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+				panic(abnormals.BombForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"organization_railway": organizationRailway}))
@@ -104,7 +104,7 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 			if ret = models.Init(models.OrganizationRailwayModel{}).
 				DB().
 				Delete(&organizationRailway); ret.Error != nil {
-				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+				panic(abnormals.BombForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())

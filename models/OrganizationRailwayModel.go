@@ -1,7 +1,7 @@
 package models
 
 import (
-	"fix-workshop-ue/exceptions"
+	"fix-workshop-ue/abnormals"
 	"fix-workshop-ue/tools"
 	"gorm.io/gorm"
 )
@@ -34,7 +34,7 @@ func (cls *OrganizationRailwayModel) ScopeBeEnable(db *gorm.DB) *gorm.DB {
 //  @return OrganizationRailwayModel
 func (cls OrganizationRailwayModel) FindOneByUUID(uuid string) OrganizationRailwayModel {
 	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
-		panic(exceptions.ThrowWhenIsEmptyByDB(ret, "路局"))
+		panic(abnormals.BombWhenIsEmptyByDB(ret, "路局"))
 	}
 
 	return cls

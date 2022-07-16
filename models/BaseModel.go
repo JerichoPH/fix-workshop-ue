@@ -2,7 +2,7 @@ package models
 
 import (
 	"fix-workshop-ue/databases"
-	"fix-workshop-ue/exceptions"
+	"fix-workshop-ue/abnormals"
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -46,7 +46,7 @@ func (cls *BaseModel) demoFindOne() {
 		SetNotWheres(tools.Map{}).
 		Prepare().
 		First(b)
-	exceptions.ThrowWhenIsEmptyByDB(ret, "XX")
+	abnormals.BombWhenIsEmptyByDB(ret, "XX")
 }
 
 // demoFind 获取多条数据演示
@@ -159,19 +159,21 @@ func (cls *BaseModel) Prepare() (dbSession *gorm.DB) {
 	}
 
 	// 拼接preloads关系
-	if cls.preloads != nil && len(cls.preloads) > 0 {
+	if len(cls.preloads) > 0 {
 		for _, v := range cls.preloads {
 			dbSession = dbSession.Preload(v)
 		}
+	} else {
+		dbSession = dbSession.Preload(clause.Associations)
 	}
 
 	// 拼接selects字段
-	if cls.selects != nil && len(cls.selects) > 0 {
+	if len(cls.selects) > 0 {
 		dbSession = dbSession.Select(cls.selects)
 	}
 
 	// 拼接omits字段
-	if cls.omits != nil && len(cls.omits) > 0 {
+	if len(cls.omits) > 0 {
 		dbSession = dbSession.Omit(cls.omits...)
 	}
 
@@ -221,13 +223,13 @@ func (cls *BaseModel) PrepareQuery(ctx *gin.Context) *gorm.DB {
 
 	// offset
 	if offset, ok := ctx.GetQuery("__offset__"); ok {
-		offset := exceptions.ThrowWhenIsNotInt(offset, "偏移参数只能填写整数")
+		offset := abnormals.BombWhenIsNotInt(offset, "偏移参数只能填写整数")
 		dbSession.Offset(offset)
 	}
 
 	// limit
 	if limit, ok := ctx.GetQuery("__limit__"); ok {
-		limit := exceptions.ThrowWhenIsNotInt(limit, "分页参数只能填写整数")
+		limit := abnormals.BombWhenIsNotInt(limit, "分页参数只能填写整数")
 		dbSession.Limit(limit)
 	}
 

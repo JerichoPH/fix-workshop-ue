@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"fix-workshop-ue/exceptions"
+	"fix-workshop-ue/abnormals"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -34,16 +34,16 @@ type OrganizationParagraphStoreForm struct {
 //  @return OrganizationParagraphStoreForm
 func (cls OrganizationParagraphStoreForm) ShouldBind(ctx *gin.Context) OrganizationParagraphStoreForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		panic(exceptions.ThrowForbidden(err.Error()))
+		panic(abnormals.BombForbidden(err.Error()))
 	}
 	if cls.UniqueCode == "" {
-		panic(exceptions.ThrowForbidden("站段代码必填"))
+		panic(abnormals.BombForbidden("站段代码必填"))
 	}
 	if cls.Name == "" {
-		panic(exceptions.ThrowForbidden("站段名称必填"))
+		panic(abnormals.BombForbidden("站段名称必填"))
 	}
 	if cls.OrganizationRailwayUUID == "" {
-		panic(exceptions.ThrowForbidden("所属路局必选"))
+		panic(abnormals.BombForbidden("所属路局必选"))
 	}
 	var ret *gorm.DB
 	ret = models.Init(models.OrganizationRailwayModel{}).
@@ -51,7 +51,7 @@ func (cls OrganizationParagraphStoreForm) ShouldBind(ctx *gin.Context) Organizat
 		SetWheres(tools.Map{"uuid": cls.OrganizationRailwayUUID}).
 		Prepare().
 		First(&cls.OrganizationRailway)
-	exceptions.ThrowWhenIsEmptyByDB(ret, "路局")
+	abnormals.BombWhenIsEmptyByDB(ret, "路局")
 	if len(cls.OrganizationWorkshopUUIDs) > 0 {
 		models.Init(models.OrganizationWorkshopModel{}).
 			SetScopes((&models.OrganizationWorkshopModel{}).ScopeBeEnable).
@@ -93,33 +93,33 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
 				First(&repeat)
-			exceptions.ThrowWhenIsRepeatByDB(ret, "站段代码")
+			abnormals.BombWhenIsRepeatByDB(ret, "站段代码")
 			ret = models.Init(models.OrganizationParagraphModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
-			exceptions.ThrowWhenIsRepeatByDB(ret, "站段名称")
+			abnormals.BombWhenIsRepeatByDB(ret, "站段名称")
 			ret = models.Init(models.OrganizationParagraphModel{}).
 				SetWheres(tools.Map{"short_name": form.ShortName}).
 				Prepare().
 				First(&repeat)
-			exceptions.ThrowWhenIsRepeatByDB(ret, "站段简称")
+			abnormals.BombWhenIsRepeatByDB(ret, "站段简称")
 
 			// 新建
 			organizationParagraph := &models.OrganizationParagraphModel{
-				BaseModel:               models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
-				UniqueCode:              form.UniqueCode,
-				Name:                    form.Name,
-				ShortName:               form.ShortName,
-				BeEnable:                form.BeEnable,
-				OrganizationRailwayUUID: form.OrganizationRailwayUUID,
-				OrganizationWorkshops:   form.OrganizationWorkshops,
-				OrganizationLines:       form.OrganizationLines,
+				BaseModel:             models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
+				UniqueCode:            form.UniqueCode,
+				Name:                  form.Name,
+				ShortName:             form.ShortName,
+				BeEnable:              form.BeEnable,
+				OrganizationRailway:   form.OrganizationRailway,
+				OrganizationWorkshops: form.OrganizationWorkshops,
+				OrganizationLines:     form.OrganizationLines,
 			}
 			if ret = models.Init(models.OrganizationParagraphModel{}).
 				DB().
 				Create(&organizationParagraph); ret.Error != nil {
-				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+				panic(abnormals.BombForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"organization_paragraph": organizationParagraph}))
@@ -136,7 +136,7 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 			if ret = models.Init(models.OrganizationParagraphModel{}).
 				DB().
 				Delete(&organizationParagraph); ret.Error != nil {
-				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+				panic(abnormals.BombForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
@@ -156,13 +156,13 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			exceptions.ThrowWhenIsRepeatByDB(ret, "站段代码")
+			abnormals.BombWhenIsRepeatByDB(ret, "站段代码")
 			ret = models.Init(models.OrganizationParagraphModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			exceptions.ThrowWhenIsRepeatByDB(ret, "站段名称")
+			abnormals.BombWhenIsRepeatByDB(ret, "站段名称")
 
 			// 查询
 			organizationParagraph := (&models.OrganizationParagraphModel{}).FindOneByUUID(ctx.Param("uuid"))
@@ -179,7 +179,7 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 			if ret = models.Init(models.OrganizationParagraphModel{}).
 				DB().
 				Save(&organizationParagraph); ret.Error != nil {
-				panic(exceptions.ThrowForbidden(ret.Error.Error()))
+				panic(abnormals.BombForbidden(ret.Error.Error()))
 			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"organization_paragraph": organizationParagraph}))
