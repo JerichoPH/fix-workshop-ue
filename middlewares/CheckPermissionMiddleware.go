@@ -48,7 +48,7 @@ func CheckPermission() gin.HandlerFunc {
 			}
 
 			if !ok {
-				panic(abnormals.BombUnAuth("未授权"))
+				abnormals.BombUnAuth("未授权")
 			}
 		}
 
