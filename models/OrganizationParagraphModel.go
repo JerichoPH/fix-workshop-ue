@@ -35,7 +35,7 @@ func (cls *OrganizationParagraphModel) ScopeBeEnable(db *gorm.DB) *gorm.DB {
 //  @return OrganizationParagraphModel
 func (cls OrganizationParagraphModel) FindOneByUUID(uuid string) OrganizationParagraphModel {
 	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
-		panic(abnormals.BombWhenIsEmpty(ret, "站段"))
+		panic(abnormals.PanicWhenIsEmpty(ret, "站段"))
 	}
 
 	return cls

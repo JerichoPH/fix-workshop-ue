@@ -23,10 +23,10 @@ type RbacPermissionGroupStoreForm struct {
 //  @return RbacPermissionGroupStoreForm
 func (cls RbacPermissionGroupStoreForm) ShouldBind(ctx *gin.Context) RbacPermissionGroupStoreForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		abnormals.BombForbidden(err.Error())
+		abnormals.PanicValidate(err.Error())
 	}
 	if cls.Name == "" {
-		abnormals.BombForbidden("名称必填")
+		abnormals.PanicValidate("名称必填")
 	}
 
 	return cls
@@ -55,14 +55,14 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeat(ret, "权限分组名称")
+			abnormals.PanicWhenIsRepeat(ret, "权限分组名称")
 
 			// 保存
 			rbacPermissionGroup := &models.RbacPermissionGroupModel{Name: form.Name}
 			if ret = models.Init(models.RbacPermissionGroupModel{}).
 				DB().
 				Create(&rbacPermissionGroup); ret.Error != nil {
-				abnormals.BombForbidden(ret.Error.Error())
+				abnormals.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"rbac_permission_group": rbacPermissionGroup}))
@@ -82,7 +82,7 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 
 			// 删除
 			if ret = models.Init(models.RbacPermissionGroupModel{}).DB().Delete(&rbacPermissionGroup); ret.Error != nil {
-				abnormals.BombForbidden(ret.Error.Error())
+				abnormals.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
@@ -103,7 +103,7 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeat(ret, "权限分组名称")
+			abnormals.PanicWhenIsRepeat(ret, "权限分组名称")
 
 			// 查询
 			rbacPermissionGroup := (&models.RbacPermissionGroupModel{}).FindOneByUUID(uuid)
@@ -127,7 +127,7 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 				SetPreloads(tools.Strings{"RbacPermissions"}).
 				Prepare().
 				First(&rbacPermissionGroup)
-			abnormals.BombWhenIsEmpty(ret, "权限分组")
+			abnormals.PanicWhenIsEmpty(ret, "权限分组")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"rbac_permission_group": rbacPermissionGroup}))
 		})

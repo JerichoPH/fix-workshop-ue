@@ -31,10 +31,10 @@ type MenuStoreForm struct {
 //  @return MenuStoreForm
 func (cls MenuStoreForm) ShouldBind(ctx *gin.Context) MenuStoreForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		abnormals.BombForbidden(err.Error())
+		abnormals.PanicValidate(err.Error())
 	}
 	if cls.Name == "" {
-		abnormals.BombForbidden("名称必填")
+		abnormals.PanicValidate("菜单名称必填")
 	}
 	if len(cls.RbacRoleUUIDs) > 0 {
 		models.Init(models.RbacRoleModel{}).DB().Where("uuid in ?", cls.RbacRoleUUIDs).Find(&cls.RbacRoles)
@@ -67,7 +67,7 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"name": form.Name, "url": form.URL}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeat(ret, "菜单名称和URL")
+			abnormals.PanicWhenIsRepeat(ret, "菜单名称和URL")
 
 			// 新建
 			menu := &models.MenuModel{
@@ -80,7 +80,7 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 				RbacRoles:  form.RbacRoles,
 			}
 			if ret = (&models.BaseModel{}).SetModel(models.MenuModel{}).DB().Create(&menu); ret.Error != nil {
-				abnormals.BombForbidden(ret.Error.Error())
+				abnormals.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"menu": menu}))
@@ -95,7 +95,7 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 
 			// 删除
 			if ret = models.Init(models.MenuModel{}).DB().Delete(&menu); ret.Error != nil {
-				abnormals.BombForbidden(ret.Error.Error())
+				abnormals.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
@@ -116,7 +116,7 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeat(ret, "菜单名称和URL")
+			abnormals.PanicWhenIsRepeat(ret, "菜单名称和URL")
 
 			// 查询
 			menu := (&models.MenuModel{}).FindOneByUUID(ctx.Param("uuid"))
@@ -129,7 +129,7 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 			menu.ParentUUID = form.ParentUUID
 			menu.RbacRoles = form.RbacRoles
 			if ret = models.Init(models.MenuModel{}).DB().Save(&menu); ret.Error != nil {
-				abnormals.BombForbidden(ret.Error.Error())
+				abnormals.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"menu": menu}))

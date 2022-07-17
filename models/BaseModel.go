@@ -46,7 +46,7 @@ func (cls *BaseModel) demoFindOne() {
 		SetNotWheres(tools.Map{}).
 		Prepare().
 		First(b)
-	abnormals.BombWhenIsEmpty(ret, "XX")
+	abnormals.PanicWhenIsEmpty(ret, "XX")
 }
 
 // demoFind 获取多条数据演示
@@ -223,13 +223,13 @@ func (cls *BaseModel) PrepareQuery(ctx *gin.Context) *gorm.DB {
 
 	// offset
 	if offset, ok := ctx.GetQuery("__offset__"); ok {
-		offset := abnormals.BombWhenIsNotInt(offset, "偏移参数只能填写整数")
+		offset := abnormals.PanicWhenIsNotInt(offset, "偏移参数只能填写整数")
 		dbSession.Offset(offset)
 	}
 
 	// limit
 	if limit, ok := ctx.GetQuery("__limit__"); ok {
-		limit := abnormals.BombWhenIsNotInt(limit, "分页参数只能填写整数")
+		limit := abnormals.PanicWhenIsNotInt(limit, "分页参数只能填写整数")
 		dbSession.Limit(limit)
 	}
 

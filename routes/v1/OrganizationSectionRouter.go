@@ -21,6 +21,8 @@ type OrganizationSectionStoreForm struct {
 	BeEnable                 bool   `form:"be_enable" json:"be_enable"`
 	OrganizationWorkshopUUID string `form:"organization_workshop_uuid" json:"organization_workshop_uuid"`
 	OrganizationWorkshop     models.OrganizationWorkshopModel
+	OrganizationWorkAreaUUID string `form:"organization_work_area_uuid" json:"organization_work_area_uuid"`
+	OrganizationWorkArea     models.OrganizationWorkAreaModel
 }
 
 // ShouldBind 绑定表单
@@ -29,16 +31,16 @@ type OrganizationSectionStoreForm struct {
 //  @return OrganizationSectionStoreForm
 func (cls OrganizationSectionStoreForm) ShouldBind(ctx *gin.Context) OrganizationSectionStoreForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		abnormals.BombForbidden(err.Error())
+		abnormals.PanicValidate(err.Error())
 	}
 	if cls.UniqueCode == "" {
-		abnormals.BombForbidden("区间代码不能为空")
+		abnormals.PanicValidate("区间代码不能为空")
 	}
 	if cls.Name == "" {
-		abnormals.BombForbidden("区间名称不能为空")
+		abnormals.PanicValidate("区间名称不能为空")
 	}
 	if cls.OrganizationWorkshopUUID == "" {
-		abnormals.BombForbidden("所属车间不能为空")
+		abnormals.PanicValidate("所属车间不能为空")
 	}
 	cls.OrganizationWorkshop = (&models.OrganizationWorkshopModel{}).FindOneByUUID(cls.OrganizationWorkshopUUID)
 
@@ -68,12 +70,12 @@ func (cls OrganizationSectionRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeat(ret, "区间代码")
+			abnormals.PanicWhenIsRepeat(ret, "区间代码")
 			ret = models.Init(models.OrganizationSectionModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeat(ret, "区间名称")
+			abnormals.PanicWhenIsRepeat(ret, "区间名称")
 
 			// 新建
 			organizationSection := &models.OrganizationSectionModel{
@@ -84,7 +86,7 @@ func (cls OrganizationSectionRouter) Load(router *gin.Engine) {
 				OrganizationWorkshop: form.OrganizationWorkshop,
 			}
 			if ret = models.Init(models.OrganizationSectionModel{}).DB().Create(&organizationSection); ret.Error != nil {
-				abnormals.BombForbidden(ret.Error.Error())
+				abnormals.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"organization_section": organizationSection}))
@@ -97,7 +99,7 @@ func (cls OrganizationSectionRouter) Load(router *gin.Engine) {
 
 			// 删除
 			if ret := models.Init(models.OrganizationSectionModel{}).DB().Delete(&organizationSection); ret.Error != nil {
-				abnormals.BombForbidden(ret.Error.Error())
+				abnormals.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
@@ -117,13 +119,13 @@ func (cls OrganizationSectionRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeat(ret, "区间代码")
+			abnormals.PanicWhenIsRepeat(ret, "区间代码")
 			ret = models.Init(models.OrganizationSectionModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeat(ret, "区间名称")
+			abnormals.PanicWhenIsRepeat(ret, "区间名称")
 
 			// 查询
 			organizationSection := (&models.OrganizationSectionModel{}).FindOneByUUID(ctx.Param("uuid"))
@@ -135,7 +137,7 @@ func (cls OrganizationSectionRouter) Load(router *gin.Engine) {
 			organizationSection.BeEnable = form.BeEnable
 			organizationSection.OrganizationWorkshop = form.OrganizationWorkshop
 			if ret = models.Init(models.OrganizationSectionModel{}).DB().Save(&organizationSection); ret.Error != nil {
-				abnormals.BombForbidden(ret.Error.Error())
+				abnormals.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"organization_section": organizationSection}))

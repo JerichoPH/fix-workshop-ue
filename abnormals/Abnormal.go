@@ -18,74 +18,83 @@ func (cls *Abnormal) Error() string {
 	return cls.errorMessage
 }
 
-// BombEmpty 404错误
+// ValidateAbnormal 表单验证错误
+type ValidateAbnormal struct{ Abnormal }
+
+// PanicValidate 421错误
+//  @param text
+func PanicValidate(text string) {
+	panic(&ValidateAbnormal{Abnormal{errorMessage: text}})
+}
+
+// PanicEmpty 404错误
 //  @param text
 //  @return error
-func BombEmpty(text string) {
+func PanicEmpty(text string) {
 	panic(&EmptyAbnormal{Abnormal{errorMessage: text}})
 }
 
 // ForbiddenAbnormal
 type ForbiddenAbnormal struct{ Abnormal }
 
-// BombForbidden 403错误
+// PanicForbidden 403错误
 //  @param text
 //  @return error
-func BombForbidden(text string) {
+func PanicForbidden(text string) {
 	panic(&ForbiddenAbnormal{Abnormal{errorMessage: text}})
 }
 
 // UnAuthAbnormal 未授权异常
 type UnAuthAbnormal struct{ Abnormal }
 
-// BombUnAuth 未授权错误
+// PanicUnAuth 未授权错误
 //  @param text
 //  @return error
-func BombUnAuth(text string) {
+func PanicUnAuth(text string) {
 	panic(&UnAuthAbnormal{Abnormal{errorMessage: text}})
 }
 
 // UnLoginAbnormal 未登录异常
 type UnLoginAbnormal struct{ Abnormal }
 
-// BombUnLogin 未登录错误
+// PanicUnLogin 未登录错误
 //  @param text
 //  @return error
-func BombUnLogin(text string) error {
+func PanicUnLogin(text string) error {
 	panic(&UnLoginAbnormal{Abnormal{errorMessage: text}})
 }
 
-// BombWhenIsNotInt 文字转整型
+// PanicWhenIsNotInt 文字转整型
 //  @param v
 //  @param errMsg
 //  @return intValue
-func BombWhenIsNotInt(strValue string, errorMessage string) (intValue int) {
+func PanicWhenIsNotInt(strValue string, errorMessage string) (intValue int) {
 	intValue, err := strconv.Atoi(strValue)
 	if err != nil && errorMessage != "" {
-		BombForbidden(errorMessage)
+		PanicForbidden(errorMessage)
 	}
 	return
 }
 
-// BombWhenIsNotUint 文字转无符号整型
+// PanicWhenIsNotUint 文字转无符号整型
 //  @param v
 //  @param errMsg
 //  @return uintValue
-func BombWhenIsNotUint(strValue string, errorMessage string) (uintValue uint) {
-	intValue := BombWhenIsNotInt(strValue, errorMessage)
+func PanicWhenIsNotUint(strValue string, errorMessage string) (uintValue uint) {
+	intValue := PanicWhenIsNotInt(strValue, errorMessage)
 	uintValue = uint(intValue)
 	return
 }
 
-// BombWhenIsEmpty 当数据库返回空则报错
+// PanicWhenIsEmpty 当数据库返回空则报错
 //  @param db
 //  @param name
 //  @return bool
-func BombWhenIsEmpty(db *gorm.DB, errorField string) bool {
+func PanicWhenIsEmpty(db *gorm.DB, errorField string) bool {
 	if db.Error != nil {
 		if errors.Is(db.Error, gorm.ErrRecordNotFound) {
 			if errorField != "" {
-				BombEmpty(errorField + "不存在")
+				PanicEmpty(errorField + "不存在")
 				return false
 			} else {
 				return false
@@ -95,14 +104,14 @@ func BombWhenIsEmpty(db *gorm.DB, errorField string) bool {
 	return true
 }
 
-// BombWhenIsRepeat 当数据库返回不空则报错
+// PanicWhenIsRepeat 当数据库返回不空则报错
 //  @param db
 //  @param name
 //  @return bool
-func BombWhenIsRepeat(db *gorm.DB, errorField string) bool {
+func PanicWhenIsRepeat(db *gorm.DB, errorField string) bool {
 	if db.Error == nil {
 		if errorField != "" {
-			BombForbidden(errorField + "重复")
+			PanicForbidden(errorField + "重复")
 			return false
 		} else {
 			return false

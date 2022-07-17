@@ -43,7 +43,7 @@ func (cls *OrganizationWorkshopModel) ScopeBeEnable(db *gorm.DB) *gorm.DB {
 //  @return OrganizationWorkshopModel
 func (cls OrganizationWorkshopModel) FindOneByUUID(uuid string) OrganizationWorkshopModel {
 	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
-		panic(abnormals.BombWhenIsEmpty(ret, "车间"))
+		panic(abnormals.PanicWhenIsEmpty(ret, "车间"))
 	}
 
 	return cls

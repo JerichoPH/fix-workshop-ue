@@ -14,7 +14,7 @@ func CheckPermission() gin.HandlerFunc {
 		// 获取上下文中的用户
 		currentAccountUUID, exists := ctx.Get("__ACCOUNT__")
 		if !exists {
-			panic(abnormals.BombUnLogin("未登录"))
+			panic(abnormals.PanicUnLogin("未登录"))
 		}
 
 		cfg := (&settings.Setting{}).Init()
@@ -32,7 +32,7 @@ func CheckPermission() gin.HandlerFunc {
 				}).
 				Prepare().
 				First(&rbacPermission)
-			abnormals.BombWhenIsEmpty(ret, "权限")
+			abnormals.PanicWhenIsEmpty(ret, "权限")
 
 			ok := false
 			if len(rbacPermission.RbacRoles) > 0 {
@@ -48,7 +48,7 @@ func CheckPermission() gin.HandlerFunc {
 			}
 
 			if !ok {
-				abnormals.BombUnAuth("未授权")
+				abnormals.PanicUnAuth("未授权")
 			}
 		}
 

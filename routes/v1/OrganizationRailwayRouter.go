@@ -32,13 +32,13 @@ type OrganizationRailwayStoreForm struct {
 //  @return OrganizationRailwayStoreForm
 func (cls OrganizationRailwayStoreForm) ShouldBind(ctx *gin.Context) OrganizationRailwayStoreForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		abnormals.BombForbidden(err.Error())
+		abnormals.PanicValidate(err.Error())
 	}
 	if cls.UniqueCode == "" {
-		abnormals.BombForbidden("路局代码必填")
+		abnormals.PanicValidate("路局代码必填")
 	}
 	if cls.Name == "" {
-		abnormals.BombForbidden("路局名称必填")
+		abnormals.PanicValidate("路局名称必填")
 	}
 	if len(cls.OrganizationLineUUIDs) > 0 {
 		models.Init(models.OrganizationLineModel{}).DB().Where("uuid in ?", cls.OrganizationLineUUIDs).Find(&cls.OrganizationLines)
@@ -78,7 +78,7 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 				OrganizationParagraphs: form.OrganizationParagraphs,
 			}
 			if ret = (&models.BaseModel{}).SetModel(models.OrganizationRailwayModel{}).DB().Create(&organizationRailway); ret.Error != nil {
-				abnormals.BombForbidden(ret.Error.Error())
+				abnormals.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"organization_railway": organizationRailway}))
@@ -93,7 +93,7 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 
 			// 删除
 			if ret = models.Init(models.OrganizationRailwayModel{}).DB().Delete(&organizationRailway); ret.Error != nil {
-				abnormals.BombForbidden(ret.Error.Error())
+				abnormals.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
@@ -118,7 +118,7 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 			organizationRailway.OrganizationLines = form.OrganizationLines
 			organizationRailway.OrganizationParagraphs = form.OrganizationParagraphs
 			if ret = models.Init(models.OrganizationRailwayModel{}).DB().Save(&organizationRailway); ret.Error != nil {
-				abnormals.BombForbidden(ret.Error.Error())
+				abnormals.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"organization_railway": organizationRailway}))

@@ -95,7 +95,6 @@ func main() {
 			&models.LocationIndoorTierModel{},     // 层
 			&models.LocationIndoorCellModel{},     // 位
 
-
 		); errAutoMigrate != nil {
 		fmt.Println("自动迁移错误：", errAutoMigrate)
 		os.Exit(1)
@@ -118,6 +117,8 @@ func main() {
 	(&v1.OrganizationParagraphRouter{}).Load(router)    // 站段
 	(&v1.OrganizationWorkshopTypeRouter{}).Load(router) // 车间类型
 	(&v1.OrganizationWorkshopRouter{}).Load(router)     // 车间
+	(&v1.OrganizationWorkAreaTypeRouter{}).Load(router) // 工区类型
+	//(&v1.OrganizationWorkAreaRouter{}).Load(router)     // 工区
 
 	initServer(router, setting.App.Section("app").Key("addr").MustString(":8080")) // 启动服务
 }

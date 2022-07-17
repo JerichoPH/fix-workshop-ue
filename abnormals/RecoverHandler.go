@@ -1,6 +1,7 @@
 package abnormals
 
 import (
+	"fix-workshop-ue/tools"
 	"fmt"
 	"log"
 	"runtime/debug"
@@ -19,6 +20,8 @@ func RecoverHandler(c *gin.Context) {
 			case "*validator.Validationerrors":
 				// 表单验证错误
 				c.JSON(InCorrectIns().Validate("", errorToString(reco)))
+			case "*abnormals.ValidateAbnormal":
+				c.JSON(InCorrectIns().Validate(errorToString(reco), tools.Map{}))
 			case "*abnormals.ForbiddenAbnormal":
 				// 禁止操作
 				c.JSON(InCorrectIns().Forbidden(errorToString(reco)))
