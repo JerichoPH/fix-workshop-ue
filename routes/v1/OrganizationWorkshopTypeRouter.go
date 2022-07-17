@@ -61,12 +61,12 @@ func (OrganizationWorkshopTypeRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
 				First(&models.OrganizationWorkAreaTypeModel{})
-			abnormals.BombWhenIsRepeatByDB(ret, "车间类型代码")
+			abnormals.BombWhenIsRepeat(ret, "车间类型代码")
 			ret = models.Init(models.OrganizationWorkshopTypeModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&models.OrganizationWorkshopTypeModel{})
-			abnormals.BombWhenIsRepeatByDB(ret, "车间类型名称")
+			abnormals.BombWhenIsRepeat(ret, "车间类型名称")
 
 			// 新建
 			organizationWorkshopType := &models.OrganizationWorkshopTypeModel{
@@ -110,13 +110,13 @@ func (OrganizationWorkshopTypeRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&models.OrganizationWorkAreaTypeModel{})
-			abnormals.BombWhenIsRepeatByDB(ret, "车间类型代码")
+			abnormals.BombWhenIsRepeat(ret, "车间类型代码")
 			ret = models.Init(models.OrganizationWorkshopTypeModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&models.OrganizationWorkshopTypeModel{})
-			abnormals.BombWhenIsRepeatByDB(ret, "车间类型名称")
+			abnormals.BombWhenIsRepeat(ret, "车间类型名称")
 
 			// 查询
 			organizationWorkshopType := (&models.OrganizationWorkshopTypeModel{}).FindOneByUUID(ctx.Param("uuid"))

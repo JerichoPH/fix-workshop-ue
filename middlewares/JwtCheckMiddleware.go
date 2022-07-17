@@ -53,7 +53,7 @@ func CheckJwt() gin.HandlerFunc {
 						Prepare().
 						First(&account)
 
-					abnormals.BombWhenIsEmptyByDB(ret, "用户")
+					abnormals.BombWhenIsEmpty(ret, "用户")
 				default:
 					abnormals.BombForbidden("权鉴认证方式不支持")
 				}

@@ -1,6 +1,10 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"fix-workshop-ue/abnormals"
+	"fix-workshop-ue/tools"
+	"gorm.io/gorm"
+)
 
 // OrganizationSectionModel 区间
 type OrganizationSectionModel struct {
@@ -20,4 +24,16 @@ func (cls *OrganizationSectionModel) TableName() string {
 // ScopeBeEnable 获取启用的数据
 func (cls *OrganizationSectionModel) ScopeBeEnable(db *gorm.DB) *gorm.DB {
 	return db.Where("be_enable = ?", 1)
+}
+
+// FindOneByUUID 根据UUID获取单条数据
+//  @receiver cls
+//  @param uuid
+//  @return OrganizationSectionModel
+func (cls OrganizationSectionModel) FindOneByUUID(uuid string) OrganizationSectionModel {
+	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
+		panic(abnormals.BombWhenIsEmpty(ret, "区间"))
+	}
+
+	return cls
 }

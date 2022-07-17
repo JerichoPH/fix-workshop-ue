@@ -113,11 +113,11 @@ func main() {
 	(&v1.MenuRouter{}).Load(router)                // 菜单
 
 	// 组织机构
-	//(&v1.OrganizationLineRouter{}).Load(router)         // 线别
-	//(&v1.OrganizationRailwayRouter{}).Load(router)      // 路局
-	//(&v1.OrganizationParagraphRouter{}).Load(router)    // 站段
-	//(&v1.OrganizationWorkshopTypeRouter{}).Load(router) // 车间类型
-	//(&v1.OrganizationWorkshopRouter{}).Load(router)     // 车间
+	(&v1.OrganizationLineRouter{}).Load(router)         // 线别
+	(&v1.OrganizationRailwayRouter{}).Load(router)      // 路局
+	(&v1.OrganizationParagraphRouter{}).Load(router)    // 站段
+	(&v1.OrganizationWorkshopTypeRouter{}).Load(router) // 车间类型
+	(&v1.OrganizationWorkshopRouter{}).Load(router)     // 车间
 
 	initServer(router, setting.App.Section("app").Key("addr").MustString(":8080")) // 启动服务
 }

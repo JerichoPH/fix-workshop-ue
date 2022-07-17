@@ -32,7 +32,7 @@ func (cls *OrganizationLineModel) ScopeBeEnable(db *gorm.DB) *gorm.DB {
 //  @return OrganizationLineModel
 func (cls OrganizationLineModel) FindOneByUUID(uuid string) OrganizationLineModel {
 	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
-		panic(abnormals.BombWhenIsEmptyByDB(ret, "线别"))
+		panic(abnormals.BombWhenIsEmpty(ret, "线别"))
 	}
 
 	return cls

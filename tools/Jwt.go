@@ -60,7 +60,7 @@ func GetJwtFromHeader(ctx *gin.Context) string {
 	tokens := ctx.Request.Header["Authorization"]
 
 	if len(tokens) == 0 {
-		panic(abnormals.BombUnAuth("令牌不存在"))
+		abnormals.BombUnAuth("令牌不存在")
 	}
 	return tokens[0]
 }

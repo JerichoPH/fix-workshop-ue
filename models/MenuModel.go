@@ -28,7 +28,7 @@ func (cls *MenuModel) TableName() string {
 //  @return MenuModel
 func (cls MenuModel) FindOneByUUID(uuid string) MenuModel {
 	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
-		panic(abnormals.BombWhenIsEmptyByDB(ret, "菜单"))
+		panic(abnormals.BombWhenIsEmpty(ret, "菜单"))
 	}
 
 	return cls

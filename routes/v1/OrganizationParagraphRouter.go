@@ -47,7 +47,7 @@ func (cls OrganizationParagraphStoreForm) ShouldBind(ctx *gin.Context) Organizat
 		abnormals.BombForbidden("所属路局必选")
 	}
 	ret = models.Init(models.OrganizationRailwayModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationRailwayUUID}).Prepare().First(&cls.OrganizationRailway)
-	abnormals.BombWhenIsEmptyByDB(ret, "路局")
+	abnormals.BombWhenIsEmpty(ret, "路局")
 	if len(cls.OrganizationWorkshopUUIDs) > 0 {
 		models.Init(models.OrganizationWorkshopModel{}).DB().Where("uuid in ?", cls.OrganizationWorkshopUUIDs).Find(cls.OrganizationWorkshops)
 	}
@@ -81,17 +81,17 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeatByDB(ret, "站段代码")
+			abnormals.BombWhenIsRepeat(ret, "站段代码")
 			ret = models.Init(models.OrganizationParagraphModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeatByDB(ret, "站段名称")
+			abnormals.BombWhenIsRepeat(ret, "站段名称")
 			ret = models.Init(models.OrganizationParagraphModel{}).
 				SetWheres(tools.Map{"short_name": form.ShortName}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeatByDB(ret, "站段简称")
+			abnormals.BombWhenIsRepeat(ret, "站段简称")
 
 			// 新建
 			organizationParagraph := &models.OrganizationParagraphModel{
@@ -140,13 +140,13 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeatByDB(ret, "站段代码")
+			abnormals.BombWhenIsRepeat(ret, "站段代码")
 			ret = models.Init(models.OrganizationParagraphModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeatByDB(ret, "站段名称")
+			abnormals.BombWhenIsRepeat(ret, "站段名称")
 
 			// 查询
 			organizationParagraph := (&models.OrganizationParagraphModel{}).FindOneByUUID(ctx.Param("uuid"))

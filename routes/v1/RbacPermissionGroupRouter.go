@@ -55,7 +55,7 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeatByDB(ret, "权限分组名称")
+			abnormals.BombWhenIsRepeat(ret, "权限分组名称")
 
 			// 保存
 			rbacPermissionGroup := &models.RbacPermissionGroupModel{Name: form.Name}
@@ -103,7 +103,7 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": uuid}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeatByDB(ret, "权限分组名称")
+			abnormals.BombWhenIsRepeat(ret, "权限分组名称")
 
 			// 查询
 			rbacPermissionGroup := (&models.RbacPermissionGroupModel{}).FindOneByUUID(uuid)
@@ -127,7 +127,7 @@ func (cls *RbacPermissionGroupRouter) Load(router *gin.Engine) {
 				SetPreloads(tools.Strings{"RbacPermissions"}).
 				Prepare().
 				First(&rbacPermissionGroup)
-			abnormals.BombWhenIsEmptyByDB(ret, "权限分组")
+			abnormals.BombWhenIsEmpty(ret, "权限分组")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"rbac_permission_group": rbacPermissionGroup}))
 		})

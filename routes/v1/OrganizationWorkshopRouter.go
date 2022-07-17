@@ -89,12 +89,12 @@ func (OrganizationWorkshopRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeatByDB(ret, "车间代码")
+			abnormals.BombWhenIsRepeat(ret, "车间代码")
 			ret = models.Init(models.OrganizationWorkshopModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeatByDB(ret, "车间名称")
+			abnormals.BombWhenIsRepeat(ret, "车间名称")
 
 			// 新建
 			organizationWorkshop := &models.OrganizationWorkshopModel{
@@ -110,6 +110,8 @@ func (OrganizationWorkshopRouter) Load(router *gin.Engine) {
 			if ret = models.Init(models.OrganizationWorkshopModel{}).DB().Create(&organizationWorkshop); ret.Error != nil {
 				abnormals.BombForbidden(ret.Error.Error())
 			}
+
+			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_workshop": organizationWorkshop}))
 		})
 
 		// 删除
@@ -141,13 +143,13 @@ func (OrganizationWorkshopRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeatByDB(ret, "车间代码")
+			abnormals.BombWhenIsRepeat(ret, "车间代码")
 			ret = models.Init(models.OrganizationWorkshopModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeatByDB(ret, "车间名称")
+			abnormals.BombWhenIsRepeat(ret, "车间名称")
 
 			// 查询
 			organizationWorkshop := (&models.OrganizationWorkshopModel{}).FindOneByUUID(ctx.Param("uuid"))
@@ -164,12 +166,27 @@ func (OrganizationWorkshopRouter) Load(router *gin.Engine) {
 			if ret = models.Init(models.OrganizationWorkshopModel{}).DB().Save(&organizationWorkshop); ret.Error != nil {
 				abnormals.BombForbidden(ret.Error.Error())
 			}
+
+			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_workshop": organizationWorkshop}))
 		})
 
 		// 详情
-		r.GET("workshop/:uuid", func(ctx *gin.Context) {})
+		r.GET("workshop/:uuid", func(ctx *gin.Context) {
+			organizationWorkshop := (&models.OrganizationWorkshopModel{}).FindOneByUUID(ctx.Param("uuid"))
+
+			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_workshop": organizationWorkshop}))
+		})
 
 		// 列表
-		r.GET("workshop", func(ctx *gin.Context) {})
+		r.GET("workshop", func(ctx *gin.Context) {
+			var organizationWorkshops []models.OrganizationWorkshopModel
+
+			models.Init(models.OrganizationWorkshopModel{}).
+				SetWhereFields("unique_code", "name", "be_enable", "organization_workshop_type_uuid", "organization_paragraph_uuid").
+				PrepareQuery(ctx).
+				Find(&organizationWorkshops)
+
+			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_workshops": organizationWorkshops}))
+		})
 	}
 }

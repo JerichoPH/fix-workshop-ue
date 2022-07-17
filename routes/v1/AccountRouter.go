@@ -122,12 +122,12 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"username": form.Username}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeatByDB(ret, "用户名")
+			abnormals.BombWhenIsRepeat(ret, "用户名")
 			ret = (&models.BaseModel{}).
 				SetWheres(tools.Map{"nickname": form.Nickname}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeatByDB(ret, "昵称")
+			abnormals.BombWhenIsRepeat(ret, "昵称")
 
 			// 密码加密
 			bytes, _ := bcrypt.GenerateFromPassword([]byte(form.Password), 14)
@@ -159,13 +159,13 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeatByDB(ret, "用户账号")
+			abnormals.BombWhenIsRepeat(ret, "用户账号")
 			ret = models.Init(models.AccountModel{}).
 				SetWheres(tools.Map{"nickname": form.Nickname}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeatByDB(ret, "用户昵称")
+			abnormals.BombWhenIsRepeat(ret, "用户昵称")
 
 			// 查询
 			account := (&models.AccountModel{}).FindOneByUUID(ctx.Param("uuid"))

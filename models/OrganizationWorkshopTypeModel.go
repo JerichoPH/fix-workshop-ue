@@ -25,7 +25,7 @@ func (cls *OrganizationWorkshopTypeModel) TableName() string {
 //  @return OrganizationWorkshopTypeModel
 func (cls OrganizationWorkshopTypeModel) FindOneByUUID(uuid string) OrganizationWorkshopTypeModel {
 	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
-		panic(abnormals.BombWhenIsEmptyByDB(ret, "车间类型"))
+		panic(abnormals.BombWhenIsEmpty(ret, "车间类型"))
 	}
 
 	return cls

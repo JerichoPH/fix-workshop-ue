@@ -46,7 +46,7 @@ func (cls *BaseModel) demoFindOne() {
 		SetNotWheres(tools.Map{}).
 		Prepare().
 		First(b)
-	abnormals.BombWhenIsEmptyByDB(ret, "XX")
+	abnormals.BombWhenIsEmpty(ret, "XX")
 }
 
 // demoFind 获取多条数据演示

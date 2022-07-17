@@ -124,7 +124,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 					SetWheres(tools.Map{"name": name, "method": method, "uri": form.Uri}).
 					Prepare().
 					First(&repeat)
-				if !abnormals.BombWhenIsEmptyByDB(ret, "") {
+				if !abnormals.BombWhenIsEmpty(ret, "") {
 					if ret = models.Init(models.RbacPermissionModel{}).
 						DB().
 						Create(&models.RbacPermissionModel{
@@ -195,7 +195,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 				SetPreloads(tools.Strings{"RbacPermissionGroup"}).
 				Prepare().
 				First(&rbacPermission)
-			abnormals.BombWhenIsEmptyByDB(ret, "权限")
+			abnormals.BombWhenIsEmpty(ret, "权限")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"rbac_permission": rbacPermission}))
 		})

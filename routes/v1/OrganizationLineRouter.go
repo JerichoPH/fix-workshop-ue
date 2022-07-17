@@ -80,12 +80,12 @@ func (cls *OrganizationLineRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeatByDB(ret, "线别代码")
+			abnormals.BombWhenIsRepeat(ret, "线别代码")
 			ret = models.Init(models.OrganizationLineModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeatByDB(ret, "线别名称")
+			abnormals.BombWhenIsRepeat(ret, "线别名称")
 
 			// 新建
 			organizationLine := &models.OrganizationLineModel{
@@ -133,13 +133,13 @@ func (cls *OrganizationLineRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeatByDB(ret, "线别代码")
+			abnormals.BombWhenIsRepeat(ret, "线别代码")
 			ret = models.Init(models.OrganizationLineModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeatByDB(ret, "线别名称")
+			abnormals.BombWhenIsRepeat(ret, "线别名称")
 
 			// 查询
 			organizationLine := (&models.OrganizationLineModel{}).FindOneByUUID(ctx.Param("uuid"))

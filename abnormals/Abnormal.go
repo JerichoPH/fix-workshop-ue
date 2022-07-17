@@ -77,11 +77,11 @@ func BombWhenIsNotUint(strValue string, errorMessage string) (uintValue uint) {
 	return
 }
 
-// BombWhenIsEmptyByDB 当数据库返回空则报错
+// BombWhenIsEmpty 当数据库返回空则报错
 //  @param db
 //  @param name
 //  @return bool
-func BombWhenIsEmptyByDB(db *gorm.DB, errorField string) bool {
+func BombWhenIsEmpty(db *gorm.DB, errorField string) bool {
 	if db.Error != nil {
 		if errors.Is(db.Error, gorm.ErrRecordNotFound) {
 			if errorField != "" {
@@ -95,11 +95,11 @@ func BombWhenIsEmptyByDB(db *gorm.DB, errorField string) bool {
 	return true
 }
 
-// BombWhenIsRepeatByDB 当数据库返回不空则报错
+// BombWhenIsRepeat 当数据库返回不空则报错
 //  @param db
 //  @param name
 //  @return bool
-func BombWhenIsRepeatByDB(db *gorm.DB, errorField string) bool {
+func BombWhenIsRepeat(db *gorm.DB, errorField string) bool {
 	if db.Error == nil {
 		if errorField != "" {
 			BombForbidden(errorField + "重复")

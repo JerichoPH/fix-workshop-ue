@@ -108,7 +108,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeatByDB(ret, "角色名称")
+			abnormals.BombWhenIsRepeat(ret, "角色名称")
 
 			// 新建
 			rbacRole := &models.RbacRoleModel{
@@ -150,7 +150,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeatByDB(ret, "角色名称")
+			abnormals.BombWhenIsRepeat(ret, "角色名称")
 
 			// 查询
 			rbacRole := (&models.RbacRoleModel{}).FindOneByUUID(ctx.Param("uuid"))
@@ -216,7 +216,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 				}).
 				Prepare().
 				First(&rbacRole)
-			abnormals.BombWhenIsEmptyByDB(ret, "角色")
+			abnormals.BombWhenIsEmpty(ret, "角色")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"rbac_role": rbacRole}))
 		})

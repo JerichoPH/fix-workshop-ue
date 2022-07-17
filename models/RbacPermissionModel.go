@@ -26,7 +26,7 @@ func (cls *RbacPermissionModel) TableName() string {
 //  @return RbacPermissionModel
 func (cls RbacPermissionModel) FindOneByUUID(uuid string) RbacPermissionModel {
 	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
-		panic(abnormals.BombWhenIsEmptyByDB(ret, "权限"))
+		panic(abnormals.BombWhenIsEmpty(ret, "权限"))
 	}
 
 	return cls

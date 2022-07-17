@@ -34,7 +34,7 @@ func (cls *OrganizationRailwayModel) ScopeBeEnable(db *gorm.DB) *gorm.DB {
 //  @return OrganizationRailwayModel
 func (cls OrganizationRailwayModel) FindOneByUUID(uuid string) OrganizationRailwayModel {
 	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
-		panic(abnormals.BombWhenIsEmptyByDB(ret, "路局"))
+		panic(abnormals.BombWhenIsEmpty(ret, "路局"))
 	}
 
 	return cls

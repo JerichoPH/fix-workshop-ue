@@ -67,7 +67,7 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"name": form.Name, "url": form.URL}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeatByDB(ret, "菜单名称和URL")
+			abnormals.BombWhenIsRepeat(ret, "菜单名称和URL")
 
 			// 新建
 			menu := &models.MenuModel{
@@ -116,7 +116,7 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			abnormals.BombWhenIsRepeatByDB(ret, "菜单名称和URL")
+			abnormals.BombWhenIsRepeat(ret, "菜单名称和URL")
 
 			// 查询
 			menu := (&models.MenuModel{}).FindOneByUUID(ctx.Param("uuid"))
