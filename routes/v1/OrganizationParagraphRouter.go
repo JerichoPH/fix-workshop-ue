@@ -33,7 +33,6 @@ type OrganizationParagraphStoreForm struct {
 //  @param ctx
 //  @return OrganizationParagraphStoreForm
 func (cls OrganizationParagraphStoreForm) ShouldBind(ctx *gin.Context) OrganizationParagraphStoreForm {
-	var ret *gorm.DB
 	if err := ctx.ShouldBind(&cls); err != nil {
 		abnormals.PanicValidate(err.Error())
 	}
@@ -47,9 +46,8 @@ func (cls OrganizationParagraphStoreForm) ShouldBind(ctx *gin.Context) Organizat
 		abnormals.PanicValidate("所属路局必选")
 	}
 	cls.OrganizationRailway = (&models.OrganizationRailwayModel{}).FindOneByUUID(cls.OrganizationRailwayUUID)
-	abnormals.PanicWhenIsEmpty(ret, "路局")
 	if len(cls.OrganizationWorkshopUUIDs) > 0 {
-		models.Init(models.OrganizationWorkshopModel{}).DB().Where("uuid in ?", cls.OrganizationWorkshopUUIDs).Find(cls.OrganizationWorkshops)
+		models.Init(models.OrganizationWorkshopModel{}).DB().Where("uuid in ?", cls.OrganizationWorkshopUUIDs).Find(&cls.OrganizationWorkshops)
 	}
 	if len(cls.OrganizationLineUUIDs) > 0 {
 		models.Init(models.OrganizationLineModel{}).DB().Where("uuid in ?", cls.OrganizationLineUUIDs).Find(&cls.OrganizationLines)

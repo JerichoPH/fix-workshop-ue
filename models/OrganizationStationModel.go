@@ -1,6 +1,10 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"fix-workshop-ue/abnormals"
+	"fix-workshop-ue/tools"
+	"gorm.io/gorm"
+)
 
 type OrganizationStationModel struct {
 	BaseModel
@@ -12,7 +16,7 @@ type OrganizationStationModel struct {
 	OrganizationWorkAreaUUID string                    `gorm:"type:CHAR(36);COMMENT:所属工区uuid;" json:"organization_work_area_uuid"`
 	OrganizationWorkArea     OrganizationWorkAreaModel `gorm:"foreignKey:OrganizationWorkAreaUUID;references:UUID;COMMENT:所属工区;" json:"organization_work_area"`
 	OrganizationLines        []*OrganizationLineModel  `gorm:"many2many:pivot_organization_line_and_organization_stations;foreignKey:id;joinForeignKey:organization_station_id;references:id;joinReferences:organization_line_id;COMMENT:线别与车站多对多;" json:"organization_lines"`
-	LocationInstallRooms     []LocationIndoorRoomModel `gorm:"foreignKey:OrganizationStationUUID;references:UUID;COMMENT:相关机房;" json:"location_install_rooms"`
+	LocationIndoorRooms      []LocationIndoorRoomModel `gorm:"foreignKey:OrganizationStationUUID;references:UUID;COMMENT:相关机房;" json:"location_indoor_rooms"`
 }
 
 // TableName 表名称
@@ -23,4 +27,16 @@ func (cls *OrganizationStationModel) TableName() string {
 // ScopeBeEnable 获取启用的数据
 func (cls *OrganizationStationModel) ScopeBeEnable(db *gorm.DB) *gorm.DB {
 	return db.Where("be_enable = ?", 1)
+}
+
+// FindOneByUUID 根据UUID获取单条数据
+//  @receiver cls
+//  @param uuid
+//  @return OrganizationStationModel
+func (cls OrganizationStationModel) FindOneByUUID(uuid string) OrganizationStationModel {
+	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
+		panic(abnormals.PanicWhenIsEmpty(ret, "站场"))
+	}
+
+	return cls
 }

@@ -48,6 +48,9 @@ func (cls OrganizationWorkAreaStoreForm) ShouldBind(ctx *gin.Context) Organizati
 	return cls
 }
 
+// Load 加载路由
+//  @receiver cls
+//  @param router
 func (cls OrganizationWorkAreaRouter) Load(router *gin.Engine) {
 	r := router.Group(
 		"api/v1/organization",

@@ -118,7 +118,8 @@ func main() {
 	(&v1.OrganizationWorkshopTypeRouter{}).Load(router) // 车间类型
 	(&v1.OrganizationWorkshopRouter{}).Load(router)     // 车间
 	(&v1.OrganizationWorkAreaTypeRouter{}).Load(router) // 工区类型
-	//(&v1.OrganizationWorkAreaRouter{}).Load(router)     // 工区
+	(&v1.OrganizationWorkAreaRouter{}).Load(router)     // 工区
+	(&v1.OrganizationStationRouter{}).Load(router)      // 站场
 
 	initServer(router, setting.App.Section("app").Key("addr").MustString(":8080")) // 启动服务
 }
