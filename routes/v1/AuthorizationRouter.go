@@ -123,7 +123,6 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 			var account models.AccountModel
 			var ret *gorm.DB
 			ret = models.Init(models.AccountModel{}).
-				SetPreloads(tools.Strings{clause.Associations}).
 				SetWheres(tools.Map{"username": form.Username}).
 				Prepare().
 				First(&account)
@@ -161,7 +160,7 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 					var account models.AccountModel
 					ret = models.Init(models.AccountModel{}).
 						SetWheres(tools.Map{"uuid": accountUUID}).
-						SetPreloads(tools.Strings{"RbacRoles", "RbacRoles.Menus"}).
+						SetPreloads("RbacRoles", "RbacRoles.Menus").
 						Prepare().
 						First(&account)
 					abnormals.PanicWhenIsEmpty(ret, "当前令牌指向用户")

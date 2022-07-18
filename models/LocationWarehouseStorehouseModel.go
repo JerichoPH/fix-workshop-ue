@@ -7,7 +7,7 @@ type LocationWarehouseStorehouseModel struct {
 	OrganizationParagraphUniqueCode          string                              `gorm:"type:CHAR(4);NOT NULL;COMMENT:所属站段代码;" json:"organization_paragraph_unique_code"`
 	OrganizationParagraph                    OrganizationParagraphModel          `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OrganizationParagraphUniqueCode;references:UniqueCode;NOT NULL;COMMENT:所属站段;" json:"organization_paragraph"`
 	OrganizationWorkshopUniqueCode           string                              `gorm:"type:CHAR(7);COMMENT:所属车间代码;" json:"organization_workshop_unique_code"`
-	OrganizationWorkshop                     OrganizationWorkshopModel           `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OrganizationWorkshopUniqueCode;references:UniqueCode;NOT NULL;COMMENT:所属车间;" json:"organization_workshop"`
+	OrganizationWorkshop                     OrganizationWorkshopModel           `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OrganizationWorkshopUUID;references:UniqueCode;NOT NULL;COMMENT:所属车间;" json:"organization_workshop"`
 	OrganizationWorkAreaUniqueCode           string                              `json:"organization_work_area_unique_code"`
 	OrganizationWorkArea                     OrganizationWorkAreaModel           `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OrganizationWorkAreaUniqueCode;references:UniqueCode;NOT NULL;COMMENT:所属工区;" json:"organization_work_area"`
 	OrganizationRailroadGradeCrossUniqueCode string                              `gorm:"type:CHAR(5);COMMENT:所属道口;" json:"organization_railroad_grade_cross_unique_code"`

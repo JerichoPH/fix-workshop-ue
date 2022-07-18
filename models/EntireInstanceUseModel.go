@@ -17,7 +17,7 @@ type EntireInstanceUseModel struct {
 	PrevOrganizationLineUniqueCode     string                       `gorm:"type:CHAR(5);COMMENT:上一次线别代码;" json:"prev_organization_line_unique_code"`
 	PrevOrganizationLine               OrganizationLineModel        `gorm:"constraint:OnUpdate:CASCADE;foreignKey:PrevOrganizationLineUniqueCode;references:UniqueCode;COMMENT:上一次所属线别;" json:"prev_organization_line"`
 	OrganizationWorkshopUniqueCode     string                       `gorm:"type:CHAR(7);COMMENT:所属车间代码;" json:"organization_workshop_unique_code"`
-	OrganizationWorkshop               OrganizationWorkshopModel    `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OrganizationWorkshopUniqueCode;references:UniqueCode;COMMENT:所属车间;" json:"organization_workshop"`
+	OrganizationWorkshop               OrganizationWorkshopModel    `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OrganizationWorkshopUUID;references:UniqueCode;COMMENT:所属车间;" json:"organization_workshop"`
 	PrevOrganizationWorkshopUniqueCode string                       `gorm:"type:CHAR(7);COMMENT:上一次所属车间代码;" json:"prev_organization_workshop_unique_code"`
 	PrevOrganizationWorkshop              OrganizationWorkshopModel `gorm:"constraint:OnUpdate:CASCADE;foreignKey:PrevOrganizationWorkshopUniqueCode;references:UniqueCode;COMMENT:上一次所属车间;" json:"prev_organization_workshop"`
 	OrganizationStationUniqueCode         string                    `gorm:"type:CHAR(6);COMMENT:所属车站代码;" json:"organization_station_unique_code"`

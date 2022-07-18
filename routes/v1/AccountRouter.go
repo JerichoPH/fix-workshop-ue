@@ -216,7 +216,7 @@ func (cls *AccountRouter) Load(router *gin.Engine) {
 		r.GET("", func(ctx *gin.Context) {
 			var accounts []models.AccountModel
 			models.Init(models.AccountModel{}).
-				SetPreloads(tools.Strings{"AccountStatus"}).
+				SetPreloads("AccountStatus").
 				PrepareQuery(ctx).
 				Find(&accounts)
 

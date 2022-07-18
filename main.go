@@ -82,10 +82,10 @@ func main() {
 			&models.OrganizationWorkshopModel{},           // 车间
 			&models.OrganizationWorkAreaTypeModel{},       // 工区类型
 			&models.OrganizationWorkAreaModel{},           // 工区
-			&models.OrganizationStationModel{},            // 站场
-			&models.OrganizationRailroadGradeCrossModel{}, // 道口
 			&models.OrganizationSectionModel{},            // 区间
 			&models.OrganizationCenterModel{},             // 中心
+			&models.OrganizationRailroadGradeCrossModel{}, // 道口
+			&models.OrganizationStationModel{},            // 站场
 
 			// 位置
 			&models.LocationIndoorRoomTypeModel{}, // 机房类型
@@ -112,13 +112,16 @@ func main() {
 	(&v1.MenuRouter{}).Load(router)                // 菜单
 
 	// 组织机构
-	(&v1.OrganizationLineRouter{}).Load(router)         // 线别
-	(&v1.OrganizationRailwayRouter{}).Load(router)      // 路局
-	(&v1.OrganizationParagraphRouter{}).Load(router)    // 站段
-	(&v1.OrganizationWorkshopTypeRouter{}).Load(router) // 车间类型
-	(&v1.OrganizationWorkshopRouter{}).Load(router)     // 车间
-	(&v1.OrganizationWorkAreaTypeRouter{}).Load(router) // 工区类型
-	//(&v1.OrganizationWorkAreaRouter{}).Load(router)     // 工区
+	(&v1.OrganizationLineRouter{}).Load(router)               // 线别
+	(&v1.OrganizationRailwayRouter{}).Load(router)            // 路局
+	(&v1.OrganizationParagraphRouter{}).Load(router)          // 站段
+	(&v1.OrganizationWorkshopTypeRouter{}).Load(router)       // 车间类型
+	(&v1.OrganizationWorkshopRouter{}).Load(router)           // 车间
+	(&v1.OrganizationWorkAreaTypeRouter{}).Load(router)       // 工区类型
+	(&v1.OrganizationWorkAreaRouter{}).Load(router)           // 工区
+	(&v1.OrganizationSectionRouter{}).Load(router)            // 区间
+	(&v1.OrganizationCenterRouter{}).Load(router)             // 中心
+	(&v1.OrganizationRailroadGradeCrossRouter{}).Load(router) // 道口
 
 	initServer(router, setting.App.Section("app").Key("addr").MustString(":8080")) // 启动服务
 }

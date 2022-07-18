@@ -207,13 +207,13 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 
 			ret = models.Init(models.RbacRoleModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				SetPreloads(tools.Strings{
+				SetPreloads(
 					"RbacPermissions",
 					"RbacPermissions.RbacPermissionGroup",
 					"Accounts",
 					"Accounts.AccountStatus",
 					"Menus",
-				}).
+				).
 				Prepare().
 				First(&rbacRole)
 			abnormals.PanicWhenIsEmpty(ret, "角色")

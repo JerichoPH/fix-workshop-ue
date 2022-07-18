@@ -43,6 +43,9 @@ func (cls OrganizationSectionStoreForm) ShouldBind(ctx *gin.Context) Organizatio
 		abnormals.PanicValidate("所属车间不能为空")
 	}
 	cls.OrganizationWorkshop = (&models.OrganizationWorkshopModel{}).FindOneByUUID(cls.OrganizationWorkshopUUID)
+	if cls.OrganizationWorkAreaUUID != "" {
+		cls.OrganizationWorkArea = (&models.OrganizationWorkAreaModel{}).FindOneByUUID(cls.OrganizationWorkAreaUUID)
+	}
 
 	return cls
 }
@@ -84,6 +87,7 @@ func (cls OrganizationSectionRouter) Load(router *gin.Engine) {
 				Name:                 form.Name,
 				BeEnable:             form.BeEnable,
 				OrganizationWorkshop: form.OrganizationWorkshop,
+				OrganizationWorkArea: form.OrganizationWorkArea,
 			}
 			if ret = models.Init(models.OrganizationSectionModel{}).DB().Create(&organizationSection); ret.Error != nil {
 				abnormals.PanicForbidden(ret.Error.Error())
@@ -136,6 +140,7 @@ func (cls OrganizationSectionRouter) Load(router *gin.Engine) {
 			organizationSection.Name = form.Name
 			organizationSection.BeEnable = form.BeEnable
 			organizationSection.OrganizationWorkshop = form.OrganizationWorkshop
+			organizationSection.OrganizationWorkArea = form.OrganizationWorkArea
 			if ret = models.Init(models.OrganizationSectionModel{}).DB().Save(&organizationSection); ret.Error != nil {
 				abnormals.PanicForbidden(ret.Error.Error())
 			}

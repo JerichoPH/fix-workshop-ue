@@ -27,7 +27,7 @@ type EntireInstanceModel struct {
 	OrganizationParagraphUniqueCode string                     `gorm:"type:CHAR(4);COMMENT:所属站段;" json:"organization_paragraph_unique_code"`
 	OrganizationParagraph           OrganizationParagraphModel `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OrganizationParagraphUniqueCode;references:UniqueCode;COMMENT:所属站段;" json:"organization_paragraph"`
 	OrganizationWorkshopUniqueCode  string                     `gorm:"type:CHAR(7);COMMENT:所属车间;" json:"organization_workshop_unique_code"`
-	OrganizationWorkshop            OrganizationWorkshopModel  `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OrganizationWorkshopUniqueCode;references:UniqueCode;COMMENT:所属专业车间;" json:"organization_workshop"`
+	OrganizationWorkshop            OrganizationWorkshopModel  `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OrganizationWorkshopUUID;references:UniqueCode;COMMENT:所属专业车间;" json:"organization_workshop"`
 	OrganizationWorkAreaUniqueCode  string                     `gorm:"type:CHAR(8);COMMENT:所属工区;" json:"organization_work_area_unique_code"`
 	OrganizationWorkArea            OrganizationWorkAreaModel  `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OrganizationWorkAreaUniqueCode;references:UniqueCode;COMMENT:所属专业工区;" json:"organization_work_area"`
 	DeleteProcessorId               string                     `gorm:"type:INT;COMMENT:删除器材操作人;" json:"delete_processor_id"`

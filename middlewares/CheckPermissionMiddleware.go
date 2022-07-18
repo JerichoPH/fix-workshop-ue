@@ -25,7 +25,7 @@ func CheckPermission() gin.HandlerFunc {
 			// 获取权限
 			var rbacPermission models.RbacPermissionModel
 			ret = (&models.BaseModel{}).
-				SetPreloads(tools.Strings{"RbacRoles"}).
+				SetPreloads("RbacRoles").
 				SetWheres(tools.Map{
 					"uri":    ctx.FullPath(),
 					"method": ctx.Request.Method,

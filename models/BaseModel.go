@@ -67,7 +67,7 @@ func (cls *BaseModel) SetModel(model interface{}) *BaseModel {
 }
 
 // SetPreloads 设置Preloads
-func (cls *BaseModel) SetPreloads(preloads []string) *BaseModel {
+func (cls *BaseModel) SetPreloads(preloads ...string) *BaseModel {
 	cls.preloads = preloads
 	return cls
 }

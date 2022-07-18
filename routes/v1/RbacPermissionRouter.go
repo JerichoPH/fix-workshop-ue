@@ -192,7 +192,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 			var rbacPermission models.RbacPermissionModel
 			ret = models.Init(&models.RbacPermissionModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				SetPreloads(tools.Strings{"RbacPermissionGroup"}).
+				SetPreloads("RbacPermissionGroup").
 				Prepare().
 				First(&rbacPermission)
 			abnormals.PanicWhenIsEmpty(ret, "权限")
@@ -204,7 +204,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 		r.GET("", func(ctx *gin.Context) {
 			var rbacPermissions []models.RbacPermissionModel
 			models.Init(models.RbacPermissionModel{}).
-				SetPreloads(tools.Strings{"RbacPermissionGroup"}).
+				SetPreloads("RbacPermissionGroup").
 				SetWhereFields("name", "uri", "method", "rbac_permission_group_uuid").
 				PrepareQuery(ctx).
 				Find(&rbacPermissions)

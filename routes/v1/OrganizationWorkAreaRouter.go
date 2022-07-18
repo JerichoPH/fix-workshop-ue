@@ -23,7 +23,9 @@ type OrganizationWorkAreaStoreForm struct {
 	OrganizationWorkAreaType     models.OrganizationWorkAreaTypeModel
 	OrganizationWorkshopUUID     string `form:"organization_workshop_uuid" json:"organization_workshop_uuid"`
 	OrganizationWorkshop         models.OrganizationWorkshopModel
+	OrganizationSectionUUIDs     []string `form:"organization_section_uuids" json:"organization_section_uuids"`
 	OrganizationSections         []models.OrganizationSectionModel
+	OrganizationStationUUIDs     []string `form:"organization_station_uuids" json:"organization_station_uuids"`
 	OrganizationStations         []models.OrganizationStationModel
 }
 
@@ -43,6 +45,17 @@ func (cls OrganizationWorkAreaStoreForm) ShouldBind(ctx *gin.Context) Organizati
 	}
 	if cls.OrganizationWorkAreaTypeUUID == "" {
 		abnormals.PanicValidate("工区类型必选")
+	}
+	cls.OrganizationWorkAreaType = (&models.OrganizationWorkAreaTypeModel{}).FindOneByUUID(cls.OrganizationWorkAreaTypeUUID)
+	if cls.OrganizationWorkshopUUID == "" {
+		abnormals.PanicValidate("所属车间必选")
+	}
+	cls.OrganizationWorkshop = (&models.OrganizationWorkshopModel{}).FindOneByUUID(cls.OrganizationWorkshopUUID)
+	if len(cls.OrganizationSections) > 0 {
+		models.Init(models.OrganizationSectionModel{}).DB().Where("uuid in ?", cls.OrganizationSectionUUIDs).Find(&cls.OrganizationSections)
+	}
+	if len(cls.OrganizationStationUUIDs) > 0 {
+		models.Init(models.OrganizationStationModel{}).DB().Where("uuid in ?", cls.OrganizationStationUUIDs).Find(&cls.OrganizationStations)
 	}
 
 	return cls
