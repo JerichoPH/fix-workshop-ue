@@ -13,8 +13,8 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/stretchr/testify v1.7.1-0.20210427113832-6241f9ab9942 // indirect
-	golang.org/x/crypto v0.0.0-20220312131142-6068a2e6cfdc
-	golang.org/x/sys v0.0.0-20211205182925-97ca703d548d // indirect
+	github.com/xuri/excelize/v2 v2.6.0 // indirect
+	golang.org/x/crypto v0.0.0-20220408190544-5352b0902921
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
