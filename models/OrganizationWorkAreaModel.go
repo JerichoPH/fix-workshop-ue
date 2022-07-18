@@ -3,7 +3,6 @@ package models
 import (
 	"fix-workshop-ue/abnormals"
 	"fix-workshop-ue/tools"
-	"gorm.io/gorm"
 )
 
 // OrganizationWorkAreaModel 工区
@@ -26,11 +25,6 @@ type OrganizationWorkAreaModel struct {
 // TableName 表名称
 func (cls *OrganizationWorkAreaModel) TableName() string {
 	return "organization_work_areas"
-}
-
-// ScopeBeEnable 获取启用的数据
-func (cls *OrganizationWorkAreaModel) ScopeBeEnable(db *gorm.DB) *gorm.DB {
-	return db.Where("be_enable = ?", 1)
 }
 
 // FindOneByUUID 根据UUID获取单条数据

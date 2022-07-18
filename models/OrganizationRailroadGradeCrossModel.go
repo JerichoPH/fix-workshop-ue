@@ -1,9 +1,10 @@
 package models
 
+import "gorm.io/gorm"
+
 import (
 	"fix-workshop-ue/abnormals"
 	"fix-workshop-ue/tools"
-	"gorm.io/gorm"
 )
 
 // OrganizationRailroadGradeCrossModel 道口

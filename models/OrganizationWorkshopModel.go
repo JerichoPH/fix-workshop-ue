@@ -3,7 +3,6 @@ package models
 import (
 	"fix-workshop-ue/abnormals"
 	"fix-workshop-ue/tools"
-	"gorm.io/gorm"
 )
 
 // OrganizationWorkshopModel 车间
@@ -31,19 +30,13 @@ func (cls *OrganizationWorkshopModel) TableName() string {
 	return "organization_workshops"
 }
 
-// ScopeBeEnable 获取启用的数据
-//  @receiver cls
-//  @param db
-//  @return *gorm.DB
-func (cls *OrganizationWorkshopModel) ScopeBeEnable(db *gorm.DB) *gorm.DB {
-	return db.Where("be_enable = ?", 1)
-}
-
 // FindOneByUUID 根据UUID获取单条数据
 //  @receiver cls
 //  @param uuid
 //  @return OrganizationWorkshopModel
 func (cls OrganizationWorkshopModel) FindOneByUUID(uuid string) OrganizationWorkshopModel {
+
+
 	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
 		panic(abnormals.PanicWhenIsEmpty(ret, "车间"))
 	}

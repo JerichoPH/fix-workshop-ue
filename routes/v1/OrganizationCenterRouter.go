@@ -42,7 +42,11 @@ func (cls OrganizationCenterStoreForm) ShouldBind(ctx *gin.Context) Organization
 	if cls.OrganizationWorkshopUUID == "" {
 		abnormals.PanicValidate("所属车间必选")
 	}
-	cls.OrganizationWorkshop = (&models.OrganizationWorkshopModel{}).FindOneByUUID(cls.OrganizationWorkshopUUID)
+	ret := models.Init(models.OrganizationWorkshopModel{}).
+		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).
+		Prepare().
+		First(&cls.OrganizationWorkshop)
+	abnormals.PanicWhenIsEmpty(ret, "所属车间")
 	if cls.OrganizationWorkAreaUUID != "" {
 		cls.OrganizationWorkArea = (&models.OrganizationWorkAreaModel{}).FindOneByUUID(cls.OrganizationWorkAreaUUID)
 	}
@@ -146,7 +150,13 @@ func (cls OrganizationCenterRouter) Load(router *gin.Engine) {
 
 		// 详情
 		r.GET("center/:uuid", func(ctx *gin.Context) {
-			organizationCenter := (&models.OrganizationCenterModel{}).FindOneByUUID(ctx.Param("uuid"))
+			var organizationCenter models.OrganizationCenterModel
+			ret := models.Init(models.OrganizationCenterModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				SetScopes((&models.BaseModel{}).ScopeBeEnable).
+				Prepare().
+				First(&organizationCenter)
+			abnormals.PanicWhenIsEmpty(ret, "中心")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organizationCenter": organizationCenter}))
 		})
@@ -156,6 +166,7 @@ func (cls OrganizationCenterRouter) Load(router *gin.Engine) {
 			var organizationCenters []models.OrganizationCenterModel
 			models.Init(models.OrganizationCenterModel{}).
 				SetWhereFields().
+				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				PrepareQuery(ctx).
 				Find(&organizationCenters)
 

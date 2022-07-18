@@ -122,6 +122,7 @@ func main() {
 	(&v1.OrganizationSectionRouter{}).Load(router)            // 区间
 	(&v1.OrganizationCenterRouter{}).Load(router)             // 中心
 	(&v1.OrganizationRailroadGradeCrossRouter{}).Load(router) // 道口
+	(&v1.OrganizationStationRouter{}).Load(router)      // 站场
 
 	initServer(router, setting.App.Section("app").Key("addr").MustString(":8080")) // 启动服务
 }
