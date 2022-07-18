@@ -3,7 +3,6 @@ package models
 import (
 	"fix-workshop-ue/abnormals"
 	"fix-workshop-ue/tools"
-	"gorm.io/gorm"
 )
 
 type OrganizationParagraphModel struct {
@@ -22,11 +21,6 @@ type OrganizationParagraphModel struct {
 // TableName 表名称
 func (cls *OrganizationParagraphModel) TableName() string {
 	return "organization_paragraphs"
-}
-
-// ScopeBeEnable 获取启用的数据
-func (cls *OrganizationParagraphModel) ScopeBeEnable(db *gorm.DB) *gorm.DB {
-	return db.Where("be_enable = ?", 1)
 }
 
 // FindOneByUUID 根据UUID获取单条数据

@@ -173,6 +173,11 @@ func (OrganizationWorkshopRouter) Load(router *gin.Engine) {
 		// 详情
 		r.GET("workshop/:uuid", func(ctx *gin.Context) {
 			organizationWorkshop := (&models.OrganizationWorkshopModel{}).FindOneByUUID(ctx.Param("uuid"))
+			models.Init(models.OrganizationWorkshopModel{}).
+				SetScopes((&models.BaseModel{}).ScopeBeEnable).
+				SetWheres(tools.Map{"uuid":ctx.Param("uuid")}).
+				Prepare().
+				First(&organizationWorkshop)
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_workshop": organizationWorkshop}))
 		})
@@ -182,6 +187,7 @@ func (OrganizationWorkshopRouter) Load(router *gin.Engine) {
 			var organizationWorkshops []models.OrganizationWorkshopModel
 
 			models.Init(models.OrganizationWorkshopModel{}).
+				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				SetWhereFields("unique_code", "name", "be_enable", "organization_workshop_type_uuid", "organization_paragraph_uuid").
 				PrepareQuery(ctx).
 				Find(&organizationWorkshops)

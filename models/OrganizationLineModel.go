@@ -3,7 +3,6 @@ package models
 import (
 	"fix-workshop-ue/abnormals"
 	"fix-workshop-ue/tools"
-	"gorm.io/gorm"
 )
 
 type OrganizationLineModel struct {
@@ -19,11 +18,6 @@ type OrganizationLineModel struct {
 // TableName 表名称
 func (cls *OrganizationLineModel) TableName() string {
 	return "organization_lines"
-}
-
-// ScopeBeEnable 获取启用的数据
-func (cls *OrganizationLineModel) ScopeBeEnable(db *gorm.DB) *gorm.DB {
-	return db.Where("be_enable = ?", 1)
 }
 
 // FindOneByUUID 根据UUID获取单条数据

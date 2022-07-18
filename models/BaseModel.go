@@ -1,8 +1,8 @@
 package models
 
 import (
-	"fix-workshop-ue/databases"
 	"fix-workshop-ue/abnormals"
+	"fix-workshop-ue/databases"
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -58,6 +58,10 @@ func (cls *BaseModel) demoFind() {
 		SetWhereFields("a", "b", "c").
 		PrepareQuery(ctx).
 		Find(&b)
+}
+
+func (cls *BaseModel) ScopeBeEnable(db *gorm.DB) *gorm.DB {
+	return db.Where("be_enable = ?", 1)
 }
 
 // SetModel 设置使用的模型
@@ -235,3 +239,19 @@ func (cls *BaseModel) PrepareQuery(ctx *gin.Context) *gorm.DB {
 
 	return dbSession
 }
+
+type BaseOption struct{
+	Preloads       []string
+	Selects        []string
+	Omits          []string
+	WhereFields    []string
+	NotWhereFields []string
+	IgnoreFields   []string
+	Wheres         map[string]interface{}
+	NotWheres      map[string]interface{}
+	Scopes         []func(*gorm.DB) *gorm.DB
+	Model          interface{}
+}
+
+
+

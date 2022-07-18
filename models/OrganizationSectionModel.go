@@ -3,7 +3,6 @@ package models
 import (
 	"fix-workshop-ue/abnormals"
 	"fix-workshop-ue/tools"
-	"gorm.io/gorm"
 )
 
 // OrganizationSectionModel 区间
@@ -21,11 +20,6 @@ type OrganizationSectionModel struct {
 // TableName 表名称
 func (cls *OrganizationSectionModel) TableName() string {
 	return "organization_sections"
-}
-
-// ScopeBeEnable 获取启用的数据
-func (cls *OrganizationSectionModel) ScopeBeEnable(db *gorm.DB) *gorm.DB {
-	return db.Where("be_enable = ?", 1)
 }
 
 // FindOneByUUID 根据UUID获取单条数据
