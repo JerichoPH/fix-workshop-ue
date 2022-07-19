@@ -30,6 +30,8 @@ type OrganizationSectionStoreForm struct {
 //  @param ctx
 //  @return OrganizationSectionStoreForm
 func (cls OrganizationSectionStoreForm) ShouldBind(ctx *gin.Context) OrganizationSectionStoreForm {
+	var ret *gorm.DB
+
 	if err := ctx.ShouldBind(&cls); err != nil {
 		abnormals.PanicValidate(err.Error())
 	}
@@ -42,9 +44,17 @@ func (cls OrganizationSectionStoreForm) ShouldBind(ctx *gin.Context) Organizatio
 	if cls.OrganizationWorkshopUUID == "" {
 		abnormals.PanicValidate("所属车间不能为空")
 	}
-	cls.OrganizationWorkshop = (&models.OrganizationWorkshopModel{}).FindOneByUUID(cls.OrganizationWorkshopUUID)
+	ret = models.Init(models.OrganizationWorkshopModel{}).
+		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).
+		Prepare().
+		First(&cls.OrganizationWorkshop)
+	abnormals.PanicWhenIsEmpty(ret, "车间")
 	if cls.OrganizationWorkAreaUUID != "" {
-		cls.OrganizationWorkArea = (&models.OrganizationWorkAreaModel{}).FindOneByUUID(cls.OrganizationWorkAreaUUID)
+		ret = models.Init(models.OrganizationWorkAreaModel{}).
+			SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUUID}).
+			Prepare().
+			First(&cls.OrganizationWorkArea)
+		abnormals.PanicWhenIsEmpty(ret, "工区")
 	}
 
 	return cls
@@ -62,13 +72,15 @@ func (cls OrganizationSectionRouter) Load(router *gin.Engine) {
 	{
 		// 新建
 		r.POST("section", func(ctx *gin.Context) {
-			var ret *gorm.DB
+			var (
+				ret *gorm.DB
+				repeat models.OrganizationSectionModel
+			)
 
 			// 表单
 			form := (&OrganizationSectionStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			var repeat models.OrganizationSectionModel
 			ret = models.Init(models.OrganizationSectionModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
@@ -98,8 +110,16 @@ func (cls OrganizationSectionRouter) Load(router *gin.Engine) {
 
 		// 删除
 		r.DELETE("section/:uuid", func(ctx *gin.Context) {
+			var (
+				ret                 *gorm.DB
+				organizationSection models.OrganizationSectionModel
+			)
 			// 查询
-			organizationSection := (&models.OrganizationSectionModel{}).FindOneByUUID(ctx.Param("uuid"))
+			ret = models.Init(models.OrganizationSectionModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&organizationSection)
+			abnormals.PanicWhenIsEmpty(ret, "区间")
 
 			// 删除
 			if ret := models.Init(models.OrganizationSectionModel{}).DB().Delete(&organizationSection); ret.Error != nil {
@@ -111,13 +131,15 @@ func (cls OrganizationSectionRouter) Load(router *gin.Engine) {
 
 		// 编辑
 		r.PUT("section/:uuid", func(ctx *gin.Context) {
-			var ret *gorm.DB
+			var (
+				ret                         *gorm.DB
+				organizationSection, repeat models.OrganizationSectionModel
+			)
 
 			// 表单
 			form := (&OrganizationSectionStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			var repeat models.OrganizationSectionModel
 			ret = models.Init(models.OrganizationSectionModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
@@ -132,7 +154,11 @@ func (cls OrganizationSectionRouter) Load(router *gin.Engine) {
 			abnormals.PanicWhenIsRepeat(ret, "区间名称")
 
 			// 查询
-			organizationSection := (&models.OrganizationSectionModel{}).FindOneByUUID(ctx.Param("uuid"))
+			ret = models.Init(models.OrganizationSectionModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&organizationSection)
+			abnormals.PanicWhenIsEmpty(ret, "区间")
 
 			// 编辑
 			organizationSection.BaseModel.Sort = form.Sort
@@ -150,7 +176,16 @@ func (cls OrganizationSectionRouter) Load(router *gin.Engine) {
 
 		// 详情
 		r.GET("section/:uuid", func(ctx *gin.Context) {
-			organizationSection := (&models.OrganizationSectionModel{}).FindOneByUUID(ctx.Param("uuid"))
+			var (
+				ret                 *gorm.DB
+				organizationSection models.OrganizationSectionModel
+			)
+			ret = models.Init(models.OrganizationSectionModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				SetScopes((&models.BaseModel{}).ScopeBeEnable).
+				Prepare().
+				First(&organizationSection)
+			abnormals.PanicWhenIsEmpty(ret, "区间")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_section": organizationSection}))
 		})
@@ -159,7 +194,8 @@ func (cls OrganizationSectionRouter) Load(router *gin.Engine) {
 		r.GET("section", func(ctx *gin.Context) {
 			var organizationSections []models.OrganizationSectionModel
 			models.Init(models.OrganizationSectionModel{}).
-				SetWhereFields().
+				SetWhereFields("unique_code", "Name", "be_enable", "organization_workshop_uuid", "organization_work_area_uuid").
+				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				PrepareQuery(ctx).
 				Find(&organizationSections)
 

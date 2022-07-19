@@ -1,10 +1,5 @@
 package models
 
-import (
-	"fix-workshop-ue/abnormals"
-	"fix-workshop-ue/tools"
-)
-
 type OrganizationParagraphModel struct {
 	BaseModel
 	UniqueCode              string                      `gorm:"type:CHAR(4);UNIQUE;NOT NULL;COMMENT:站段代码;" json:"unique_code"` // B049
@@ -21,16 +16,4 @@ type OrganizationParagraphModel struct {
 // TableName 表名称
 func (cls *OrganizationParagraphModel) TableName() string {
 	return "organization_paragraphs"
-}
-
-// FindOneByUUID 根据UUID获取单条数据
-//  @receiver cls
-//  @param uuid
-//  @return OrganizationParagraphModel
-func (cls OrganizationParagraphModel) FindOneByUUID(uuid string) OrganizationParagraphModel {
-	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
-		panic(abnormals.PanicWhenIsEmpty(ret, "站段"))
-	}
-
-	return cls
 }

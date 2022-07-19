@@ -1,10 +1,5 @@
 package models
 
-import (
-	"fix-workshop-ue/abnormals"
-	"fix-workshop-ue/tools"
-)
-
 // OrganizationSectionModel 区间
 type OrganizationSectionModel struct {
 	BaseModel
@@ -20,16 +15,4 @@ type OrganizationSectionModel struct {
 // TableName 表名称
 func (cls *OrganizationSectionModel) TableName() string {
 	return "organization_sections"
-}
-
-// FindOneByUUID 根据UUID获取单条数据
-//  @receiver cls
-//  @param uuid
-//  @return OrganizationSectionModel
-func (cls OrganizationSectionModel) FindOneByUUID(uuid string) OrganizationSectionModel {
-	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
-		panic(abnormals.PanicWhenIsEmpty(ret, "区间"))
-	}
-
-	return cls
 }

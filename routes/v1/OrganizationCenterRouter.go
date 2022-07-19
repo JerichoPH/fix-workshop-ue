@@ -30,6 +30,8 @@ type OrganizationCenterStoreForm struct {
 //  @param ctx
 //  @return OrganizationCenterStoreForm
 func (cls OrganizationCenterStoreForm) ShouldBind(ctx *gin.Context) OrganizationCenterStoreForm {
+	var ret *gorm.DB
+
 	if err := ctx.ShouldBind(ctx); err != nil {
 		abnormals.PanicValidate(err.Error())
 	}
@@ -42,13 +44,17 @@ func (cls OrganizationCenterStoreForm) ShouldBind(ctx *gin.Context) Organization
 	if cls.OrganizationWorkshopUUID == "" {
 		abnormals.PanicValidate("所属车间必选")
 	}
-	ret := models.Init(models.OrganizationWorkshopModel{}).
+	ret = models.Init(models.OrganizationWorkshopModel{}).
 		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).
 		Prepare().
 		First(&cls.OrganizationWorkshop)
 	abnormals.PanicWhenIsEmpty(ret, "所属车间")
 	if cls.OrganizationWorkAreaUUID != "" {
-		cls.OrganizationWorkArea = (&models.OrganizationWorkAreaModel{}).FindOneByUUID(cls.OrganizationWorkAreaUUID)
+		models.Init(models.OrganizationWorkAreaModel{}).
+			SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUUID}).
+			Prepare().
+			First(&cls.OrganizationWorkArea)
+		abnormals.PanicWhenIsEmpty(ret, "工区")
 	}
 
 	return cls
@@ -66,13 +72,15 @@ func (cls OrganizationCenterRouter) Load(router *gin.Engine) {
 	{
 		// 新建
 		r.POST("center", func(ctx *gin.Context) {
-			var ret *gorm.DB
+			var (
+				ret *gorm.DB
+				repeat models.OrganizationCenterModel
+			)
 
 			// 表单
 			form := (&OrganizationCenterStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			var repeat models.OrganizationCenterModel
 			ret = models.Init(models.OrganizationCenterModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
@@ -100,8 +108,17 @@ func (cls OrganizationCenterRouter) Load(router *gin.Engine) {
 
 		// 删除
 		r.DELETE("center/:uuid", func(ctx *gin.Context) {
+			var (
+				ret                *gorm.DB
+				organizationCenter models.OrganizationCenterModel
+			)
+
 			// 查询
-			organizationCenter := (&models.OrganizationCenterModel{}).FindOneByUUID(ctx.Param("uuid"))
+			ret = models.Init(models.OrganizationCenterModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&organizationCenter)
+			abnormals.PanicWhenIsEmpty(ret, "中心")
 
 			// 删除
 			if ret := models.Init(models.OrganizationCenterModel{}).DB().Delete(&organizationCenter); ret.Error != nil {
@@ -113,13 +130,15 @@ func (cls OrganizationCenterRouter) Load(router *gin.Engine) {
 
 		// 编辑
 		r.PUT("center/:uuid", func(ctx *gin.Context) {
-			var ret *gorm.DB
+			var (
+				ret                        *gorm.DB
+				organizationCenter, repeat models.OrganizationCenterModel
+			)
 
 			// 表单
 			form := (&OrganizationCenterStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			var repeat models.OrganizationCenterModel
 			ret = models.Init(models.OrganizationCenterModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
@@ -134,7 +153,11 @@ func (cls OrganizationCenterRouter) Load(router *gin.Engine) {
 			abnormals.PanicWhenIsRepeat(ret, "中心名称")
 
 			// 查询
-			organizationCenter := (&models.OrganizationCenterModel{}).FindOneByUUID(ctx.Param("uuid"))
+			ret = models.Init(models.OrganizationCenterModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&organizationCenter)
+			abnormals.PanicWhenIsEmpty(ret, "中心")
 
 			// 编辑
 			organizationCenter.BaseModel.Sort = form.Sort

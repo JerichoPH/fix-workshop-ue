@@ -1,10 +1,5 @@
 package models
 
-import (
-	"fix-workshop-ue/abnormals"
-	"fix-workshop-ue/tools"
-)
-
 type OrganizationLineModel struct {
 	BaseModel
 	UniqueCode             string                        `gorm:"type:CHAR(5);UNIQUE;NOT NULL;COMMENT:线别代码;" json:"unique_code"` // E0001
@@ -18,16 +13,4 @@ type OrganizationLineModel struct {
 // TableName 表名称
 func (cls *OrganizationLineModel) TableName() string {
 	return "organization_lines"
-}
-
-// FindOneByUUID 根据UUID获取单条数据
-//  @receiver cls
-//  @param uuid
-//  @return OrganizationLineModel
-func (cls OrganizationLineModel) FindOneByUUID(uuid string) OrganizationLineModel {
-	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
-		panic(abnormals.PanicWhenIsEmpty(ret, "线别"))
-	}
-
-	return cls
 }

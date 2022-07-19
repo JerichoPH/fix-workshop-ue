@@ -32,6 +32,8 @@ type OrganizationStationStoreForm struct {
 //  @param ctx
 //  @return OrganizationStationStoreForm
 func (cls OrganizationStationStoreForm) ShouldBind(ctx *gin.Context) OrganizationStationStoreForm {
+	var ret *gorm.DB
+
 	if err := ctx.ShouldBind(&cls); err != nil {
 		abnormals.PanicValidate(err.Error())
 	}
@@ -44,12 +46,17 @@ func (cls OrganizationStationStoreForm) ShouldBind(ctx *gin.Context) Organizatio
 	if cls.OrganizationWorkshopUUID == "" {
 		abnormals.PanicValidate("所属车间必选")
 	}
-	cls.OrganizationWorkshop = (&models.OrganizationWorkshopModel{}).FindOneByUUID(cls.OrganizationWorkshopUUID)
+	ret = models.Init(models.OrganizationWorkshopModel{}).
+		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).
+		Prepare().
+		First(&cls.OrganizationWorkshop)
+	abnormals.PanicWhenIsEmpty(ret, "车间")
 	if cls.OrganizationWorkAreaUUID != "" {
-		cls.OrganizationWorkArea = (&models.OrganizationWorkAreaModel{}).FindOneByUUID(cls.OrganizationWorkAreaUUID)
-	}
-	if len(cls.OrganizationLineUUIDs) > 0 {
-		models.Init(models.OrganizationLineModel{}).DB().Where("uuid in ?", cls.OrganizationLineUUIDs).Find(&cls.OrganizationLines)
+		ret = models.Init(models.OrganizationWorkAreaModel{}).
+			SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUUID}).
+			Prepare().
+			First(&cls.OrganizationWorkArea)
+		abnormals.PanicWhenIsEmpty(ret, "工区")
 	}
 
 	return cls
@@ -67,13 +74,15 @@ func (cls OrganizationStationRouter) Load(router *gin.Engine) {
 	{
 		// 新建
 		r.POST("station", func(ctx *gin.Context) {
-			var ret *gorm.DB
+			var (
+				ret *gorm.DB
+				repeat models.OrganizationStationModel
+			)
 
 			// 表单
 			form := (&OrganizationStationStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			var repeat models.OrganizationStationModel
 			ret = models.Init(models.OrganizationStationModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
@@ -104,8 +113,16 @@ func (cls OrganizationStationRouter) Load(router *gin.Engine) {
 
 		// 删除
 		r.DELETE("station/:uuid", func(ctx *gin.Context) {
+			var (
+				ret                 *gorm.DB
+				organizationStation models.OrganizationStationModel
+			)
 			// 查询
-			organizationStation := (&models.OrganizationStationModel{}).FindOneByUUID(ctx.Param("uuid"))
+			ret = models.Init(models.OrganizationStationModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&organizationStation)
+			abnormals.PanicWhenIsEmpty(ret, "站场")
 
 			// 删除
 			if ret := models.Init(models.OrganizationStationModel{}).DB().Delete(&organizationStation); ret.Error != nil {
@@ -117,13 +134,15 @@ func (cls OrganizationStationRouter) Load(router *gin.Engine) {
 
 		// 编辑
 		r.PUT("station/:uuid", func(ctx *gin.Context) {
-			var ret *gorm.DB
+			var (
+				ret                         *gorm.DB
+				organizationStation, repeat models.OrganizationStationModel
+			)
 
 			// 表单
 			form := (&OrganizationStationStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			var repeat models.OrganizationStationModel
 			ret = models.Init(models.OrganizationStationModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
@@ -138,7 +157,11 @@ func (cls OrganizationStationRouter) Load(router *gin.Engine) {
 			abnormals.PanicWhenIsRepeat(ret, "站场名称")
 
 			// 查询
-			organizationStation := (&models.OrganizationStationModel{}).FindOneByUUID(ctx.Param("uuid"))
+			ret = models.Init(models.OrganizationStationModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&organizationStation)
+			abnormals.PanicWhenIsEmpty(ret, "站场")
 
 			// 编辑
 			organizationStation.BaseModel.Sort = form.Sort
@@ -157,7 +180,17 @@ func (cls OrganizationStationRouter) Load(router *gin.Engine) {
 
 		// 详情
 		r.GET("station/:uuid", func(ctx *gin.Context) {
-			organizationStation := (&models.OrganizationStationModel{}).FindOneByUUID(ctx.Param("uuid"))
+			var (
+				ret                 *gorm.DB
+				organizationStation models.OrganizationStationModel
+			)
+			// 查询
+			ret = models.Init(models.OrganizationStationModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				SetScopes((&models.BaseModel{}).ScopeBeEnable).
+				Prepare().
+				First(&organizationStation)
+			abnormals.PanicWhenIsEmpty(ret, "站场")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_station": organizationStation}))
 		})
@@ -167,6 +200,7 @@ func (cls OrganizationStationRouter) Load(router *gin.Engine) {
 			var organizationStations []models.OrganizationStationModel
 			models.Init(models.OrganizationStationModel{}).
 				SetWhereFields().
+				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				PrepareQuery(ctx).
 				Find(&organizationStations)
 

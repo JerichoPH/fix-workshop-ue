@@ -30,6 +30,8 @@ type OrganizationRailroadGradeCrossStoreForm struct {
 //  @param ctx
 //  @return OrganizationCenterStoreForm
 func (cls OrganizationRailroadGradeCrossStoreForm) ShouldBind(ctx *gin.Context) OrganizationRailroadGradeCrossStoreForm {
+	var ret *gorm.DB
+
 	if err := ctx.ShouldBind(ctx); err != nil {
 		abnormals.PanicValidate(err.Error())
 	}
@@ -42,9 +44,17 @@ func (cls OrganizationRailroadGradeCrossStoreForm) ShouldBind(ctx *gin.Context) 
 	if cls.OrganizationWorkshopUUID == "" {
 		abnormals.PanicValidate("所属车间必选")
 	}
-	cls.OrganizationWorkshop = (&models.OrganizationWorkshopModel{}).FindOneByUUID(cls.OrganizationWorkshopUUID)
+	ret = models.Init(models.OrganizationWorkshopModel{}).
+		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).
+		Prepare().
+		First(&cls.OrganizationWorkshop)
+	abnormals.PanicWhenIsEmpty(ret, "车间")
 	if cls.OrganizationWorkAreaUUID != "" {
-		cls.OrganizationWorkArea = (&models.OrganizationWorkAreaModel{}).FindOneByUUID(cls.OrganizationWorkAreaUUID)
+		ret = models.Init(models.OrganizationWorkAreaModel{}).
+			SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUUID}).
+			Prepare().
+			First(&cls.OrganizationWorkArea)
+		abnormals.PanicWhenIsEmpty(ret, "工区")
 	}
 
 	return cls
@@ -62,13 +72,15 @@ func (cls OrganizationRailroadGradeCrossRouter) Load(router *gin.Engine) {
 	{
 		// 新建
 		r.POST("railroadGradeCross", func(ctx *gin.Context) {
-			var ret *gorm.DB
+			var (
+				ret    *gorm.DB
+				repeat models.OrganizationRailroadGradeCrossModel
+			)
 
 			// 表单
 			form := (&OrganizationRailroadGradeCrossStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			var repeat models.OrganizationRailroadGradeCrossModel
 			ret = models.Init(models.OrganizationRailroadGradeCrossModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
@@ -96,8 +108,17 @@ func (cls OrganizationRailroadGradeCrossRouter) Load(router *gin.Engine) {
 
 		// 删除
 		r.DELETE("railroadGradeCross/:uuid", func(ctx *gin.Context) {
+			var (
+				ret                            *gorm.DB
+				organizationRailroadGradeCross models.OrganizationRailroadGradeCrossModel
+			)
+
 			// 查询
-			organizationRailroadGradeCross := (&models.OrganizationRailroadGradeCrossModel{}).FindOneByUUID(ctx.Param("uuid"))
+			ret = models.Init(models.OrganizationRailroadGradeCrossModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&organizationRailroadGradeCross)
+			abnormals.PanicWhenIsEmpty(ret, "道口")
 
 			// 删除
 			if ret := models.Init(models.OrganizationRailroadGradeCrossModel{}).DB().Delete(&organizationRailroadGradeCross); ret.Error != nil {
@@ -109,13 +130,15 @@ func (cls OrganizationRailroadGradeCrossRouter) Load(router *gin.Engine) {
 
 		// 编辑
 		r.PUT("railroadGradeCross/:uuid", func(ctx *gin.Context) {
-			var ret *gorm.DB
+			var (
+				ret                                    *gorm.DB
+				organizationRailroadGradeCross, repeat models.OrganizationRailroadGradeCrossModel
+			)
 
 			// 表单
 			form := (&OrganizationRailroadGradeCrossStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			var repeat models.OrganizationRailroadGradeCrossModel
 			ret = models.Init(models.OrganizationRailroadGradeCrossModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
@@ -130,7 +153,11 @@ func (cls OrganizationRailroadGradeCrossRouter) Load(router *gin.Engine) {
 			abnormals.PanicWhenIsRepeat(ret, "道口名称")
 
 			// 查询
-			organizationRailroadGradeCross := (&models.OrganizationRailroadGradeCrossModel{}).FindOneByUUID(ctx.Param("uuid"))
+			ret = models.Init(models.OrganizationRailroadGradeCrossModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&organizationRailroadGradeCross)
+			abnormals.PanicWhenIsEmpty(ret, "道口")
 
 			// 编辑
 			organizationRailroadGradeCross.BaseModel.Sort = form.Sort
@@ -146,7 +173,16 @@ func (cls OrganizationRailroadGradeCrossRouter) Load(router *gin.Engine) {
 
 		// 详情
 		r.GET("railroadGradeCross/:uuid", func(ctx *gin.Context) {
-			organizationRailroadGradeCross := (&models.OrganizationRailroadGradeCrossModel{}).FindOneByUUID(ctx.Param("uuid"))
+			var (
+				ret                            *gorm.DB
+				organizationRailroadGradeCross models.OrganizationRailroadGradeCrossModel
+			)
+			ret = models.Init(models.OrganizationRailroadGradeCrossModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				SetScopes((&models.BaseModel{}).ScopeBeEnable).
+				Prepare().
+				First(&organizationRailroadGradeCross)
+			abnormals.PanicWhenIsEmpty(ret, "道口")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organizationRailroadGradeCross": organizationRailroadGradeCross}))
 		})
@@ -155,7 +191,8 @@ func (cls OrganizationRailroadGradeCrossRouter) Load(router *gin.Engine) {
 		r.GET("railroadGradeCross", func(ctx *gin.Context) {
 			var organizationRailroadGradeCrosses []models.OrganizationRailroadGradeCrossModel
 			models.Init(models.OrganizationRailroadGradeCrossModel{}).
-				SetWhereFields().
+				SetWhereFields("unique_code", "name", "be_enable", "organization_workshop_uuid", "organization_work_area_uuid").
+				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				PrepareQuery(ctx).
 				Find(&organizationRailroadGradeCrosses)
 

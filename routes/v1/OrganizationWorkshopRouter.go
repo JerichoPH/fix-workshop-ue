@@ -36,6 +36,7 @@ type OrganizationWorkshopStoreForm struct {
 //  @param ctx
 //  @return OrganizationWorkshopStoreForm
 func (cls OrganizationWorkshopStoreForm) ShouldBind(ctx *gin.Context) OrganizationWorkshopStoreForm {
+	var ret *gorm.DB
 	if err := ctx.ShouldBind(&cls); err != nil {
 		abnormals.PanicValidate(err.Error())
 	}
@@ -52,7 +53,11 @@ func (cls OrganizationWorkshopStoreForm) ShouldBind(ctx *gin.Context) Organizati
 	if cls.OrganizationParagraphUUID == "" {
 		abnormals.PanicValidate("所属站段必选")
 	}
-	cls.OrganizationParagraph = (&models.OrganizationParagraphModel{}).FindOneByUUID(cls.OrganizationParagraphUUID)
+	ret = models.Init(models.OrganizationRailwayModel{}).
+		SetWheres(tools.Map{"uuid": cls.OrganizationParagraphUUID}).
+		Prepare().
+		First(&cls.OrganizationParagraph)
+	abnormals.PanicWhenIsEmpty(ret, "站段")
 	if len(cls.OrganizationSectionUUIDs) > 0 {
 		models.Init(models.OrganizationSectionModel{}).DB().Where("uuid in ?", cls.OrganizationSectionUUIDs).Find(&cls.OrganizationSections)
 	}
@@ -78,13 +83,15 @@ func (OrganizationWorkshopRouter) Load(router *gin.Engine) {
 	{
 		// 新建
 		r.POST("workshop", func(ctx *gin.Context) {
-			var ret *gorm.DB
+			var (
+				ret *gorm.DB
+				repeat models.OrganizationWorkshopModel
+			)
 
 			// 表单
 			form := (&OrganizationWorkshopStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			var repeat models.OrganizationWorkshopModel
 			ret = models.Init(models.OrganizationWorkshopModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
@@ -116,10 +123,17 @@ func (OrganizationWorkshopRouter) Load(router *gin.Engine) {
 
 		// 删除
 		r.DELETE("workshop/:uuid", func(ctx *gin.Context) {
-			var ret *gorm.DB
+			var (
+				ret                  *gorm.DB
+				organizationWorkshop models.OrganizationWorkshopModel
+			)
 
 			// 查询
-			organizationWorkshop := (&models.OrganizationWorkshopModel{}).FindOneByUUID(ctx.Param("uuid"))
+			ret = models.Init(models.OrganizationWorkshopModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&organizationWorkshop)
+			abnormals.PanicWhenIsEmpty(ret, "车间")
 
 			// 删除
 			if ret = models.Init(models.OrganizationWorkshopModel{}).DB().Delete(&organizationWorkshop); ret.Error != nil {
@@ -131,7 +145,10 @@ func (OrganizationWorkshopRouter) Load(router *gin.Engine) {
 
 		// 编辑
 		r.PUT("workshop/:uuid", func(ctx *gin.Context) {
-			var ret *gorm.DB
+			var (
+				ret                  *gorm.DB
+				organizationWorkshop models.OrganizationWorkshopModel
+			)
 
 			// 表单
 			form := (&OrganizationWorkshopStoreForm{}).ShouldBind(ctx)
@@ -152,7 +169,11 @@ func (OrganizationWorkshopRouter) Load(router *gin.Engine) {
 			abnormals.PanicWhenIsRepeat(ret, "车间名称")
 
 			// 查询
-			organizationWorkshop := (&models.OrganizationWorkshopModel{}).FindOneByUUID(ctx.Param("uuid"))
+			ret = models.Init(models.OrganizationWorkshopModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&organizationWorkshop)
+			abnormals.PanicWhenIsEmpty(ret, "车间")
 
 			// 编辑
 			organizationWorkshop.UniqueCode = form.UniqueCode
@@ -172,12 +193,17 @@ func (OrganizationWorkshopRouter) Load(router *gin.Engine) {
 
 		// 详情
 		r.GET("workshop/:uuid", func(ctx *gin.Context) {
-			organizationWorkshop := (&models.OrganizationWorkshopModel{}).FindOneByUUID(ctx.Param("uuid"))
-			models.Init(models.OrganizationWorkshopModel{}).
+			var (
+				ret                  *gorm.DB
+				organizationWorkshop models.OrganizationWorkshopModel
+			)
+
+			ret = models.Init(models.OrganizationWorkshopModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				SetScopes((&models.BaseModel{}).ScopeBeEnable).
-				SetWheres(tools.Map{"uuid":ctx.Param("uuid")}).
 				Prepare().
 				First(&organizationWorkshop)
+			abnormals.PanicWhenIsEmpty(ret, "车间")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_workshop": organizationWorkshop}))
 		})
@@ -187,8 +213,8 @@ func (OrganizationWorkshopRouter) Load(router *gin.Engine) {
 			var organizationWorkshops []models.OrganizationWorkshopModel
 
 			models.Init(models.OrganizationWorkshopModel{}).
-				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				SetWhereFields("unique_code", "name", "be_enable", "organization_workshop_type_uuid", "organization_paragraph_uuid").
+				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				PrepareQuery(ctx).
 				Find(&organizationWorkshops)
 

@@ -97,13 +97,15 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 	{
 		// 新建角色
 		r.POST("", func(ctx *gin.Context) {
-			var ret *gorm.DB
+			var (
+				ret    *gorm.DB
+				repeat RbacRoleStoreForm
+			)
 
 			// 表单
 			form := (&RbacRoleStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			var repeat RbacRoleStoreForm
 			ret = models.Init(models.RbacRoleModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
@@ -124,9 +126,16 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 
 		// 删除角色
 		r.DELETE(":uuid", func(ctx *gin.Context) {
-			var ret *gorm.DB
+			var (
+				ret      *gorm.DB
+				rbacRole models.RbacRoleModel
+			)
 			// 查询
-			rbacRole := (&models.RbacRoleModel{}).FindOneByUUID(ctx.Param("uuid"))
+			ret = models.Init(models.RbacRoleModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&rbacRole)
+			abnormals.PanicWhenIsEmpty(ret, "角色")
 
 			// 删除
 			if ret = models.Init(models.RbacRoleModel{}).DB().Delete(&rbacRole); ret.Error != nil {
@@ -138,13 +147,15 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 
 		// 编辑角色
 		r.PUT(":uuid", func(ctx *gin.Context) {
-			var ret *gorm.DB
+			var (
+				ret              *gorm.DB
+				rbacRole, repeat models.RbacRoleModel
+			)
 
 			// 表单
 			form := (&RbacRoleStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			var repeat models.RbacRoleModel
 			ret = models.Init(models.RbacRoleModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
@@ -153,7 +164,11 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 			abnormals.PanicWhenIsRepeat(ret, "角色名称")
 
 			// 查询
-			rbacRole := (&models.RbacRoleModel{}).FindOneByUUID(ctx.Param("uuid"))
+			ret = models.Init(models.RbacRoleModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&rbacRole)
+			abnormals.PanicWhenIsEmpty(ret, "角色")
 
 			// 修改
 			rbacRole.Name = form.Name
@@ -164,13 +179,20 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 
 		// 绑定用户
 		r.PUT(":uuid/bindAccounts", func(ctx *gin.Context) {
-			var ret *gorm.DB
+			var (
+				ret      *gorm.DB
+				rbacRole models.RbacRoleModel
+			)
 
 			// 表单
 			form := (&RbacRoleBindAccountsForm{}).ShouldBind(ctx)
 
-			// 获取角色
-			rbacRole := (&models.RbacRoleModel{}).FindOneByUUID(ctx.Param("uuid"))
+			// 查询
+			ret = models.Init(models.RbacRoleModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&rbacRole)
+			abnormals.PanicWhenIsEmpty(ret, "角色")
 
 			// 添加绑定关系
 			rbacRole.Accounts = form.Accounts
@@ -183,13 +205,20 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 
 		// 绑定权限
 		r.PUT(":uuid/bindPermissions", func(ctx *gin.Context) {
-			var ret *gorm.DB
+			var (
+				ret      *gorm.DB
+				rbacRole models.RbacRoleModel
+			)
 
 			// 表单
 			form := (&RbacRoleBindPermissionsForm{}).ShouldBind(ctx)
 
-			// 查询角色
-			rbacRole := (&models.RbacRoleModel{}).FindOneByUUID(ctx.Param("uuid"))
+			// 查询
+			ret = models.Init(models.RbacRoleModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&rbacRole)
+			abnormals.PanicWhenIsEmpty(ret, "角色")
 
 			// 绑定
 			rbacRole.RbacPermissions = form.RbacPermissions
@@ -202,8 +231,10 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 
 		// 角色详情
 		r.GET(":uuid", func(ctx *gin.Context) {
-			var ret *gorm.DB
-			var rbacRole models.RbacRoleModel
+			var (
+				ret      *gorm.DB
+				rbacRole models.RbacRoleModel
+			)
 
 			ret = models.Init(models.RbacRoleModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).

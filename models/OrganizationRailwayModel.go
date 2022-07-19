@@ -1,10 +1,5 @@
 package models
 
-import (
-	"fix-workshop-ue/abnormals"
-	"fix-workshop-ue/tools"
-)
-
 // OrganizationRailwayModel 路局
 type OrganizationRailwayModel struct {
 	BaseModel
@@ -20,16 +15,4 @@ type OrganizationRailwayModel struct {
 // TableName 表名称
 func (cls *OrganizationRailwayModel) TableName() string {
 	return "organization_railways"
-}
-
-// FindOneByUUID 根据UUID获取单条数据
-//  @receiver cls
-//  @param uuid
-//  @return OrganizationRailwayModel
-func (cls OrganizationRailwayModel) FindOneByUUID(uuid string) OrganizationRailwayModel {
-	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
-		panic(abnormals.PanicWhenIsEmpty(ret, "路局"))
-	}
-
-	return cls
 }

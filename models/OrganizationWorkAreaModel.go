@@ -1,10 +1,5 @@
 package models
 
-import (
-	"fix-workshop-ue/abnormals"
-	"fix-workshop-ue/tools"
-)
-
 // OrganizationWorkAreaModel 工区
 type OrganizationWorkAreaModel struct {
 	BaseModel
@@ -25,16 +20,4 @@ type OrganizationWorkAreaModel struct {
 // TableName 表名称
 func (cls *OrganizationWorkAreaModel) TableName() string {
 	return "organization_work_areas"
-}
-
-// FindOneByUUID 根据UUID获取单条数据
-//  @receiver cls
-//  @param uuid
-//  @return OrganizationWorkAreaModel
-func (cls OrganizationWorkAreaModel) FindOneByUUID(uuid string) OrganizationWorkAreaModel {
-	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
-		panic(abnormals.PanicWhenIsEmpty(ret, "工区"))
-	}
-
-	return cls
 }

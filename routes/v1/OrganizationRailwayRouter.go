@@ -62,10 +62,30 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 	{
 		// 新建路局
 		r.POST("railway", func(ctx *gin.Context) {
-			var ret *gorm.DB
+			var (
+				ret    *gorm.DB
+				repeat models.OrganizationRailwayModel
+			)
 
 			// 表单
 			form := (&OrganizationRailwayStoreForm{}).ShouldBind(ctx)
+
+			// 查重
+			ret = models.Init(models.OrganizationRailwayModel{}).
+				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
+				Prepare().
+				First(&repeat)
+			abnormals.PanicWhenIsRepeat(ret, "路局代码")
+			ret = models.Init(models.OrganizationRailwayModel{}).
+				SetWheres(tools.Map{"name": form.Name}).
+				Prepare().
+				First(&repeat)
+			abnormals.PanicWhenIsRepeat(ret, "路局名称")
+			ret = models.Init(models.OrganizationRailwayModel{}).
+				SetWheres(tools.Map{"short_name": form.ShortName}).
+				Prepare().
+				First(&repeat)
+			abnormals.PanicWhenIsRepeat(ret, "路局简称")
 
 			// 新建
 			organizationRailway := &models.OrganizationRailwayModel{
@@ -89,8 +109,12 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 			var ret *gorm.DB
 
 			// 查询
-			organizationRailway := (&models.OrganizationRailwayModel{}).FindOneByUUID(ctx.Param("uuid"))
-
+			var organizationRailway models.OrganizationRailwayModel
+			ret = models.Init(models.OrganizationRailwayModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&organizationRailway)
+			abnormals.PanicWhenIsEmpty(ret, "路局")
 			// 删除
 			if ret = models.Init(models.OrganizationRailwayModel{}).DB().Delete(&organizationRailway); ret.Error != nil {
 				abnormals.PanicForbidden(ret.Error.Error())
@@ -101,13 +125,40 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 
 		// 编辑
 		r.PUT("railway/:uuid", func(ctx *gin.Context) {
-			var ret *gorm.DB
+			var (
+				ret                         *gorm.DB
+				organizationRailway, repeat models.OrganizationRailwayModel
+			)
 
 			// 表单
 			form := (&OrganizationRailwayStoreForm{}).ShouldBind(ctx)
 
+			// 查重
+			ret = models.Init(models.OrganizationRailwayModel{}).
+				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
+				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&repeat)
+			abnormals.PanicWhenIsRepeat(ret, "路局代码")
+			ret = models.Init(models.OrganizationRailwayModel{}).
+				SetWheres(tools.Map{"name": form.Name}).
+				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&repeat)
+			abnormals.PanicWhenIsRepeat(ret, "路局名称")
+			ret = models.Init(models.OrganizationRailwayModel{}).
+				SetWheres(tools.Map{"short_name": form.ShortName}).
+				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&repeat)
+			abnormals.PanicWhenIsRepeat(ret, "路局简称")
+
 			// 查询
-			organizationRailway := (&models.OrganizationRailwayModel{}).FindOneByUUID(ctx.Param("uuid"))
+			ret = models.Init(models.OrganizationRailwayModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&organizationRailway)
+			abnormals.PanicWhenIsEmpty(ret, "路局")
 
 			// 修改
 			organizationRailway.Sort = form.Sort
@@ -126,7 +177,16 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 
 		// 详情
 		r.GET("railway/:uuid", func(ctx *gin.Context) {
-			organizationRailway := (&models.OrganizationRailwayModel{}).FindOneByUUID(ctx.Param("uuid"))
+			var (
+				ret                 *gorm.DB
+				organizationRailway models.OrganizationRailwayModel
+			)
+			ret = models.Init(models.OrganizationRailwayModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				SetScopes((&models.BaseModel{}).ScopeBeEnable).
+				Prepare().
+				First(&organizationRailway)
+			abnormals.PanicWhenIsEmpty(ret, "路局")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_railway": organizationRailway}))
 		})
@@ -137,6 +197,7 @@ func (cls *OrganizationRailwayRouter) Load(router *gin.Engine) {
 
 			models.Init(models.OrganizationRailwayModel{}).
 				SetWhereFields("uuid", "sort", "unique_code", "name", "short_name", "be_enable").
+				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				PrepareQuery(ctx).
 				Find(&organizationRailways)
 

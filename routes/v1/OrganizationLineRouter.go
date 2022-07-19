@@ -69,13 +69,15 @@ func (cls *OrganizationLineRouter) Load(router *gin.Engine) {
 	{
 		// 新建
 		r.POST("line", func(ctx *gin.Context) {
-			var ret *gorm.DB
+			var (
+				ret *gorm.DB
+				repeat models.OrganizationLineModel
+			)
 
 			// 表单
 			form := (&OrganizationLineStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			var repeat models.OrganizationLineModel
 			ret = models.Init(models.OrganizationLineModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
@@ -106,10 +108,16 @@ func (cls *OrganizationLineRouter) Load(router *gin.Engine) {
 
 		// 删除
 		r.DELETE("line/:uuid", func(ctx *gin.Context) {
-			var ret *gorm.DB
-
+			var (
+				ret              *gorm.DB
+				organizationLine models.OrganizationLineModel
+			)
 			// 查询
-			organizationLine := (&models.OrganizationLineModel{}).FindOneByUUID(ctx.Param("uuid"))
+			ret = models.Init(models.OrganizationLineModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&organizationLine)
+			abnormals.PanicWhenIsEmpty(ret, "线别")
 
 			// 删除
 			if ret = models.Init(models.OrganizationLineModel{}).DB().Delete(&organizationLine); ret.Error != nil {
@@ -121,13 +129,15 @@ func (cls *OrganizationLineRouter) Load(router *gin.Engine) {
 
 		// 编辑
 		r.PUT("line/:uuid", func(ctx *gin.Context) {
-			var ret *gorm.DB
+			var (
+				ret                      *gorm.DB
+				organizationLine, repeat models.OrganizationLineModel
+			)
 
 			// 表单
 			form := (&OrganizationLineStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			var repeat models.OrganizationLineModel
 			ret = models.Init(models.OrganizationLineModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
@@ -142,7 +152,11 @@ func (cls *OrganizationLineRouter) Load(router *gin.Engine) {
 			abnormals.PanicWhenIsRepeat(ret, "线别名称")
 
 			// 查询
-			organizationLine := (&models.OrganizationLineModel{}).FindOneByUUID(ctx.Param("uuid"))
+			ret = models.Init(models.OrganizationLineModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&organizationLine)
+			abnormals.PanicWhenIsEmpty(ret, "线别")
 
 			// 修改
 			organizationLine.UniqueCode = form.UniqueCode
@@ -161,7 +175,18 @@ func (cls *OrganizationLineRouter) Load(router *gin.Engine) {
 
 		// 详情
 		r.GET("line/:uuid", func(ctx *gin.Context) {
-			organizationLine := (&models.OrganizationLineModel{}).FindOneByUUID(ctx.Param("uuid"))
+			var (
+				ret              *gorm.DB
+				organizationLine models.OrganizationLineModel
+			)
+			// 查询
+			ret = models.Init(models.OrganizationLineModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				SetScopes((&models.BaseModel{}).ScopeBeEnable).
+				Prepare().
+				First(&organizationLine)
+			abnormals.PanicWhenIsEmpty(ret, "线别")
+
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_line": organizationLine}))
 		})
 
@@ -169,8 +194,8 @@ func (cls *OrganizationLineRouter) Load(router *gin.Engine) {
 		r.GET("line", func(ctx *gin.Context) {
 			var organizationLines []models.OrganizationLineModel
 			models.Init(models.OrganizationLineModel{}).
-				SetScopes((&models.OrganizationLineModel{}).ScopeBeEnable).
 				SetWhereFields("unique_code", "name", "be_enable", "sort").
+				SetScopes((&models.OrganizationLineModel{}).ScopeBeEnable).
 				PrepareQuery(ctx).
 				Find(&organizationLines)
 

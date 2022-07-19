@@ -1,10 +1,5 @@
 package models
 
-import (
-	"fix-workshop-ue/abnormals"
-	"fix-workshop-ue/tools"
-)
-
 // RbacRoleModel 角色模型
 type RbacRoleModel struct {
 	BaseModel
@@ -17,16 +12,4 @@ type RbacRoleModel struct {
 // TableName 表名称
 func (cls *RbacRoleModel) TableName() string {
 	return "rbac_roles"
-}
-
-// FindOneByUUID 根据UUID获取单挑数据
-//  @receiver cls
-//  @param uuid
-//  @return RbacRoleModel
-func (cls RbacRoleModel) FindOneByUUID(uuid string) RbacRoleModel {
-	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
-		panic(abnormals.PanicWhenIsEmpty(ret, "角色"))
-	}
-
-	return cls
 }

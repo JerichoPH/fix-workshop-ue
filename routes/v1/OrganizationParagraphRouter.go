@@ -33,6 +33,7 @@ type OrganizationParagraphStoreForm struct {
 //  @param ctx
 //  @return OrganizationParagraphStoreForm
 func (cls OrganizationParagraphStoreForm) ShouldBind(ctx *gin.Context) OrganizationParagraphStoreForm {
+	var ret *gorm.DB
 	if err := ctx.ShouldBind(&cls); err != nil {
 		abnormals.PanicValidate(err.Error())
 	}
@@ -45,7 +46,11 @@ func (cls OrganizationParagraphStoreForm) ShouldBind(ctx *gin.Context) Organizat
 	if cls.OrganizationRailwayUUID == "" {
 		abnormals.PanicValidate("所属路局必选")
 	}
-	cls.OrganizationRailway = (&models.OrganizationRailwayModel{}).FindOneByUUID(cls.OrganizationRailwayUUID)
+	ret = models.Init(models.OrganizationRailwayModel{}).
+		SetWheres(tools.Map{"uuid": cls.OrganizationRailwayUUID}).
+		Prepare().
+		First(&cls.OrganizationRailway)
+	abnormals.PanicWhenIsEmpty(ret, "路局")
 	if len(cls.OrganizationWorkshopUUIDs) > 0 {
 		models.Init(models.OrganizationWorkshopModel{}).DB().Where("uuid in ?", cls.OrganizationWorkshopUUIDs).Find(&cls.OrganizationWorkshops)
 	}
@@ -68,13 +73,15 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 	{
 		// 新建
 		r.POST("paragraph", func(ctx *gin.Context) {
-			var ret *gorm.DB
+			var (
+				ret *gorm.DB
+				repeat models.OrganizationParagraphModel
+			)
 
 			// 表单
 			form := (&OrganizationParagraphStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			var repeat models.OrganizationParagraphModel
 			ret = models.Init(models.OrganizationParagraphModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
@@ -93,12 +100,12 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 
 			// 新建
 			organizationParagraph := &models.OrganizationParagraphModel{
-				BaseModel:           models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
-				UniqueCode:          form.UniqueCode,
-				Name:                form.Name,
-				ShortName:           form.ShortName,
-				BeEnable:            form.BeEnable,
-				OrganizationRailway: form.OrganizationRailway,
+				BaseModel:             models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
+				UniqueCode:            form.UniqueCode,
+				Name:                  form.Name,
+				ShortName:             form.ShortName,
+				BeEnable:              form.BeEnable,
+				OrganizationRailway:   form.OrganizationRailway,
 				OrganizationWorkshops: form.OrganizationWorkshops,
 				OrganizationLines:     form.OrganizationLines,
 			}
@@ -111,10 +118,17 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 
 		// 删除
 		r.DELETE("paragraph/:uuid", func(ctx *gin.Context) {
-			var ret *gorm.DB
+			var (
+				ret                   *gorm.DB
+				organizationParagraph models.OrganizationParagraphModel
+			)
 
 			// 查询
-			organizationParagraph := (&models.OrganizationParagraphModel{}).FindOneByUUID(ctx.Param("uuid"))
+			ret = models.Init(models.OrganizationRailwayModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&organizationParagraph)
+			abnormals.PanicWhenIsEmpty(ret, "站段")
 
 			// 删除
 			if ret = models.Init(models.OrganizationParagraphModel{}).DB().Delete(&organizationParagraph); ret.Error != nil {
@@ -126,7 +140,10 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 
 		// 编辑
 		r.PUT("paragraph/:uuid", func(ctx *gin.Context) {
-			var ret *gorm.DB
+			var (
+				ret                   *gorm.DB
+				organizationParagraph models.OrganizationParagraphModel
+			)
 
 			// 表单
 			form := (&OrganizationParagraphStoreForm{}).ShouldBind(ctx)
@@ -147,7 +164,11 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 			abnormals.PanicWhenIsRepeat(ret, "站段名称")
 
 			// 查询
-			organizationParagraph := (&models.OrganizationParagraphModel{}).FindOneByUUID(ctx.Param("uuid"))
+			ret = models.Init(models.OrganizationRailwayModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&organizationParagraph)
+			abnormals.PanicWhenIsEmpty(ret, "站段")
 
 			// 编辑
 			organizationParagraph.BaseModel.Sort = form.Sort
@@ -167,7 +188,18 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 
 		// 详情
 		r.GET("paragraph/:uuid", func(ctx *gin.Context) {
-			organizationParagraph := (&models.OrganizationParagraphModel{}).FindOneByUUID(ctx.Param("uuid"))
+			var (
+				ret                   *gorm.DB
+				organizationParagraph models.OrganizationParagraphModel
+			)
+
+			ret = models.Init(models.OrganizationRailwayModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				SetScopes((&models.BaseModel{}).ScopeBeEnable).
+				Prepare().
+				First(&organizationParagraph)
+			abnormals.PanicWhenIsEmpty(ret, "站段")
+
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_paragraph": organizationParagraph}))
 		})
 
@@ -176,6 +208,7 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 			var organizationParagraphs []models.OrganizationParagraphModel
 			models.Init(models.OrganizationParagraphModel{}).
 				SetWhereFields("uuid", "sort", "unique_code", "name", "shot_name", "be_enable", "organization_railway_uuid").
+				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				PrepareQuery(ctx).
 				Find(&organizationParagraphs)
 

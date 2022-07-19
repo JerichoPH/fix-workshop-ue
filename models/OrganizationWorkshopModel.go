@@ -1,10 +1,5 @@
 package models
 
-import (
-	"fix-workshop-ue/abnormals"
-	"fix-workshop-ue/tools"
-)
-
 // OrganizationWorkshopModel 车间
 type OrganizationWorkshopModel struct {
 	BaseModel
@@ -28,18 +23,4 @@ type OrganizationWorkshopModel struct {
 //  @return string
 func (cls *OrganizationWorkshopModel) TableName() string {
 	return "organization_workshops"
-}
-
-// FindOneByUUID 根据UUID获取单条数据
-//  @receiver cls
-//  @param uuid
-//  @return OrganizationWorkshopModel
-func (cls OrganizationWorkshopModel) FindOneByUUID(uuid string) OrganizationWorkshopModel {
-
-
-	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
-		panic(abnormals.PanicWhenIsEmpty(ret, "车间"))
-	}
-
-	return cls
 }
