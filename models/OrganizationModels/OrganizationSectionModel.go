@@ -1,8 +1,10 @@
-package models
+package OrganizationModels
+
+import "fix-workshop-ue/models"
 
 // OrganizationSectionModel 区间
 type OrganizationSectionModel struct {
-	BaseModel
+	models.BaseModel
 	UniqueCode               string                    `gorm:"type:CHAR(6);NOT NULL;COMMENT:区间代码;" json:"unique_code"` // H07675
 	Name                     string                    `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:区间名称;" json:"name"`
 	BeEnable                 bool                      `gorm:"type:BOOLEAN;DEFAULT:1;COMMENT:是否启用;" json:"be_enable"`

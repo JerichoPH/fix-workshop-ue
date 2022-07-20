@@ -1,7 +1,9 @@
-package models
+package RbacModels
+
+import "fix-workshop-ue/models"
 
 type RbacPermissionModel struct {
-	BaseModel
+	models.BaseModel
 	Name                    string                   `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:权限名称;" json:"name"`
 	URI                     string                   `gorm:"type:VARCHAR(128);INDEX;NOT NULL;COMMENT:指向路由;" json:"uri"`
 	Method                  string                   `gorm:"type:VARCHAR(64);INDEX;NOT NULL;COMMENT:请求方法;" json:"method"`
