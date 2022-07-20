@@ -46,10 +46,21 @@ type EntireInstanceModel struct {
 	//EntireInstanceUses             []EntireInstanceUseModel   `gorm:"foreignKey:EntireInstanceIdentityCode;references:IdentityCode;COMMENT:使用信息;" json:"entire_instance_uses"`
 	//EntireInstanceLogs []EntireInstanceLogModel `gorm:"foreignKey:EntireInstanceIdentityCode;references:IdentityCode;COMMENT:相关日志;" json:"entire_instance_logs"`
 	//EntireInstanceRepairs               []EntireInstanceRepairModel    `gorm:"foreignKey:EntireInstanceIdentityCode;references:IdentityCode;COMMENT:相关检修记录;" json:"entire_instance_repairs"`
-	LocationWarehousePositionUUID string                         `gorm:"type:CHAR(36);COMMENT:所属仓库位置代码;" json:"location_warehouse_position_uuid"`
-	LocationWarehousePosition     LocationWarehousePositionModel `gorm:"foreignKey:LocationWarehousePositionUUID;references:UUID;COMMENT:所属仓库位置;" json:"location_warehouse_position"`
-	DeleteOperatorUUID            string                         `gorm:"type:CHAR(36);COMMENT:删除操作人UUID;" json:"delete_operator_uuid"`
-	DeleteOperator                AccountModel                   `gorm:"foreignKey:DeleteOperatorUUID;references:UUID;COMMENT:删除操作人;" json:"delete_operator"`
+	LocationDepotStorehouseUUID string                       `gorm:"type:CHAR(36);COMMENT:所属仓库库房UUID;" json:"location_depot_storehouse_uuid"`
+	LocationDepotStorehouse     LocationDepotStorehouseModel `gorm:"foreignKey:LocationDepotStorehouseUUID;references:UUID;COMMENT:所属仓库库房;" json:"location_depot_storehouse"`
+
+	LocationDepotSectionUUID string                        `gorm:"type:CHAR(36);COMMENT:所属仓库区域UUID;" json:""`
+	LocationDepotSection     LocationDepotSectionModel     `gorm:"foreignKey:LocationDepotSectionUUID;references:UUID;COMMENT:所属库房区域;" json:""`
+	LocationDepotRowUUID     string                        `gorm:"type:CHAR(36);COMMENT:所属仓库排UUID;" json:""`
+	LocationDepotRow         LocationDepotRowModel         `gorm:"foreignKey:LocationDepotRowUUID;references:UUID;COMMENT:所属仓库排;" json:""`
+	LocationDepotCabinetUUID string                        `gorm:"type:CHAR(36);COMMENT:所属仓库柜架UUID;" json:""`
+	LocationDepotCabinet     LocationDepotCabinetModel     `gorm:"foreignKey:LocationDepotCabinetUUID:references:UUID;COMMENT:所属仓库柜架;" json:""`
+	LocationDepotTierUUID    string                        `gorm:"type:CHAR(36);COMMENT:所属仓库柜架层;" json:""`
+	LocationDepotTier        LocationDepotCabinetTierModel `gorm:"foreignKey:LocationDepotCabinetTierUUID;COMMENT:所属仓库柜架层;" json:""`
+	LocationDepotCellUUID    string                        `gorm:"type:CHAR(36);COMMENT:所属仓库位置代码;" json:"location_depot_cell_uuid"`
+	LocationDepotCell        LocationDepotCellsModel       `gorm:"foreignKey:LocationDepotCellUUID;references:UUID;COMMENT:所属仓库位置;" json:"location_depot_cell"`
+	DeleteOperatorUUID       string                        `gorm:"type:CHAR(36);COMMENT:删除操作人UUID;" json:"delete_operator_uuid"`
+	DeleteOperator           AccountModel                  `gorm:"foreignKey:DeleteOperatorUUID;references:UUID;COMMENT:删除操作人;" json:"delete_operator"`
 }
 
 // TableName 表名称

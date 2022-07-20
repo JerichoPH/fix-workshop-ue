@@ -15,6 +15,7 @@ type OrganizationWorkshopModel struct {
 	OrganizationCenters                 []OrganizationCenterModel             `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;NOT NULL;COMMENT:相关中心;" json:"organization_centers"`
 	OrganizationRailroadGradeCrossModel []OrganizationRailroadGradeCrossModel `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;COMMENT:相关道口;" json:"organization_railroad_grade_crosses"`
 	OrganizationStations                []OrganizationStationModel            `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;COMMENT:相关站场;" json:"organization_stations"`
+	LocationDepotStorehouseModel        []LocationDepotStorehouseModel        `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;NOT NULL;COMMENT:相关库房;" json:"location_depot_storehouses"`
 	EntireInstances                     []EntireInstanceModel                 `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;COMMENT:所属器材;" json:"entire_instances"`
 }
 

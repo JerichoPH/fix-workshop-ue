@@ -1,15 +1,15 @@
 package models
 
-type LocationWarehouseShelfModel struct {
+type LocationDepotCabinetModel struct {
 	BaseModel
-	UniqueCode                         string                       `gorm:"type:CHAR(14);UNIQUE;NOT NULL;COMMENT:柜架代码;" json:"unique_code"`
-	Name                               string                       `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:柜架名称;" json:"name"`
-	LocationWarehousePlatoonUniqueCode string                       `gorm:"type:CHAR(10);COMMENT:所属排代码;" json:"location_warehouse_platoon_unique_code"`
-	LocationWarehousePlatoon           LocationDepotRowModel        `gorm:"constraint:OnUpdate:CASCADE;foreignKey:LocationWarehousePlatoonUniqueCode;references:UniqueCode;NOT NULL;COMMENT:所属排;" json:"location_warehouse_platoon"`
-	LocationWarehouseTiers             []LocationWarehouseTierModel `gorm:"constraint:OnUpdate:CASCADE;foreignKey:LocationWarehouseShelfUniqueCode;references:UniqueCode;NOT NULL;COMMENT:相关层;" json:"location_warehouse_tiers"`
+	UniqueCode                string                          `gorm:"type:CHAR(14);UNIQUE;NOT NULL;COMMENT:柜架代码;" json:"unique_code"`
+	Name                      string                          `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:柜架名称;" json:"name"`
+	LocationDepotRowUUID      string                          `gorm:"type:CHAR(36);COMMENT:所属排代码;" json:"location_depot_row_uuid"`
+	LocationDepotRow          LocationDepotRowModel           `gorm:"foreignKey:LocationDepotRowUUID;references:UUID;NOT NULL;COMMENT:所属排;" json:"location_depot_row"`
+	LocationDepotCabinetTiers []LocationDepotCabinetTierModel `gorm:"foreignKey:LocationDepotCabinetUUID;references:UUID;NOT NULL;COMMENT:相关层;" json:"location_depot_tiers"`
 }
 
 // TableName 表名称
-func (cls *LocationWarehouseShelfModel) TableName() string {
-	return "location_warehouse_shelves"
+func (cls *LocationDepotCabinetModel) TableName() string {
+	return "location_depot_cabinets"
 }
