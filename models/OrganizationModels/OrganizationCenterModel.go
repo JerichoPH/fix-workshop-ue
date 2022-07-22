@@ -1,7 +1,9 @@
-package models
+package OrganizationModels
+
+import "fix-workshop-ue/models"
 
 type OrganizationCenterModel struct {
-	BaseModel
+	models.BaseModel
 	UniqueCode               string                    `gorm:"type:CHAR(6);UNIQUE;NOT NULL;COMMENT:中心代码;"` // A12F01
 	Name                     string                    `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:中心名称;"`
 	BeEnable                 bool                      `gorm:"type:BOOLEAN;NOT NULL;DEFAULT:0;COMMENT:是否启用;" json:"be_enable"`

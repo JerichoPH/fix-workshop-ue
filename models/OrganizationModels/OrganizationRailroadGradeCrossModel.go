@@ -1,8 +1,10 @@
-package models
+package OrganizationModels
+
+import "fix-workshop-ue/models"
 
 // OrganizationRailroadGradeCrossModel 道口
 type OrganizationRailroadGradeCrossModel struct {
-	BaseModel
+	models.BaseModel
 	UniqueCode               string                    `gorm:"type:CHAR(5);UNIQUE;NOT NULL;COMMENT:道口代码;" json:"unique_code"` // I0100
 	Name                     string                    `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:道口名称;" json:"name"`
 	BeEnable                 bool                      `gorm:"type:BOOLEAN;NOT NULL;DEFAULT:0;COMMENT:是否启用;" json:"be_enable"`

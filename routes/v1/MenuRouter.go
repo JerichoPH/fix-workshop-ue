@@ -4,6 +4,7 @@ import (
 	"fix-workshop-ue/abnormals"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
+	"fix-workshop-ue/models/RbacModels"
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
@@ -22,7 +23,7 @@ type MenuStoreForm struct {
 	ParentUUID    string   `form:"parent_uuid" json:"parent_uuid"`
 	Icon          string   `form:"icon" json:"icon"`
 	RbacRoleUUIDs []string `form:"rbac_role_uuids" json:"rbac_role_uuids"`
-	RbacRoles     []*models.RbacRoleModel
+	RbacRoles     []*RbacModels.RbacRoleModel
 }
 
 // ShouldBind 绑定表单
@@ -37,7 +38,7 @@ func (cls MenuStoreForm) ShouldBind(ctx *gin.Context) MenuStoreForm {
 		abnormals.PanicValidate("菜单名称必填")
 	}
 	if len(cls.RbacRoleUUIDs) > 0 {
-		models.Init(models.RbacRoleModel{}).DB().Where("uuid in ?", cls.RbacRoleUUIDs).Find(&cls.RbacRoles)
+		models.Init(RbacModels.RbacRoleModel{}).DB().Where("uuid in ?", cls.RbacRoleUUIDs).Find(&cls.RbacRoles)
 	}
 
 	return cls

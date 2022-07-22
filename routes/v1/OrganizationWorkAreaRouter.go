@@ -4,6 +4,7 @@ import (
 	"fix-workshop-ue/abnormals"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
+	"fix-workshop-ue/models/OrganizationModels"
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
@@ -20,13 +21,13 @@ type OrganizationWorkAreaStoreForm struct {
 	Name                         string `form:"name" json:"name"`
 	BeEnable                     bool   `form:"be_enable" json:"be_enable"`
 	OrganizationWorkAreaTypeUUID string `form:"organization_work_area_type_uuid" json:"organization_work_area_type_uuid"`
-	OrganizationWorkAreaType     models.OrganizationWorkAreaTypeModel
+	OrganizationWorkAreaType     OrganizationModels.OrganizationWorkAreaTypeModel
 	OrganizationWorkshopUUID     string `form:"organization_workshop_uuid" json:"organization_workshop_uuid"`
-	OrganizationWorkshop         models.OrganizationWorkshopModel
+	OrganizationWorkshop         OrganizationModels.OrganizationWorkshopModel
 	OrganizationSectionUUIDs     []string `form:"organization_section_uuids" json:"organization_section_uuids"`
-	OrganizationSections         []models.OrganizationSectionModel
+	OrganizationSections         []OrganizationModels.OrganizationSectionModel
 	OrganizationStationUUIDs     []string `form:"organization_station_uuids" json:"organization_station_uuids"`
-	OrganizationStations         []models.OrganizationStationModel
+	OrganizationStations         []OrganizationModels.OrganizationStationModel
 }
 
 // ShouldBind 绑定表单
@@ -48,20 +49,20 @@ func (cls OrganizationWorkAreaStoreForm) ShouldBind(ctx *gin.Context) Organizati
 	if cls.OrganizationWorkAreaTypeUUID == "" {
 		abnormals.PanicValidate("工区类型必选")
 	}
-	cls.OrganizationWorkAreaType = (&models.OrganizationWorkAreaTypeModel{}).FindOneByUUID(cls.OrganizationWorkAreaTypeUUID)
+	cls.OrganizationWorkAreaType = (&OrganizationModels.OrganizationWorkAreaTypeModel{}).FindOneByUUID(cls.OrganizationWorkAreaTypeUUID)
 	if cls.OrganizationWorkshopUUID == "" {
 		abnormals.PanicValidate("所属车间必选")
 	}
-	ret = models.Init(models.OrganizationWorkshopModel{}).
+	ret = models.Init(OrganizationModels.OrganizationWorkshopModel{}).
 		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).
 		Prepare().
 		First(&cls.OrganizationWorkshop)
 	abnormals.PanicWhenIsEmpty(ret, "车间")
 	if len(cls.OrganizationSections) > 0 {
-		models.Init(models.OrganizationSectionModel{}).DB().Where("uuid in ?", cls.OrganizationSectionUUIDs).Find(&cls.OrganizationSections)
+		models.Init(OrganizationModels.OrganizationSectionModel{}).DB().Where("uuid in ?", cls.OrganizationSectionUUIDs).Find(&cls.OrganizationSections)
 	}
 	if len(cls.OrganizationStationUUIDs) > 0 {
-		models.Init(models.OrganizationStationModel{}).DB().Where("uuid in ?", cls.OrganizationStationUUIDs).Find(&cls.OrganizationStations)
+		models.Init(OrganizationModels.OrganizationStationModel{}).DB().Where("uuid in ?", cls.OrganizationStationUUIDs).Find(&cls.OrganizationStations)
 	}
 
 	return cls
@@ -80,27 +81,27 @@ func (cls OrganizationWorkAreaRouter) Load(router *gin.Engine) {
 		// 新建
 		r.POST("workArea", func(ctx *gin.Context) {
 			var (
-				ret *gorm.DB
-				repeat models.OrganizationWorkAreaModel
+				ret    *gorm.DB
+				repeat OrganizationModels.OrganizationWorkAreaModel
 			)
 
 			// 表单
 			form := (&OrganizationWorkAreaStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.OrganizationWorkAreaModel{}).
+			ret = models.Init(OrganizationModels.OrganizationWorkAreaModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
 				First(&repeat)
 			abnormals.PanicWhenIsRepeat(ret, "工区代码")
-			ret = models.Init(models.OrganizationWorkAreaModel{}).
+			ret = models.Init(OrganizationModels.OrganizationWorkAreaModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
 			abnormals.PanicWhenIsRepeat(ret, "工区名称")
 
 			// 新建
-			organizationWorkArea := &models.OrganizationWorkAreaModel{
+			organizationWorkArea := &OrganizationModels.OrganizationWorkAreaModel{
 				BaseModel:                models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
 				UniqueCode:               form.UniqueCode,
 				Name:                     form.Name,
@@ -110,7 +111,7 @@ func (cls OrganizationWorkAreaRouter) Load(router *gin.Engine) {
 				OrganizationSections:     form.OrganizationSections,
 				OrganizationStations:     form.OrganizationStations,
 			}
-			if ret = models.Init(models.OrganizationWorkAreaModel{}).DB().Create(&organizationWorkArea); ret.Error != nil {
+			if ret = models.Init(OrganizationModels.OrganizationWorkAreaModel{}).DB().Create(&organizationWorkArea); ret.Error != nil {
 				abnormals.PanicForbidden(ret.Error.Error())
 			}
 
@@ -121,17 +122,17 @@ func (cls OrganizationWorkAreaRouter) Load(router *gin.Engine) {
 		r.DELETE("workArea/:uuid", func(ctx *gin.Context) {
 			var (
 				ret                  *gorm.DB
-				organizationWorkArea models.OrganizationWorkAreaModel
+				organizationWorkArea OrganizationModels.OrganizationWorkAreaModel
 			)
 			// 查询
-			ret = models.Init(models.OrganizationWorkAreaModel{}).
+			ret = models.Init(OrganizationModels.OrganizationWorkAreaModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&organizationWorkArea)
 			abnormals.PanicWhenIsEmpty(ret, "工区")
 
 			// 删除
-			if ret := models.Init(models.OrganizationWorkAreaModel{}).DB().Delete(&organizationWorkArea); ret.Error != nil {
+			if ret := models.Init(OrganizationModels.OrganizationWorkAreaModel{}).DB().Delete(&organizationWorkArea); ret.Error != nil {
 				abnormals.PanicForbidden(ret.Error.Error())
 			}
 
@@ -142,20 +143,20 @@ func (cls OrganizationWorkAreaRouter) Load(router *gin.Engine) {
 		r.PUT("workArea/:uuid", func(ctx *gin.Context) {
 			var (
 				ret                          *gorm.DB
-				organizationWorkArea, repeat models.OrganizationWorkAreaModel
+				organizationWorkArea, repeat OrganizationModels.OrganizationWorkAreaModel
 			)
 
 			// 表单
 			form := (&OrganizationWorkAreaStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.OrganizationWorkAreaModel{}).
+			ret = models.Init(OrganizationModels.OrganizationWorkAreaModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
 			abnormals.PanicWhenIsRepeat(ret, "工区代码")
-			ret = models.Init(models.OrganizationWorkAreaModel{}).
+			ret = models.Init(OrganizationModels.OrganizationWorkAreaModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
@@ -163,7 +164,7 @@ func (cls OrganizationWorkAreaRouter) Load(router *gin.Engine) {
 			abnormals.PanicWhenIsRepeat(ret, "工区名称")
 
 			// 查询
-			ret = models.Init(models.OrganizationWorkAreaModel{}).
+			ret = models.Init(OrganizationModels.OrganizationWorkAreaModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&organizationWorkArea)
@@ -178,7 +179,7 @@ func (cls OrganizationWorkAreaRouter) Load(router *gin.Engine) {
 			organizationWorkArea.OrganizationWorkshop = form.OrganizationWorkshop
 			organizationWorkArea.OrganizationSections = form.OrganizationSections
 			organizationWorkArea.OrganizationStations = form.OrganizationStations
-			if ret = models.Init(models.OrganizationWorkAreaModel{}).DB().Save(&organizationWorkArea); ret.Error != nil {
+			if ret = models.Init(OrganizationModels.OrganizationWorkAreaModel{}).DB().Save(&organizationWorkArea); ret.Error != nil {
 				abnormals.PanicForbidden(ret.Error.Error())
 			}
 
@@ -189,9 +190,9 @@ func (cls OrganizationWorkAreaRouter) Load(router *gin.Engine) {
 		r.GET("workArea/:uuid", func(ctx *gin.Context) {
 			var (
 				ret                  *gorm.DB
-				organizationWorkArea models.OrganizationWorkAreaModel
+				organizationWorkArea OrganizationModels.OrganizationWorkAreaModel
 			)
-			ret = models.Init(models.OrganizationWorkAreaModel{}).
+			ret = models.Init(OrganizationModels.OrganizationWorkAreaModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				Prepare().
@@ -203,8 +204,8 @@ func (cls OrganizationWorkAreaRouter) Load(router *gin.Engine) {
 
 		// 列表
 		r.GET("workArea", func(ctx *gin.Context) {
-			var organizationWorkAreas []models.OrganizationWorkAreaModel
-			models.Init(models.OrganizationWorkAreaModel{}).
+			var organizationWorkAreas []OrganizationModels.OrganizationWorkAreaModel
+			models.Init(OrganizationModels.OrganizationWorkAreaModel{}).
 				SetWhereFields("unique_code", "name", "be_enable", "organization_work_area_type_uuid", "organization_workshop_uuid").
 				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				PrepareQuery(ctx).

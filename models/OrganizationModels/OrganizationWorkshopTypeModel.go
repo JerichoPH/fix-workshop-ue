@@ -1,13 +1,14 @@
-package models
+package OrganizationModels
 
 import (
 	"fix-workshop-ue/abnormals"
+	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
 )
 
 // OrganizationWorkshopTypeModel 车间类型
 type OrganizationWorkshopTypeModel struct {
-	BaseModel
+	models.BaseModel
 	UniqueCode            string                      `gorm:"type:VARCHAR(64);UNIQUE;NOT NULL;COMMENT:车间类型代码;" json:"unique_code"`
 	Name                  string                      `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:车间类型名称;" json:"name"`
 	Number                string                      `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:车间类型数字代码;" json:"number"`
@@ -24,7 +25,7 @@ func (cls *OrganizationWorkshopTypeModel) TableName() string {
 //  @param uuid
 //  @return OrganizationWorkshopTypeModel
 func (cls OrganizationWorkshopTypeModel) FindOneByUUID(uuid string) OrganizationWorkshopTypeModel {
-	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
+	if ret := models.Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
 		panic(abnormals.PanicWhenIsEmpty(ret, "车间类型"))
 	}
 
