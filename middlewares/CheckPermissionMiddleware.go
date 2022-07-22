@@ -3,7 +3,6 @@ package middlewares
 import (
 	"fix-workshop-ue/abnormals"
 	"fix-workshop-ue/models"
-	"fix-workshop-ue/models/RbacModels"
 	"fix-workshop-ue/settings"
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
@@ -24,7 +23,7 @@ func CheckPermission() gin.HandlerFunc {
 			var ret *gorm.DB
 
 			// 获取权限
-			var rbacPermission RbacModels.RbacPermissionModel
+			var rbacPermission models.RbacPermissionModel
 			ret = (&models.BaseModel{}).
 				SetPreloads("RbacRoles").
 				SetWheres(tools.Map{

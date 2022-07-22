@@ -4,8 +4,6 @@ import (
 	"context"
 	"fix-workshop-ue/databases"
 	"fix-workshop-ue/models"
-	"fix-workshop-ue/models/OrganizationModels"
-	"fix-workshop-ue/models/RbacModels"
 	v1 "fix-workshop-ue/routes/v1"
 	"fix-workshop-ue/settings"
 	"fmt"
@@ -75,22 +73,22 @@ func main() {
 		AutoMigrate(
 			// 用户与权鉴
 			&models.AccountModel{},                 // 用户
-			&RbacModels.RbacRoleModel{},            // 角色
-			&RbacModels.RbacPermissionModel{},      // 权限
-			&RbacModels.RbacPermissionGroupModel{}, //权限分组
+			&models.RbacRoleModel{},            // 角色
+			&models.RbacPermissionModel{},      // 权限
+			&models.RbacPermissionGroupModel{}, //权限分组
 
 			// 组织机构
-			&OrganizationModels.OrganizationRailwayModel{},            //路局
-			&OrganizationModels.OrganizationParagraphModel{},          // 站段
-			&OrganizationModels.OrganizationLineModel{},               // 线别
-			&OrganizationModels.OrganizationWorkshopTypeModel{},       // 车间类型
-			&OrganizationModels.OrganizationWorkshopModel{},           // 车间
-			&OrganizationModels.OrganizationWorkAreaTypeModel{},       // 工区类型
-			&OrganizationModels.OrganizationWorkAreaModel{},           // 工区
-			&OrganizationModels.OrganizationSectionModel{},            // 区间
-			&OrganizationModels.OrganizationCenterModel{},             // 中心
-			&OrganizationModels.OrganizationRailroadGradeCrossModel{}, // 道口
-			&OrganizationModels.OrganizationStationModel{},            // 站场
+			&models.OrganizationRailwayModel{},            //路局
+			&models.OrganizationParagraphModel{},          // 站段
+			&models.OrganizationLineModel{},               // 线别
+			&models.OrganizationWorkshopTypeModel{},       // 车间类型
+			&models.OrganizationWorkshopModel{},           // 车间
+			&models.OrganizationWorkAreaTypeModel{},       // 工区类型
+			&models.OrganizationWorkAreaModel{},           // 工区
+			&models.OrganizationSectionModel{},            // 区间
+			&models.OrganizationCenterModel{},             // 中心
+			&models.OrganizationRailroadGradeCrossModel{}, // 道口
+			&models.OrganizationStationModel{},            // 站场
 
 			// 位置
 			&models.LocationIndoorRoomTypeModel{}, // 机房类型

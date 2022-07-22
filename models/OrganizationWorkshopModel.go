@@ -1,13 +1,8 @@
-package OrganizationModels
-
-import (
-	"fix-workshop-ue/models"
-	"fix-workshop-ue/models/EntireInstanceModels"
-)
+package models
 
 // OrganizationWorkshopModel 车间
 type OrganizationWorkshopModel struct {
-	models.BaseModel
+	BaseModel
 	UniqueCode                          string                                     `gorm:"type:CHAR(7);UNIQUE;NOT NULL;COMMENT:车间代码;" json:"unique_code"`
 	Name                                string                                     `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:车间名称;" json:"name"`
 	BeEnable                            bool                                       `gorm:"type:BOOLEAN;DEFAULT:1;COMMENT:是否启用;" json:"be_enable"`
@@ -20,7 +15,7 @@ type OrganizationWorkshopModel struct {
 	OrganizationCenters                 []OrganizationCenterModel                  `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;NOT NULL;COMMENT:相关中心;" json:"organization_centers"`
 	OrganizationRailroadGradeCrossModel []OrganizationRailroadGradeCrossModel      `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;COMMENT:相关道口;" json:"organization_railroad_grade_crosses"`
 	OrganizationStations                []OrganizationStationModel                 `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;COMMENT:相关站场;" json:"organization_stations"`
-	EntireInstances                     []EntireInstanceModels.EntireInstanceModel `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;COMMENT:所属器材;" json:"entire_instances"`
+	EntireInstances                     []EntireInstanceModel `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;COMMENT:所属器材;" json:"entire_instances"`
 }
 
 // TableName 表名称

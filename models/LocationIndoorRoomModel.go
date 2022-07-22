@@ -1,6 +1,5 @@
 package models
 
-import "fix-workshop-ue/models/OrganizationModels"
 
 type LocationIndoorRoomModel struct {
 	BaseModel
@@ -9,7 +8,7 @@ type LocationIndoorRoomModel struct {
 	LocationIndoorRoomTypeUUID string                                      `gorm:"type:CHAR(36);COMMENT:所属机房类型;" json:"location_indoor_room_type_uuid"`
 	LocationIndoorRoomType     LocationIndoorRoomTypeModel                 `gorm:"foreignKey:LocationIndoorRoomTypeUUID;references:UUID;COMMENT:所属机房类型;" json:"location_indoor_room_type"`
 	OrganizationStationUUID    string                                      `gorm:"type:CHAR(36);COMMENT:所属车站代码;" json:"organization_station_uuid"`
-	OrganizationStation        OrganizationModels.OrganizationStationModel `gorm:"foreignKey:OrganizationStationUUID;references:UUID;COMMENT:所属车站;" json:"organization_station"`
+	OrganizationStation        OrganizationStationModel `gorm:"foreignKey:OrganizationStationUUID;references:UUID;COMMENT:所属车站;" json:"organization_station"`
 	LocationIndoorRows         []LocationIndoorRowModel                    `gorm:"foreignKey:LocationIndoorRoomUUID;references:UUID;COMMENT:相关排;" json:"location_indoor_rows"`
 }
 

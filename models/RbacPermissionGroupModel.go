@@ -1,11 +1,9 @@
-package RbacModels
-
-import "fix-workshop-ue/models"
+package models
 
 type RbacPermissionGroupModel struct {
-	models.BaseModel
+	BaseModel
 	Name            string                 `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:权限分组名称;" json:"name"`
-	RbacPermissions []*RbacPermissionModel `gorm:"constraint:OnUpdate:CASCADE;foreignKey:RbacPermissionGroupUUID;references:UUID;COMMENT:相关权限;" json:"rbac_permissions"`
+	RbacPermissions []*RbacPermissionModel `gorm:"foreignKey:RbacPermissionGroupUUID;references:UUID;COMMENT:相关权限;" json:"rbac_permissions"`
 }
 
 // TableName 表名称
