@@ -55,17 +55,7 @@ func main() {
 	// 获取参数
 	setting := (&settings.Setting{}).Init()
 
-	mssql := (&databases.MsSql{}).GetConn()
-	fmt.Println(mssql)
-
-	//mssqlConn := (&MsSql{
-	//	Schema:   "sqlserver",
-	//	Username: "sa",
-	//	Password: "JW087073yjz..",
-	//	Host:     "127.0.0.1:14332",
-	//	Database: "Dwqcgl",
-	//}).
-	//	InitDB() // 创建mssql链接
+	//mssql := (&databases.MsSql{}).GetConn()
 
 	if errAutoMigrate := (&databases.MySql{}).GetConn().
 		Set("gorm:table_options", "ENGINE=Distributed(cluster, default, hits)").

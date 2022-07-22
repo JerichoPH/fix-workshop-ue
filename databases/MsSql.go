@@ -7,31 +7,34 @@ import (
 	"gorm.io/gorm"
 )
 
-type MsSql struct{
-	Schema string
+type MsSql struct {
+	Schema   string
 	Username string
 	Password string
-	Host string
+	Host     string
+	Port     string
 	Database string
 }
 
 var msSqlConn *gorm.DB
 
-func(cls *MsSql) getConn() (db *gorm.DB){
+func (cls *MsSql) getConn() (db *gorm.DB) {
 	ctf := settings.Setting{}
 	config := ctf.Init()
 
 	cls.Username = config.DB.Section("mssql").Key("username").MustString("sa")
 	cls.Password = config.DB.Section("mssql").Key("password").MustString("JW087073yjz..")
 	cls.Host = config.DB.Section("mssql").Key("host").MustString("127.0.0.1")
+	cls.Port = config.DB.Section("mssql").Key("port").MustString("1433")
 	cls.Database = config.DB.Section("mssql").Key("databases").MustString("Dwqcgl")
 
 	dsn := fmt.Sprintf(
-		"%s://%s:%s@%s?database=%s",
+		"%s://%s:%s@%s:%s?database=%s",
 		cls.Schema,
 		cls.Username,
 		cls.Password,
 		cls.Host,
+		cls.Port,
 		cls.Database,
 	)
 	db, err := gorm.Open(sqlserver.Open(dsn), &gorm.Config{})
