@@ -4,8 +4,6 @@ import (
 	"context"
 	"fix-workshop-ue/databases"
 	"fix-workshop-ue/models"
-	"fix-workshop-ue/models/OrganizationModels"
-	"fix-workshop-ue/models/RbacModels"
 	v1 "fix-workshop-ue/routes/v1"
 	"fix-workshop-ue/settings"
 	"fmt"
@@ -57,6 +55,9 @@ func main() {
 	// 获取参数
 	setting := (&settings.Setting{}).Init()
 
+	mssql := (&databases.MsSql{}).GetConn()
+	fmt.Println(mssql)
+
 	//mssqlConn := (&MsSql{
 	//	Schema:   "sqlserver",
 	//	Username: "sa",
@@ -72,22 +73,22 @@ func main() {
 		AutoMigrate(
 			// 用户与权鉴
 			&models.AccountModel{},                 // 用户
-			&RbacModels.RbacRoleModel{},            // 角色
-			&RbacModels.RbacPermissionModel{},      // 权限
-			&RbacModels.RbacPermissionGroupModel{}, //权限分组
+			&models.RbacRoleModel{},            // 角色
+			&models.RbacPermissionModel{},      // 权限
+			&models.RbacPermissionGroupModel{}, //权限分组
 
 			// 组织机构
-			&OrganizationModels.OrganizationRailwayModel{},            //路局
-			&OrganizationModels.OrganizationParagraphModel{},          // 站段
-			&OrganizationModels.OrganizationLineModel{},               // 线别
-			&OrganizationModels.OrganizationWorkshopTypeModel{},       // 车间类型
-			&OrganizationModels.OrganizationWorkshopModel{},           // 车间
-			&OrganizationModels.OrganizationWorkAreaTypeModel{},       // 工区类型
-			&OrganizationModels.OrganizationWorkAreaModel{},           // 工区
-			&OrganizationModels.OrganizationSectionModel{},            // 区间
-			&OrganizationModels.OrganizationCenterModel{},             // 中心
-			&OrganizationModels.OrganizationRailroadGradeCrossModel{}, // 道口
-			&OrganizationModels.OrganizationStationModel{},            // 站场
+			&models.OrganizationRailwayModel{},            //路局
+			&models.OrganizationParagraphModel{},          // 站段
+			&models.OrganizationLineModel{},               // 线别
+			&models.OrganizationWorkshopTypeModel{},       // 车间类型
+			&models.OrganizationWorkshopModel{},           // 车间
+			&models.OrganizationWorkAreaTypeModel{},       // 工区类型
+			&models.OrganizationWorkAreaModel{},           // 工区
+			&models.OrganizationSectionModel{},            // 区间
+			&models.OrganizationCenterModel{},             // 中心
+			&models.OrganizationRailroadGradeCrossModel{}, // 道口
+			&models.OrganizationStationModel{},            // 站场
 
 			// 位置
 			&models.LocationIndoorRoomTypeModel{}, // 机房类型
@@ -124,7 +125,7 @@ func main() {
 	(&v1.OrganizationSectionRouter{}).Load(router)            // 区间
 	(&v1.OrganizationCenterRouter{}).Load(router)             // 中心
 	(&v1.OrganizationRailroadGradeCrossRouter{}).Load(router) // 道口
-	(&v1.OrganizationStationRouter{}).Load(router)      // 站场
+	(&v1.OrganizationStationRouter{}).Load(router)            // 站场
 
 	initServer(router, setting.App.Section("app").Key("addr").MustString(":8080")) // 启动服务
 }

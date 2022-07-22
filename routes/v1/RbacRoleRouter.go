@@ -4,7 +4,6 @@ import (
 	"fix-workshop-ue/abnormals"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
-	"fix-workshop-ue/models/RbacModels"
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
@@ -67,7 +66,7 @@ func (cls RbacRoleBindAccountsForm) ShouldBind(ctx *gin.Context) RbacRoleBindAcc
 // RbacRoleBindPermissionsForm 角色绑定权限表单
 type RbacRoleBindPermissionsForm struct {
 	RbacPermissionUUIDs []string `form:"rbac_permission_uuids" json:"rbac_permission_uuids"`
-	RbacPermissions     []*RbacModels.RbacPermissionModel
+	RbacPermissions     []*models.RbacPermissionModel
 }
 
 // ShouldBind 表单绑定
@@ -80,7 +79,7 @@ func (cls RbacRoleBindPermissionsForm) ShouldBind(ctx *gin.Context) RbacRoleBind
 	}
 
 	if len(cls.RbacPermissionUUIDs) > 0 {
-		models.Init(RbacModels.RbacPermissionModel{}).
+		models.Init(models.RbacPermissionModel{}).
 			DB().
 			Where("uuid in ?", cls.RbacPermissionUUIDs).
 			Find(&cls.RbacPermissions)
@@ -107,18 +106,18 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 			form := (&RbacRoleStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(RbacModels.RbacRoleModel{}).
+			ret = models.Init(models.RbacRoleModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
 			abnormals.PanicWhenIsRepeat(ret, "角色名称")
 
 			// 新建
-			rbacRole := &RbacModels.RbacRoleModel{
+			rbacRole := &models.RbacRoleModel{
 				BaseModel: models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
 				Name:      form.Name,
 			}
-			if ret = models.Init(RbacModels.RbacRoleModel{}).DB().Create(rbacRole); ret.Error != nil {
+			if ret = models.Init(models.RbacRoleModel{}).DB().Create(rbacRole); ret.Error != nil {
 				abnormals.PanicForbidden(ret.Error.Error())
 			}
 
@@ -129,17 +128,17 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 		r.DELETE(":uuid", func(ctx *gin.Context) {
 			var (
 				ret      *gorm.DB
-				rbacRole RbacModels.RbacRoleModel
+				rbacRole models.RbacRoleModel
 			)
 			// 查询
-			ret = models.Init(RbacModels.RbacRoleModel{}).
+			ret = models.Init(models.RbacRoleModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&rbacRole)
 			abnormals.PanicWhenIsEmpty(ret, "角色")
 
 			// 删除
-			if ret = models.Init(RbacModels.RbacRoleModel{}).DB().Delete(&rbacRole); ret.Error != nil {
+			if ret = models.Init(models.RbacRoleModel{}).DB().Delete(&rbacRole); ret.Error != nil {
 				abnormals.PanicForbidden(ret.Error.Error())
 			}
 
@@ -150,14 +149,14 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 		r.PUT(":uuid", func(ctx *gin.Context) {
 			var (
 				ret              *gorm.DB
-				rbacRole, repeat RbacModels.RbacRoleModel
+				rbacRole, repeat models.RbacRoleModel
 			)
 
 			// 表单
 			form := (&RbacRoleStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(RbacModels.RbacRoleModel{}).
+			ret = models.Init(models.RbacRoleModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
@@ -165,7 +164,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 			abnormals.PanicWhenIsRepeat(ret, "角色名称")
 
 			// 查询
-			ret = models.Init(RbacModels.RbacRoleModel{}).
+			ret = models.Init(models.RbacRoleModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&rbacRole)
@@ -173,7 +172,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 
 			// 修改
 			rbacRole.Name = form.Name
-			models.Init(RbacModels.RbacRoleModel{}).DB().Save(&rbacRole)
+			models.Init(models.RbacRoleModel{}).DB().Save(&rbacRole)
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"rbac_role": rbacRole}))
 		})
@@ -182,14 +181,14 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 		r.PUT(":uuid/bindAccounts", func(ctx *gin.Context) {
 			var (
 				ret      *gorm.DB
-				rbacRole RbacModels.RbacRoleModel
+				rbacRole models.RbacRoleModel
 			)
 
 			// 表单
 			form := (&RbacRoleBindAccountsForm{}).ShouldBind(ctx)
 
 			// 查询
-			ret = models.Init(RbacModels.RbacRoleModel{}).
+			ret = models.Init(models.RbacRoleModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&rbacRole)
@@ -197,7 +196,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 
 			// 添加绑定关系
 			rbacRole.Accounts = form.Accounts
-			if ret = models.Init(RbacModels.RbacRoleModel{}).DB().Save(&rbacRole); ret.Error != nil {
+			if ret = models.Init(models.RbacRoleModel{}).DB().Save(&rbacRole); ret.Error != nil {
 				abnormals.PanicForbidden(ret.Error.Error())
 			}
 
@@ -208,14 +207,14 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 		r.PUT(":uuid/bindPermissions", func(ctx *gin.Context) {
 			var (
 				ret      *gorm.DB
-				rbacRole RbacModels.RbacRoleModel
+				rbacRole models.RbacRoleModel
 			)
 
 			// 表单
 			form := (&RbacRoleBindPermissionsForm{}).ShouldBind(ctx)
 
 			// 查询
-			ret = models.Init(RbacModels.RbacRoleModel{}).
+			ret = models.Init(models.RbacRoleModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&rbacRole)
@@ -223,7 +222,7 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 
 			// 绑定
 			rbacRole.RbacPermissions = form.RbacPermissions
-			if ret = models.Init(RbacModels.RbacRoleModel{}).DB().Save(&rbacRole); ret.Error != nil {
+			if ret = models.Init(models.RbacRoleModel{}).DB().Save(&rbacRole); ret.Error != nil {
 				abnormals.PanicForbidden(ret.Error.Error())
 			}
 
@@ -234,10 +233,10 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 		r.GET(":uuid", func(ctx *gin.Context) {
 			var (
 				ret      *gorm.DB
-				rbacRole RbacModels.RbacRoleModel
+				rbacRole models.RbacRoleModel
 			)
 
-			ret = models.Init(RbacModels.RbacRoleModel{}).
+			ret = models.Init(models.RbacRoleModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				SetPreloads(
 					"RbacPermissions",
@@ -255,8 +254,8 @@ func (cls *RbacRoleRouter) Load(router *gin.Engine) {
 
 		// 角色列表
 		r.GET("", func(ctx *gin.Context) {
-			var rbacRoles []RbacModels.RbacRoleModel
-			models.Init(RbacModels.RbacRoleModel{}).
+			var rbacRoles []models.RbacRoleModel
+			models.Init(models.RbacRoleModel{}).
 				PrepareQuery(ctx).
 				Find(&rbacRoles)
 

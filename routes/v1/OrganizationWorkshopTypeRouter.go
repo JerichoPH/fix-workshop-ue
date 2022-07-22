@@ -4,7 +4,6 @@ import (
 	"fix-workshop-ue/abnormals"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
-	"fix-workshop-ue/models/OrganizationModels"
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
@@ -58,25 +57,25 @@ func (OrganizationWorkshopTypeRouter) Load(router *gin.Engine) {
 			form := (&OrganizationWorkshopTypeStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(OrganizationModels.OrganizationWorkshopTypeModel{}).
+			ret = models.Init(models.OrganizationWorkshopTypeModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
-				First(&OrganizationModels.OrganizationWorkAreaTypeModel{})
+				First(&models.OrganizationWorkAreaTypeModel{})
 			abnormals.PanicWhenIsRepeat(ret, "车间类型代码")
-			ret = models.Init(OrganizationModels.OrganizationWorkshopTypeModel{}).
+			ret = models.Init(models.OrganizationWorkshopTypeModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
-				First(&OrganizationModels.OrganizationWorkshopTypeModel{})
+				First(&models.OrganizationWorkshopTypeModel{})
 			abnormals.PanicWhenIsRepeat(ret, "车间类型名称")
 
 			// 新建
-			organizationWorkshopType := &OrganizationModels.OrganizationWorkshopTypeModel{
+			organizationWorkshopType := &models.OrganizationWorkshopTypeModel{
 				BaseModel:  models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
 				UniqueCode: form.UniqueCode,
 				Name:       form.Name,
 				Number:     form.Number,
 			}
-			if ret = models.Init(OrganizationModels.OrganizationWorkshopTypeModel{}).DB().Create(&organizationWorkshopType); ret.Error != nil {
+			if ret = models.Init(models.OrganizationWorkshopTypeModel{}).DB().Create(&organizationWorkshopType); ret.Error != nil {
 				abnormals.PanicForbidden(ret.Error.Error())
 			}
 
@@ -88,10 +87,10 @@ func (OrganizationWorkshopTypeRouter) Load(router *gin.Engine) {
 			var ret *gorm.DB
 
 			// 查询
-			organizationWorkshopType := (&OrganizationModels.OrganizationWorkshopTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
+			organizationWorkshopType := (&models.OrganizationWorkshopTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 删除
-			if ret = models.Init(OrganizationModels.OrganizationWorkshopTypeModel{}).DB().Delete(&organizationWorkshopType); ret.Error != nil {
+			if ret = models.Init(models.OrganizationWorkshopTypeModel{}).DB().Delete(&organizationWorkshopType); ret.Error != nil {
 				abnormals.PanicForbidden(ret.Error.Error())
 			}
 
@@ -106,43 +105,43 @@ func (OrganizationWorkshopTypeRouter) Load(router *gin.Engine) {
 			form := (&OrganizationWorkshopTypeStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(OrganizationModels.OrganizationWorkshopTypeModel{}).
+			ret = models.Init(models.OrganizationWorkshopTypeModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
-				First(&OrganizationModels.OrganizationWorkAreaTypeModel{})
+				First(&models.OrganizationWorkAreaTypeModel{})
 			abnormals.PanicWhenIsRepeat(ret, "车间类型代码")
-			ret = models.Init(OrganizationModels.OrganizationWorkshopTypeModel{}).
+			ret = models.Init(models.OrganizationWorkshopTypeModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
-				First(&OrganizationModels.OrganizationWorkshopTypeModel{})
+				First(&models.OrganizationWorkshopTypeModel{})
 			abnormals.PanicWhenIsRepeat(ret, "车间类型名称")
 
 			// 查询
-			organizationWorkshopType := (&OrganizationModels.OrganizationWorkshopTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
+			organizationWorkshopType := (&models.OrganizationWorkshopTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 编辑
 			organizationWorkshopType.BaseModel.Sort = form.Sort
 			organizationWorkshopType.UniqueCode = form.UniqueCode
 			organizationWorkshopType.Name = form.Name
 			organizationWorkshopType.Number = form.Number
-			models.Init(OrganizationModels.OrganizationWorkshopTypeModel{}).DB().Save(&organizationWorkshopType)
+			models.Init(models.OrganizationWorkshopTypeModel{}).DB().Save(&organizationWorkshopType)
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"organization_workshop_type": organizationWorkshopType}))
 		})
 
 		// 详情
 		r.GET("workshopType/:uuid", func(ctx *gin.Context) {
-			organizationWorkshopType := (&OrganizationModels.OrganizationWorkshopTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
+			organizationWorkshopType := (&models.OrganizationWorkshopTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_workshop_type": organizationWorkshopType}))
 		})
 
 		// 列表
 		r.GET("workshopType", func(ctx *gin.Context) {
-			var organizationWorkshopTypes []OrganizationModels.OrganizationWorkshopTypeModel
-			models.Init(OrganizationModels.OrganizationWorkshopTypeModel{}).
+			var organizationWorkshopTypes []models.OrganizationWorkshopTypeModel
+			models.Init(models.OrganizationWorkshopTypeModel{}).
 				SetWhereFields("sort", "unique_code", "name", "number").
 				PrepareQuery(ctx).
 				Find(&organizationWorkshopTypes)

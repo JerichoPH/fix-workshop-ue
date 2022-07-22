@@ -1,9 +1,7 @@
-package OrganizationModels
-
-import "fix-workshop-ue/models"
+package models
 
 type OrganizationLineModel struct {
-	models.BaseModel
+	BaseModel
 	UniqueCode             string                        `gorm:"type:CHAR(5);UNIQUE;NOT NULL;COMMENT:线别代码;" json:"unique_code"` // E0001
 	Name                   string                        `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:线别名称;" json:"name"`
 	BeEnable               bool                          `gorm:"type:BOOLEAN;NOT NULL;DEFAULT:1;COMMENT:是否启用;" json:"be_enable"`

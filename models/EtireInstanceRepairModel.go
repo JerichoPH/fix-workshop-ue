@@ -1,12 +1,11 @@
-package EntireInstanceModels
+package models
 
 import (
-	"fix-workshop-ue/models"
 	"time"
 )
 
 type EntireInstanceRepairModel struct {
-	models.BaseModel
+	BaseModel
 	EntireInstanceIdentityCode string              `gorm:"type:VARCHAR(19);NOT NULL;COMMENT:所属器材唯一编号;" json:"entire_instance_identity_code"`
 	EntireInstance             EntireInstanceModel `gorm:"constraint:OnUpdate:CASCADE;foreignKey:EntireInstanceIdentityCode;references:IdentityCode;COMMENT:所属器材;" json:"entire_instance"`
 	FixerName                  string              `gorm:"type:VARCHAR(64);COMMENT:检修人;" json:"fixer_name"`
