@@ -19,7 +19,7 @@ type MySql struct {
 
 var mySqlConn *gorm.DB
 
-func (cls *MySql) getMySqlConn() (tx *gorm.DB) {
+func (cls *MySql) getConn() (db *gorm.DB) {
 	ctf := settings.Setting{}
 	config := ctf.Init()
 
@@ -45,7 +45,7 @@ func (cls *MySql) getMySqlConn() (tx *gorm.DB) {
 		DisableForeignKeyConstraintWhenMigrating: true,
 	})
 
-	tx = mySqlConn.Session(&gorm.Session{
+	db = mySqlConn.Session(&gorm.Session{
 		SkipDefaultTransaction: true,
 		QueryFields:            true,
 		PrepareStmt:            true,
@@ -57,12 +57,12 @@ func (cls *MySql) getMySqlConn() (tx *gorm.DB) {
 // GetConn 获取数据库链接
 func (cls *MySql) GetConn() *gorm.DB {
 	if mySqlConn == nil {
-		mySqlConn = cls.getMySqlConn()
+		mySqlConn = cls.getConn()
 	}
 	return mySqlConn
 }
 
-// GetNewConn 获取新数据库链接
-func (cls *MySql) GetNewConn() *gorm.DB {
-	return cls.getMySqlConn()
+// NewConn 获取新数据库链接
+func (cls *MySql) NewConn() *gorm.DB {
+	return cls.getConn()
 }

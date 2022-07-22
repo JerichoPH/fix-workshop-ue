@@ -55,6 +55,9 @@ func main() {
 	// 获取参数
 	setting := (&settings.Setting{}).Init()
 
+	mssql := (&databases.MsSql{}).GetConn()
+	fmt.Println(mssql)
+
 	//mssqlConn := (&MsSql{
 	//	Schema:   "sqlserver",
 	//	Username: "sa",
@@ -122,7 +125,7 @@ func main() {
 	(&v1.OrganizationSectionRouter{}).Load(router)            // 区间
 	(&v1.OrganizationCenterRouter{}).Load(router)             // 中心
 	(&v1.OrganizationRailroadGradeCrossRouter{}).Load(router) // 道口
-	(&v1.OrganizationStationRouter{}).Load(router)      // 站场
+	(&v1.OrganizationStationRouter{}).Load(router)            // 站场
 
 	initServer(router, setting.App.Section("app").Key("addr").MustString(":8080")) // 启动服务
 }
