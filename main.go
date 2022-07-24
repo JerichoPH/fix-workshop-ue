@@ -55,8 +55,6 @@ func main() {
 	// 获取参数
 	setting := (&settings.Setting{}).Init()
 
-	//mssql := (&databases.MsSql{}).GetConn()
-
 	if errAutoMigrate := (&databases.MySql{}).GetConn().
 		Set("gorm:table_options", "ENGINE=Distributed(cluster, default, hits)").
 		Set("gorm:table_options", "ENGINE=InnoDB").
