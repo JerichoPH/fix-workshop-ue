@@ -60,7 +60,7 @@ func main() {
 		Set("gorm:table_options", "ENGINE=InnoDB").
 		AutoMigrate(
 			// 用户与权鉴
-			&models.AccountModel{},                 // 用户
+			&models.AccountModel{},             // 用户
 			&models.RbacRoleModel{},            // 角色
 			&models.RbacPermissionModel{},      // 权限
 			&models.RbacPermissionGroupModel{}, //权限分组
@@ -78,13 +78,21 @@ func main() {
 			&models.OrganizationRailroadGradeCrossModel{}, // 道口
 			&models.OrganizationStationModel{},            // 站场
 
-			// 位置
-			&models.LocationIndoorRoomTypeModel{}, // 机房类型
-			&models.LocationIndoorRoomModel{},     // 机房
-			&models.LocationIndoorRowModel{},      // 排
-			&models.LocationIndoorCabinetModel{},  // 架
-			&models.LocationIndoorTierModel{},     // 层
-			&models.LocationIndoorCellModel{},     // 位
+			// 仓储
+			&models.LocationDepotStorehouseModel{}, // 仓储仓库
+			&models.LocationDepotSectionModel{},    // 仓储仓库区域
+			&models.LocationDepotRowModel{},        // 仓储仓库排
+			&models.LocationDepotCabinetModel{},    // 仓储柜架
+			&models.LocationDepotTierModel{},       // 仓储柜架层
+			&models.LocationDepotCellModel{},       // 仓储柜架格位
+
+			// 室内上道位置
+			&models.LocationIndoorRoomTypeModel{},  // 机房类型
+			&models.LocationIndoorRoomModel{},      // 机房
+			&models.LocationIndoorRowModel{},       // 排
+			&models.LocationIndoorCabinetModel{},   // 架
+			&models.LocationIndoorTierModel{},      // 层
+			&models.LocationIndoorCellModel{},      // 位
 
 		); errAutoMigrate != nil {
 		fmt.Println("自动迁移错误：", errAutoMigrate)
