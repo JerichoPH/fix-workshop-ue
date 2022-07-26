@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"fix-workshop-ue/abnormals"
+	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/settings"
 	"fix-workshop-ue/tools"
@@ -17,7 +17,7 @@ func CheckJwt() gin.HandlerFunc {
 		// 获取令牌
 		split := strings.Split(tools.GetJwtFromHeader(ctx), " ")
 		if len(split) != 2 {
-			abnormals.PanicUnAuth("令牌格式错误")
+			wrongs.PanicUnAuth("令牌格式错误")
 		}
 		tokenType := split[0]
 		token := split[1]
@@ -27,7 +27,7 @@ func CheckJwt() gin.HandlerFunc {
 		if cfg.App.Section("app").Key("production").MustBool(true) {
 			var account models.AccountModel
 			if token == "" {
-				abnormals.PanicUnAuth("令牌不存在")
+				wrongs.PanicUnAuth("令牌不存在")
 			} else {
 				switch tokenType {
 				case "JWT":
@@ -35,14 +35,14 @@ func CheckJwt() gin.HandlerFunc {
 
 					// 判断令牌是否有效
 					if err != nil {
-						abnormals.PanicUnAuth("令牌解析失败")
+						wrongs.PanicUnAuth("令牌解析失败")
 					} else if time.Now().Unix() > claims.ExpiresAt {
-						abnormals.PanicUnAuth("令牌过期")
+						wrongs.PanicUnAuth("令牌过期")
 					}
 
 					// 判断用户是否存在
 					if reflect.DeepEqual(claims, tools.Claims{}) {
-						abnormals.PanicUnAuth("令牌解析失败：用户不存在")
+						wrongs.PanicUnAuth("令牌解析失败：用户不存在")
 					}
 
 					// 获取用户信息
@@ -53,9 +53,9 @@ func CheckJwt() gin.HandlerFunc {
 						Prepare().
 						First(&account)
 
-					abnormals.PanicWhenIsEmpty(ret, "用户")
+					wrongs.PanicWhenIsEmpty(ret, "用户")
 				default:
-					abnormals.PanicForbidden("权鉴认证方式不支持")
+					wrongs.PanicForbidden("权鉴认证方式不支持")
 				}
 			}
 			ctx.Set("__ACCOUNT__", account.UUID)

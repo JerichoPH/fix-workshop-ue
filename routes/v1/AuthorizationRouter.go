@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"fix-workshop-ue/abnormals"
+	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -26,19 +26,19 @@ type AuthorizationRegisterForm struct {
 //  @return AuthorizationRegisterForm
 func (cls AuthorizationRegisterForm) ShouldBind(ctx *gin.Context) AuthorizationRegisterForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		abnormals.PanicValidate(err.Error())
+		wrongs.PanicValidate(err.Error())
 	}
 	if cls.Username == "" {
-		abnormals.PanicValidate("账号必填")
+		wrongs.PanicValidate("账号必填")
 	}
 	if cls.Password == "" {
-		abnormals.PanicValidate("密码必填")
+		wrongs.PanicValidate("密码必填")
 	}
 	if len(cls.Password) < 6 || len(cls.Password) > 18 {
-		abnormals.PanicValidate("密码不可小于6位或大于18位")
+		wrongs.PanicValidate("密码不可小于6位或大于18位")
 	}
 	if cls.Password != cls.PasswordConfirmation {
-		abnormals.PanicValidate("两次密码输入不一致")
+		wrongs.PanicValidate("两次密码输入不一致")
 	}
 
 	return cls
@@ -52,16 +52,16 @@ type AuthorizationLoginForm struct {
 
 func (cls AuthorizationLoginForm) ShouldBind(ctx *gin.Context) AuthorizationLoginForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		abnormals.PanicValidate(err.Error())
+		wrongs.PanicValidate(err.Error())
 	}
 	if cls.Username == "" {
-		abnormals.PanicValidate("账号必填")
+		wrongs.PanicValidate("账号必填")
 	}
 	if cls.Password == "" {
-		abnormals.PanicValidate("密码必填")
+		wrongs.PanicValidate("密码必填")
 	}
 	if len(cls.Password) < 6 || len(cls.Password) > 18 {
-		abnormals.PanicValidate("密码不可小于6位或大于18位")
+		wrongs.PanicValidate("密码不可小于6位或大于18位")
 	}
 
 	return cls
@@ -72,7 +72,7 @@ type AuthorizationRouter struct{}
 // Load 加载路由
 //  @receiver cls
 //  @param router
-func (cls *AuthorizationRouter) Load(router *gin.Engine) {
+func (cls AuthorizationRouter) Load(router *gin.Engine) {
 	r := router.Group("/api/v1/authorization")
 	{
 		// 注册
@@ -87,12 +87,12 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"username": form.Username}).
 				Prepare().
 				First(&repeat)
-			abnormals.PanicWhenIsRepeat(ret, "用户名")
+			wrongs.PanicWhenIsRepeat(ret, "用户名")
 			ret = (&models.BaseModel{}).
 				SetWheres(tools.Map{"nickname": form.Nickname}).
 				Prepare().
 				First(&repeat)
-			abnormals.PanicWhenIsRepeat(ret, "昵称")
+			wrongs.PanicWhenIsRepeat(ret, "昵称")
 
 			// 密码加密
 			bytes, _ := bcrypt.GenerateFromPassword([]byte(form.Password), 14)
@@ -106,9 +106,9 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 			}
 			if ret = models.Init(models.AccountModel{}).
 				SetOmits(clause.Associations).
-				DB().
+				GetSession().
 				Create(&account); ret.Error != nil {
-				abnormals.PanicForbidden("创建失败：" + ret.Error.Error())
+				wrongs.PanicForbidden("创建失败：" + ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("注册成功").Created(tools.Map{"account": account}))
@@ -126,17 +126,17 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"username": form.Username}).
 				Prepare().
 				First(&account)
-			abnormals.PanicWhenIsEmpty(ret, "用户")
+			wrongs.PanicWhenIsEmpty(ret, "用户")
 
 			// 验证密码
 			if err := bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(form.Password)); err != nil {
-				abnormals.PanicUnAuth("账号或密码错误")
+				wrongs.PanicUnAuth("账号或密码错误")
 			}
 
 			// 生成Jwt
 			if token, err := tools.GenerateJwt(account.UUID, account.Password); err != nil {
 				// 生成jwt错误
-				abnormals.PanicForbidden(err.Error())
+				wrongs.PanicForbidden(err.Error())
 			} else {
 				ctx.JSON(tools.CorrectIns("登陆成功").OK(tools.Map{
 					"token":    token,
@@ -154,7 +154,7 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 			func(ctx *gin.Context) {
 				var ret *gorm.DB
 				if accountUUID, exists := ctx.Get("__ACCOUNT__"); !exists {
-					panic(abnormals.PanicUnLogin("用户未登录"))
+					panic(wrongs.PanicUnLogin("用户未登录"))
 				} else {
 					// 获取当前用户信息
 					var account models.AccountModel
@@ -163,7 +163,7 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 						SetPreloads("RbacRoles", "RbacRoles.Menus").
 						Prepare().
 						First(&account)
-					abnormals.PanicWhenIsEmpty(ret, "当前令牌指向用户")
+					wrongs.PanicWhenIsEmpty(ret, "当前令牌指向用户")
 
 					menuUUIDs := make([]string, 50)
 					if len(account.RbacRoles) > 0 {
@@ -178,7 +178,7 @@ func (cls *AuthorizationRouter) Load(router *gin.Engine) {
 
 					var menus []models.MenuModel
 					models.Init(models.MenuModel{}).
-						DB().
+						GetSession().
 						Where("uuid in ?", menuUUIDs).
 						Where("parent_uuid is null").
 						Preload("Subs").

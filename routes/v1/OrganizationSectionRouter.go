@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"fix-workshop-ue/abnormals"
+	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -33,28 +33,28 @@ func (cls OrganizationSectionStoreForm) ShouldBind(ctx *gin.Context) Organizatio
 	var ret *gorm.DB
 
 	if err := ctx.ShouldBind(&cls); err != nil {
-		abnormals.PanicValidate(err.Error())
+		wrongs.PanicValidate(err.Error())
 	}
 	if cls.UniqueCode == "" {
-		abnormals.PanicValidate("区间代码不能为空")
+		wrongs.PanicValidate("区间代码不能为空")
 	}
 	if cls.Name == "" {
-		abnormals.PanicValidate("区间名称不能为空")
+		wrongs.PanicValidate("区间名称不能为空")
 	}
 	if cls.OrganizationWorkshopUUID == "" {
-		abnormals.PanicValidate("所属车间不能为空")
+		wrongs.PanicValidate("所属车间不能为空")
 	}
 	ret = models.Init(models.OrganizationWorkshopModel{}).
 		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).
 		Prepare().
 		First(&cls.OrganizationWorkshop)
-	abnormals.PanicWhenIsEmpty(ret, "车间")
+	wrongs.PanicWhenIsEmpty(ret, "车间")
 	if cls.OrganizationWorkAreaUUID != "" {
 		ret = models.Init(models.OrganizationWorkAreaModel{}).
 			SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUUID}).
 			Prepare().
 			First(&cls.OrganizationWorkArea)
-		abnormals.PanicWhenIsEmpty(ret, "工区")
+		wrongs.PanicWhenIsEmpty(ret, "工区")
 	}
 
 	return cls
@@ -85,12 +85,12 @@ func (cls OrganizationSectionRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
 				First(&repeat)
-			abnormals.PanicWhenIsRepeat(ret, "区间代码")
+			wrongs.PanicWhenIsRepeat(ret, "区间代码")
 			ret = models.Init(models.OrganizationSectionModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
-			abnormals.PanicWhenIsRepeat(ret, "区间名称")
+			wrongs.PanicWhenIsRepeat(ret, "区间名称")
 
 			// 新建
 			organizationSection := &models.OrganizationSectionModel{
@@ -101,8 +101,8 @@ func (cls OrganizationSectionRouter) Load(router *gin.Engine) {
 				OrganizationWorkshop: form.OrganizationWorkshop,
 				OrganizationWorkArea: form.OrganizationWorkArea,
 			}
-			if ret = models.Init(models.OrganizationSectionModel{}).DB().Create(&organizationSection); ret.Error != nil {
-				abnormals.PanicForbidden(ret.Error.Error())
+			if ret = models.Init(models.OrganizationSectionModel{}).GetSession().Create(&organizationSection); ret.Error != nil {
+				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"organization_section": organizationSection}))
@@ -119,11 +119,11 @@ func (cls OrganizationSectionRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&organizationSection)
-			abnormals.PanicWhenIsEmpty(ret, "区间")
+			wrongs.PanicWhenIsEmpty(ret, "区间")
 
 			// 删除
-			if ret := models.Init(models.OrganizationSectionModel{}).DB().Delete(&organizationSection); ret.Error != nil {
-				abnormals.PanicForbidden(ret.Error.Error())
+			if ret := models.Init(models.OrganizationSectionModel{}).GetSession().Delete(&organizationSection); ret.Error != nil {
+				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
@@ -145,20 +145,20 @@ func (cls OrganizationSectionRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			abnormals.PanicWhenIsRepeat(ret, "区间代码")
+			wrongs.PanicWhenIsRepeat(ret, "区间代码")
 			ret = models.Init(models.OrganizationSectionModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			abnormals.PanicWhenIsRepeat(ret, "区间名称")
+			wrongs.PanicWhenIsRepeat(ret, "区间名称")
 
 			// 查询
 			ret = models.Init(models.OrganizationSectionModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&organizationSection)
-			abnormals.PanicWhenIsEmpty(ret, "区间")
+			wrongs.PanicWhenIsEmpty(ret, "区间")
 
 			// 编辑
 			organizationSection.BaseModel.Sort = form.Sort
@@ -167,8 +167,8 @@ func (cls OrganizationSectionRouter) Load(router *gin.Engine) {
 			organizationSection.BeEnable = form.BeEnable
 			organizationSection.OrganizationWorkshop = form.OrganizationWorkshop
 			organizationSection.OrganizationWorkArea = form.OrganizationWorkArea
-			if ret = models.Init(models.OrganizationSectionModel{}).DB().Save(&organizationSection); ret.Error != nil {
-				abnormals.PanicForbidden(ret.Error.Error())
+			if ret = models.Init(models.OrganizationSectionModel{}).GetSession().Save(&organizationSection); ret.Error != nil {
+				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"organization_section": organizationSection}))
@@ -185,7 +185,7 @@ func (cls OrganizationSectionRouter) Load(router *gin.Engine) {
 				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				Prepare().
 				First(&organizationSection)
-			abnormals.PanicWhenIsEmpty(ret, "区间")
+			wrongs.PanicWhenIsEmpty(ret, "区间")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_section": organizationSection}))
 		})

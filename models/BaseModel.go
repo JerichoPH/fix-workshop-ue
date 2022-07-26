@@ -1,7 +1,8 @@
 package models
 
 import (
-	"fix-workshop-ue/abnormals"
+	"database/sql"
+	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/databases"
 	"fix-workshop-ue/tools"
 	"github.com/gin-gonic/gin"
@@ -13,8 +14,8 @@ import (
 // BaseModel 出厂数据、财务数据、检修数据、仓储数据、流转数据、运用数据
 type BaseModel struct {
 	ID             uint           `gorm:"primaryKey" json:"id"`
-	CreatedAt      time.Time      `gorm:"type:DATETIME;auto_now_add;" json:"created_at"`
-	UpdatedAt      time.Time      `gorm:"type:DATETIME;" json:"updated_at"`
+	CreatedAt      sql.NullTime   `gorm:"type:DATETIME;auto_now_add;" json:"created_at"`
+	UpdatedAt      sql.NullTime   `gorm:"type:DATETIME;" json:"updated_at"`
 	DeletedAt      gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 	UUID           string         `gorm:"type:CHAR(36);UNIQUE;NOT NULL;COMMENT:uuid;" json:"uuid"`
 	Sort           int64          `gorm:"type:BIGINT;DEFAULT:0;NOT NULL;COMMENT:排序;" json:"sort"`
@@ -46,7 +47,7 @@ func (cls *BaseModel) demoFindOne() {
 		SetNotWheres(tools.Map{}).
 		Prepare().
 		First(b)
-	abnormals.PanicWhenIsEmpty(ret, "XX")
+	wrongs.PanicWhenIsEmpty(ret, "XX")
 }
 
 // demoFind 获取多条数据演示
@@ -132,19 +133,19 @@ func (cls *BaseModel) SetScopes(scopes ...func(*gorm.DB) *gorm.DB) *BaseModel {
 
 // BeforeCreate 插入数据前
 func (cls *BaseModel) BeforeCreate(db *gorm.DB) (err error) {
-	cls.CreatedAt = time.Now()
-	cls.UpdatedAt = time.Now()
+	cls.CreatedAt = sql.NullTime{Time:time.Now()}
+	cls.UpdatedAt = sql.NullTime{Time:time.Now()}
 	return
 }
 
 // BeforeSave 修改数据前
 func (cls *BaseModel) BeforeSave(db *gorm.DB) (err error) {
-	cls.UpdatedAt = time.Now()
+	cls.UpdatedAt = sql.NullTime{Time:time.Now()}
 	return
 }
 
-// DB 获取对象
-func (cls *BaseModel) DB() (dbSession *gorm.DB) {
+// GetSession 获取对象
+func (cls *BaseModel) GetSession() (dbSession *gorm.DB) {
 	dbSession = (&databases.MySql{}).GetConn()
 	return
 }
@@ -227,13 +228,13 @@ func (cls *BaseModel) PrepareQuery(ctx *gin.Context) *gorm.DB {
 
 	// offset
 	if offset, ok := ctx.GetQuery("__offset__"); ok {
-		offset := abnormals.PanicWhenIsNotInt(offset, "偏移参数只能填写整数")
+		offset := wrongs.PanicWhenIsNotInt(offset, "偏移参数只能填写整数")
 		dbSession.Offset(offset)
 	}
 
 	// limit
 	if limit, ok := ctx.GetQuery("__limit__"); ok {
-		limit := abnormals.PanicWhenIsNotInt(limit, "分页参数只能填写整数")
+		limit := wrongs.PanicWhenIsNotInt(limit, "分页参数只能填写整数")
 		dbSession.Limit(limit)
 	}
 

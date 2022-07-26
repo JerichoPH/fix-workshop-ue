@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"fix-workshop-ue/abnormals"
+	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -35,28 +35,28 @@ func (cls OrganizationStationStoreForm) ShouldBind(ctx *gin.Context) Organizatio
 	var ret *gorm.DB
 
 	if err := ctx.ShouldBind(&cls); err != nil {
-		abnormals.PanicValidate(err.Error())
+		wrongs.PanicValidate(err.Error())
 	}
 	if cls.UniqueCode == "" {
-		abnormals.PanicValidate("站场代码必填")
+		wrongs.PanicValidate("站场代码必填")
 	}
 	if cls.Name == "" {
-		abnormals.PanicValidate("站场名称必填")
+		wrongs.PanicValidate("站场名称必填")
 	}
 	if cls.OrganizationWorkshopUUID == "" {
-		abnormals.PanicValidate("所属车间必选")
+		wrongs.PanicValidate("所属车间必选")
 	}
 	ret = models.Init(models.OrganizationWorkshopModel{}).
 		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).
 		Prepare().
 		First(&cls.OrganizationWorkshop)
-	abnormals.PanicWhenIsEmpty(ret, "车间")
+	wrongs.PanicWhenIsEmpty(ret, "车间")
 	if cls.OrganizationWorkAreaUUID != "" {
 		ret = models.Init(models.OrganizationWorkAreaModel{}).
 			SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUUID}).
 			Prepare().
 			First(&cls.OrganizationWorkArea)
-		abnormals.PanicWhenIsEmpty(ret, "工区")
+		wrongs.PanicWhenIsEmpty(ret, "工区")
 	}
 
 	return cls
@@ -87,12 +87,12 @@ func (cls OrganizationStationRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
 				First(&repeat)
-			abnormals.PanicWhenIsRepeat(ret, "站场代码")
+			wrongs.PanicWhenIsRepeat(ret, "站场代码")
 			ret = models.Init(models.OrganizationStationModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
-			abnormals.PanicWhenIsRepeat(ret, "站场名称")
+			wrongs.PanicWhenIsRepeat(ret, "站场名称")
 
 			// 新建
 			organizationStation := &models.OrganizationStationModel{
@@ -104,8 +104,8 @@ func (cls OrganizationStationRouter) Load(router *gin.Engine) {
 				OrganizationWorkArea: form.OrganizationWorkArea,
 				OrganizationLines:    form.OrganizationLines,
 			}
-			if ret = models.Init(models.OrganizationStationModel{}).DB().Create(&organizationStation); ret.Error != nil {
-				abnormals.PanicForbidden(ret.Error.Error())
+			if ret = models.Init(models.OrganizationStationModel{}).GetSession().Create(&organizationStation); ret.Error != nil {
+				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"organization_station": organizationStation}))
@@ -122,11 +122,11 @@ func (cls OrganizationStationRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&organizationStation)
-			abnormals.PanicWhenIsEmpty(ret, "站场")
+			wrongs.PanicWhenIsEmpty(ret, "站场")
 
 			// 删除
-			if ret := models.Init(models.OrganizationStationModel{}).DB().Delete(&organizationStation); ret.Error != nil {
-				abnormals.PanicForbidden(ret.Error.Error())
+			if ret := models.Init(models.OrganizationStationModel{}).GetSession().Delete(&organizationStation); ret.Error != nil {
+				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
@@ -148,20 +148,20 @@ func (cls OrganizationStationRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			abnormals.PanicWhenIsRepeat(ret, "站场代码")
+			wrongs.PanicWhenIsRepeat(ret, "站场代码")
 			ret = models.Init(models.OrganizationStationModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			abnormals.PanicWhenIsRepeat(ret, "站场名称")
+			wrongs.PanicWhenIsRepeat(ret, "站场名称")
 
 			// 查询
 			ret = models.Init(models.OrganizationStationModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&organizationStation)
-			abnormals.PanicWhenIsEmpty(ret, "站场")
+			wrongs.PanicWhenIsEmpty(ret, "站场")
 
 			// 编辑
 			organizationStation.BaseModel.Sort = form.Sort
@@ -171,8 +171,8 @@ func (cls OrganizationStationRouter) Load(router *gin.Engine) {
 			organizationStation.OrganizationWorkshop = form.OrganizationWorkshop
 			organizationStation.OrganizationWorkArea = form.OrganizationWorkArea
 			organizationStation.OrganizationLines = form.OrganizationLines
-			if ret = models.Init(models.OrganizationStationModel{}).DB().Save(&organizationStation); ret.Error != nil {
-				abnormals.PanicForbidden(ret.Error.Error())
+			if ret = models.Init(models.OrganizationStationModel{}).GetSession().Save(&organizationStation); ret.Error != nil {
+				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"organization_station": organizationStation}))
@@ -190,7 +190,7 @@ func (cls OrganizationStationRouter) Load(router *gin.Engine) {
 				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				Prepare().
 				First(&organizationStation)
-			abnormals.PanicWhenIsEmpty(ret, "站场")
+			wrongs.PanicWhenIsEmpty(ret, "站场")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_station": organizationStation}))
 		})

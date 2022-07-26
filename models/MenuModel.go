@@ -1,7 +1,7 @@
 package models
 
 import (
-	"fix-workshop-ue/abnormals"
+	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/tools"
 )
 
@@ -28,7 +28,7 @@ func (cls *MenuModel) TableName() string {
 //  @return MenuModel
 func (cls MenuModel) FindOneByUUID(uuid string) MenuModel {
 	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
-		panic(abnormals.PanicWhenIsEmpty(ret, "菜单"))
+		panic(wrongs.PanicWhenIsEmpty(ret, "菜单"))
 	}
 
 	return cls

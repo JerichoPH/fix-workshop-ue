@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"fix-workshop-ue/abnormals"
+	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -28,16 +28,16 @@ type OrganizationWorkAreaTypeStoreForm struct {
 //  @return OrganizationWorkAreaTypeStoreForm
 func (cls OrganizationWorkAreaTypeStoreForm) ShouldBind(ctx *gin.Context) OrganizationWorkAreaTypeStoreForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		abnormals.PanicValidate(err.Error())
+		wrongs.PanicValidate(err.Error())
 	}
 	if cls.UniqueCode == "" {
-		abnormals.PanicValidate("工区代码必填")
+		wrongs.PanicValidate("工区代码必填")
 	}
 	if cls.Name == "" {
-		abnormals.PanicValidate("工区名称必填")
+		wrongs.PanicValidate("工区名称必填")
 	}
 	if len(cls.OrganizationWorkAreaUUIDs) > 0 {
-		models.Init(models.OrganizationWorkAreaModel{}).DB().Where("uuid in ?", cls.OrganizationWorkAreaUUIDs).Find(&cls.OrganizationWorkAreas)
+		models.Init(models.OrganizationWorkAreaModel{}).GetSession().Where("uuid in ?", cls.OrganizationWorkAreaUUIDs).Find(&cls.OrganizationWorkAreas)
 	}
 
 	return cls
@@ -66,12 +66,12 @@ func (cls OrganizationWorkAreaTypeRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
 				First(&repeat)
-			abnormals.PanicWhenIsRepeat(ret, "工区类型代码")
+			wrongs.PanicWhenIsRepeat(ret, "工区类型代码")
 			ret = models.Init(models.OrganizationWorkAreaTypeModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
-			abnormals.PanicWhenIsRepeat(ret, "工区类型名称")
+			wrongs.PanicWhenIsRepeat(ret, "工区类型名称")
 
 			// 新建
 			organizationWorkAreaType := &models.OrganizationWorkAreaTypeModel{
@@ -79,8 +79,8 @@ func (cls OrganizationWorkAreaTypeRouter) Load(router *gin.Engine) {
 				UniqueCode: form.UniqueCode,
 				Name:       form.Name,
 			}
-			if ret = models.Init(models.OrganizationWorkAreaTypeModel{}).DB().Create(&organizationWorkAreaType); ret.Error != nil {
-				abnormals.PanicForbidden(ret.Error.Error())
+			if ret = models.Init(models.OrganizationWorkAreaTypeModel{}).GetSession().Create(&organizationWorkAreaType); ret.Error != nil {
+				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"organization_work_area_type": organizationWorkAreaType}))
@@ -92,8 +92,8 @@ func (cls OrganizationWorkAreaTypeRouter) Load(router *gin.Engine) {
 			organizationWorkAreaType := (&models.OrganizationWorkAreaTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 删除
-			if ret := models.Init(models.OrganizationWorkAreaTypeModel{}).DB().Delete(&organizationWorkAreaType); ret.Error != nil {
-				abnormals.PanicForbidden(ret.Error.Error())
+			if ret := models.Init(models.OrganizationWorkAreaTypeModel{}).GetSession().Delete(&organizationWorkAreaType); ret.Error != nil {
+				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
@@ -113,13 +113,13 @@ func (cls OrganizationWorkAreaTypeRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			abnormals.PanicWhenIsRepeat(ret, "工区类型代码")
+			wrongs.PanicWhenIsRepeat(ret, "工区类型代码")
 			ret = models.Init(models.OrganizationWorkAreaTypeModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			abnormals.PanicWhenIsRepeat(ret, "工区类型名称")
+			wrongs.PanicWhenIsRepeat(ret, "工区类型名称")
 
 			// 查询
 			organizationWorkAreaType := (&models.OrganizationWorkAreaTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
@@ -128,8 +128,8 @@ func (cls OrganizationWorkAreaTypeRouter) Load(router *gin.Engine) {
 			organizationWorkAreaType.BaseModel.Sort = form.Sort
 			organizationWorkAreaType.UniqueCode = form.UniqueCode
 			organizationWorkAreaType.Name = form.Name
-			if ret = models.Init(models.OrganizationWorkAreaTypeModel{}).DB().Save(&organizationWorkAreaType); ret.Error != nil {
-				abnormals.PanicForbidden(ret.Error.Error())
+			if ret = models.Init(models.OrganizationWorkAreaTypeModel{}).GetSession().Save(&organizationWorkAreaType); ret.Error != nil {
+				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"organization_work_area_type": organizationWorkAreaType}))

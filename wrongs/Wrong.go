@@ -1,4 +1,4 @@
-package abnormals
+package wrongs
 
 import (
 	"errors"
@@ -6,62 +6,62 @@ import (
 	"strconv"
 )
 
-type Abnormal struct{ errorMessage string }
+type Wrong struct{ errorMessage string }
 
-// EmptyAbnormal 空数据异常
-type EmptyAbnormal struct{ Abnormal }
+// EmptyWrong 空数据异常
+type EmptyWrong struct{ Wrong }
 
 // Error 获取异常信息
 //  @receiver cls
 //  @return string
-func (cls *Abnormal) Error() string {
+func (cls *Wrong) Error() string {
 	return cls.errorMessage
 }
 
-// ValidateAbnormal 表单验证错误
-type ValidateAbnormal struct{ Abnormal }
+// ValidateWrong 表单验证错误
+type ValidateWrong struct{ Wrong }
 
 // PanicValidate 421错误
 //  @param text
 func PanicValidate(text string) {
-	panic(&ValidateAbnormal{Abnormal{errorMessage: text}})
+	panic(&ValidateWrong{Wrong{errorMessage: text}})
 }
 
 // PanicEmpty 404错误
 //  @param text
 //  @return error
 func PanicEmpty(text string) {
-	panic(&EmptyAbnormal{Abnormal{errorMessage: text}})
+	panic(&EmptyWrong{Wrong{errorMessage: text}})
 }
 
-// ForbiddenAbnormal
-type ForbiddenAbnormal struct{ Abnormal }
+// ForbiddenWrong
+type ForbiddenWrong struct{ Wrong }
 
 // PanicForbidden 403错误
 //  @param text
 //  @return error
 func PanicForbidden(text string) {
-	panic(&ForbiddenAbnormal{Abnormal{errorMessage: text}})
+	panic(&ForbiddenWrong{Wrong{errorMessage: text}})
 }
 
-// UnAuthAbnormal 未授权异常
-type UnAuthAbnormal struct{ Abnormal }
+// UnAuthWrong 未授权异常
+type UnAuthWrong struct{ Wrong }
 
 // PanicUnAuth 未授权错误
 //  @param text
 //  @return error
 func PanicUnAuth(text string) {
-	panic(&UnAuthAbnormal{Abnormal{errorMessage: text}})
+	panic(&UnAuthWrong{Wrong{errorMessage: text}})
 }
 
-// UnLoginAbnormal 未登录异常
-type UnLoginAbnormal struct{ Abnormal }
+// UnLoginWrong 未登录异常
+type UnLoginWrong struct{ Wrong }
 
 // PanicUnLogin 未登录错误
 //  @param text
 //  @return error
 func PanicUnLogin(text string) error {
-	panic(&UnLoginAbnormal{Abnormal{errorMessage: text}})
+	panic(&UnLoginWrong{Wrong{errorMessage: text}})
 }
 
 // PanicWhenIsNotInt 文字转整型

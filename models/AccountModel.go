@@ -1,7 +1,7 @@
 package models
 
 import (
-	"fix-workshop-ue/abnormals"
+	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/tools"
 )
 
@@ -26,7 +26,7 @@ func (cls *AccountModel) TableName() string {
 //  @return AccountModel
 func (cls AccountModel) FindOneByUUID(uuid string) AccountModel {
 	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
-		panic(abnormals.PanicWhenIsEmpty(ret, "用户"))
+		panic(wrongs.PanicWhenIsEmpty(ret, "用户"))
 	}
 
 	return cls

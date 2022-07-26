@@ -1,7 +1,7 @@
 package models
 
 import (
-	"fix-workshop-ue/abnormals"
+	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/tools"
 )
 
@@ -23,7 +23,7 @@ func (cls *LocationIndoorRoomTypeModel) TableName() string {
 //  @return LocationIndoorRoomTypeModel
 func (cls LocationIndoorRoomTypeModel) FindOneByUUID(uuid string) LocationIndoorRoomTypeModel {
 	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
-		panic(abnormals.PanicWhenIsEmpty(ret, "工区"))
+		panic(wrongs.PanicWhenIsEmpty(ret, "工区"))
 	}
 
 	return cls

@@ -13,7 +13,7 @@ import (
 	"os/signal"
 	"time"
 
-	"fix-workshop-ue/abnormals"
+	"fix-workshop-ue/wrongs"
 	"github.com/gin-gonic/gin"
 )
 
@@ -87,12 +87,12 @@ func main() {
 			&models.LocationDepotCellModel{},       // 仓储柜架格位
 
 			// 室内上道位置
-			&models.LocationIndoorRoomTypeModel{},  // 机房类型
-			&models.LocationIndoorRoomModel{},      // 机房
-			&models.LocationIndoorRowModel{},       // 排
-			&models.LocationIndoorCabinetModel{},   // 架
-			&models.LocationIndoorTierModel{},      // 层
-			&models.LocationIndoorCellModel{},      // 位
+			&models.LocationIndoorRoomTypeModel{}, // 机房类型
+			&models.LocationIndoorRoomModel{},     // 机房
+			&models.LocationIndoorRowModel{},      // 排
+			&models.LocationIndoorCabinetModel{},  // 架
+			&models.LocationIndoorTierModel{},     // 层
+			&models.LocationIndoorCellModel{},     // 位
 
 		); errAutoMigrate != nil {
 		fmt.Println("自动迁移错误：", errAutoMigrate)
@@ -100,7 +100,7 @@ func main() {
 	}
 
 	router := gin.Default()
-	router.Use(abnormals.RecoverHandler) // 异常处理
+	router.Use(wrongs.RecoverHandler) // 异常处理
 
 	// 用户与权鉴
 	(&v1.AuthorizationRouter{}).Load(router)       // 权鉴
@@ -122,6 +122,17 @@ func main() {
 	(&v1.OrganizationCenterRouter{}).Load(router)             // 中心
 	(&v1.OrganizationRailroadGradeCrossRouter{}).Load(router) // 道口
 	(&v1.OrganizationStationRouter{}).Load(router)            // 站场
+
+	// 仓储位置
+	(&v1.LocationDepotStorehouseRouter{}).Load(router) // 仓库
+	(&v1.LocationDepotSectionRouter{}).Load(router)    // 仓库区域
+	(&v1.LocationDepotRowRouter{}).Load(router)        // 仓库排
+	(&v1.LocationDepotCabinetRouter{}).Load(router)    // 仓库柜架
+	(&v1.LocationDepotTierRouter{}).Load(router)       // 仓库柜架层
+	(&v1.LocationDepotCellRouter{}).Load(router)       // 仓库柜架格位
+
+	// 室内上道位置
+	(&v1.LocationIndoorRoomTypeRouter{}).Load(router) // 室内上到位置机房类型
 
 	initServer(router, setting.App.Section("app").Key("addr").MustString(":8080")) // 启动服务
 }

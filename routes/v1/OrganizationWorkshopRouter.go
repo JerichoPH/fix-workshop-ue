@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"fix-workshop-ue/abnormals"
+	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -38,34 +38,34 @@ type OrganizationWorkshopStoreForm struct {
 func (cls OrganizationWorkshopStoreForm) ShouldBind(ctx *gin.Context) OrganizationWorkshopStoreForm {
 	var ret *gorm.DB
 	if err := ctx.ShouldBind(&cls); err != nil {
-		abnormals.PanicValidate(err.Error())
+		wrongs.PanicValidate(err.Error())
 	}
 	if cls.UniqueCode == "" {
-		abnormals.PanicValidate("车间代码必填")
+		wrongs.PanicValidate("车间代码必填")
 	}
 	if cls.Name == "" {
-		abnormals.PanicValidate("车间名称必填")
+		wrongs.PanicValidate("车间名称必填")
 	}
 	if cls.OrganizationWorkshopTypeUUID == "" {
-		abnormals.PanicValidate("车间类型必选")
+		wrongs.PanicValidate("车间类型必选")
 	}
 	cls.OrganizationWorkshopType = (&models.OrganizationWorkshopTypeModel{}).FindOneByUUID(cls.OrganizationWorkshopTypeUUID)
 	if cls.OrganizationParagraphUUID == "" {
-		abnormals.PanicValidate("所属站段必选")
+		wrongs.PanicValidate("所属站段必选")
 	}
 	ret = models.Init(models.OrganizationRailwayModel{}).
 		SetWheres(tools.Map{"uuid": cls.OrganizationParagraphUUID}).
 		Prepare().
 		First(&cls.OrganizationParagraph)
-	abnormals.PanicWhenIsEmpty(ret, "站段")
+	wrongs.PanicWhenIsEmpty(ret, "站段")
 	if len(cls.OrganizationSectionUUIDs) > 0 {
-		models.Init(models.OrganizationSectionModel{}).DB().Where("uuid in ?", cls.OrganizationSectionUUIDs).Find(&cls.OrganizationSections)
+		models.Init(models.OrganizationSectionModel{}).GetSession().Where("uuid in ?", cls.OrganizationSectionUUIDs).Find(&cls.OrganizationSections)
 	}
 	if len(cls.OrganizationWorkAreaUUIDs) > 0 {
-		models.Init(models.OrganizationWorkAreaModel{}).DB().Where("uuid in ?", cls.OrganizationWorkAreaUUIDs).Find(&cls.OrganizationWorkAreas)
+		models.Init(models.OrganizationWorkAreaModel{}).GetSession().Where("uuid in ?", cls.OrganizationWorkAreaUUIDs).Find(&cls.OrganizationWorkAreas)
 	}
 	if len(cls.OrganizationStationUUIDs) > 0 {
-		models.Init(models.OrganizationStationModel{}).DB().Where("uuid in ?", cls.OrganizationStationUUIDs).Find(&cls.OrganizationStations)
+		models.Init(models.OrganizationStationModel{}).GetSession().Where("uuid in ?", cls.OrganizationStationUUIDs).Find(&cls.OrganizationStations)
 	}
 
 	return cls
@@ -96,12 +96,12 @@ func (OrganizationWorkshopRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
 				First(&repeat)
-			abnormals.PanicWhenIsRepeat(ret, "车间代码")
+			wrongs.PanicWhenIsRepeat(ret, "车间代码")
 			ret = models.Init(models.OrganizationWorkshopModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
-			abnormals.PanicWhenIsRepeat(ret, "车间名称")
+			wrongs.PanicWhenIsRepeat(ret, "车间名称")
 
 			// 新建
 			organizationWorkshop := &models.OrganizationWorkshopModel{
@@ -114,8 +114,8 @@ func (OrganizationWorkshopRouter) Load(router *gin.Engine) {
 				OrganizationWorkAreas:    form.OrganizationWorkAreas,
 				OrganizationStations:     form.OrganizationStations,
 			}
-			if ret = models.Init(models.OrganizationWorkshopModel{}).DB().Create(&organizationWorkshop); ret.Error != nil {
-				abnormals.PanicForbidden(ret.Error.Error())
+			if ret = models.Init(models.OrganizationWorkshopModel{}).GetSession().Create(&organizationWorkshop); ret.Error != nil {
+				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_workshop": organizationWorkshop}))
@@ -133,11 +133,11 @@ func (OrganizationWorkshopRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&organizationWorkshop)
-			abnormals.PanicWhenIsEmpty(ret, "车间")
+			wrongs.PanicWhenIsEmpty(ret, "车间")
 
 			// 删除
-			if ret = models.Init(models.OrganizationWorkshopModel{}).DB().Delete(&organizationWorkshop); ret.Error != nil {
-				abnormals.PanicForbidden(ret.Error.Error())
+			if ret = models.Init(models.OrganizationWorkshopModel{}).GetSession().Delete(&organizationWorkshop); ret.Error != nil {
+				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
@@ -160,20 +160,20 @@ func (OrganizationWorkshopRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			abnormals.PanicWhenIsRepeat(ret, "车间代码")
+			wrongs.PanicWhenIsRepeat(ret, "车间代码")
 			ret = models.Init(models.OrganizationWorkshopModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			abnormals.PanicWhenIsRepeat(ret, "车间名称")
+			wrongs.PanicWhenIsRepeat(ret, "车间名称")
 
 			// 查询
 			ret = models.Init(models.OrganizationWorkshopModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&organizationWorkshop)
-			abnormals.PanicWhenIsEmpty(ret, "车间")
+			wrongs.PanicWhenIsEmpty(ret, "车间")
 
 			// 编辑
 			organizationWorkshop.UniqueCode = form.UniqueCode
@@ -184,8 +184,8 @@ func (OrganizationWorkshopRouter) Load(router *gin.Engine) {
 			organizationWorkshop.OrganizationSections = form.OrganizationSections
 			organizationWorkshop.OrganizationWorkAreas = form.OrganizationWorkAreas
 			organizationWorkshop.OrganizationStations = form.OrganizationStations
-			if ret = models.Init(models.OrganizationWorkshopModel{}).DB().Save(&organizationWorkshop); ret.Error != nil {
-				abnormals.PanicForbidden(ret.Error.Error())
+			if ret = models.Init(models.OrganizationWorkshopModel{}).GetSession().Save(&organizationWorkshop); ret.Error != nil {
+				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_workshop": organizationWorkshop}))
@@ -203,7 +203,7 @@ func (OrganizationWorkshopRouter) Load(router *gin.Engine) {
 				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				Prepare().
 				First(&organizationWorkshop)
-			abnormals.PanicWhenIsEmpty(ret, "车间")
+			wrongs.PanicWhenIsEmpty(ret, "车间")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_workshop": organizationWorkshop}))
 		})

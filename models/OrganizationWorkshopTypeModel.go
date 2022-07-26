@@ -1,7 +1,7 @@
 package models
 
 import (
-	"fix-workshop-ue/abnormals"
+	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/tools"
 )
 
@@ -25,7 +25,7 @@ func (cls *OrganizationWorkshopTypeModel) TableName() string {
 //  @return OrganizationWorkshopTypeModel
 func (cls OrganizationWorkshopTypeModel) FindOneByUUID(uuid string) OrganizationWorkshopTypeModel {
 	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
-		panic(abnormals.PanicWhenIsEmpty(ret, "车间类型"))
+		panic(wrongs.PanicWhenIsEmpty(ret, "车间类型"))
 	}
 
 	return cls

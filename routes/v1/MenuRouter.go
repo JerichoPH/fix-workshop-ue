@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"fix-workshop-ue/abnormals"
+	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -31,13 +31,13 @@ type MenuStoreForm struct {
 //  @return MenuStoreForm
 func (cls MenuStoreForm) ShouldBind(ctx *gin.Context) MenuStoreForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		abnormals.PanicValidate(err.Error())
+		wrongs.PanicValidate(err.Error())
 	}
 	if cls.Name == "" {
-		abnormals.PanicValidate("菜单名称必填")
+		wrongs.PanicValidate("菜单名称必填")
 	}
 	if len(cls.RbacRoleUUIDs) > 0 {
-		models.Init(models.RbacRoleModel{}).DB().Where("uuid in ?", cls.RbacRoleUUIDs).Find(&cls.RbacRoles)
+		models.Init(models.RbacRoleModel{}).GetSession().Where("uuid in ?", cls.RbacRoleUUIDs).Find(&cls.RbacRoles)
 	}
 
 	return cls
@@ -46,7 +46,7 @@ func (cls MenuStoreForm) ShouldBind(ctx *gin.Context) MenuStoreForm {
 // Load 加载路由
 //  @receiver cls
 //  @param router
-func (cls *MenuRouter) Load(router *gin.Engine) {
+func (cls MenuRouter) Load(router *gin.Engine) {
 	r := router.Group(
 		"/api/v1/menu",
 		middlewares.CheckJwt(),
@@ -67,7 +67,7 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"name": form.Name, "url": form.URL}).
 				Prepare().
 				First(&repeat)
-			abnormals.PanicWhenIsRepeat(ret, "菜单名称和URL")
+			wrongs.PanicWhenIsRepeat(ret, "菜单名称和URL")
 
 			// 新建
 			menu := &models.MenuModel{
@@ -79,8 +79,8 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 				ParentUUID: form.ParentUUID,
 				RbacRoles:  form.RbacRoles,
 			}
-			if ret = (&models.BaseModel{}).SetModel(models.MenuModel{}).DB().Create(&menu); ret.Error != nil {
-				abnormals.PanicForbidden(ret.Error.Error())
+			if ret = (&models.BaseModel{}).SetModel(models.MenuModel{}).GetSession().Create(&menu); ret.Error != nil {
+				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"menu": menu}))
@@ -94,8 +94,8 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 			menu := (&models.MenuModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 删除
-			if ret = models.Init(models.MenuModel{}).DB().Delete(&menu); ret.Error != nil {
-				abnormals.PanicForbidden(ret.Error.Error())
+			if ret = models.Init(models.MenuModel{}).GetSession().Delete(&menu); ret.Error != nil {
+				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
@@ -116,7 +116,7 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			abnormals.PanicWhenIsRepeat(ret, "菜单名称和URL")
+			wrongs.PanicWhenIsRepeat(ret, "菜单名称和URL")
 
 			// 查询
 			menu := (&models.MenuModel{}).FindOneByUUID(ctx.Param("uuid"))
@@ -128,8 +128,8 @@ func (cls *MenuRouter) Load(router *gin.Engine) {
 			menu.Icon = form.Icon
 			menu.ParentUUID = form.ParentUUID
 			menu.RbacRoles = form.RbacRoles
-			if ret = models.Init(models.MenuModel{}).DB().Save(&menu); ret.Error != nil {
-				abnormals.PanicForbidden(ret.Error.Error())
+			if ret = models.Init(models.MenuModel{}).GetSession().Save(&menu); ret.Error != nil {
+				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"menu": menu}))

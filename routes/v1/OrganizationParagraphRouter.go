@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"fix-workshop-ue/abnormals"
+	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -35,27 +35,27 @@ type OrganizationParagraphStoreForm struct {
 func (cls OrganizationParagraphStoreForm) ShouldBind(ctx *gin.Context) OrganizationParagraphStoreForm {
 	var ret *gorm.DB
 	if err := ctx.ShouldBind(&cls); err != nil {
-		abnormals.PanicValidate(err.Error())
+		wrongs.PanicValidate(err.Error())
 	}
 	if cls.UniqueCode == "" {
-		abnormals.PanicValidate("站段代码必填")
+		wrongs.PanicValidate("站段代码必填")
 	}
 	if cls.Name == "" {
-		abnormals.PanicValidate("站段名称必填")
+		wrongs.PanicValidate("站段名称必填")
 	}
 	if cls.OrganizationRailwayUUID == "" {
-		abnormals.PanicValidate("所属路局必选")
+		wrongs.PanicValidate("所属路局必选")
 	}
 	ret = models.Init(models.OrganizationRailwayModel{}).
 		SetWheres(tools.Map{"uuid": cls.OrganizationRailwayUUID}).
 		Prepare().
 		First(&cls.OrganizationRailway)
-	abnormals.PanicWhenIsEmpty(ret, "路局")
+	wrongs.PanicWhenIsEmpty(ret, "路局")
 	if len(cls.OrganizationWorkshopUUIDs) > 0 {
-		models.Init(models.OrganizationWorkshopModel{}).DB().Where("uuid in ?", cls.OrganizationWorkshopUUIDs).Find(&cls.OrganizationWorkshops)
+		models.Init(models.OrganizationWorkshopModel{}).GetSession().Where("uuid in ?", cls.OrganizationWorkshopUUIDs).Find(&cls.OrganizationWorkshops)
 	}
 	if len(cls.OrganizationLineUUIDs) > 0 {
-		models.Init(models.OrganizationLineModel{}).DB().Where("uuid in ?", cls.OrganizationLineUUIDs).Find(&cls.OrganizationLines)
+		models.Init(models.OrganizationLineModel{}).GetSession().Where("uuid in ?", cls.OrganizationLineUUIDs).Find(&cls.OrganizationLines)
 	}
 
 	return cls
@@ -64,7 +64,7 @@ func (cls OrganizationParagraphStoreForm) ShouldBind(ctx *gin.Context) Organizat
 // Load 加载路由
 //  @receiver cls
 //  @param router
-func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
+func (cls OrganizationParagraphRouter) Load(router *gin.Engine) {
 	r := router.Group(
 		"/api/v1/organization",
 		middlewares.CheckJwt(),
@@ -86,17 +86,17 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
 				First(&repeat)
-			abnormals.PanicWhenIsRepeat(ret, "站段代码")
+			wrongs.PanicWhenIsRepeat(ret, "站段代码")
 			ret = models.Init(models.OrganizationParagraphModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
-			abnormals.PanicWhenIsRepeat(ret, "站段名称")
+			wrongs.PanicWhenIsRepeat(ret, "站段名称")
 			ret = models.Init(models.OrganizationParagraphModel{}).
 				SetWheres(tools.Map{"short_name": form.ShortName}).
 				Prepare().
 				First(&repeat)
-			abnormals.PanicWhenIsRepeat(ret, "站段简称")
+			wrongs.PanicWhenIsRepeat(ret, "站段简称")
 
 			// 新建
 			organizationParagraph := &models.OrganizationParagraphModel{
@@ -109,8 +109,8 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 				OrganizationWorkshops: form.OrganizationWorkshops,
 				OrganizationLines:     form.OrganizationLines,
 			}
-			if ret = models.Init(models.OrganizationParagraphModel{}).DB().Create(&organizationParagraph); ret.Error != nil {
-				abnormals.PanicForbidden(ret.Error.Error())
+			if ret = models.Init(models.OrganizationParagraphModel{}).GetSession().Create(&organizationParagraph); ret.Error != nil {
+				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"organization_paragraph": organizationParagraph}))
@@ -128,11 +128,11 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&organizationParagraph)
-			abnormals.PanicWhenIsEmpty(ret, "站段")
+			wrongs.PanicWhenIsEmpty(ret, "站段")
 
 			// 删除
-			if ret = models.Init(models.OrganizationParagraphModel{}).DB().Delete(&organizationParagraph); ret.Error != nil {
-				abnormals.PanicForbidden(ret.Error.Error())
+			if ret = models.Init(models.OrganizationParagraphModel{}).GetSession().Delete(&organizationParagraph); ret.Error != nil {
+				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
@@ -155,20 +155,20 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			abnormals.PanicWhenIsRepeat(ret, "站段代码")
+			wrongs.PanicWhenIsRepeat(ret, "站段代码")
 			ret = models.Init(models.OrganizationParagraphModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
-			abnormals.PanicWhenIsRepeat(ret, "站段名称")
+			wrongs.PanicWhenIsRepeat(ret, "站段名称")
 
 			// 查询
 			ret = models.Init(models.OrganizationRailwayModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&organizationParagraph)
-			abnormals.PanicWhenIsEmpty(ret, "站段")
+			wrongs.PanicWhenIsEmpty(ret, "站段")
 
 			// 编辑
 			organizationParagraph.BaseModel.Sort = form.Sort
@@ -179,8 +179,8 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 			organizationParagraph.OrganizationRailway = form.OrganizationRailway
 			organizationParagraph.OrganizationWorkshops = form.OrganizationWorkshops
 			organizationParagraph.OrganizationLines = form.OrganizationLines
-			if ret = models.Init(models.OrganizationParagraphModel{}).DB().Save(&organizationParagraph); ret.Error != nil {
-				abnormals.PanicForbidden(ret.Error.Error())
+			if ret = models.Init(models.OrganizationParagraphModel{}).GetSession().Save(&organizationParagraph); ret.Error != nil {
+				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"organization_paragraph": organizationParagraph}))
@@ -198,7 +198,7 @@ func (cls *OrganizationParagraphRouter) Load(router *gin.Engine) {
 				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				Prepare().
 				First(&organizationParagraph)
-			abnormals.PanicWhenIsEmpty(ret, "站段")
+			wrongs.PanicWhenIsEmpty(ret, "站段")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_paragraph": organizationParagraph}))
 		})

@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"fix-workshop-ue/abnormals"
+	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -27,13 +27,13 @@ type OrganizationWorkshopTypeStoreForm struct {
 //  @return OrganizationWorkshopTypeStoreForm
 func (cls OrganizationWorkshopTypeStoreForm) ShouldBind(ctx *gin.Context) OrganizationWorkshopTypeStoreForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		abnormals.PanicValidate(err.Error())
+		wrongs.PanicValidate(err.Error())
 	}
 	if cls.UniqueCode == "" {
-		abnormals.PanicValidate("车间类型代码必填")
+		wrongs.PanicValidate("车间类型代码必填")
 	}
 	if cls.Name == "" {
-		abnormals.PanicValidate("车间类型名称必填")
+		wrongs.PanicValidate("车间类型名称必填")
 	}
 
 	return cls
@@ -61,12 +61,12 @@ func (OrganizationWorkshopTypeRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
 				First(&models.OrganizationWorkAreaTypeModel{})
-			abnormals.PanicWhenIsRepeat(ret, "车间类型代码")
+			wrongs.PanicWhenIsRepeat(ret, "车间类型代码")
 			ret = models.Init(models.OrganizationWorkshopTypeModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&models.OrganizationWorkshopTypeModel{})
-			abnormals.PanicWhenIsRepeat(ret, "车间类型名称")
+			wrongs.PanicWhenIsRepeat(ret, "车间类型名称")
 
 			// 新建
 			organizationWorkshopType := &models.OrganizationWorkshopTypeModel{
@@ -75,8 +75,8 @@ func (OrganizationWorkshopTypeRouter) Load(router *gin.Engine) {
 				Name:       form.Name,
 				Number:     form.Number,
 			}
-			if ret = models.Init(models.OrganizationWorkshopTypeModel{}).DB().Create(&organizationWorkshopType); ret.Error != nil {
-				abnormals.PanicForbidden(ret.Error.Error())
+			if ret = models.Init(models.OrganizationWorkshopTypeModel{}).GetSession().Create(&organizationWorkshopType); ret.Error != nil {
+				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"organization_workshop_type": organizationWorkshopType}))
@@ -90,8 +90,8 @@ func (OrganizationWorkshopTypeRouter) Load(router *gin.Engine) {
 			organizationWorkshopType := (&models.OrganizationWorkshopTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 删除
-			if ret = models.Init(models.OrganizationWorkshopTypeModel{}).DB().Delete(&organizationWorkshopType); ret.Error != nil {
-				abnormals.PanicForbidden(ret.Error.Error())
+			if ret = models.Init(models.OrganizationWorkshopTypeModel{}).GetSession().Delete(&organizationWorkshopType); ret.Error != nil {
+				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
@@ -110,13 +110,13 @@ func (OrganizationWorkshopTypeRouter) Load(router *gin.Engine) {
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&models.OrganizationWorkAreaTypeModel{})
-			abnormals.PanicWhenIsRepeat(ret, "车间类型代码")
+			wrongs.PanicWhenIsRepeat(ret, "车间类型代码")
 			ret = models.Init(models.OrganizationWorkshopTypeModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&models.OrganizationWorkshopTypeModel{})
-			abnormals.PanicWhenIsRepeat(ret, "车间类型名称")
+			wrongs.PanicWhenIsRepeat(ret, "车间类型名称")
 
 			// 查询
 			organizationWorkshopType := (&models.OrganizationWorkshopTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
@@ -126,7 +126,7 @@ func (OrganizationWorkshopTypeRouter) Load(router *gin.Engine) {
 			organizationWorkshopType.UniqueCode = form.UniqueCode
 			organizationWorkshopType.Name = form.Name
 			organizationWorkshopType.Number = form.Number
-			models.Init(models.OrganizationWorkshopTypeModel{}).DB().Save(&organizationWorkshopType)
+			models.Init(models.OrganizationWorkshopTypeModel{}).GetSession().Save(&organizationWorkshopType)
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"organization_workshop_type": organizationWorkshopType}))
 		})

@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"fix-workshop-ue/abnormals"
+	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/settings"
 	"fix-workshop-ue/tools"
@@ -14,7 +14,7 @@ func CheckPermission() gin.HandlerFunc {
 		// 获取上下文中的用户
 		currentAccountUUID, exists := ctx.Get("__ACCOUNT__")
 		if !exists {
-			panic(abnormals.PanicUnLogin("未登录"))
+			panic(wrongs.PanicUnLogin("未登录"))
 		}
 
 		cfg := (&settings.Setting{}).Init()
@@ -32,7 +32,7 @@ func CheckPermission() gin.HandlerFunc {
 				}).
 				Prepare().
 				First(&rbacPermission)
-			abnormals.PanicWhenIsEmpty(ret, "权限")
+			wrongs.PanicWhenIsEmpty(ret, "权限")
 
 			ok := false
 			if len(rbacPermission.RbacRoles) > 0 {
@@ -48,7 +48,7 @@ func CheckPermission() gin.HandlerFunc {
 			}
 
 			if !ok {
-				abnormals.PanicUnAuth("未授权")
+				wrongs.PanicUnAuth("未授权")
 			}
 		}
 

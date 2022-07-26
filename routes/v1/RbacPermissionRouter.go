@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"fix-workshop-ue/abnormals"
+	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -32,25 +32,25 @@ func (cls RbacPermissionStoreForm) ShouldBind(ctx *gin.Context) RbacPermissionSt
 	var ret *gorm.DB
 
 	if err := ctx.ShouldBind(&cls); err != nil {
-		abnormals.PanicValidate(err.Error())
+		wrongs.PanicValidate(err.Error())
 	}
 	if cls.Name == "" {
-		abnormals.PanicValidate("名称必填")
+		wrongs.PanicValidate("名称必填")
 	}
 	if cls.Uri == "" {
-		abnormals.PanicValidate("URI必填")
+		wrongs.PanicValidate("URI必填")
 	}
 	if cls.Method == "" {
-		abnormals.PanicValidate("访问方法必选")
+		wrongs.PanicValidate("访问方法必选")
 	}
 	if cls.RbacPermissionGroupUUID == "" {
-		abnormals.PanicValidate("所属权限分组必选")
+		wrongs.PanicValidate("所属权限分组必选")
 	}
 	ret = models.Init(models.RbacPermissionGroupModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 		Prepare().
 		First(&cls.RbacPermissionGroup)
-	abnormals.PanicWhenIsEmpty(ret, "权限分组")
+	wrongs.PanicWhenIsEmpty(ret, "权限分组")
 
 	return cls
 }
@@ -67,13 +67,13 @@ type RbacPermissionStoreResourceForm struct {
 //  @return RbacPermissionStoreResourceForm
 func (cls RbacPermissionStoreResourceForm) ShouldBind(ctx *gin.Context) RbacPermissionStoreResourceForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
-		abnormals.PanicForbidden(err.Error())
+		wrongs.PanicForbidden(err.Error())
 	}
 	if cls.Uri == "" {
-		abnormals.PanicForbidden("URI必填")
+		wrongs.PanicForbidden("URI必填")
 	}
 	if cls.RbacPermissionGroupUUID == "" {
-		abnormals.PanicForbidden("权限分组必选")
+		wrongs.PanicForbidden("权限分组必选")
 	}
 
 	return cls
@@ -82,7 +82,7 @@ func (cls RbacPermissionStoreResourceForm) ShouldBind(ctx *gin.Context) RbacPerm
 // Load 加载路由
 //  @receiver cls
 //  @param router
-func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
+func (cls RbacPermissionRouter) Load(router *gin.Engine) {
 	r := router.Group(
 		"api/v1/rbacPermission",
 		middlewares.CheckJwt(),
@@ -105,9 +105,9 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 				RbacPermissionGroupUUID: form.RbacPermissionGroup.UUID,
 			}
 			if ret = models.Init(&models.RbacPermissionModel{}).
-				DB().
+				GetSession().
 				Create(&rbacPermission); ret.Error != nil {
-				abnormals.PanicForbidden(ret.Error.Error())
+				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"rbac_permission": rbacPermission}))
@@ -130,9 +130,9 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 					SetWheres(tools.Map{"name": name, "method": method, "uri": form.Uri}).
 					Prepare().
 					First(&repeat)
-				if !abnormals.PanicWhenIsEmpty(ret, "") {
+				if !wrongs.PanicWhenIsEmpty(ret, "") {
 					if ret = models.Init(models.RbacPermissionModel{}).
-						DB().
+						GetSession().
 						Create(&models.RbacPermissionModel{
 							BaseModel:               models.BaseModel{UUID: uuid.NewV4().String()},
 							Name:                    name,
@@ -140,7 +140,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 							Method:                  method,
 							RbacPermissionGroupUUID: form.RbacPermissionGroupUUID,
 						}); ret.Error != nil {
-						abnormals.PanicForbidden("批量添加资源权限时错误：" + ret.Error.Error())
+						wrongs.PanicForbidden("批量添加资源权限时错误：" + ret.Error.Error())
 					} else {
 						successCount += 1
 					}
@@ -161,13 +161,13 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&rbacPermission)
-			abnormals.PanicWhenIsEmpty(ret, "权限")
+			wrongs.PanicWhenIsEmpty(ret, "权限")
 
 			// 删除
 			if ret = models.Init(&models.RbacPermissionModel{}).
-				DB().
+				GetSession().
 				Delete(&rbacPermission); ret.Error != nil {
-				abnormals.PanicForbidden(ret.Error.Error())
+				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Deleted())
@@ -188,7 +188,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&rbacPermission)
-			abnormals.PanicWhenIsEmpty(ret, "权限")
+			wrongs.PanicWhenIsEmpty(ret, "权限")
 
 			// 修改
 			rbacPermission.Name = form.Name
@@ -196,9 +196,9 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 			rbacPermission.Method = form.Method
 			rbacPermission.RbacPermissionGroupUUID = form.RbacPermissionGroupUUID
 			if ret = models.Init(models.RbacPermissionModel{}).
-				DB().
+				GetSession().
 				Save(&rbacPermission); ret.Error != nil {
-				abnormals.PanicForbidden(ret.Error.Error())
+				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"rbac_permission": rbacPermission}))
@@ -216,7 +216,7 @@ func (cls *RbacPermissionRouter) Load(router *gin.Engine) {
 				SetPreloads("RbacPermissionGroup").
 				Prepare().
 				First(&rbacPermission)
-			abnormals.PanicWhenIsEmpty(ret, "权限")
+			wrongs.PanicWhenIsEmpty(ret, "权限")
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"rbac_permission": rbacPermission}))
 		})
