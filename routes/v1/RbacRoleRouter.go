@@ -1,10 +1,10 @@
 package v1
 
 import (
-	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
+	"fix-workshop-ue/wrongs"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
@@ -88,8 +88,8 @@ func (cls RbacRoleBindPermissionsForm) ShouldBind(ctx *gin.Context) RbacRoleBind
 	return cls
 }
 
-func (cls RbacRoleRouter) Load(router *gin.Engine) {
-	r := router.Group(
+func (cls RbacRoleRouter) Load(engine *gin.Engine) {
+	r := engine.Group(
 		"/api/v1/rbacRole",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),

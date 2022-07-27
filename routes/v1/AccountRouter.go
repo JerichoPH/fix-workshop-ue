@@ -103,8 +103,8 @@ func (cls AccountUpdatePasswordForm) ShouldBind(ctx *gin.Context) AccountUpdateP
 // Load 加载路由
 //  @receiver cls
 //  @param router
-func (cls AccountRouter) Load(router *gin.Engine) {
-	r := router.Group(
+func (cls AccountRouter) Load(engine *gin.Engine) {
+	r := engine.Group(
 		"/api/v1/account",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),

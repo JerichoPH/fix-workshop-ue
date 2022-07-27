@@ -1,10 +1,10 @@
 package v1
 
 import (
-	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
+	"fix-workshop-ue/wrongs"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -35,8 +35,8 @@ func (cls RbacPermissionGroupStoreForm) ShouldBind(ctx *gin.Context) RbacPermiss
 // Load 加载路由
 //  @receiver cls
 //  @param router
-func (cls RbacPermissionGroupRouter) Load(router *gin.Engine) {
-	r := router.Group(
+func (cls RbacPermissionGroupRouter) Load(engine *gin.Engine) {
+	r := engine.Group(
 		"api/v1/rbacPermissionGroup",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),

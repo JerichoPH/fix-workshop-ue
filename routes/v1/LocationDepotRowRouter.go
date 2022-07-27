@@ -1,10 +1,10 @@
 package v1
 
 import (
-	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
+	"fix-workshop-ue/wrongs"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
@@ -58,8 +58,11 @@ func (cls LocationDepotRowStoreForm) ShouldBind(ctx *gin.Context) LocationDepotR
 	return cls
 }
 
-func (cls LocationDepotRowRouter) Load(router *gin.Engine) {
-	r := router.Group(
+// Load 加载路由
+//  @receiver cls
+//  @param engine
+func (cls LocationDepotRowRouter) Load(engine *gin.Engine) {
+	r := engine.Group(
 		"api/v1/location",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),

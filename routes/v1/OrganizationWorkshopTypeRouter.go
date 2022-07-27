@@ -1,10 +1,10 @@
 package v1
 
 import (
-	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
+	"fix-workshop-ue/wrongs"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
@@ -42,8 +42,8 @@ func (cls OrganizationWorkshopTypeStoreForm) ShouldBind(ctx *gin.Context) Organi
 // Load 加载路由
 //  @receiver OrganizationWorkshopTypeRouter
 //  @param router
-func (OrganizationWorkshopTypeRouter) Load(router *gin.Engine) {
-	r := router.Group(
+func (OrganizationWorkshopTypeRouter) Load(engine *gin.Engine) {
+	r := engine.Group(
 		"api/v1/organization",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),

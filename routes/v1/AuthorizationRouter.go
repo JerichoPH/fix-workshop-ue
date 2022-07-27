@@ -1,10 +1,10 @@
 package v1
 
 import (
-	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
+	"fix-workshop-ue/wrongs"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -72,8 +72,8 @@ type AuthorizationRouter struct{}
 // Load 加载路由
 //  @receiver cls
 //  @param router
-func (cls AuthorizationRouter) Load(router *gin.Engine) {
-	r := router.Group("/api/v1/authorization")
+func (cls AuthorizationRouter) Load(engine *gin.Engine) {
+	r := engine.Group("/api/v1/authorization")
 	{
 		// 注册
 		r.POST("register", func(ctx *gin.Context) {

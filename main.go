@@ -99,40 +99,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	router := gin.Default()
-	router.Use(wrongs.RecoverHandler) // 异常处理
+	engine := gin.Default()
+	engine.Use(wrongs.RecoverHandler) // 异常处理
 
-	// 用户与权鉴
-	(&v1.AuthorizationRouter{}).Load(router)       // 权鉴
-	(&v1.AccountRouter{}).Load(router)             // 用户                                                                                                                                                          // 用户
-	(&v1.RbacRoleRouter{}).Load(router)            // 角色
-	(&v1.RbacPermissionGroupRouter{}).Load(router) //权限分组
-	(&v1.RbacPermissionRouter{}).Load(router)      // 权限
-	(&v1.MenuRouter{}).Load(router)                // 菜单
+	(&v1.Router{}).Load(engine) // 加载v1路由
 
-	// 组织机构
-	(&v1.OrganizationLineRouter{}).Load(router)               // 线别
-	(&v1.OrganizationRailwayRouter{}).Load(router)            // 路局
-	(&v1.OrganizationParagraphRouter{}).Load(router)          // 站段
-	(&v1.OrganizationWorkshopTypeRouter{}).Load(router)       // 车间类型
-	(&v1.OrganizationWorkshopRouter{}).Load(router)           // 车间
-	(&v1.OrganizationWorkAreaTypeRouter{}).Load(router)       // 工区类型
-	(&v1.OrganizationWorkAreaRouter{}).Load(router)           // 工区
-	(&v1.OrganizationSectionRouter{}).Load(router)            // 区间
-	(&v1.OrganizationCenterRouter{}).Load(router)             // 中心
-	(&v1.OrganizationRailroadGradeCrossRouter{}).Load(router) // 道口
-	(&v1.OrganizationStationRouter{}).Load(router)            // 站场
-
-	// 仓储位置
-	(&v1.LocationDepotStorehouseRouter{}).Load(router) // 仓库
-	(&v1.LocationDepotSectionRouter{}).Load(router)    // 仓库区域
-	(&v1.LocationDepotRowRouter{}).Load(router)        // 仓库排
-	(&v1.LocationDepotCabinetRouter{}).Load(router)    // 仓库柜架
-	(&v1.LocationDepotTierRouter{}).Load(router)       // 仓库柜架层
-	(&v1.LocationDepotCellRouter{}).Load(router)       // 仓库柜架格位
-
-	// 室内上道位置
-	(&v1.LocationIndoorRoomTypeRouter{}).Load(router) // 室内上到位置机房类型
-
-	initServer(router, setting.App.Section("app").Key("addr").MustString(":8080")) // 启动服务
+	initServer(engine, setting.App.Section("app").Key("addr").MustString(":8080")) // 启动服务
 }
