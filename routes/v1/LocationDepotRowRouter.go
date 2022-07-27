@@ -43,10 +43,10 @@ func (cls LocationDepotRowStoreForm) ShouldBind(ctx *gin.Context) LocationDepotR
 	if cls.LocationDepotSectionUUID == "" {
 		wrongs.PanicValidate("所属仓库区域必选")
 	}
-	ret = models.Init(models.LocationDepotRowModel{}).
+	ret = models.Init(models.LocationDepotSectionModel{}).
 		SetWheres(tools.Map{"uuid": cls.LocationDepotSectionUUID}).
 		Prepare().
-		First(cls.LocationDepotSection)
+		First(&cls.LocationDepotSection)
 	wrongs.PanicWhenIsEmpty(ret, "所属仓库区域")
 	if len(cls.LocationDepotCabinetUUIDs) > 0 {
 		models.Init(models.LocationDepotCabinetModel{}).
@@ -188,13 +188,13 @@ func (LocationDepotRowRouter) Load(engine *gin.Engine) {
 
 		// 列表
 		r.GET("depotRow", func(ctx *gin.Context) {
-			var locataionDepotRows []models.LocationDepotRowModel
+			var locationDepotRows []models.LocationDepotRowModel
 			models.Init(models.LocationDepotRowModel{}).
 				SetWhereFields().
 				PrepareQuery(ctx).
-				Find(&locataionDepotRows)
+				Find(&locationDepotRows)
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"locataion_depot_rows": locataionDepotRows}))
+			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"location_depot_rows": locationDepotRows}))
 		})
 	}
 }

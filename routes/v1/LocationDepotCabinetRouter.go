@@ -43,7 +43,7 @@ func (cls LocationDepotCabinetStoreForm) ShouldBind(ctx *gin.Context) LocationDe
 	if cls.LocationDepotRowUUID == "" {
 		wrongs.PanicValidate("所属仓库排必选")
 	}
-	ret = models.Init(models.LocationDepotCabinetModel{}).
+	ret = models.Init(models.LocationDepotRowModel{}).
 		SetWheres(tools.Map{"uuid": cls.LocationDepotRowUUID}).
 		Prepare().
 		First(&cls.LocationDepotRow)
