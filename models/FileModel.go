@@ -13,6 +13,6 @@ type FileModel struct {
 }
 
 // TableName 表名称
-func (cls *FileModel) TableName() string {
+func (FileModel) TableName() string {
 	return "files"
 }

@@ -1,8 +1,8 @@
 package models
 
 import (
-	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/tools"
+	"fix-workshop-ue/wrongs"
 )
 
 type MenuModel struct {
@@ -18,7 +18,7 @@ type MenuModel struct {
 }
 
 // TableName 表名称
-func (cls *MenuModel) TableName() string {
+func (MenuModel) TableName() string {
 	return "menus"
 }
 

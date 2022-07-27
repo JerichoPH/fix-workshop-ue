@@ -35,7 +35,7 @@ func (cls RbacPermissionGroupStoreForm) ShouldBind(ctx *gin.Context) RbacPermiss
 // Load 加载路由
 //  @receiver cls
 //  @param router
-func (cls RbacPermissionGroupRouter) Load(engine *gin.Engine) {
+func (RbacPermissionGroupRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
 		"api/v1/rbacPermissionGroup",
 		middlewares.CheckJwt(),

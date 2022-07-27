@@ -53,7 +53,7 @@ func (cls OrganizationWorkshopStoreForm) ShouldBind(ctx *gin.Context) Organizati
 	if cls.OrganizationParagraphUUID == "" {
 		wrongs.PanicValidate("所属站段必选")
 	}
-	ret = models.Init(models.OrganizationRailwayModel{}).
+	ret = models.Init(models.OrganizationParagraphModel{}).
 		SetWheres(tools.Map{"uuid": cls.OrganizationParagraphUUID}).
 		Prepare().
 		First(&cls.OrganizationParagraph)

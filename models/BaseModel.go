@@ -2,9 +2,9 @@ package models
 
 import (
 	"database/sql"
-	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/databases"
 	"fix-workshop-ue/tools"
+	"fix-workshop-ue/wrongs"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -133,14 +133,14 @@ func (cls *BaseModel) SetScopes(scopes ...func(*gorm.DB) *gorm.DB) *BaseModel {
 
 // BeforeCreate 插入数据前
 func (cls *BaseModel) BeforeCreate(db *gorm.DB) (err error) {
-	cls.CreatedAt = sql.NullTime{Time:time.Now()}
-	cls.UpdatedAt = sql.NullTime{Time:time.Now()}
+	cls.CreatedAt = sql.NullTime{Time: time.Now(), Valid: true}
+	cls.UpdatedAt = sql.NullTime{Time: time.Now(), Valid: true}
 	return
 }
 
 // BeforeSave 修改数据前
 func (cls *BaseModel) BeforeSave(db *gorm.DB) (err error) {
-	cls.UpdatedAt = sql.NullTime{Time:time.Now()}
+	cls.UpdatedAt = sql.NullTime{Time: time.Now(), Valid: true}
 	return
 }
 

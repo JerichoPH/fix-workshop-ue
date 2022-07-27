@@ -88,7 +88,10 @@ func (cls RbacRoleBindPermissionsForm) ShouldBind(ctx *gin.Context) RbacRoleBind
 	return cls
 }
 
-func (cls RbacRoleRouter) Load(engine *gin.Engine) {
+// Load 加载路由
+//  @receiver RbacRoleRouter
+//  @param engine
+func (RbacRoleRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
 		"/api/v1/rbacRole",
 		middlewares.CheckJwt(),

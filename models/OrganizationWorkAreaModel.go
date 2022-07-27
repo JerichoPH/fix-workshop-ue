@@ -19,6 +19,6 @@ type OrganizationWorkAreaModel struct {
 }
 
 // TableName 表名称
-func (cls *OrganizationWorkAreaModel) TableName() string {
+func (OrganizationWorkAreaModel) TableName() string {
 	return "organization_work_areas"
 }

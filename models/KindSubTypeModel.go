@@ -12,6 +12,6 @@ type KindSubTypeModel struct {
 }
 
 // TableName 表名称
-func (cls *KindSubTypeModel) TableName() string {
+func (KindSubTypeModel) TableName() string {
 	return "kind_sub_types"
 }

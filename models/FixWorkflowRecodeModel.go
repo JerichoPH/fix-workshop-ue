@@ -13,6 +13,6 @@ type FixWorkflowRecodeModel struct {
 }
 
 // TableName 表名称
-func (cls *FixWorkflowRecodeModel) TableName() string {
+func (FixWorkflowRecodeModel) TableName() string {
 	return "fix_workflow_recodes"
 }

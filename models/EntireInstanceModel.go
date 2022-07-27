@@ -49,6 +49,6 @@ type EntireInstanceModel struct {
 }
 
 // TableName 表名称
-func (cls *EntireInstanceModel) TableName() string {
+func (EntireInstanceModel) TableName() string {
 	return "entire_instances"
 }

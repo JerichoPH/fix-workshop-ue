@@ -11,6 +11,6 @@ type RbacPermissionModel struct {
 }
 
 // TableName 表名称
-func (cls *RbacPermissionModel) TableName() string {
+func (RbacPermissionModel) TableName() string {
 	return "rbac_permissions"
 }

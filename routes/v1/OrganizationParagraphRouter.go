@@ -64,7 +64,7 @@ func (cls OrganizationParagraphStoreForm) ShouldBind(ctx *gin.Context) Organizat
 // Load 加载路由
 //  @receiver cls
 //  @param router
-func (cls OrganizationParagraphRouter) Load(engine *gin.Engine) {
+func (OrganizationParagraphRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
 		"/api/v1/organization",
 		middlewares.CheckJwt(),

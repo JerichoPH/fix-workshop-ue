@@ -63,7 +63,7 @@ func (cls OrganizationRailroadGradeCrossStoreForm) ShouldBind(ctx *gin.Context) 
 // Load 加载路由
 //  @receiver cls
 //  @param router
-func (cls OrganizationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
+func (OrganizationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
 		"api/v1/organization",
 		middlewares.CheckJwt(),

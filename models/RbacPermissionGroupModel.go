@@ -7,6 +7,6 @@ type RbacPermissionGroupModel struct {
 }
 
 // TableName 表名称
-func (cls *RbacPermissionGroupModel) TableName() string {
+func (RbacPermissionGroupModel) TableName() string {
 	return "rbac_permission_groups"
 }

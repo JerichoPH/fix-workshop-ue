@@ -13,6 +13,6 @@ type LocationDepotRowModel struct {
 // TableName 表名称
 //  @receiver cls
 //  @return string
-func (cls LocationDepotRowModel) TableName() string {
+func (LocationDepotRowModel) TableName() string {
 	return "location_depot_rows"
 }

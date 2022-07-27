@@ -9,6 +9,6 @@ type LocationIndoorCellModel struct {
 }
 
 // TableName 表名称
-func (cls *LocationIndoorCellModel) TableName() string {
+func (LocationIndoorCellModel) TableName() string {
 	return "location_indoor_cells"
 }

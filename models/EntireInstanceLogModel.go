@@ -26,6 +26,6 @@ type EntireInstanceLogModel struct {
 }
 
 // TableName 表名称
-func (cls *EntireInstanceLogModel) TableName() string {
+func (EntireInstanceLogModel) TableName() string {
 	return "entire_instance_logs"
 }

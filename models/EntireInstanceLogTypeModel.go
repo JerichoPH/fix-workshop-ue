@@ -10,6 +10,6 @@ type EntireInstanceLogTypeModel struct {
 }
 
 // TableName 表名称
-func (cls *EntireInstanceLogTypeModel) TableName() string {
+func (EntireInstanceLogTypeModel) TableName() string {
 	return "entire_instance_log_types"
 }

@@ -13,6 +13,6 @@ type KindEntireTypeModel struct {
 }
 
 // TableName 表名称
-func (cls *KindEntireTypeModel) TableName() string {
+func (KindEntireTypeModel) TableName() string {
 	return "kind_entire_types"
 }

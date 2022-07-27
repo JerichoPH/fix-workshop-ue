@@ -60,7 +60,7 @@ func (cls OrganizationLineStoreForm) ShouldBind(ctx *gin.Context) OrganizationLi
 // Load 加载路由
 //  @receiver cls
 //  @param router
-func (cls OrganizationLineRouter) Load(engine *gin.Engine) {
+func (OrganizationLineRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
 		"/api/v1/organization",
 		middlewares.CheckJwt(),

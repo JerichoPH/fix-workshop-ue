@@ -72,7 +72,7 @@ type AuthorizationRouter struct{}
 // Load 加载路由
 //  @receiver cls
 //  @param router
-func (cls AuthorizationRouter) Load(engine *gin.Engine) {
+func (AuthorizationRouter) Load(engine *gin.Engine) {
 	r := engine.Group("/api/v1/authorization")
 	{
 		// 注册

@@ -13,6 +13,6 @@ type OrganizationRailroadGradeCrossModel struct {
 }
 
 // TableName 表名称
-func (cls *OrganizationRailroadGradeCrossModel) TableName() string {
+func (OrganizationRailroadGradeCrossModel) TableName() string {
 	return "organization_railroad_grade_crosses"
 }

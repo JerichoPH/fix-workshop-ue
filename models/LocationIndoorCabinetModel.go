@@ -10,6 +10,6 @@ type LocationIndoorCabinetModel struct {
 }
 
 // TableName 表名称
-func (cls *LocationIndoorCabinetModel) TableName() string {
+func (LocationIndoorCabinetModel) TableName() string {
 	return "location_indoor_cabinets"
 }

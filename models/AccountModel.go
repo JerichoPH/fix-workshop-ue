@@ -1,8 +1,8 @@
 package models
 
 import (
-	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/tools"
+	"fix-workshop-ue/wrongs"
 )
 
 // AccountModel 用户模型
@@ -16,7 +16,7 @@ type AccountModel struct {
 }
 
 // TableName 表名称
-func (cls *AccountModel) TableName() string {
+func (AccountModel) TableName() string {
 	return "accounts"
 }
 

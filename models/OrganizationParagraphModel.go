@@ -15,6 +15,6 @@ type OrganizationParagraphModel struct {
 }
 
 // TableName 表名称
-func (cls *OrganizationParagraphModel) TableName() string {
+func (OrganizationParagraphModel) TableName() string {
 	return "organization_paragraphs"
 }

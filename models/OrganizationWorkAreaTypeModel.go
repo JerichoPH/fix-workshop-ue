@@ -1,8 +1,8 @@
 package models
 
 import (
-	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/tools"
+	"fix-workshop-ue/wrongs"
 )
 
 type OrganizationWorkAreaTypeModel struct {
@@ -13,7 +13,7 @@ type OrganizationWorkAreaTypeModel struct {
 }
 
 // TableName 表名称
-func (cls *OrganizationWorkAreaTypeModel) TableName() string {
+func (OrganizationWorkAreaTypeModel) TableName() string {
 	return "organization_work_area_types"
 }
 

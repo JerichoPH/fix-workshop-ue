@@ -1,8 +1,8 @@
 package models
 
 import (
-	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/tools"
+	"fix-workshop-ue/wrongs"
 )
 
 type LocationIndoorRoomTypeModel struct {
@@ -13,7 +13,7 @@ type LocationIndoorRoomTypeModel struct {
 }
 
 // TableName 表名称
-func (cls *LocationIndoorRoomTypeModel) TableName() string {
+func (LocationIndoorRoomTypeModel) TableName() string {
 	return "location_indoor_room_types"
 }
 

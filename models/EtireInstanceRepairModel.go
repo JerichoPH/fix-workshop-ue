@@ -27,6 +27,6 @@ type EntireInstanceRepairModel struct {
 }
 
 // TableName 表名称
-func (cls *EntireInstanceRepairModel) TableName() string {
+func (EntireInstanceRepairModel) TableName() string {
 	return "entire_instance_repairs"
 }

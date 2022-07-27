@@ -1,8 +1,8 @@
 package models
 
 import (
-	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/tools"
+	"fix-workshop-ue/wrongs"
 )
 
 // OrganizationWorkshopTypeModel 车间类型
@@ -15,7 +15,7 @@ type OrganizationWorkshopTypeModel struct {
 }
 
 // TableName 表名称
-func (cls *OrganizationWorkshopTypeModel) TableName() string {
+func (OrganizationWorkshopTypeModel) TableName() string {
 	return "organization_workshop_types"
 }
 

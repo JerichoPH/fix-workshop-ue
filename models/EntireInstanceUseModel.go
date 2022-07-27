@@ -67,6 +67,6 @@ type EntireInstanceUseModel struct {
 }
 
 // TableName 表名称
-func (cls *EntireInstanceUseModel) TableName() string {
+func (EntireInstanceUseModel) TableName() string {
 	return "entire_instance_uses"
 }

@@ -7,6 +7,6 @@ type LocationOutdoorSignalPostMainOrIndicatorModel struct {
 }
 
 // TableName 表名称
-func (cls *LocationOutdoorSignalPostMainOrIndicatorModel) TableName() string {
+func (LocationOutdoorSignalPostMainOrIndicatorModel) TableName() string {
 	return "location_signal_post_main_or_indicators"
 }

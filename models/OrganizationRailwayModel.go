@@ -13,6 +13,6 @@ type OrganizationRailwayModel struct {
 }
 
 // TableName 表名称
-func (cls *OrganizationRailwayModel) TableName() string {
+func (OrganizationRailwayModel) TableName() string {
 	return "organization_railways"
 }

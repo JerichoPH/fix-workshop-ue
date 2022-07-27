@@ -49,7 +49,7 @@ func (cls LocationIndoorRoomTypeStoreForm) ShouldBind(ctx *gin.Context) Location
 // Load 加载路由
 //  @receiver cls
 //  @param engine
-func (cls LocationIndoorRoomTypeRouter) Load(engine *gin.Engine) {
+func (LocationIndoorRoomTypeRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
 		"api/v1/location",
 		middlewares.CheckJwt(),

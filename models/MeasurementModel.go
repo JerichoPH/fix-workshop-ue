@@ -5,6 +5,6 @@ type MeasurementModel struct {
 }
 
 // TableName 表名称
-func (cls *MeasurementModel) TableName() string {
+func (MeasurementModel) TableName() string {
 	return "measurements"
 }

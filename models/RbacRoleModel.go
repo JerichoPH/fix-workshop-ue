@@ -10,6 +10,6 @@ type RbacRoleModel struct {
 }
 
 // TableName 表名称
-func (cls *RbacRoleModel) TableName() string {
+func (RbacRoleModel) TableName() string {
 	return "rbac_roles"
 }

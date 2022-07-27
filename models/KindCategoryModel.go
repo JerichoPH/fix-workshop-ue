@@ -11,6 +11,6 @@ type KindCategoryModel struct {
 }
 
 // TableName 表名称
-func (cls *KindCategoryModel) TableName() string {
+func (KindCategoryModel) TableName() string {
 	return "kind_categories"
 }

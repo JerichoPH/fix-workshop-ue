@@ -1,10 +1,10 @@
 package v1
 
 import (
-	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
+	"fix-workshop-ue/wrongs"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -103,7 +103,7 @@ func (cls AccountUpdatePasswordForm) ShouldBind(ctx *gin.Context) AccountUpdateP
 // Load 加载路由
 //  @receiver cls
 //  @param router
-func (cls AccountRouter) Load(engine *gin.Engine) {
+func (AccountRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
 		"/api/v1/account",
 		middlewares.CheckJwt(),

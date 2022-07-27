@@ -12,6 +12,6 @@ type OrganizationCenterModel struct {
 }
 
 // TableName 表名称
-func (cls *OrganizationCenterModel) TableName() string {
+func (OrganizationCenterModel) TableName() string {
 	return "organization_centers"
 }

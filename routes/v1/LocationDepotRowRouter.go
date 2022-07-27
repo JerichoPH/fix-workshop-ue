@@ -61,7 +61,7 @@ func (cls LocationDepotRowStoreForm) ShouldBind(ctx *gin.Context) LocationDepotR
 // Load 加载路由
 //  @receiver cls
 //  @param engine
-func (cls LocationDepotRowRouter) Load(engine *gin.Engine) {
+func (LocationDepotRowRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
 		"api/v1/location",
 		middlewares.CheckJwt(),

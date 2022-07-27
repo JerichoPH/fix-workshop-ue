@@ -10,6 +10,6 @@ type SourceNameModel struct {
 }
 
 // TableName 表名称
-func (cls *SourceNameModel) TableName() string {
+func (SourceNameModel) TableName() string {
 	return "source_names"
 }

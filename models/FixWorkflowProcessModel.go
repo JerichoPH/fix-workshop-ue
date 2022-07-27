@@ -13,6 +13,6 @@ type FixWorkflowProcessModel struct {
 }
 
 // TableName 表名称
-func (cls *FixWorkflowProcessModel) TableName() string {
+func (FixWorkflowProcessModel) TableName() string {
 	return "fix_workflow_processes"
 }

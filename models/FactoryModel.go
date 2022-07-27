@@ -9,6 +9,6 @@ type FactoryModel struct {
 }
 
 // TableName 表名称
-func (cls *FactoryModel) TableName() string {
+func (FactoryModel) TableName() string {
 	return "factories"
 }

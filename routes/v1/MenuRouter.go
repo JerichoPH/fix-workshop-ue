@@ -46,7 +46,7 @@ func (cls MenuStoreForm) ShouldBind(ctx *gin.Context) MenuStoreForm {
 // Load 加载路由
 //  @receiver cls
 //  @param router
-func (cls MenuRouter) Load(engine *gin.Engine) {
+func (MenuRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
 		"/api/v1/menu",
 		middlewares.CheckJwt(),

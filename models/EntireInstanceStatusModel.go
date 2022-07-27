@@ -9,6 +9,6 @@ type EntireInstanceStatusModel struct {
 }
 
 // TableName 表名称
-func (cls *EntireInstanceStatusModel) TableName() string {
+func (EntireInstanceStatusModel) TableName() string {
 	return "entire_instance_statuses"
 }
