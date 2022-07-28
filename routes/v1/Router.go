@@ -41,4 +41,9 @@ func (Router) Load(engine *gin.Engine) {
 	(&LocationIndoorCabinetRouter{}).Load(engine)  // 室内上道位置柜架
 	(&LocationIndoorTierRouter{}).Load(engine)     // 室内上道位置柜架层
 	(&LocationIndoorCellRouter{}).Load(engine)     // 室内上道位置柜架格位
+
+	// 种类型
+	(&KindCategoryRouter{}).Load(engine)   // 种类
+	(&KindEntireTypeRouter{}).Load(engine) // 类型
+	(&KindSubTypeRouter{}).Load(engine)    // 型号
 }

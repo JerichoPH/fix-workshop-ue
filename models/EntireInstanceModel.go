@@ -7,12 +7,8 @@ type EntireInstanceModel struct {
 	IdentityCode                   string                     `gorm:"type:VARCHAR(20);UNIQUE;NOT NULL;COMMENT:唯一编号;" json:"identity_code"`
 	EntireInstanceStatusUniqueCode string                     `gorm:"type:VARCHAR(64);COMMENT:所属类型;" json:"entire_instance_status_unique_code"`
 	EntireInstanceStatus           EntireInstanceStatusModel  `gorm:"foreignKey:EntireInstanceStatusUniqueCode;references:UniqueCode;COMMENT:所属状态;" json:"entire_instance_status"`
-	KindCategoryUniqueCode         string                     `gorm:"type:CHAR(3);COMMENT:所属类型;" json:"kind_category_unique_code"`
-	KindCategory                   KindCategoryModel          `gorm:"foreignKey:KindCategoryUniqueCode;references:UniqueCode;COMMENT:所属种类;" json:"kind_category"`
-	KindEntireTypeUniqueCode       string                     `gorm:"type:CHAR(5);COMMENT:所属类型;" json:"kind_entire_model_unique_code"`
-	KindEntireType                 KindEntireTypeModel        `gorm:"foreignKey:KindEntireTypeUniqueCode;references:UniqueCode;COMMENT:所属类型;" json:"kind_entire_model"`
-	KindSubTypeUniqueCode          string                     `gorm:"type:CHAR(7);COMMENT:所属型号;" json:"kind_sub_model_unique_code"`
-	KindSubModel                   KindSubTypeModel           `gorm:"foreignKey:KindSubTypeUniqueCode;references:UniqueCode;COMMENT:所属型号;" json:"kind_sub_model"`
+	KindSubTypeUUID                string                     `gorm:"type:CHAR(36);COMMENT:所属型号UUID;" json:"kind_sub_model_uuid"`
+	KindSubModel                   KindSubTypeModel           `gorm:"foreignKey:KindSubTypeUUID;references:UUID;COMMENT:所属型号;" json:"kind_sub_model"`
 	ParentIdentityCode             string                     `gorm:"type:VARCHAR(20);COMMENT:所属整机唯一编号;" json:"parent_identity_code"`
 	Parent                         *EntireInstanceModel       `gorm:"foreignKey:ParentIdentityCode;references:IdentityCode;COMMENT:所属整机;" json:"parent"`
 	Parts                          []*EntireInstanceModel     `gorm:"foreignKey:ParentIdentityCode;references:IdentityCode;COMMENT:相关部件;" json:"parts"`

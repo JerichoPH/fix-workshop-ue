@@ -94,6 +94,11 @@ func main() {
 			&models.LocationIndoorTierModel{},     // 层
 			&models.LocationIndoorCellModel{},     // 位
 
+			// 种类型
+			&models.KindCategoryModel{},   // 种类
+			&models.KindEntireTypeModel{}, // 类型
+			&models.KindSubTypeModel{},    // 型号
+
 		); errAutoMigrate != nil {
 		fmt.Println("自动迁移错误：", errAutoMigrate)
 		os.Exit(1)
