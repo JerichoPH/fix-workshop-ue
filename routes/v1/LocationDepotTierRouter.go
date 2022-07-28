@@ -20,8 +20,6 @@ type LocationDepotTierStoreForm struct {
 	Name                     string `form:"name" json:"name"`
 	LocationDepotCabinetUUID string `form:"location_depot_cabinet_uuid" json:"location_depot_cabinet_uuid"`
 	LocationDepotCabinet     models.LocationDepotCabinetModel
-	LocationDepotCellUUIDs   []string `form:"location_depot_cell_uuids" json:"location_depot_cell_uuids"`
-	LocationDepotCells       []models.LocationDepotCellModel
 }
 
 // ShouldBind 绑定表单
@@ -48,12 +46,6 @@ func (cls LocationDepotTierStoreForm) ShouldBind(ctx *gin.Context) LocationDepot
 		Prepare().
 		First(&cls.LocationDepotCabinet)
 	wrongs.PanicWhenIsEmpty(ret, "所属仓库柜架")
-	if len(cls.LocationDepotCellUUIDs) > 0 {
-		models.Init(models.LocationDepotCellModel{}).
-			GetSession().
-			Where("uuid in ?", cls.LocationDepotCellUUIDs).
-			Find(&cls.LocationDepotCells)
-	}
 
 	return cls
 }
@@ -96,7 +88,6 @@ func (LocationDepotTierRouter) Load(engine *gin.Engine) {
 				UniqueCode:           form.UniqueCode,
 				Name:                 form.Name,
 				LocationDepotCabinet: form.LocationDepotCabinet,
-				LocationDepotCells:   form.LocationDepotCells,
 			}
 			if ret = models.Init(models.LocationDepotTierModel{}).GetSession().Create(&locationDepotTier); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
@@ -163,7 +154,6 @@ func (LocationDepotTierRouter) Load(engine *gin.Engine) {
 			locationDepotTier.UniqueCode = form.UniqueCode
 			locationDepotTier.Name = form.Name
 			locationDepotTier.LocationDepotCabinet = form.LocationDepotCabinet
-			locationDepotTier.LocationDepotCells = form.LocationDepotCells
 			if ret = models.Init(models.LocationDepotTierModel{}).GetSession().Save(&locationDepotTier); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}

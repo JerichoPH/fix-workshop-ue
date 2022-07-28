@@ -22,8 +22,6 @@ type OrganizationRailwayStoreForm struct {
 	BeEnable                   bool     `form:"be_enable" json:"be_enable"`
 	OrganizationLineUUIDs      []string `form:"organization_line_uuids" json:"organization_line_uuids"`
 	OrganizationLines          []*models.OrganizationLineModel
-	OrganizationParagraphUUIDs []string `form:"organization_paragraph_uuids" json:"organization_paragraph_uuids"`
-	OrganizationParagraphs     []models.OrganizationParagraphModel
 }
 
 // ShouldBind 绑定表单
@@ -41,10 +39,10 @@ func (cls OrganizationRailwayStoreForm) ShouldBind(ctx *gin.Context) Organizatio
 		wrongs.PanicValidate("路局名称必填")
 	}
 	if len(cls.OrganizationLineUUIDs) > 0 {
-		models.Init(models.OrganizationLineModel{}).GetSession().Where("uuid in ?", cls.OrganizationLineUUIDs).Find(&cls.OrganizationLines)
-	}
-	if len(cls.OrganizationParagraphUUIDs) > 0 {
-		models.Init(models.OrganizationParagraphModel{}).GetSession().Where("uuid in ?", cls.OrganizationParagraphUUIDs).Find(&cls.OrganizationParagraphs)
+		models.Init(models.OrganizationLineModel{}).
+			GetSession().
+			Where("uuid in ?", cls.OrganizationLineUUIDs).
+			Find(&cls.OrganizationLines)
 	}
 
 	return cls
@@ -95,7 +93,6 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 				ShortName:              form.ShortName,
 				BeEnable:               form.BeEnable,
 				OrganizationLines:      form.OrganizationLines,
-				OrganizationParagraphs: form.OrganizationParagraphs,
 			}
 			if ret = (&models.BaseModel{}).SetModel(models.OrganizationRailwayModel{}).GetSession().Create(&organizationRailway); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
@@ -167,7 +164,6 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 			organizationRailway.ShortName = form.ShortName
 			organizationRailway.BeEnable = form.BeEnable
 			organizationRailway.OrganizationLines = form.OrganizationLines
-			organizationRailway.OrganizationParagraphs = form.OrganizationParagraphs
 			if ret = models.Init(models.OrganizationRailwayModel{}).GetSession().Save(&organizationRailway); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}

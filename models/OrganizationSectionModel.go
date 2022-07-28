@@ -10,6 +10,7 @@ type OrganizationSectionModel struct {
 	OrganizationWorkshop     OrganizationWorkshopModel `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;COMMENT:所属车间;" json:"organization_workshop"`
 	OrganizationWorkAreaUUID string                    `gorm:"type:CHAR(36);COMMENT:所护工区;" json:"organization_work_area_uuid"`
 	OrganizationWorkArea     OrganizationWorkAreaModel `gorm:"foreignKey:OrganizationWorkAreaUUID;references:UUID;COMMENT:所属工区;" json:"organization_work_area"`
+	LocationIndoorRooms      []LocationIndoorRoomModel `gorm:"foreignKey:OrganizationSectionUUID;references:UUID;COMMENT:相关机房;" json:"location_indoor_rooms"`
 }
 
 // TableName 表名称

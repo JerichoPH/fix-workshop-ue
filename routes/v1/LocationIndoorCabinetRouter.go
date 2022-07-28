@@ -20,8 +20,6 @@ type LocationIndoorCabinetStoreForm struct {
 	Name                    string `form:"name" json:"name"`
 	LocationIndoorRowUUID   string `form:"location_indoor_row_uuid" json:"location_indoor_row_uuid"`
 	LocationIndoorRow       models.LocationIndoorRowModel
-	LocationIndoorTierUUIDs []string `form:"location_indoor_tier_uuids" json:"location_indoor_tier_uuids"`
-	LocationIndoorTiers     []models.LocationIndoorTierModel
 }
 
 // ShouldBind 绑定表单
@@ -89,7 +87,6 @@ func (LocationIndoorCabinetRouter) Load(engine *gin.Engine) {
 				UniqueCode:          form.UniqueCode,
 				Name:                form.Name,
 				LocationIndoorRow:   form.LocationIndoorRow,
-				LocationIndoorTiers: form.LocationIndoorTiers,
 			}
 			if ret = models.Init(models.LocationIndoorCabinetModel{}).GetSession().Create(&locationIndoorCabinet); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
@@ -156,7 +153,6 @@ func (LocationIndoorCabinetRouter) Load(engine *gin.Engine) {
 			locationIndoorCabinet.UniqueCode = form.UniqueCode
 			locationIndoorCabinet.Name = form.Name
 			locationIndoorCabinet.LocationIndoorRow = form.LocationIndoorRow
-			locationIndoorCabinet.LocationIndoorTiers = form.LocationIndoorTiers
 			if ret = models.Init(models.LocationIndoorCabinetModel{}).GetSession().Save(&locationIndoorCabinet); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}

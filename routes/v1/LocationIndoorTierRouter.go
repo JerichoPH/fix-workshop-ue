@@ -20,8 +20,6 @@ type LocationIndoorTierStoreForm struct {
 	Name                      string `form:"name" json:"name"`
 	LocationIndoorCabinetUUID string `form:"location_indoor_cabinet_uuid" json:"location_indoor_cabinet_uuid"`
 	LocationIndoorCabinet     models.LocationIndoorCabinetModel
-	LocationIndoorCellUUIDs   []string `form:"location_indoor_cell_uuids" json:"location_indoor_cell_uuids"`
-	LocationIndoorCells       []models.LocationIndoorCellModel
 }
 
 // ShouldBind 
@@ -48,12 +46,6 @@ func (cls LocationIndoorTierStoreForm) ShouldBind(ctx *gin.Context) LocationIndo
 		Prepare().
 		First(&cls.LocationIndoorCabinet)
 	wrongs.PanicWhenIsEmpty(ret, "所属柜架")
-	if len(cls.LocationIndoorCellUUIDs) > 0 {
-		models.Init(models.LocationIndoorTierModel{}).
-			GetSession().
-			Where("uuid in ?", cls.LocationIndoorCellUUIDs).
-			Find(&cls.LocationIndoorCells)
-	}
 
 	return cls
 }
@@ -96,7 +88,6 @@ func (LocationIndoorTierRouter) Load(engine *gin.Engine) {
 				UniqueCode:            form.UniqueCode,
 				Name:                  form.Name,
 				LocationIndoorCabinet: form.LocationIndoorCabinet,
-				LocationIndoorCells:   form.LocationIndoorCells,
 			}
 			if ret = models.Init(models.LocationIndoorTierModel{}).GetSession().Create(&locationIndoorTier); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
@@ -163,7 +154,6 @@ func (LocationIndoorTierRouter) Load(engine *gin.Engine) {
 			locationIndoorTier.UniqueCode = form.UniqueCode
 			locationIndoorTier.Name = form.Name
 			locationIndoorTier.LocationIndoorCabinet = form.LocationIndoorCabinet
-			locationIndoorTier.LocationIndoorCells = form.LocationIndoorCells
 			if ret = models.Init(models.LocationIndoorTierModel{}).GetSession().Save(&locationIndoorTier); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}

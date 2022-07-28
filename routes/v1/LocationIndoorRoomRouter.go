@@ -22,8 +22,10 @@ type LocationIndoorRoomStoreForm struct {
 	LocationIndoorRoomType     models.LocationIndoorRoomTypeModel
 	OrganizationStationUUID    string `form:"organization_station_uuid" json:"organization_station_uuid"`
 	OrganizationStation        models.OrganizationStationModel
-	LocationIndoorRowUUIDs     []string `form:"location_indoor_row_uuids" json:"location_indoor_row_uuids"`
-	LocationIndoorRows         []models.LocationIndoorRowModel
+	OrganizationSectionUUID    string `form:"organization_section_uuid" json:"organization_section_uuid"`
+	OrganizationSection        models.OrganizationSectionModel
+	OrganizationCenterUUID     string `form:"organization_center_uuid" json:"organization_center_uuid"`
+	OrganizationCenter         models.OrganizationCenterModel
 }
 
 // ShouldBind 绑定表单
@@ -50,19 +52,29 @@ func (cls LocationIndoorRoomStoreForm) ShouldBind(ctx *gin.Context) LocationIndo
 		Prepare().
 		First(&cls.LocationIndoorRoomType)
 	wrongs.PanicWhenIsEmpty(ret, "机房类型")
-	if cls.OrganizationStationUUID == "" {
-		wrongs.PanicValidate("所属战场必选")
+	if cls.OrganizationStationUUID == "" && cls.OrganizationSectionUUID == "" && cls.OrganizationCenterUUID == "" {
+		wrongs.PanicValidate("归属单位必选")
 	}
-	ret = models.Init(models.OrganizationStationModel{}).
-		SetWheres(tools.Map{"uuid": cls.OrganizationStationUUID}).
-		Prepare().
-		First(&cls.OrganizationStation)
-	wrongs.PanicWhenIsEmpty(ret, "所属战场")
-	if len(cls.LocationIndoorRowUUIDs) > 0 {
-		models.Init(models.LocationIndoorRowModel{}).
-			GetSession().
-			Where("uuid in ?", cls.LocationIndoorRowUUIDs).
-			Find(&cls.LocationIndoorRows)
+	if cls.OrganizationStationUUID != "" {
+		ret = models.Init(models.OrganizationStationModel{}).
+			SetWheres(tools.Map{"uuid": cls.OrganizationStationUUID}).
+			Prepare().
+			First(&cls.OrganizationStation)
+		wrongs.PanicWhenIsEmpty(ret, "所属战场")
+	}
+	if cls.OrganizationSectionUUID != "" {
+		ret = models.Init(models.OrganizationSectionModel{}).
+			SetWheres(tools.Map{"uuid": cls.OrganizationSection}).
+			Prepare().
+			First(&cls.OrganizationSection)
+		wrongs.PanicWhenIsEmpty(ret, "所属区间")
+	}
+	if cls.OrganizationCenterUUID != "" {
+		ret = models.Init(models.OrganizationSectionModel{}).
+			SetWheres(tools.Map{"uuid": cls.OrganizationSection}).
+			Prepare().
+			First(&cls.OrganizationSection)
+		wrongs.PanicWhenIsEmpty(ret, "所属中心")
 	}
 
 	return cls
@@ -107,7 +119,6 @@ func (LocationIndoorRoomRouter) Load(engine *gin.Engine) {
 				Name:                   form.Name,
 				LocationIndoorRoomType: form.LocationIndoorRoomType,
 				OrganizationStation:    form.OrganizationStation,
-				LocationIndoorRows:     form.LocationIndoorRows,
 			}
 			if ret = models.Init(models.LocationIndoorRoomModel{}).GetSession().Create(&locationIndoorRoom); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
@@ -175,7 +186,6 @@ func (LocationIndoorRoomRouter) Load(engine *gin.Engine) {
 			locationIndoorRoom.Name = form.Name
 			locationIndoorRoom.LocationIndoorRoomType = form.LocationIndoorRoomType
 			locationIndoorRoom.OrganizationStation = form.OrganizationStation
-			locationIndoorRoom.LocationIndoorRows = form.LocationIndoorRows
 			if ret = models.Init(models.LocationIndoorRoomModel{}).GetSession().Save(&locationIndoorRoom); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}

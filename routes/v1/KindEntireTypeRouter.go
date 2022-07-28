@@ -22,8 +22,6 @@ type KindEntireTypeStoreForm struct {
 	BeEnable         bool   `form:"be_enable" json:"be_enable"`
 	KindCategoryUUID string `form:"kind_category_uuid" json:"kind_category_uuid"`
 	KindCategory     models.KindCategoryModel
-	KindSubTypeUUIDs []string `form:"kind_sub_type_uuids" json:"kind_sub_type_uuids"`
-	KindSubTypes     []models.KindSubTypeModel
 }
 
 // ShouldBind 绑定表单
@@ -50,12 +48,6 @@ func (cls KindEntireTypeStoreForm) ShouldBind(ctx *gin.Context) KindEntireTypeSt
 		Prepare().
 		First(&cls.KindCategory)
 	wrongs.PanicWhenIsEmpty(ret, "所属种类")
-	if len(cls.KindSubTypeUUIDs) > 0 {
-		models.Init(models.KindSubTypeModel{}).
-			GetSession().
-			Where("uuid in ?", cls.KindSubTypeUUIDs).
-			Find(&cls.KindSubTypes)
-	}
 
 	return cls
 }
@@ -99,7 +91,6 @@ func (KindEntireTypeRouter) Load(engine *gin.Engine) {
 				Name:         form.Name,
 				BeEnable:     form.BeEnable,
 				KindCategory: form.KindCategory,
-				KindSubTypes: form.KindSubTypes,
 			}
 			if ret = models.Init(models.KindEntireTypeModel{}).GetSession().Create(&kindEntireType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
@@ -167,7 +158,6 @@ func (KindEntireTypeRouter) Load(engine *gin.Engine) {
 			kindEntireType.Name = form.Name
 			kindEntireType.BeEnable = form.BeEnable
 			kindEntireType.KindCategory = form.KindCategory
-			kindEntireType.KindSubTypes = form.KindSubTypes
 			if ret = models.Init(models.KindEntireTypeModel{}).GetSession().Save(&kindEntireType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}

@@ -20,8 +20,6 @@ type LocationDepotStorehouseStoreForm struct {
 	Name                      string `form:"name" json:"name"`
 	OrganizationWorkshopUUID  string `form:"organization_workshop_uuid" json:"organization_workshop_uuid"`
 	OrganizationWorkshop      models.OrganizationWorkshopModel
-	LocationDepotSectionUUIDs []string `form:"location_depot_section_uuids" json:"location_depot_section_uuids"`
-	LocationDepotSections     []models.LocationDepotSectionModel
 }
 
 // ShouldBind 绑定表单
@@ -48,13 +46,6 @@ func (cls LocationDepotStorehouseStoreForm) ShouldBind(ctx *gin.Context) Locatio
 		Prepare().
 		First(&cls.OrganizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "所属车间")
-
-	if len(cls.LocationDepotSectionUUIDs) > 0 {
-		models.Init(models.LocationDepotSectionModel{}).
-			GetSession().
-			Where("uuid in ?", cls.LocationDepotSectionUUIDs).
-			Find(&cls.LocationDepotSections)
-	}
 
 	return cls
 }
@@ -92,7 +83,6 @@ func (cls LocationDepotStorehouseRouter) Load(engine *gin.Engine) {
 				UniqueCode:            form.UniqueCode,
 				Name:                  form.Name,
 				OrganizationWorkshop:  form.OrganizationWorkshop,
-				LocationDepotSections: form.LocationDepotSections,
 			}
 			if ret = models.Init(models.LocationDepotStorehouseModel{}).GetSession().Create(&locationStorehouse); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
@@ -153,7 +143,6 @@ func (cls LocationDepotStorehouseRouter) Load(engine *gin.Engine) {
 			locationStorehouse.UniqueCode = form.UniqueCode
 			locationStorehouse.Name = form.Name
 			locationStorehouse.OrganizationWorkshop = form.OrganizationWorkshop
-			locationStorehouse.LocationDepotSections = form.LocationDepotSections
 			if ret = models.Init(models.LocationDepotStorehouseModel{}).GetSession().Save(&locationStorehouse); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}

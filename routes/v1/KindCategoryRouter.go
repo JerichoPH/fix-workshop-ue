@@ -20,8 +20,6 @@ type KindCategoryStoreForm struct {
 	Name                string   `form:"name" json:"name"`
 	Nickname            string   `form:"nickname" json:"nickname"`
 	BeEnable            bool     `form:"be_enable" json:"be_enable"`
-	KindEntireTypeUUIDs []string `form:"kind_entire_type_uuids" json:"kind_entire_type_uuids"`
-	KindEntireTypes     []models.KindEntireTypeModel
 	Race                string `form:"race" json:"race"`
 }
 
@@ -38,12 +36,6 @@ func (cls KindCategoryStoreForm) ShouldBind(ctx *gin.Context) KindCategoryStoreF
 	}
 	if cls.Name == "" {
 		wrongs.PanicValidate("种类名称必填")
-	}
-	if len(cls.KindEntireTypeUUIDs) > 0 {
-		models.Init(models.KindEntireTypeModel{}).
-			GetSession().
-			Where("uuid in ?", cls.KindEntireTypeUUIDs).
-			Find(&cls.KindEntireTypes)
 	}
 
 	return cls
@@ -85,7 +77,6 @@ func (KindCategoryRouter) Load(engine *gin.Engine) {
 				Name:            form.Name,
 				BeEnable:        form.BeEnable,
 				Nickname:        form.Nickname,
-				KindEntireTypes: form.KindEntireTypes,
 				Race:            form.Race,
 			}
 			if ret = models.Init(models.KindCategoryModel{}).GetSession().Create(&kindCategory); ret.Error != nil {
@@ -154,7 +145,6 @@ func (KindCategoryRouter) Load(engine *gin.Engine) {
 			kindCategory.Name = form.Name
 			kindCategory.Nickname = form.Nickname
 			kindCategory.BeEnable = form.BeEnable
-			kindCategory.KindEntireTypes = form.KindEntireTypes
 			kindCategory.Race = form.Race
 			if ret = models.Init(models.KindCategoryModel{}).GetSession().Save(&kindCategory); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())

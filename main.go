@@ -81,6 +81,7 @@ func main() {
 			// 仓储
 			&models.LocationDepotStorehouseModel{}, // 仓储仓库
 			&models.LocationDepotSectionModel{},    // 仓储仓库区域
+			&models.LocationDepotRowTypeModel{},    // 仓储仓库排类型
 			&models.LocationDepotRowModel{},        // 仓储仓库排
 			&models.LocationDepotCabinetModel{},    // 仓储柜架
 			&models.LocationDepotTierModel{},       // 仓储柜架层

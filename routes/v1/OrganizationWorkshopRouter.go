@@ -23,12 +23,6 @@ type OrganizationWorkshopStoreForm struct {
 	OrganizationWorkshopType     models.OrganizationWorkshopTypeModel
 	OrganizationParagraphUUID    string `form:"organization_paragraph_uuid" json:"organization_paragraph_uuid"`
 	OrganizationParagraph        models.OrganizationParagraphModel
-	OrganizationSectionUUIDs     []string `form:"organization_section_uuids" json:"organization_section_uuids"`
-	OrganizationSections         []models.OrganizationSectionModel
-	OrganizationWorkAreaUUIDs    []string `form:"organization_work_area_uuids" json:"organization_work_area_uuids"`
-	OrganizationWorkAreas        []models.OrganizationWorkAreaModel
-	OrganizationStationUUIDs     []string `form:"organization_station_uuids" json:"organization_station_uuids"`
-	OrganizationStations         []models.OrganizationStationModel
 }
 
 // ShouldBind 绑定表单
@@ -58,15 +52,6 @@ func (cls OrganizationWorkshopStoreForm) ShouldBind(ctx *gin.Context) Organizati
 		Prepare().
 		First(&cls.OrganizationParagraph)
 	wrongs.PanicWhenIsEmpty(ret, "站段")
-	if len(cls.OrganizationSectionUUIDs) > 0 {
-		models.Init(models.OrganizationSectionModel{}).GetSession().Where("uuid in ?", cls.OrganizationSectionUUIDs).Find(&cls.OrganizationSections)
-	}
-	if len(cls.OrganizationWorkAreaUUIDs) > 0 {
-		models.Init(models.OrganizationWorkAreaModel{}).GetSession().Where("uuid in ?", cls.OrganizationWorkAreaUUIDs).Find(&cls.OrganizationWorkAreas)
-	}
-	if len(cls.OrganizationStationUUIDs) > 0 {
-		models.Init(models.OrganizationStationModel{}).GetSession().Where("uuid in ?", cls.OrganizationStationUUIDs).Find(&cls.OrganizationStations)
-	}
 
 	return cls
 }
@@ -110,9 +95,6 @@ func (OrganizationWorkshopRouter) Load(engine *gin.Engine) {
 				Name:                     form.Name,
 				OrganizationWorkshopType: form.OrganizationWorkshopType,
 				OrganizationParagraph:    form.OrganizationParagraph,
-				OrganizationSections:     form.OrganizationSections,
-				OrganizationWorkAreas:    form.OrganizationWorkAreas,
-				OrganizationStations:     form.OrganizationStations,
 			}
 			if ret = models.Init(models.OrganizationWorkshopModel{}).GetSession().Create(&organizationWorkshop); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
@@ -181,9 +163,6 @@ func (OrganizationWorkshopRouter) Load(engine *gin.Engine) {
 			organizationWorkshop.BeEnable = form.BeEnable
 			organizationWorkshop.OrganizationWorkshopType = form.OrganizationWorkshopType
 			organizationWorkshop.OrganizationParagraph = form.OrganizationParagraph
-			organizationWorkshop.OrganizationSections = form.OrganizationSections
-			organizationWorkshop.OrganizationWorkAreas = form.OrganizationWorkAreas
-			organizationWorkshop.OrganizationStations = form.OrganizationStations
 			if ret = models.Init(models.OrganizationWorkshopModel{}).GetSession().Save(&organizationWorkshop); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}

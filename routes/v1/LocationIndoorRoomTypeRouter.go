@@ -18,8 +18,6 @@ type LocationIndoorRoomTypeStoreForm struct {
 	Sort                    int64    `form:"sort" json:"sort"`
 	UniqueCode              string   `form:"unique_code" json:"unique_code"`
 	Name                    string   `form:"name" json:"name"`
-	LocationIndoorRoomUUIDs []string `form:"location_indoor_room_uuids" json:"location_indoor_room_uuids"`
-	LocationIndoorRooms     []models.LocationIndoorRoomModel
 }
 
 // ShouldBind 绑定表单
@@ -35,12 +33,6 @@ func (cls LocationIndoorRoomTypeStoreForm) ShouldBind(ctx *gin.Context) Location
 	}
 	if cls.Name == "" {
 		wrongs.PanicValidate("机房名称必填")
-	}
-	if len(cls.LocationIndoorRoomUUIDs) > 0 {
-		models.Init(models.LocationIndoorRoomModel{}).
-			GetSession().
-			Where("uuid in ?", cls.LocationIndoorRoomUUIDs).
-			Find(&cls.LocationIndoorRooms)
 	}
 
 	return cls
@@ -81,7 +73,6 @@ func (LocationIndoorRoomTypeRouter) Load(engine *gin.Engine) {
 				BaseModel:           models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
 				UniqueCode:          form.UniqueCode,
 				Name:                form.Name,
-				LocationIndoorRooms: form.LocationIndoorRooms,
 			}
 			if ret = models.Init(models.LocationIndoorRoomTypeModel{}).GetSession().Create(&locationIndoorRoomType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
@@ -132,7 +123,6 @@ func (LocationIndoorRoomTypeRouter) Load(engine *gin.Engine) {
 			locationIndoorRoomType.BaseModel.Sort = form.Sort
 			locationIndoorRoomType.UniqueCode = form.UniqueCode
 			locationIndoorRoomType.Name = form.Name
-			locationIndoorRoomType.LocationIndoorRooms = form.LocationIndoorRooms
 			if ret = models.Init(models.LocationIndoorRoomTypeModel{}).GetSession().Save(&locationIndoorRoomType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}

@@ -23,10 +23,6 @@ type OrganizationWorkAreaStoreForm struct {
 	OrganizationWorkAreaType     models.OrganizationWorkAreaTypeModel
 	OrganizationWorkshopUUID     string `form:"organization_workshop_uuid" json:"organization_workshop_uuid"`
 	OrganizationWorkshop         models.OrganizationWorkshopModel
-	OrganizationSectionUUIDs     []string `form:"organization_section_uuids" json:"organization_section_uuids"`
-	OrganizationSections         []models.OrganizationSectionModel
-	OrganizationStationUUIDs     []string `form:"organization_station_uuids" json:"organization_station_uuids"`
-	OrganizationStations         []models.OrganizationStationModel
 }
 
 // ShouldBind 绑定表单
@@ -57,12 +53,6 @@ func (cls OrganizationWorkAreaStoreForm) ShouldBind(ctx *gin.Context) Organizati
 		Prepare().
 		First(&cls.OrganizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "车间")
-	if len(cls.OrganizationSections) > 0 {
-		models.Init(models.OrganizationSectionModel{}).GetSession().Where("uuid in ?", cls.OrganizationSectionUUIDs).Find(&cls.OrganizationSections)
-	}
-	if len(cls.OrganizationStationUUIDs) > 0 {
-		models.Init(models.OrganizationStationModel{}).GetSession().Where("uuid in ?", cls.OrganizationStationUUIDs).Find(&cls.OrganizationStations)
-	}
 
 	return cls
 }
@@ -107,8 +97,6 @@ func (OrganizationWorkAreaRouter) Load(engine *gin.Engine) {
 				BeEnable:                 form.BeEnable,
 				OrganizationWorkAreaType: form.OrganizationWorkAreaType,
 				OrganizationWorkshop:     form.OrganizationWorkshop,
-				OrganizationSections:     form.OrganizationSections,
-				OrganizationStations:     form.OrganizationStations,
 			}
 			if ret = models.Init(models.OrganizationWorkAreaModel{}).GetSession().Create(&organizationWorkArea); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
@@ -176,8 +164,6 @@ func (OrganizationWorkAreaRouter) Load(engine *gin.Engine) {
 			organizationWorkArea.BeEnable = form.BeEnable
 			organizationWorkArea.OrganizationWorkAreaType = form.OrganizationWorkAreaType
 			organizationWorkArea.OrganizationWorkshop = form.OrganizationWorkshop
-			organizationWorkArea.OrganizationSections = form.OrganizationSections
-			organizationWorkArea.OrganizationStations = form.OrganizationStations
 			if ret = models.Init(models.OrganizationWorkAreaModel{}).GetSession().Save(&organizationWorkArea); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}

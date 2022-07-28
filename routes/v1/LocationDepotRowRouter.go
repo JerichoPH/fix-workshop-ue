@@ -15,13 +15,13 @@ type LocationDepotRowRouter struct{}
 
 // LocationDepotRowStoreForm 新建仓储仓库排表单
 type LocationDepotRowStoreForm struct {
-	Sort                      int64  `form:"sort" json:"sort"`
-	UniqueCode                string `form:"unique_code" json:"unique_code"`
-	Name                      string `form:"name" json:"name"`
-	LocationDepotSectionUUID  string `form:"location_depot_section_uuid" json:"location_depot_section_uuid"`
-	LocationDepotSection      models.LocationDepotSectionModel
-	LocationDepotCabinetUUIDs []string `form:"location_depot_cabinet_uuids" json:"location_depot_cabinet_uuids"`
-	LocationDepotCabinets     []models.LocationDepotCabinetModel
+	Sort                     int64  `form:"sort" json:"sort"`
+	UniqueCode               string `form:"unique_code" json:"unique_code"`
+	Name                     string `form:"name" json:"name"`
+	LocationDepotRowTypeUUID string `form:"location_depot_row_type_uuid" json:"location_depot_row_type_uuid"`
+	LocationDepotRowType     models.LocationDepotRowTypeModel
+	LocationDepotSectionUUID string `form:"location_depot_section_uuid" json:"location_depot_section_uuid"`
+	LocationDepotSection     models.LocationDepotSectionModel
 }
 
 // ShouldBind 绑定表单
@@ -40,6 +40,14 @@ func (cls LocationDepotRowStoreForm) ShouldBind(ctx *gin.Context) LocationDepotR
 	if cls.Name == "" {
 		wrongs.PanicValidate("仓库排名称必填")
 	}
+	if cls.LocationDepotRowTypeUUID == "" {
+		wrongs.PanicValidate("所属排类型必选")
+	}
+	models.Init(models.LocationDepotRowTypeModel{}).
+		SetWheres(tools.Map{"uuid": cls.LocationDepotRowTypeUUID}).
+		Prepare().
+		First(&cls.LocationDepotRowType)
+	wrongs.PanicWhenIsEmpty(ret, "所属仓库排类型")
 	if cls.LocationDepotSectionUUID == "" {
 		wrongs.PanicValidate("所属仓库区域必选")
 	}
@@ -48,12 +56,6 @@ func (cls LocationDepotRowStoreForm) ShouldBind(ctx *gin.Context) LocationDepotR
 		Prepare().
 		First(&cls.LocationDepotSection)
 	wrongs.PanicWhenIsEmpty(ret, "所属仓库区域")
-	if len(cls.LocationDepotCabinetUUIDs) > 0 {
-		models.Init(models.LocationDepotCabinetModel{}).
-			GetSession().
-			Where("uuid in ?", cls.LocationDepotCabinetUUIDs).
-			Find(&cls.LocationDepotCabinets)
-	}
 
 	return cls
 }
@@ -92,11 +94,11 @@ func (LocationDepotRowRouter) Load(engine *gin.Engine) {
 
 			// 新建
 			locationDepotRow := &models.LocationDepotRowModel{
-				BaseModel:             models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
-				UniqueCode:            form.UniqueCode,
-				Name:                  form.Name,
-				LocationDepotSection:  form.LocationDepotSection,
-				LocationDepotCabinets: form.LocationDepotCabinets,
+				BaseModel:            models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
+				UniqueCode:           form.UniqueCode,
+				Name:                 form.Name,
+				LocationDepotRowType: form.LocationDepotRowType,
+				LocationDepotSection: form.LocationDepotSection,
 			}
 			if ret = models.Init(models.LocationDepotRowModel{}).GetSession().Create(&locationDepotRow); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
@@ -162,8 +164,8 @@ func (LocationDepotRowRouter) Load(engine *gin.Engine) {
 			locationDepotRow.BaseModel.Sort = form.Sort
 			locationDepotRow.UniqueCode = form.UniqueCode
 			locationDepotRow.Name = form.Name
+			locationDepotRow.LocationDepotRowType = form.LocationDepotRowType
 			locationDepotRow.LocationDepotSection = form.LocationDepotSection
-			locationDepotRow.LocationDepotCabinets = form.LocationDepotCabinets
 			if ret = models.Init(models.LocationDepotRowModel{}).GetSession().Save(&locationDepotRow); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}

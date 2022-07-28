@@ -5,7 +5,9 @@ type LocationDepotRowModel struct {
 	BaseModel
 	UniqueCode               string                      `gorm:"type:CHAR(8);UNIQUE;NOT NULL;COMMENT:仓储仓库排代码;" json:"unique_code"`
 	Name                     string                      `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:仓储仓库排名称;" json:"name"`
-	LocationDepotSectionUUID string                      `gorm:"type:CHAR(36);NOT NULL;COMMENT:仓储仓库区域UUID;" json:"location_depot_section_uuid"`
+	LocationDepotRowTypeUUID string                      `gorm:"type:CHAR(36);NOT NULL;COMMENT:所属仓储仓库排类型UUID;" json:"location_depot_row_type_uuid"`
+	LocationDepotRowType     LocationDepotRowTypeModel   `gorm:"foreignKey:LocationDepotRowTypeUUID;references:UUID;COMMENT:所属仓储仓库排类型;" json:"location_depot_row_type"`
+	LocationDepotSectionUUID string                      `gorm:"type:CHAR(36);NOT NULL;COMMENT:所属仓储仓库区域UUID;" json:"location_depot_section_uuid"`
 	LocationDepotSection     LocationDepotSectionModel   `gorm:"foreignKey:LocationDepotSectionUUID;references:UUID;COMMENT:所属仓储仓库区域;" json:"location_depot_section"`
 	LocationDepotCabinets    []LocationDepotCabinetModel `gorm:"foreignKey:LocationDepotRowUUID;references:UUID;COMMENT:相关仓储柜架;" json:"location_depot_cabinet"`
 }

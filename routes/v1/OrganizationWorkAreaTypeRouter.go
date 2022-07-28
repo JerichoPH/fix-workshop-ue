@@ -18,8 +18,6 @@ type OrganizationWorkAreaTypeStoreForm struct {
 	Sort                      int64    `form:"sort" json:"sort"`
 	UniqueCode                string   `form:"unique_code" json:"unique_code"`
 	Name                      string   `form:"name" json:"name"`
-	OrganizationWorkAreaUUIDs []string `form:"organization_work_area_uuids" json:"organization_work_area_uuids"`
-	OrganizationWorkAreas     []models.OrganizationWorkAreaModel
 }
 
 // ShouldBind 绑定表单
@@ -35,9 +33,6 @@ func (cls OrganizationWorkAreaTypeStoreForm) ShouldBind(ctx *gin.Context) Organi
 	}
 	if cls.Name == "" {
 		wrongs.PanicValidate("工区名称必填")
-	}
-	if len(cls.OrganizationWorkAreaUUIDs) > 0 {
-		models.Init(models.OrganizationWorkAreaModel{}).GetSession().Where("uuid in ?", cls.OrganizationWorkAreaUUIDs).Find(&cls.OrganizationWorkAreas)
 	}
 
 	return cls
