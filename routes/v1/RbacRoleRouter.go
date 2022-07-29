@@ -245,7 +245,6 @@ func (RbacRoleRouter) Load(engine *gin.Engine) {
 					"RbacPermissions",
 					"RbacPermissions.RbacPermissionGroup",
 					"Accounts",
-					"Accounts.AccountStatus",
 					"Menus",
 				).
 				Prepare().

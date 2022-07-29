@@ -208,7 +208,15 @@ func (AccountRouter) Load(engine *gin.Engine) {
 
 		// 用户详情
 		r.GET(":uuid", func(ctx *gin.Context) {
-			account := (&models.AccountModel{}).FindOneByUUID(ctx.Param("uuid"))
+			var ret *gorm.DB
+			var account models.AccountModel
+			ret = models.Init(models.AccountModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				SetPreloads("RbacRoles","RbacRoles.RbacPermissions").
+				Prepare().
+				First(&account)
+			wrongs.PanicWhenIsEmpty(ret, "用户")
+
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"account": account}))
 		})
 
