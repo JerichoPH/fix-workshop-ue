@@ -1,7 +1,6 @@
 package models
 
 import (
-	"database/sql"
 	"fix-workshop-ue/databases"
 	"fix-workshop-ue/tools"
 	"fix-workshop-ue/wrongs"
@@ -14,8 +13,8 @@ import (
 // BaseModel 出厂数据、财务数据、检修数据、仓储数据、流转数据、运用数据
 type BaseModel struct {
 	ID             uint           `gorm:"primaryKey" json:"id"`
-	CreatedAt      sql.NullTime   `gorm:"type:DATETIME;auto_now_add;" json:"created_at"`
-	UpdatedAt      sql.NullTime   `gorm:"type:DATETIME;" json:"updated_at"`
+	CreatedAt      time.Time      `gorm:"type:DATETIME;auto_now_add;" json:"created_at"`
+	UpdatedAt      time.Time      `gorm:"type:DATETIME;" json:"updated_at"`
 	DeletedAt      gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 	UUID           string         `gorm:"type:CHAR(36);UNIQUE;NOT NULL;COMMENT:uuid;" json:"uuid"`
 	Sort           int64          `gorm:"type:BIGINT;DEFAULT:0;NOT NULL;COMMENT:排序;" json:"sort"`
@@ -133,14 +132,17 @@ func (cls *BaseModel) SetScopes(scopes ...func(*gorm.DB) *gorm.DB) *BaseModel {
 
 // BeforeCreate 插入数据前
 func (cls *BaseModel) BeforeCreate(db *gorm.DB) (err error) {
-	cls.CreatedAt = sql.NullTime{Time: time.Now(), Valid: true}
-	cls.UpdatedAt = sql.NullTime{Time: time.Now(), Valid: true}
+	//cls.CreatedAt = sql.NullTime{Time: time.Now(), Valid: true}
+	//cls.UpdatedAt = sql.NullTime{Time: time.Now(), Valid: true}
+	cls.CreatedAt = time.Now()
+	cls.UpdatedAt = time.Now()
 	return
 }
 
 // BeforeSave 修改数据前
 func (cls *BaseModel) BeforeSave(db *gorm.DB) (err error) {
-	cls.UpdatedAt = sql.NullTime{Time: time.Now(), Valid: true}
+	//cls.UpdatedAt = sql.NullTime{Time: time.Now(), Valid: true}
+	cls.UpdatedAt = time.Now()
 	return
 }
 
