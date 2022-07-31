@@ -53,7 +53,7 @@ from pivot_rbac_role_and_rbac_permissions as prp
 where p.uri = ? and p.method = ? and a.uuid = ?`, ctx.FullPath(), ctx.Request.Method, currentAccountUUID).
 				Scan(&currentRbacRoleID)
 
-			if currentRbacRoleID > 0 {
+			if currentRbacRoleID == 0 {
 				wrongs.PanicUnAuth(fmt.Sprintf("当前用户没有权限进行此操作 %s %s", ctx.Request.Method, ctx.FullPath()))
 			}
 		}
