@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"fix-workshop-ue/databases"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -197,7 +198,10 @@ func (RbacRoleRouter) Load(engine *gin.Engine) {
 				First(&rbacRole)
 			wrongs.PanicWhenIsEmpty(ret, "角色")
 
-			// 添加绑定关系
+			// 删除原有绑定关系
+			(&databases.MySql{}).GetConn().Exec("delete from pivot_rbac_role_and_rbac_permissions where rbac_role_id = ?", rbacRole.ID)
+
+			// 绑定
 			rbacRole.Accounts = form.Accounts
 			if ret = models.Init(models.RbacRoleModel{}).GetSession().Save(&rbacRole); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
@@ -222,6 +226,9 @@ func (RbacRoleRouter) Load(engine *gin.Engine) {
 				Prepare().
 				First(&rbacRole)
 			wrongs.PanicWhenIsEmpty(ret, "角色")
+
+			// 删除原有绑定关系
+			(&databases.MySql{}).GetConn().Exec("delete from pivot_rbac_role_and_rbac_permissions where rbac_role_id = ?", rbacRole.ID)
 
 			// 绑定
 			rbacRole.RbacPermissions = form.RbacPermissions

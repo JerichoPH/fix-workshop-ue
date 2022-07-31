@@ -10,6 +10,7 @@ type OrganizationRailroadGradeCrossModel struct {
 	OrganizationWorkshop     OrganizationWorkshopModel `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;NOT NULL;COMMENT:所属车间;" json:"organization_workshop"`
 	OrganizationWorkAreaUUID string                    `gorm:"type:CHAR(36);COMMENT:所属工区UUID;" json:"organization_work_area_uuid"`
 	OrganizationWorkArea     OrganizationWorkAreaModel `gorm:"foreignKey:OrganizationWorkAreaUUID;references:UUID;COMMENT:所属工区;" json:"organization_work_area"`
+	OrganizationLines        []*OrganizationLineModel  `gorm:"many2many:pivot_organization_line_and_organization_railroad_grade_crosses;foreignKey:id;joinForeignKey:organization_railroad_grade_crossroad_id;references:id;joinReferences:organization_line_id;COMMENT:线别与道口多对多;" join:"organization_lines"`
 }
 
 // TableName 表名称

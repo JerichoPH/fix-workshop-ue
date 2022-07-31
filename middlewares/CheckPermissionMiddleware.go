@@ -1,10 +1,13 @@
 package middlewares
 
 import (
-	"fix-workshop-ue/wrongs"
+	"errors"
+	"fix-workshop-ue/databases"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/settings"
 	"fix-workshop-ue/tools"
+	"fix-workshop-ue/wrongs"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -19,8 +22,11 @@ func CheckPermission() gin.HandlerFunc {
 
 		cfg := (&settings.Setting{}).Init()
 
-		if !cfg.App.Section("app").Key("production").MustBool(true) {
-			var ret *gorm.DB
+		if cfg.App.Section("app").Key("production").MustBool(true) {
+			var (
+				ret               *gorm.DB
+				currentRbacRoleID int64
+			)
 
 			// 获取权限
 			var rbacPermission models.RbacPermissionModel
@@ -32,23 +38,23 @@ func CheckPermission() gin.HandlerFunc {
 				}).
 				Prepare().
 				First(&rbacPermission)
-			wrongs.PanicWhenIsEmpty(ret, "权限")
-
-			ok := false
-			if len(rbacPermission.RbacRoles) > 0 {
-				for _, rbacRole := range rbacPermission.RbacRoles {
-					if len(rbacRole.Accounts) > 0 {
-						for _, account := range rbacRole.Accounts {
-							if account.UUID == currentAccountUUID {
-								ok = true
-							}
-						}
-					}
-				}
+			if errors.Is(ret.Error, gorm.ErrRecordNotFound) {
+				wrongs.PanicUnAuth(fmt.Sprintf("权限不存在（%s %s）", ctx.Request.Method, ctx.FullPath()))
 			}
 
-			if !ok {
-				wrongs.PanicUnAuth("未授权")
+			(&databases.MySql{}).
+				GetConn().
+				Raw(`select prp.rbac_role_id
+from pivot_rbac_role_and_rbac_permissions as prp
+         join rbac_roles r on prp.rbac_role_id = r.id
+         join rbac_permissions p on prp.rbac_permission_id = p.id
+         join pivot_rbac_role_and_accounts pra on prp.rbac_role_id = pra.rbac_role_id
+         join accounts a on pra.account_id = a.id
+where p.uri = ? and p.method = ? and a.uuid = ?`, ctx.FullPath(), ctx.Request.Method, currentAccountUUID).
+				Scan(&currentRbacRoleID)
+
+			if currentRbacRoleID > 0 {
+				wrongs.PanicUnAuth(fmt.Sprintf("当前用户没有权限进行此操作 %s %s", ctx.Request.Method, ctx.FullPath()))
 			}
 		}
 

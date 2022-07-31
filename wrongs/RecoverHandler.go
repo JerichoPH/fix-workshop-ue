@@ -19,18 +19,18 @@ func RecoverHandler(c *gin.Context) {
 			case "*validator.Validationerrors":
 				// 表单验证错误
 				c.JSON(InCorrectIns().Validate("", errorToString(reco)))
-			case "*abnormals.ValidateWrong":
+			case "*wrongs.ValidateWrong":
 				c.JSON(InCorrectIns().Validate(errorToString(reco), map[string]string{}))
-			case "*abnormals.ForbiddenWrong":
+			case "*wrongs.ForbiddenWrong":
 				// 禁止操作
 				c.JSON(InCorrectIns().Forbidden(errorToString(reco)))
-			case "*abnormals.EmptyWrong":
+			case "*wrongs.EmptyWrong":
 				// 空数据
 				c.JSON(InCorrectIns().Empty(errorToString(reco)))
-			case "*abnormals.UnAuthWrong":
+			case "*wrongs.UnAuthWrong":
 				// 未授权
 				c.JSON(InCorrectIns().UnAuthorization(errorToString(reco)))
-			case "*abnormals.UnLoginWrong":
+			case "*wrongs.UnLoginWrong":
 				// 未登录
 				c.JSON(InCorrectIns().ErrUnLogin())
 			default:

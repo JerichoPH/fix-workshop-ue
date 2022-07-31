@@ -9,6 +9,7 @@ type OrganizationCenterModel struct {
 	OrganizationWorkshop     OrganizationWorkshopModel `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;COMMENT:所属车间;" json:"organization_workshop"`
 	OrganizationWorkAreaUUID string                    `gorm:"type:CHAR(36);COMMENT:所属工区UUID;" json:"organization_work_area_uuid"`
 	OrganizationWorkArea     OrganizationWorkAreaModel `gorm:"foreignKey:OrganizationWorkAreaUUID;references:UUID;COMMENT:所属工区;" json:"organization_work_area"`
+	OrganizationLines        []*OrganizationLineModel  `gorm:"many2many:pivot_organization_line_and_organization_centers;foreignKey:id;joinForeignKey:organization_line_id;references:id;joinReferences:organization_center_id;COMMENT:线别与中心多对多;" json:"organization_centers"`
 	LocationIndoorRooms      []LocationIndoorRoomModel `gorm:"foreignKey:OrganizationCenterUUID;references:UUID;COMMENT:相关机房;" json:"location_indoor_rooms"`
 }
 
