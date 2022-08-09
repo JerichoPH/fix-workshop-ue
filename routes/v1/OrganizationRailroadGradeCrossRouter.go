@@ -28,7 +28,7 @@ type OrganizationRailroadGradeCrossStoreForm struct {
 // ShouldBind 表单绑定
 //  @receiver cls
 //  @param ctx
-//  @return OrganizationCenterStoreForm
+//  @return LocationCenterStoreForm
 func (cls OrganizationRailroadGradeCrossStoreForm) ShouldBind(ctx *gin.Context) OrganizationRailroadGradeCrossStoreForm {
 	var ret *gorm.DB
 
@@ -74,32 +74,32 @@ func (OrganizationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 		r.POST("railroadGradeCross", func(ctx *gin.Context) {
 			var (
 				ret    *gorm.DB
-				repeat models.OrganizationRailroadGradeCrossModel
+				repeat models.LocationRailroadGradeCrossModel
 			)
 
 			// 表单
 			form := (&OrganizationRailroadGradeCrossStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.OrganizationRailroadGradeCrossModel{}).
+			ret = models.Init(models.LocationRailroadGradeCrossModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "道口代码")
-			ret = models.Init(models.OrganizationRailroadGradeCrossModel{}).
+			ret = models.Init(models.LocationRailroadGradeCrossModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "道口名称")
 
 			// 新建
-			organizationRailroadGradeCross := &models.OrganizationRailroadGradeCrossModel{
+			organizationRailroadGradeCross := &models.LocationRailroadGradeCrossModel{
 				BaseModel:  models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
 				UniqueCode: form.UniqueCode,
 				Name:       form.Name,
 				BeEnable:   form.BeEnable,
 			}
-			if ret = models.Init(models.OrganizationRailroadGradeCrossModel{}).GetSession().Create(&organizationRailroadGradeCross); ret.Error != nil {
+			if ret = models.Init(models.LocationRailroadGradeCrossModel{}).GetSession().Create(&organizationRailroadGradeCross); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -110,18 +110,18 @@ func (OrganizationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 		r.DELETE("railroadGradeCross/:uuid", func(ctx *gin.Context) {
 			var (
 				ret                            *gorm.DB
-				organizationRailroadGradeCross models.OrganizationRailroadGradeCrossModel
+				organizationRailroadGradeCross models.LocationRailroadGradeCrossModel
 			)
 
 			// 查询
-			ret = models.Init(models.OrganizationRailroadGradeCrossModel{}).
+			ret = models.Init(models.LocationRailroadGradeCrossModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&organizationRailroadGradeCross)
 			wrongs.PanicWhenIsEmpty(ret, "道口")
 
 			// 删除
-			if ret := models.Init(models.OrganizationRailroadGradeCrossModel{}).GetSession().Delete(&organizationRailroadGradeCross); ret.Error != nil {
+			if ret := models.Init(models.LocationRailroadGradeCrossModel{}).GetSession().Delete(&organizationRailroadGradeCross); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -132,20 +132,20 @@ func (OrganizationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 		r.PUT("railroadGradeCross/:uuid", func(ctx *gin.Context) {
 			var (
 				ret                                    *gorm.DB
-				organizationRailroadGradeCross, repeat models.OrganizationRailroadGradeCrossModel
+				organizationRailroadGradeCross, repeat models.LocationRailroadGradeCrossModel
 			)
 
 			// 表单
 			form := (&OrganizationRailroadGradeCrossStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.OrganizationRailroadGradeCrossModel{}).
+			ret = models.Init(models.LocationRailroadGradeCrossModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "道口代码")
-			ret = models.Init(models.OrganizationRailroadGradeCrossModel{}).
+			ret = models.Init(models.LocationRailroadGradeCrossModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
@@ -153,7 +153,7 @@ func (OrganizationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsRepeat(ret, "道口名称")
 
 			// 查询
-			ret = models.Init(models.OrganizationRailroadGradeCrossModel{}).
+			ret = models.Init(models.LocationRailroadGradeCrossModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&organizationRailroadGradeCross)
@@ -164,7 +164,7 @@ func (OrganizationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 			organizationRailroadGradeCross.UniqueCode = form.UniqueCode
 			organizationRailroadGradeCross.Name = form.Name
 			organizationRailroadGradeCross.BeEnable = form.BeEnable
-			if ret = models.Init(models.OrganizationRailroadGradeCrossModel{}).GetSession().Save(&organizationRailroadGradeCross); ret.Error != nil {
+			if ret = models.Init(models.LocationRailroadGradeCrossModel{}).GetSession().Save(&organizationRailroadGradeCross); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -175,9 +175,9 @@ func (OrganizationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 		r.GET("railroadGradeCross/:uuid", func(ctx *gin.Context) {
 			var (
 				ret                            *gorm.DB
-				organizationRailroadGradeCross models.OrganizationRailroadGradeCrossModel
+				organizationRailroadGradeCross models.LocationRailroadGradeCrossModel
 			)
-			ret = models.Init(models.OrganizationRailroadGradeCrossModel{}).
+			ret = models.Init(models.LocationRailroadGradeCrossModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				Prepare().
@@ -189,8 +189,8 @@ func (OrganizationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 
 		// 列表
 		r.GET("railroadGradeCross", func(ctx *gin.Context) {
-			var organizationRailroadGradeCrosses []models.OrganizationRailroadGradeCrossModel
-			models.Init(models.OrganizationRailroadGradeCrossModel{}).
+			var organizationRailroadGradeCrosses []models.LocationRailroadGradeCrossModel
+			models.Init(models.LocationRailroadGradeCrossModel{}).
 				SetWhereFields("unique_code", "name", "be_enable", "organization_workshop_uuid", "organization_work_area_uuid").
 				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				PrepareQuery(ctx).

@@ -21,7 +21,7 @@ type OrganizationRailwayStoreForm struct {
 	ShortName                  string   `form:"short_name" json:"short_name"`
 	BeEnable                   bool     `form:"be_enable" json:"be_enable"`
 	OrganizationLineUUIDs      []string `form:"organization_line_uuids" json:"organization_line_uuids"`
-	OrganizationLines          []*models.OrganizationLineModel
+	OrganizationLines          []*models.LocationLineModel
 }
 
 // ShouldBind 绑定表单
@@ -39,7 +39,7 @@ func (cls OrganizationRailwayStoreForm) ShouldBind(ctx *gin.Context) Organizatio
 		wrongs.PanicValidate("路局名称必填")
 	}
 	if len(cls.OrganizationLineUUIDs) > 0 {
-		models.Init(models.OrganizationLineModel{}).
+		models.Init(models.LocationLineModel{}).
 			GetSession().
 			Where("uuid in ?", cls.OrganizationLineUUIDs).
 			Find(&cls.OrganizationLines)
@@ -87,12 +87,12 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 
 			// 新建
 			organizationRailway := &models.OrganizationRailwayModel{
-				BaseModel:              models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
-				UniqueCode:             form.UniqueCode,
-				Name:                   form.Name,
-				ShortName:              form.ShortName,
-				BeEnable:               form.BeEnable,
-				OrganizationLines:      form.OrganizationLines,
+				BaseModel:     models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
+				UniqueCode:    form.UniqueCode,
+				Name:          form.Name,
+				ShortName:     form.ShortName,
+				BeEnable:      form.BeEnable,
+				LocationLines: form.OrganizationLines,
 			}
 			if ret = (&models.BaseModel{}).SetModel(models.OrganizationRailwayModel{}).GetSession().Create(&organizationRailway); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
@@ -163,7 +163,7 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 			organizationRailway.Name = form.Name
 			organizationRailway.ShortName = form.ShortName
 			organizationRailway.BeEnable = form.BeEnable
-			organizationRailway.OrganizationLines = form.OrganizationLines
+			organizationRailway.LocationLines = form.OrganizationLines
 			if ret = models.Init(models.OrganizationRailwayModel{}).GetSession().Save(&organizationRailway); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}

@@ -94,13 +94,13 @@ func (cls RbacRoleBindPermissionsForm) ShouldBind(ctx *gin.Context) RbacRoleBind
 //  @param engine
 func (RbacRoleRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
-		"/api/v1/rbacRole",
+		"/api/v1/rbac",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),
 	)
 	{
 		// 新建角色
-		r.POST("", func(ctx *gin.Context) {
+		r.POST("role", func(ctx *gin.Context) {
 			var (
 				ret    *gorm.DB
 				repeat RbacRoleStoreForm
@@ -129,7 +129,7 @@ func (RbacRoleRouter) Load(engine *gin.Engine) {
 		})
 
 		// 删除角色
-		r.DELETE(":uuid", func(ctx *gin.Context) {
+		r.DELETE("role/:uuid", func(ctx *gin.Context) {
 			var (
 				ret      *gorm.DB
 				rbacRole models.RbacRoleModel
@@ -150,7 +150,7 @@ func (RbacRoleRouter) Load(engine *gin.Engine) {
 		})
 
 		// 编辑角色
-		r.PUT(":uuid", func(ctx *gin.Context) {
+		r.PUT("role/:uuid", func(ctx *gin.Context) {
 			var (
 				ret              *gorm.DB
 				rbacRole, repeat models.RbacRoleModel
@@ -182,7 +182,7 @@ func (RbacRoleRouter) Load(engine *gin.Engine) {
 		})
 
 		// 绑定用户
-		r.PUT(":uuid/bindAccounts", func(ctx *gin.Context) {
+		r.PUT("role/:uuid/bindAccounts", func(ctx *gin.Context) {
 			var (
 				ret      *gorm.DB
 				rbacRole models.RbacRoleModel
@@ -211,7 +211,7 @@ func (RbacRoleRouter) Load(engine *gin.Engine) {
 		})
 
 		// 绑定权限
-		r.PUT(":uuid/bindPermissions", func(ctx *gin.Context) {
+		r.PUT("role/:uuid/bindPermissions", func(ctx *gin.Context) {
 			var (
 				ret      *gorm.DB
 				rbacRole models.RbacRoleModel
@@ -240,7 +240,7 @@ func (RbacRoleRouter) Load(engine *gin.Engine) {
 		})
 
 		// 角色详情
-		r.GET(":uuid", func(ctx *gin.Context) {
+		r.GET("role/:uuid", func(ctx *gin.Context) {
 			var (
 				ret      *gorm.DB
 				rbacRole models.RbacRoleModel
@@ -262,7 +262,7 @@ func (RbacRoleRouter) Load(engine *gin.Engine) {
 		})
 
 		// 角色列表
-		r.GET("", func(ctx *gin.Context) {
+		r.GET("role", func(ctx *gin.Context) {
 			var rbacRoles []models.RbacRoleModel
 			models.Init(models.RbacRoleModel{}).
 				PrepareQuery(ctx).

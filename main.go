@@ -66,34 +66,34 @@ func main() {
 			&models.RbacPermissionGroupModel{}, //权限分组
 
 			// 组织机构
-			&models.OrganizationRailwayModel{},            //路局
-			&models.OrganizationParagraphModel{},          // 站段
-			&models.OrganizationLineModel{},               // 线别
-			&models.OrganizationWorkshopTypeModel{},       // 车间类型
-			&models.OrganizationWorkshopModel{},           // 车间
-			&models.OrganizationWorkAreaTypeModel{},       // 工区类型
-			&models.OrganizationWorkAreaModel{},           // 工区
-			&models.OrganizationSectionModel{},            // 区间
-			&models.OrganizationCenterModel{},             // 中心
-			&models.OrganizationRailroadGradeCrossModel{}, // 道口
-			&models.OrganizationStationModel{},            // 站场
+			&models.OrganizationRailwayModel{},        //路局
+			&models.OrganizationParagraphModel{},      // 站段
+			&models.LocationLineModel{},               // 线别
+			&models.OrganizationWorkshopTypeModel{},   // 车间类型
+			&models.OrganizationWorkshopModel{},       // 车间
+			&models.OrganizationWorkAreaTypeModel{},   // 工区类型
+			&models.OrganizationWorkAreaModel{},       // 工区
+			&models.LocationSectionModel{},            // 区间
+			&models.LocationCenterModel{},             // 中心
+			&models.LocationRailroadGradeCrossModel{}, // 道口
+			&models.LocationStationModel{},            // 站场
 
 			// 仓储
-			&models.LocationDepotStorehouseModel{}, // 仓储仓库
-			&models.LocationDepotSectionModel{},    // 仓储仓库区域
-			&models.LocationDepotRowTypeModel{},    // 仓储仓库排类型
-			&models.LocationDepotRowModel{},        // 仓储仓库排
-			&models.LocationDepotCabinetModel{},    // 仓储柜架
-			&models.LocationDepotTierModel{},       // 仓储柜架层
-			&models.LocationDepotCellModel{},       // 仓储柜架格位
+			&models.PositionDepotStorehouseModel{}, // 仓储仓库
+			&models.PositionDepotSectionModel{},    // 仓储仓库区域
+			&models.PositionDepotRowTypeModel{},    // 仓储仓库排类型
+			&models.PositionDepotRowModel{},        // 仓储仓库排
+			&models.PositionDepotCabinetModel{},    // 仓储柜架
+			&models.PositionDepotTierModel{},       // 仓储柜架层
+			&models.PositionDepotCellModel{},       // 仓储柜架格位
 
 			// 室内上道位置
-			&models.LocationIndoorRoomTypeModel{}, // 机房类型
-			&models.LocationIndoorRoomModel{},     // 机房
-			&models.LocationIndoorRowModel{},      // 排
-			&models.LocationIndoorCabinetModel{},  // 架
-			&models.LocationIndoorTierModel{},     // 层
-			&models.LocationIndoorCellModel{},     // 位
+			&models.PositionIndoorRoomTypeModel{}, // 机房类型
+			&models.PositionIndoorRoomModel{},     // 机房
+			&models.PositionIndoorRowModel{},      // 排
+			&models.PositionIndoorCabinetModel{},  // 架
+			&models.PositionIndoorTierModel{},     // 层
+			&models.PositionIndoorCellModel{},     // 位
 
 			// 种类型
 			&models.KindCategoryModel{},   // 种类
