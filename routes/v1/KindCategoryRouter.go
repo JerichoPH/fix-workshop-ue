@@ -43,13 +43,13 @@ func (cls KindCategoryStoreForm) ShouldBind(ctx *gin.Context) KindCategoryStoreF
 
 func (KindCategoryRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
-		"api/v1/kind",
+		"api/v1/kindCategory",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),
 	)
 	{
 		// 新建
-		r.POST("category", func(ctx *gin.Context) {
+		r.POST("", func(ctx *gin.Context) {
 			var (
 				ret    *gorm.DB
 				repeat models.KindCategoryModel
@@ -87,7 +87,7 @@ func (KindCategoryRouter) Load(engine *gin.Engine) {
 		})
 
 		// 删除
-		r.DELETE("category/:uuid", func(ctx *gin.Context) {
+		r.DELETE(":uuid", func(ctx *gin.Context) {
 			var (
 				ret          *gorm.DB
 				kindCategory models.KindCategoryModel
@@ -109,7 +109,7 @@ func (KindCategoryRouter) Load(engine *gin.Engine) {
 		})
 
 		// 编辑
-		r.PUT("category/:uuid", func(ctx *gin.Context) {
+		r.PUT(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                  *gorm.DB
 				kindCategory, repeat models.KindCategoryModel
@@ -154,7 +154,7 @@ func (KindCategoryRouter) Load(engine *gin.Engine) {
 		})
 
 		// 详情
-		r.GET("category/:uuid", func(ctx *gin.Context) {
+		r.GET(":uuid", func(ctx *gin.Context) {
 			var (
 				ret          *gorm.DB
 				kindCategory models.KindCategoryModel
@@ -170,7 +170,7 @@ func (KindCategoryRouter) Load(engine *gin.Engine) {
 		})
 
 		// 列表
-		r.GET("category", func(ctx *gin.Context) {
+		r.GET("", func(ctx *gin.Context) {
 			var kindCategories []models.KindCategoryModel
 			models.Init(models.KindCategoryModel{}).
 				SetScopes((&models.BaseModel{}).ScopeBeEnable).

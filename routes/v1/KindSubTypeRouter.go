@@ -57,13 +57,13 @@ func (cls KindSubTypeStoreForm) ShouldBind(ctx *gin.Context) KindSubTypeStoreFor
 //  @param engine
 func (KindSubTypeRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
-		"api/v1/kind",
+		"api/v1/kindSubType",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),
 	)
 	{
 		// 新建
-		r.POST("subType", func(ctx *gin.Context) {
+		r.POST("", func(ctx *gin.Context) {
 			var (
 				ret    *gorm.DB
 				repeat models.KindSubTypeModel
@@ -101,7 +101,7 @@ func (KindSubTypeRouter) Load(engine *gin.Engine) {
 		})
 
 		// 删除
-		r.DELETE("subType/:uuid", func(ctx *gin.Context) {
+		r.DELETE(":uuid", func(ctx *gin.Context) {
 			var (
 				ret         *gorm.DB
 				kindSubType models.KindSubTypeModel
@@ -123,7 +123,7 @@ func (KindSubTypeRouter) Load(engine *gin.Engine) {
 		})
 
 		// 编辑
-		r.PUT("subType/:uuid", func(ctx *gin.Context) {
+		r.PUT(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                 *gorm.DB
 				kindSubType, repeat models.KindSubTypeModel
@@ -168,7 +168,7 @@ func (KindSubTypeRouter) Load(engine *gin.Engine) {
 		})
 
 		// 详情
-		r.GET("subType/:uuid", func(ctx *gin.Context) {
+		r.GET(":uuid", func(ctx *gin.Context) {
 			var (
 				ret         *gorm.DB
 				kindSubType models.KindSubTypeModel
@@ -183,7 +183,7 @@ func (KindSubTypeRouter) Load(engine *gin.Engine) {
 		})
 
 		// 列表
-		r.GET("subType", func(ctx *gin.Context) {
+		r.GET("", func(ctx *gin.Context) {
 			var kindSubTypes []models.KindSubTypeModel
 			models.Init(models.KindSubTypeModel{}).
 				SetWhereFields().

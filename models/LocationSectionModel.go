@@ -16,5 +16,5 @@ type LocationSectionModel struct {
 
 // TableName 表名称
 func (LocationSectionModel) TableName() string {
-	return "organization_sections"
+	return "location_sections"
 }

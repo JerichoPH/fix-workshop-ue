@@ -61,13 +61,13 @@ func (cls OrganizationWorkshopStoreForm) ShouldBind(ctx *gin.Context) Organizati
 //  @param router
 func (OrganizationWorkshopRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
-		"api/v1/organization",
+		"api/v1/organizationWorkshop",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),
 	)
 	{
 		// 新建
-		r.POST("workshop", func(ctx *gin.Context) {
+		r.POST("", func(ctx *gin.Context) {
 			var (
 				ret    *gorm.DB
 				repeat models.OrganizationWorkshopModel
@@ -104,7 +104,7 @@ func (OrganizationWorkshopRouter) Load(engine *gin.Engine) {
 		})
 
 		// 删除
-		r.DELETE("workshop/:uuid", func(ctx *gin.Context) {
+		r.DELETE(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                  *gorm.DB
 				organizationWorkshop models.OrganizationWorkshopModel
@@ -126,7 +126,7 @@ func (OrganizationWorkshopRouter) Load(engine *gin.Engine) {
 		})
 
 		// 编辑
-		r.PUT("workshop/:uuid", func(ctx *gin.Context) {
+		r.PUT(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                  *gorm.DB
 				organizationWorkshop models.OrganizationWorkshopModel
@@ -171,7 +171,7 @@ func (OrganizationWorkshopRouter) Load(engine *gin.Engine) {
 		})
 
 		// 详情
-		r.GET("workshop/:uuid", func(ctx *gin.Context) {
+		r.GET(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                  *gorm.DB
 				organizationWorkshop models.OrganizationWorkshopModel
@@ -188,7 +188,7 @@ func (OrganizationWorkshopRouter) Load(engine *gin.Engine) {
 		})
 
 		// 列表
-		r.GET("workshop", func(ctx *gin.Context) {
+		r.GET("", func(ctx *gin.Context) {
 			var organizationWorkshops []models.OrganizationWorkshopModel
 
 			models.Init(models.OrganizationWorkshopModel{}).

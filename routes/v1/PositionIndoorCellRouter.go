@@ -55,13 +55,13 @@ func (cls PositionIndoorCellStoreForm) ShouldBind(ctx *gin.Context) PositionIndo
 //  @param engine
 func (PositionIndoorCellRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
-		"api/v1/location",
+		"api/v1/positionIndoorCell",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),
 	)
 	{
 		// 新建
-		r.POST("indoorCell", func(ctx *gin.Context) {
+		r.POST("", func(ctx *gin.Context) {
 			var (
 				ret    *gorm.DB
 				repeat models.PositionIndoorCellModel
@@ -97,7 +97,7 @@ func (PositionIndoorCellRouter) Load(engine *gin.Engine) {
 		})
 
 		// 删除
-		r.DELETE("indoorCell/:uuid", func(ctx *gin.Context) {
+		r.DELETE(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                *gorm.DB
 				positionIndoorCell models.PositionIndoorCellModel
@@ -119,7 +119,7 @@ func (PositionIndoorCellRouter) Load(engine *gin.Engine) {
 		})
 
 		// 编辑
-		r.PUT("indoorCell/:uuid", func(ctx *gin.Context) {
+		r.PUT(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                        *gorm.DB
 				positionIndoorCell, repeat models.PositionIndoorCellModel
@@ -162,7 +162,7 @@ func (PositionIndoorCellRouter) Load(engine *gin.Engine) {
 		})
 
 		// 详情
-		r.GET("indoorCell/:uuid", func(ctx *gin.Context) {
+		r.GET(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                *gorm.DB
 				positionIndoorCell models.PositionIndoorCellModel
@@ -177,7 +177,7 @@ func (PositionIndoorCellRouter) Load(engine *gin.Engine) {
 		})
 
 		// 列表
-		r.GET("indoorCell", func(ctx *gin.Context) {
+		r.GET("", func(ctx *gin.Context) {
 			var positionIndoorCells []models.PositionIndoorCellModel
 			models.Init(models.PositionIndoorCellModel{}).
 				SetWhereFields().

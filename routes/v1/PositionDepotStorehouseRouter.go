@@ -55,13 +55,13 @@ func (cls PositionDepotStorehouseStoreForm) ShouldBind(ctx *gin.Context) Positio
 //  @param router 
 func (cls PositionDepotStorehouseRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
-		"api/v1/location",
+		"api/v1/positionDepotStorehouse",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),
 	)
 	{
 		// 新建
-		r.POST("depotStorehouse", func(ctx *gin.Context) {
+		r.POST("", func(ctx *gin.Context) {
 			var (
 				ret    *gorm.DB
 				repeat models.PositionDepotStorehouseModel
@@ -92,7 +92,7 @@ func (cls PositionDepotStorehouseRouter) Load(engine *gin.Engine) {
 		})
 
 		// 删除
-		r.DELETE("depotStorehouse/:uuid", func(ctx *gin.Context) {
+		r.DELETE(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                     *gorm.DB
 				positionDepotStorehouse models.PositionDepotStorehouseModel
@@ -114,7 +114,7 @@ func (cls PositionDepotStorehouseRouter) Load(engine *gin.Engine) {
 		})
 
 		// 编辑
-		r.PUT("depotStorehouse/:uuid", func(ctx *gin.Context) {
+		r.PUT(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                             *gorm.DB
 				positionDepotStorehouse, repeat models.PositionDepotStorehouseModel
@@ -151,7 +151,7 @@ func (cls PositionDepotStorehouseRouter) Load(engine *gin.Engine) {
 		})
 
 		// 详情
-		r.GET("depotStorehouse/:uuid", func(ctx *gin.Context) {
+		r.GET(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                     *gorm.DB
 				positionDepotStorehouse models.PositionDepotStorehouseModel
@@ -166,7 +166,7 @@ func (cls PositionDepotStorehouseRouter) Load(engine *gin.Engine) {
 		})
 
 		// 列表
-		r.GET("depotStorehouse", func(ctx *gin.Context) {
+		r.GET("", func(ctx *gin.Context) {
 			var positionDepotStorehouses []models.PositionDepotStorehouseModel
 			models.Init(models.PositionDepotStorehouseModel{}).
 				SetWhereFields().

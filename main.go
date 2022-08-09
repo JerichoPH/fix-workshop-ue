@@ -5,6 +5,7 @@ import (
 	"fix-workshop-ue/databases"
 	"fix-workshop-ue/models"
 	v1 "fix-workshop-ue/routes/v1"
+	web "fix-workshop-ue/routes/web"
 	"fix-workshop-ue/settings"
 	"fmt"
 	"log"
@@ -106,9 +107,10 @@ func main() {
 	}
 
 	engine := gin.Default()
-	engine.Use(wrongs.RecoverHandler) // 异常处理
+	engine.Use(wrongs.RecoverHandler)     // 异常处理
 
-	(&v1.Router{}).Load(engine) // 加载v1路由
+	(&web.Router{}).Load(engine) // 加载web路由
+	(&v1.Router{}).Load(engine)  // 加载v1路由
 
 	initServer(engine, setting.App.Section("app").Key("addr").MustString(":8080")) // 启动服务
 }

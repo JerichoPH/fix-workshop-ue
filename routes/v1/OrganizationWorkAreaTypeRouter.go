@@ -43,13 +43,13 @@ func (cls OrganizationWorkAreaTypeStoreForm) ShouldBind(ctx *gin.Context) Organi
 //  @param router
 func (OrganizationWorkAreaTypeRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
-		"api/v1/organization",
+		"api/v1/organizationWorkAreaType",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),
 	)
 	{
 		// 新建
-		r.POST("workAreaType", func(ctx *gin.Context) {
+		r.POST("", func(ctx *gin.Context) {
 			var ret *gorm.DB
 
 			// 表单
@@ -82,7 +82,7 @@ func (OrganizationWorkAreaTypeRouter) Load(engine *gin.Engine) {
 		})
 
 		// 删除
-		r.DELETE("workAreaType/:uuid", func(ctx *gin.Context) {
+		r.DELETE(":uuid", func(ctx *gin.Context) {
 			// 查询
 			organizationWorkAreaType := (&models.OrganizationWorkAreaTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
@@ -95,7 +95,7 @@ func (OrganizationWorkAreaTypeRouter) Load(engine *gin.Engine) {
 		})
 
 		// 编辑
-		r.PUT("workAreaType/:uuid", func(ctx *gin.Context) {
+		r.PUT(":uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
 
 			// 表单
@@ -131,14 +131,14 @@ func (OrganizationWorkAreaTypeRouter) Load(engine *gin.Engine) {
 		})
 
 		// 详情
-		r.GET("workAreaType/:uuid", func(ctx *gin.Context) {
+		r.GET(":uuid", func(ctx *gin.Context) {
 			organizationWorkAreaType := (&models.OrganizationWorkAreaTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_work_area_type": organizationWorkAreaType}))
 		})
 
 		// 列表
-		r.GET("workAreaType", func(ctx *gin.Context) {
+		r.GET("", func(ctx *gin.Context) {
 			var organizationWorkAreaType []models.OrganizationWorkAreaTypeModel
 			models.Init(models.OrganizationWorkAreaTypeModel{}).
 				SetWhereFields().

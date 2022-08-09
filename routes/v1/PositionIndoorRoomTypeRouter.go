@@ -43,13 +43,13 @@ func (cls PositionIndoorRoomTypeStoreForm) ShouldBind(ctx *gin.Context) Position
 //  @param engine
 func (PositionIndoorRoomTypeRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
-		"api/v1/location",
+		"api/v1/positionIndoorRoomType",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),
 	)
 	{
 		// 新建
-		r.POST("indoorRoomType", func(ctx *gin.Context) {
+		r.POST("", func(ctx *gin.Context) {
 			var ret *gorm.DB
 
 			// 表单
@@ -82,7 +82,7 @@ func (PositionIndoorRoomTypeRouter) Load(engine *gin.Engine) {
 		})
 
 		// 删除
-		r.DELETE("indoorRoomType/:uuid", func(ctx *gin.Context) {
+		r.DELETE(":uuid", func(ctx *gin.Context) {
 			// 查询
 			locationIndoorRoomType := (&models.PositionIndoorRoomTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
@@ -95,7 +95,7 @@ func (PositionIndoorRoomTypeRouter) Load(engine *gin.Engine) {
 		})
 
 		// 编辑
-		r.PUT("indoorRoomType/:uuid", func(ctx *gin.Context) {
+		r.PUT(":uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
 
 			// 表单
@@ -131,14 +131,14 @@ func (PositionIndoorRoomTypeRouter) Load(engine *gin.Engine) {
 		})
 
 		// 详情
-		r.GET("indoorRoomType/:uuid", func(ctx *gin.Context) {
+		r.GET(":uuid", func(ctx *gin.Context) {
 			positionIndoorRoomType := (&models.PositionIndoorRoomTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"position_indoor_room_type": positionIndoorRoomType}))
 		})
 
 		// 列表
-		r.GET("indoorRoomType", func(ctx *gin.Context) {
+		r.GET("", func(ctx *gin.Context) {
 			var positionIndoorRoomTypes []models.PositionIndoorRoomTypeModel
 			models.Init(models.PositionIndoorRoomTypeModel{}).
 				SetWhereFields().

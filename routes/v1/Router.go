@@ -14,17 +14,17 @@ func (Router) Load(engine *gin.Engine) {
 	(&MenuRouter{}).Load(engine)                // 菜单
 
 	// 组织机构
-	(&LocationLineRouter{}).Load(engine)                   // 线别
-	(&OrganizationRailwayRouter{}).Load(engine)            // 路局
-	(&OrganizationParagraphRouter{}).Load(engine)          // 站段
-	(&OrganizationWorkshopTypeRouter{}).Load(engine)       // 车间类型
-	(&OrganizationWorkshopRouter{}).Load(engine)           // 车间
-	(&OrganizationWorkAreaTypeRouter{}).Load(engine)       // 工区类型
-	(&OrganizationWorkAreaRouter{}).Load(engine)           // 工区
-	(&OrganizationSectionRouter{}).Load(engine)            // 区间
-	(&LocationCenterRouter{}).Load(engine)                 // 中心
-	(&OrganizationRailroadGradeCrossRouter{}).Load(engine) // 道口
-	(&OrganizationStationRouter{}).Load(engine)            // 站场
+	(&LocationLineRouter{}).Load(engine)               // 线别
+	(&OrganizationRailwayRouter{}).Load(engine)        // 路局
+	(&OrganizationParagraphRouter{}).Load(engine)      // 站段
+	(&OrganizationWorkshopTypeRouter{}).Load(engine)   // 车间类型
+	(&OrganizationWorkshopRouter{}).Load(engine)       // 车间
+	(&OrganizationWorkAreaTypeRouter{}).Load(engine)   // 工区类型
+	(&OrganizationWorkAreaRouter{}).Load(engine)       // 工区
+	(&LocationSectionRouter{}).Load(engine)            // 区间
+	(&LocationCenterRouter{}).Load(engine)             // 中心
+	(&LocationRailroadGradeCrossRouter{}).Load(engine) // 道口
+	(&LocationStationRouter{}).Load(engine)            // 站场
 
 	// 仓储位置
 	(&PositionDepotStorehouseRouter{}).Load(engine) // 仓库

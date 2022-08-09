@@ -65,13 +65,13 @@ func (cls LocationCenterStoreForm) ShouldBind(ctx *gin.Context) LocationCenterSt
 //  @param router
 func (LocationCenterRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
-		"api/v1/location",
+		"api/v1/locationCenter",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),
 	)
 	{
 		// 新建
-		r.POST("center", func(ctx *gin.Context) {
+		r.POST("", func(ctx *gin.Context) {
 			var (
 				ret    *gorm.DB
 				repeat models.LocationCenterModel
@@ -107,7 +107,7 @@ func (LocationCenterRouter) Load(engine *gin.Engine) {
 		})
 
 		// 删除
-		r.DELETE("center/:uuid", func(ctx *gin.Context) {
+		r.DELETE(":uuid", func(ctx *gin.Context) {
 			var (
 				ret            *gorm.DB
 				locationCenter models.LocationCenterModel
@@ -129,7 +129,7 @@ func (LocationCenterRouter) Load(engine *gin.Engine) {
 		})
 
 		// 编辑
-		r.PUT("center/:uuid", func(ctx *gin.Context) {
+		r.PUT(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                    *gorm.DB
 				locationCenter, repeat models.LocationCenterModel
@@ -172,7 +172,7 @@ func (LocationCenterRouter) Load(engine *gin.Engine) {
 		})
 
 		// 详情
-		r.GET("center/:uuid", func(ctx *gin.Context) {
+		r.GET(":uuid", func(ctx *gin.Context) {
 			var locationCenter models.LocationCenterModel
 			ret := models.Init(models.LocationCenterModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
@@ -185,7 +185,7 @@ func (LocationCenterRouter) Load(engine *gin.Engine) {
 		})
 
 		// 列表
-		r.GET("center", func(ctx *gin.Context) {
+		r.GET("", func(ctx *gin.Context) {
 			var locationCenters []models.LocationCenterModel
 			models.Init(models.LocationCenterModel{}).
 				SetWhereFields().

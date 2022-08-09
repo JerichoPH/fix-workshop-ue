@@ -84,13 +84,13 @@ func (cls RbacPermissionStoreResourceForm) ShouldBind(ctx *gin.Context) RbacPerm
 //  @param router
 func (RbacPermissionRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
-		"api/v1/rbac",
+		"api/v1/rbacPermission",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),
 	)
 	{
 		// 新建
-		r.POST("permission", func(ctx *gin.Context) {
+		r.POST("", func(ctx *gin.Context) {
 			var ret *gorm.DB
 
 			// 表单
@@ -151,7 +151,7 @@ func (RbacPermissionRouter) Load(engine *gin.Engine) {
 		})
 
 		// 删除权限
-		r.DELETE("permission/:uuid", func(ctx *gin.Context) {
+		r.DELETE(":uuid", func(ctx *gin.Context) {
 			var (
 				ret            *gorm.DB
 				rbacPermission models.RbacPermissionModel
@@ -174,7 +174,7 @@ func (RbacPermissionRouter) Load(engine *gin.Engine) {
 		})
 
 		// 编辑权限
-		r.PUT("permission/:uuid", func(ctx *gin.Context) {
+		r.PUT(":uuid", func(ctx *gin.Context) {
 			var (
 				ret            *gorm.DB
 				rbacPermission models.RbacPermissionModel
@@ -205,7 +205,7 @@ func (RbacPermissionRouter) Load(engine *gin.Engine) {
 		})
 
 		// 权限详情
-		r.GET("permission/:uuid", func(ctx *gin.Context) {
+		r.GET(":uuid", func(ctx *gin.Context) {
 			var (
 				ret            *gorm.DB
 				rbacPermission models.RbacPermissionModel
@@ -222,7 +222,7 @@ func (RbacPermissionRouter) Load(engine *gin.Engine) {
 		})
 
 		// 权限列表
-		r.GET("permission", func(ctx *gin.Context) {
+		r.GET("", func(ctx *gin.Context) {
 			var rbacPermissions []models.RbacPermissionModel
 			models.Init(models.RbacPermissionModel{}).
 				SetPreloads("RbacPermissionGroup").

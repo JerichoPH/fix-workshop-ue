@@ -64,13 +64,13 @@ func (cls OrganizationParagraphStoreForm) ShouldBind(ctx *gin.Context) Organizat
 //  @param router
 func (OrganizationParagraphRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
-		"/api/v1/organization",
+		"/api/v1/organizationParagraph",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),
 	)
 	{
 		// 新建
-		r.POST("paragraph", func(ctx *gin.Context) {
+		r.POST("", func(ctx *gin.Context) {
 			var (
 				ret    *gorm.DB
 				repeat models.OrganizationParagraphModel
@@ -114,7 +114,7 @@ func (OrganizationParagraphRouter) Load(engine *gin.Engine) {
 		})
 
 		// 删除
-		r.DELETE("paragraph/:uuid", func(ctx *gin.Context) {
+		r.DELETE(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                   *gorm.DB
 				organizationParagraph models.OrganizationParagraphModel
@@ -136,7 +136,7 @@ func (OrganizationParagraphRouter) Load(engine *gin.Engine) {
 		})
 
 		// 编辑
-		r.PUT("paragraph/:uuid", func(ctx *gin.Context) {
+		r.PUT(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                   *gorm.DB
 				organizationParagraph models.OrganizationParagraphModel
@@ -183,7 +183,7 @@ func (OrganizationParagraphRouter) Load(engine *gin.Engine) {
 		})
 
 		// 详情
-		r.GET("paragraph/:uuid", func(ctx *gin.Context) {
+		r.GET(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                   *gorm.DB
 				organizationParagraph models.OrganizationParagraphModel
@@ -200,7 +200,7 @@ func (OrganizationParagraphRouter) Load(engine *gin.Engine) {
 		})
 
 		// 列表
-		r.GET("paragraph", func(ctx *gin.Context) {
+		r.GET("", func(ctx *gin.Context) {
 			var organizationParagraphs []models.OrganizationParagraphModel
 			models.Init(models.OrganizationParagraphModel{}).
 				SetWhereFields("uuid", "sort", "unique_code", "name", "shot_name", "be_enable", "organization_railway_uuid").

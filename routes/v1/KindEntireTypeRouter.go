@@ -57,13 +57,13 @@ func (cls KindEntireTypeStoreForm) ShouldBind(ctx *gin.Context) KindEntireTypeSt
 //  @param engine
 func (KindEntireTypeRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
-		"api/v1/kind",
+		"api/v1/kindEntireType",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),
 	)
 	{
 		// 新建
-		r.POST("entireType", func(ctx *gin.Context) {
+		r.POST("", func(ctx *gin.Context) {
 			var (
 				ret    *gorm.DB
 				repeat models.KindEntireTypeModel
@@ -100,7 +100,7 @@ func (KindEntireTypeRouter) Load(engine *gin.Engine) {
 		})
 
 		// 删除
-		r.DELETE("entireType/:uuid", func(ctx *gin.Context) {
+		r.DELETE(":uuid", func(ctx *gin.Context) {
 			var (
 				ret            *gorm.DB
 				kindEntireType models.KindEntireTypeModel
@@ -122,7 +122,7 @@ func (KindEntireTypeRouter) Load(engine *gin.Engine) {
 		})
 
 		// 编辑
-		r.PUT("entireType/:uuid", func(ctx *gin.Context) {
+		r.PUT(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                    *gorm.DB
 				kindEntireType, repeat models.KindEntireTypeModel
@@ -166,7 +166,7 @@ func (KindEntireTypeRouter) Load(engine *gin.Engine) {
 		})
 
 		// 详情
-		r.GET("entireType/:uuid", func(ctx *gin.Context) {
+		r.GET(":uuid", func(ctx *gin.Context) {
 			var (
 				ret            *gorm.DB
 				kindEntireType models.KindEntireTypeModel
@@ -181,7 +181,7 @@ func (KindEntireTypeRouter) Load(engine *gin.Engine) {
 		})
 
 		// 列表
-		r.GET("entireType", func(ctx *gin.Context) {
+		r.GET("", func(ctx *gin.Context) {
 			var kindEntireTypes []models.KindEntireTypeModel
 			models.Init(models.KindEntireTypeModel{}).
 				SetWhereFields().

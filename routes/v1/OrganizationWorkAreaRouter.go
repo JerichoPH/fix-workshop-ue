@@ -62,13 +62,13 @@ func (cls OrganizationWorkAreaStoreForm) ShouldBind(ctx *gin.Context) Organizati
 //  @param router
 func (OrganizationWorkAreaRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
-		"api/v1/organization",
+		"api/v1/organizationWorkArea",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),
 	)
 	{
 		// 新建
-		r.POST("workArea", func(ctx *gin.Context) {
+		r.POST("", func(ctx *gin.Context) {
 			var (
 				ret    *gorm.DB
 				repeat models.OrganizationWorkAreaModel
@@ -106,7 +106,7 @@ func (OrganizationWorkAreaRouter) Load(engine *gin.Engine) {
 		})
 
 		// 删除
-		r.DELETE("workArea/:uuid", func(ctx *gin.Context) {
+		r.DELETE(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                  *gorm.DB
 				organizationWorkArea models.OrganizationWorkAreaModel
@@ -127,7 +127,7 @@ func (OrganizationWorkAreaRouter) Load(engine *gin.Engine) {
 		})
 
 		// 编辑
-		r.PUT("workArea/:uuid", func(ctx *gin.Context) {
+		r.PUT(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                          *gorm.DB
 				organizationWorkArea, repeat models.OrganizationWorkAreaModel
@@ -172,7 +172,7 @@ func (OrganizationWorkAreaRouter) Load(engine *gin.Engine) {
 		})
 
 		// 详情
-		r.GET("workArea/:uuid", func(ctx *gin.Context) {
+		r.GET(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                  *gorm.DB
 				organizationWorkArea models.OrganizationWorkAreaModel
@@ -188,7 +188,7 @@ func (OrganizationWorkAreaRouter) Load(engine *gin.Engine) {
 		})
 
 		// 列表
-		r.GET("workArea", func(ctx *gin.Context) {
+		r.GET("", func(ctx *gin.Context) {
 			var organizationWorkAreas []models.OrganizationWorkAreaModel
 			models.Init(models.OrganizationWorkAreaModel{}).
 				SetWhereFields("unique_code", "name", "be_enable", "organization_work_area_type_uuid", "organization_workshop_uuid").

@@ -14,7 +14,7 @@ type PositionIndoorRoomTypeModel struct {
 
 // TableName 表名称
 func (PositionIndoorRoomTypeModel) TableName() string {
-	return "location_indoor_room_types"
+	return "position_indoor_room_types"
 }
 
 // FindOneByUUID 根据UUID获取单条数据

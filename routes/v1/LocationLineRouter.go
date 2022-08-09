@@ -189,13 +189,13 @@ func (cls LocationLineBindForm) ShouldBind(ctx *gin.Context) LocationLineBindFor
 //  @param router
 func (LocationLineRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
-		"/api/v1/location",
+		"/api/v1/locationLine",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),
 	)
 	{
 		// 新建
-		r.POST("line", func(ctx *gin.Context) {
+		r.POST("", func(ctx *gin.Context) {
 			var (
 				ret    *gorm.DB
 				repeat models.LocationLineModel
@@ -239,7 +239,7 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 		})
 
 		// 删除
-		r.DELETE("line/:uuid", func(ctx *gin.Context) {
+		r.DELETE(":uuid", func(ctx *gin.Context) {
 			var (
 				ret              *gorm.DB
 				organizationLine models.LocationLineModel
@@ -260,7 +260,7 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 		})
 
 		// 编辑
-		r.PUT("line/:uuid", func(ctx *gin.Context) {
+		r.PUT(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                  *gorm.DB
 				locationLine, repeat models.LocationLineModel
@@ -311,7 +311,7 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 		})
 
 		// 绑定路局
-		r.PUT("line/:uuid/bindOrganizationRailways", func(ctx *gin.Context) {
+		r.PUT(":uuid/bindOrganizationRailways", func(ctx *gin.Context) {
 			var (
 				ret          *gorm.DB
 				locationLine models.LocationLineModel
@@ -340,7 +340,7 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 		})
 
 		// 绑定路局
-		r.PUT("line/:uuid/bindOrganizationParagraphs", func(ctx *gin.Context) {
+		r.PUT(":uuid/bindOrganizationParagraphs", func(ctx *gin.Context) {
 			var (
 				ret          *gorm.DB
 				locationLine models.LocationLineModel
@@ -369,7 +369,7 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 		})
 
 		// 绑定车间
-		r.PUT("line/:uuid/bindOrganizationWorkshops", func(ctx *gin.Context) {
+		r.PUT(":uuid/bindOrganizationWorkshops", func(ctx *gin.Context) {
 			var (
 				ret          *gorm.DB
 				locationLine models.LocationLineModel
@@ -398,7 +398,7 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 		})
 
 		// 绑定工区
-		r.PUT("line/:uuid/bindOrganizationWorkAreas", func(ctx *gin.Context) {
+		r.PUT(":uuid/bindOrganizationWorkAreas", func(ctx *gin.Context) {
 			var (
 				ret          *gorm.DB
 				locationLine models.LocationLineModel
@@ -427,7 +427,7 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 		})
 
 		// 绑定区间
-		r.PUT("line/:uuid/bindOrganizationSections", func(ctx *gin.Context) {
+		r.PUT(":uuid/bindOrganizationSections", func(ctx *gin.Context) {
 			var (
 				ret          *gorm.DB
 				locationLine models.LocationLineModel
@@ -456,7 +456,7 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 		})
 
 		// 绑定站场
-		r.PUT("line/:uuid/bindOrganizationStations", func(ctx *gin.Context) {
+		r.PUT(":uuid/bindOrganizationStations", func(ctx *gin.Context) {
 			var (
 				ret          *gorm.DB
 				locationLine models.LocationLineModel
@@ -485,7 +485,7 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 		})
 
 		// 绑定道口
-		r.PUT("line/:uuid/bindOrganizationRailroadGradeCrosses", func(ctx *gin.Context) {
+		r.PUT(":uuid/bindOrganizationRailroadGradeCrosses", func(ctx *gin.Context) {
 			var (
 				ret          *gorm.DB
 				locationLine models.LocationLineModel
@@ -514,7 +514,7 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 		})
 
 		// 绑定中心
-		r.PUT("line/:uuid/bindOrganizationCenters", func(ctx *gin.Context) {
+		r.PUT(":uuid/bindOrganizationCenters", func(ctx *gin.Context) {
 			var (
 				ret          *gorm.DB
 				locationLine models.LocationLineModel
@@ -543,7 +543,7 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 		})
 
 		// 详情
-		r.GET("line/:uuid", func(ctx *gin.Context) {
+		r.GET(":uuid", func(ctx *gin.Context) {
 			var (
 				ret              *gorm.DB
 				organizationLine models.LocationLineModel
@@ -560,7 +560,7 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 		})
 
 		// 列表
-		r.GET("line", func(ctx *gin.Context) {
+		r.GET("", func(ctx *gin.Context) {
 			var organizationLines []models.LocationLineModel
 			models.Init(models.LocationLineModel{}).
 				SetWhereFields("unique_code", "name", "be_enable", "sort").

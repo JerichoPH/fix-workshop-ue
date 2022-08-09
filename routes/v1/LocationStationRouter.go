@@ -10,11 +10,11 @@ import (
 	"gorm.io/gorm"
 )
 
-// OrganizationStationRouter 站场路由
-type OrganizationStationRouter struct{}
+// LocationStationRouter 站场路由
+type LocationStationRouter struct{}
 
-// OrganizationStationStoreForm 新建站场表单
-type OrganizationStationStoreForm struct {
+// LocationStationStoreForm 新建站场表单
+type LocationStationStoreForm struct {
 	Sort                     int64  `form:"sort" json:"sort"`
 	UniqueCode               string `form:"unique_code" json:"unique_code"`
 	Name                     string `form:"name" json:"name"`
@@ -23,15 +23,15 @@ type OrganizationStationStoreForm struct {
 	OrganizationWorkshop     models.OrganizationWorkshopModel
 	OrganizationWorkAreaUUID string `form:"organization_work_area_uuid" json:"organization_work_area_uuid"`
 	OrganizationWorkArea     models.OrganizationWorkAreaModel
-	OrganizationLineUUIDs    []string `form:"organization_line_uuids" json:"organization_line_uuids"`
-	OrganizationLines        []*models.LocationLineModel
+	LocationLineUUIDs        []string `form:"location_line_uuids" json:"location_line_uuids"`
+	LocationLines            []*models.LocationLineModel
 }
 
 // ShouldBind 绑定表单
 //  @receiver cls
 //  @param ctx
-//  @return OrganizationStationStoreForm
-func (cls OrganizationStationStoreForm) ShouldBind(ctx *gin.Context) OrganizationStationStoreForm {
+//  @return LocationStationStoreForm
+func (cls LocationStationStoreForm) ShouldBind(ctx *gin.Context) LocationStationStoreForm {
 	var ret *gorm.DB
 
 	if err := ctx.ShouldBind(&cls); err != nil {
@@ -65,22 +65,22 @@ func (cls OrganizationStationStoreForm) ShouldBind(ctx *gin.Context) Organizatio
 // Load 加载路由
 //  @receiver cls
 //  @param router
-func (OrganizationStationRouter) Load(engine *gin.Engine) {
+func (LocationStationRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
-		"api/v1/organization",
+		"api/v1/locationStation",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),
 	)
 	{
 		// 新建
-		r.POST("station", func(ctx *gin.Context) {
+		r.POST("", func(ctx *gin.Context) {
 			var (
 				ret    *gorm.DB
 				repeat models.LocationStationModel
 			)
 
 			// 表单
-			form := (&OrganizationStationStoreForm{}).ShouldBind(ctx)
+			form := (&LocationStationStoreForm{}).ShouldBind(ctx)
 
 			// 查重
 			ret = models.Init(models.LocationStationModel{}).
@@ -95,37 +95,37 @@ func (OrganizationStationRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsRepeat(ret, "站场名称")
 
 			// 新建
-			organizationStation := &models.LocationStationModel{
+			locationStation := &models.LocationStationModel{
 				BaseModel:            models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
 				UniqueCode:           form.UniqueCode,
 				Name:                 form.Name,
 				BeEnable:             form.BeEnable,
 				OrganizationWorkshop: form.OrganizationWorkshop,
 				OrganizationWorkArea: form.OrganizationWorkArea,
-				LocationLines:        form.OrganizationLines,
+				LocationLines:        form.LocationLines,
 			}
-			if ret = models.Init(models.LocationStationModel{}).GetSession().Create(&organizationStation); ret.Error != nil {
+			if ret = models.Init(models.LocationStationModel{}).GetSession().Create(&locationStation); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"organization_station": organizationStation}))
+			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"organization_station": locationStation}))
 		})
 
 		// 删除
 		r.DELETE("station/:uuid", func(ctx *gin.Context) {
 			var (
-				ret                 *gorm.DB
-				organizationStation models.LocationStationModel
+				ret             *gorm.DB
+				locationStation models.LocationStationModel
 			)
 			// 查询
 			ret = models.Init(models.LocationStationModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
-				First(&organizationStation)
+				First(&locationStation)
 			wrongs.PanicWhenIsEmpty(ret, "站场")
 
 			// 删除
-			if ret := models.Init(models.LocationStationModel{}).GetSession().Delete(&organizationStation); ret.Error != nil {
+			if ret := models.Init(models.LocationStationModel{}).GetSession().Delete(&locationStation); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -133,14 +133,14 @@ func (OrganizationStationRouter) Load(engine *gin.Engine) {
 		})
 
 		// 编辑
-		r.PUT("station/:uuid", func(ctx *gin.Context) {
+		r.PUT(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                         *gorm.DB
 				organizationStation, repeat models.LocationStationModel
 			)
 
 			// 表单
-			form := (&OrganizationStationStoreForm{}).ShouldBind(ctx)
+			form := (&LocationStationStoreForm{}).ShouldBind(ctx)
 
 			// 查重
 			ret = models.Init(models.LocationStationModel{}).
@@ -170,41 +170,41 @@ func (OrganizationStationRouter) Load(engine *gin.Engine) {
 			organizationStation.BeEnable = form.BeEnable
 			organizationStation.OrganizationWorkshop = form.OrganizationWorkshop
 			organizationStation.OrganizationWorkArea = form.OrganizationWorkArea
-			organizationStation.LocationLines = form.OrganizationLines
+			organizationStation.LocationLines = form.LocationLines
 			if ret = models.Init(models.LocationStationModel{}).GetSession().Save(&organizationStation); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"organization_station": organizationStation}))
+			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"location_station": organizationStation}))
 		})
 
 		// 详情
-		r.GET("station/:uuid", func(ctx *gin.Context) {
+		r.GET(":uuid", func(ctx *gin.Context) {
 			var (
-				ret                 *gorm.DB
-				organizationStation models.LocationStationModel
+				ret             *gorm.DB
+				locationStation models.LocationStationModel
 			)
 			// 查询
 			ret = models.Init(models.LocationStationModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				Prepare().
-				First(&organizationStation)
+				First(&locationStation)
 			wrongs.PanicWhenIsEmpty(ret, "站场")
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_station": organizationStation}))
+			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"location_station": locationStation}))
 		})
 
 		// 列表
 		r.GET("station", func(ctx *gin.Context) {
-			var organizationStations []models.LocationStationModel
+			var locationStations []models.LocationStationModel
 			models.Init(models.LocationStationModel{}).
 				SetWhereFields().
 				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				PrepareQuery(ctx).
-				Find(&organizationStations)
+				Find(&locationStations)
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_stations": organizationStations}))
+			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"location_stations": locationStations}))
 		})
 	}
 }

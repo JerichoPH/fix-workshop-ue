@@ -54,13 +54,13 @@ func (cls PositionIndoorCabinetStoreForm) ShouldBind(ctx *gin.Context) PositionI
 //  @param router
 func (PositionIndoorCabinetRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
-		"api/v1/location",
+		"api/v1/positionIndoorCabinet",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),
 	)
 	{
 		// 新建
-		r.POST("indoorCabinet", func(ctx *gin.Context) {
+		r.POST("", func(ctx *gin.Context) {
 			var (
 				ret    *gorm.DB
 				repeat models.PositionIndoorCabinetModel
@@ -96,7 +96,7 @@ func (PositionIndoorCabinetRouter) Load(engine *gin.Engine) {
 		})
 
 		// 删除
-		r.DELETE("indoorCabinet/:uuid", func(ctx *gin.Context) {
+		r.DELETE(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                   *gorm.DB
 				positionIndoorCabinet models.PositionIndoorCabinetModel
@@ -118,7 +118,7 @@ func (PositionIndoorCabinetRouter) Load(engine *gin.Engine) {
 		})
 
 		// 编辑
-		r.PUT("indoorCabinet/:uuid", func(ctx *gin.Context) {
+		r.PUT(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                           *gorm.DB
 				positionIndoorCabinet, repeat models.PositionIndoorCabinetModel
@@ -161,7 +161,7 @@ func (PositionIndoorCabinetRouter) Load(engine *gin.Engine) {
 		})
 
 		// 详情
-		r.GET("indoorCabinet/:uuid", func(ctx *gin.Context) {
+		r.GET(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                   *gorm.DB
 				positionIndoorCabinet models.PositionIndoorCabinetModel
@@ -176,7 +176,7 @@ func (PositionIndoorCabinetRouter) Load(engine *gin.Engine) {
 		})
 
 		// 列表
-		r.GET("indoorCabinet", func(ctx *gin.Context) {
+		r.GET("", func(ctx *gin.Context) {
 			var positionIndoorCabinet []models.PositionIndoorCabinetModel
 			models.Init(models.PositionIndoorCabinetModel{}).
 				SetWhereFields().

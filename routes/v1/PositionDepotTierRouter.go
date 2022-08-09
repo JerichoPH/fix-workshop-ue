@@ -55,13 +55,13 @@ func (cls PositionDepotTierStoreForm) ShouldBind(ctx *gin.Context) PositionDepot
 //  @param router
 func (PositionDepotTierRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
-		"api/v1/location",
+		"api/v1/positionDepotTier",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),
 	)
 	{
 		// 新建
-		r.POST("depotTier", func(ctx *gin.Context) {
+		r.POST("", func(ctx *gin.Context) {
 			var (
 				ret    *gorm.DB
 				repeat models.PositionDepotTierModel
@@ -97,7 +97,7 @@ func (PositionDepotTierRouter) Load(engine *gin.Engine) {
 		})
 
 		// 删除
-		r.DELETE("depotTier/:uuid", func(ctx *gin.Context) {
+		r.DELETE(":uuid", func(ctx *gin.Context) {
 			var (
 				ret               *gorm.DB
 				positionDepotTier models.PositionDepotTierModel
@@ -119,7 +119,7 @@ func (PositionDepotTierRouter) Load(engine *gin.Engine) {
 		})
 
 		// 编辑
-		r.PUT("depotTier/:uuid", func(ctx *gin.Context) {
+		r.PUT(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                       *gorm.DB
 				positionDepotTier, repeat models.PositionDepotTierModel
@@ -162,7 +162,7 @@ func (PositionDepotTierRouter) Load(engine *gin.Engine) {
 		})
 
 		// 详情
-		r.GET("depotTier/:uuid", func(ctx *gin.Context) {
+		r.GET(":uuid", func(ctx *gin.Context) {
 			var (
 				ret               *gorm.DB
 				positionDepotTier models.PositionDepotTierModel
@@ -177,7 +177,7 @@ func (PositionDepotTierRouter) Load(engine *gin.Engine) {
 		})
 
 		// 列表
-		r.GET("depotTier", func(ctx *gin.Context) {
+		r.GET("", func(ctx *gin.Context) {
 			var positionDepotTiers []models.PositionDepotTierModel
 			models.Init(models.PositionDepotTierModel{}).
 				SetWhereFields().

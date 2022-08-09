@@ -10,11 +10,11 @@ import (
 	"gorm.io/gorm"
 )
 
-// OrganizationSectionRouter 区间路由
-type OrganizationSectionRouter struct{}
+// LocationSectionRouter 区间路由
+type LocationSectionRouter struct{}
 
-// OrganizationSectionStoreForm 新建区间表单
-type OrganizationSectionStoreForm struct {
+// LocationSectionStoreForm 新建区间表单
+type LocationSectionStoreForm struct {
 	Sort                     int64  `form:"sort" json:"sort"`
 	UniqueCode               string `form:"unique_code" json:"unique_code"`
 	Name                     string `form:"name" json:"name"`
@@ -28,8 +28,8 @@ type OrganizationSectionStoreForm struct {
 // ShouldBind 绑定表单
 //  @receiver cls
 //  @param ctx
-//  @return OrganizationSectionStoreForm
-func (cls OrganizationSectionStoreForm) ShouldBind(ctx *gin.Context) OrganizationSectionStoreForm {
+//  @return LocationSectionStoreForm
+func (cls LocationSectionStoreForm) ShouldBind(ctx *gin.Context) LocationSectionStoreForm {
 	var ret *gorm.DB
 
 	if err := ctx.ShouldBind(&cls); err != nil {
@@ -63,22 +63,22 @@ func (cls OrganizationSectionStoreForm) ShouldBind(ctx *gin.Context) Organizatio
 // Load 加载路由
 //  @receiver cls
 //  @param router
-func (OrganizationSectionRouter) Load(engine *gin.Engine) {
+func (LocationSectionRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
-		"api/v1/organization",
+		"api/v1/locationSection",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),
 	)
 	{
 		// 新建
-		r.POST("section", func(ctx *gin.Context) {
+		r.POST("", func(ctx *gin.Context) {
 			var (
 				ret    *gorm.DB
 				repeat models.LocationSectionModel
 			)
 
 			// 表单
-			form := (&OrganizationSectionStoreForm{}).ShouldBind(ctx)
+			form := (&LocationSectionStoreForm{}).ShouldBind(ctx)
 
 			// 查重
 			ret = models.Init(models.LocationSectionModel{}).
@@ -105,24 +105,24 @@ func (OrganizationSectionRouter) Load(engine *gin.Engine) {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"organization_section": organizationSection}))
+			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"location_section": organizationSection}))
 		})
 
 		// 删除
-		r.DELETE("section/:uuid", func(ctx *gin.Context) {
+		r.DELETE(":uuid", func(ctx *gin.Context) {
 			var (
-				ret                 *gorm.DB
-				organizationSection models.LocationSectionModel
+				ret             *gorm.DB
+				locationSection models.LocationSectionModel
 			)
 			// 查询
 			ret = models.Init(models.LocationSectionModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
-				First(&organizationSection)
+				First(&locationSection)
 			wrongs.PanicWhenIsEmpty(ret, "区间")
 
 			// 删除
-			if ret := models.Init(models.LocationSectionModel{}).GetSession().Delete(&organizationSection); ret.Error != nil {
+			if ret := models.Init(models.LocationSectionModel{}).GetSession().Delete(&locationSection); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -130,14 +130,14 @@ func (OrganizationSectionRouter) Load(engine *gin.Engine) {
 		})
 
 		// 编辑
-		r.PUT("section/:uuid", func(ctx *gin.Context) {
+		r.PUT(":uuid", func(ctx *gin.Context) {
 			var (
-				ret                         *gorm.DB
-				organizationSection, repeat models.LocationSectionModel
+				ret                     *gorm.DB
+				locationSection, repeat models.LocationSectionModel
 			)
 
 			// 表单
-			form := (&OrganizationSectionStoreForm{}).ShouldBind(ctx)
+			form := (&LocationSectionStoreForm{}).ShouldBind(ctx)
 
 			// 查重
 			ret = models.Init(models.LocationSectionModel{}).
@@ -157,25 +157,25 @@ func (OrganizationSectionRouter) Load(engine *gin.Engine) {
 			ret = models.Init(models.LocationSectionModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
-				First(&organizationSection)
+				First(&locationSection)
 			wrongs.PanicWhenIsEmpty(ret, "区间")
 
 			// 编辑
-			organizationSection.BaseModel.Sort = form.Sort
-			organizationSection.UniqueCode = form.UniqueCode
-			organizationSection.Name = form.Name
-			organizationSection.BeEnable = form.BeEnable
-			organizationSection.OrganizationWorkshop = form.OrganizationWorkshop
-			organizationSection.OrganizationWorkArea = form.OrganizationWorkArea
-			if ret = models.Init(models.LocationSectionModel{}).GetSession().Save(&organizationSection); ret.Error != nil {
+			locationSection.BaseModel.Sort = form.Sort
+			locationSection.UniqueCode = form.UniqueCode
+			locationSection.Name = form.Name
+			locationSection.BeEnable = form.BeEnable
+			locationSection.OrganizationWorkshop = form.OrganizationWorkshop
+			locationSection.OrganizationWorkArea = form.OrganizationWorkArea
+			if ret = models.Init(models.LocationSectionModel{}).GetSession().Save(&locationSection); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"organization_section": organizationSection}))
+			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"location_section": locationSection}))
 		})
 
 		// 详情
-		r.GET("section/:uuid", func(ctx *gin.Context) {
+		r.GET(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                 *gorm.DB
 				organizationSection models.LocationSectionModel
@@ -187,19 +187,19 @@ func (OrganizationSectionRouter) Load(engine *gin.Engine) {
 				First(&organizationSection)
 			wrongs.PanicWhenIsEmpty(ret, "区间")
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_section": organizationSection}))
+			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"location_section": organizationSection}))
 		})
 
 		// 列表
-		r.GET("section", func(ctx *gin.Context) {
-			var organizationSections []models.LocationSectionModel
+		r.GET("", func(ctx *gin.Context) {
+			var locationSections []models.LocationSectionModel
 			models.Init(models.LocationSectionModel{}).
 				SetWhereFields("unique_code", "Name", "be_enable", "organization_workshop_uuid", "organization_work_area_uuid").
 				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				PrepareQuery(ctx).
-				Find(&organizationSections)
+				Find(&locationSections)
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_sections": organizationSections}))
+			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"location_sections": locationSections}))
 		})
 	}
 }

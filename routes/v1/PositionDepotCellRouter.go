@@ -55,13 +55,13 @@ func (cls PositionDepotCellStoreForm) ShouldBind(ctx *gin.Context) PositionDepot
 //  @param router
 func (PositionDepotCellRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
-		"api/v1/location",
+		"api/v1/positionDepotCell",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),
 	)
 	{
 		// 新建
-		r.POST("depotCell", func(ctx *gin.Context) {
+		r.POST("", func(ctx *gin.Context) {
 			var (
 				ret    *gorm.DB
 				repeat models.PositionDepotCellModel
@@ -97,7 +97,7 @@ func (PositionDepotCellRouter) Load(engine *gin.Engine) {
 		})
 
 		// 删除
-		r.DELETE("depotCell/:uuid", func(ctx *gin.Context) {
+		r.DELETE(":uuid", func(ctx *gin.Context) {
 			var (
 				ret               *gorm.DB
 				positionDepotCell models.PositionDepotCellModel
@@ -119,7 +119,7 @@ func (PositionDepotCellRouter) Load(engine *gin.Engine) {
 		})
 
 		// 编辑
-		r.PUT("depotCell/:uuid", func(ctx *gin.Context) {
+		r.PUT(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                       *gorm.DB
 				positionDepotCell, repeat models.PositionDepotCellModel
@@ -162,7 +162,7 @@ func (PositionDepotCellRouter) Load(engine *gin.Engine) {
 		})
 
 		// 详情
-		r.GET("depotCell/:uuid", func(ctx *gin.Context) {
+		r.GET(":uuid", func(ctx *gin.Context) {
 			var (
 				ret               *gorm.DB
 				positionDepotCell models.PositionDepotCellModel
@@ -177,7 +177,7 @@ func (PositionDepotCellRouter) Load(engine *gin.Engine) {
 		})
 
 		// 列表
-		r.GET("depotCell", func(ctx *gin.Context) {
+		r.GET("", func(ctx *gin.Context) {
 			var positionDepotCells []models.PositionDepotCellModel
 			models.Init(models.PositionDepotCellModel{}).
 				SetWhereFields().

@@ -53,13 +53,13 @@ func (cls OrganizationRailwayStoreForm) ShouldBind(ctx *gin.Context) Organizatio
 //  @param router
 func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
-		"/api/v1/organization",
+		"/api/v1/organizationRailway",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),
 	)
 	{
 		// 新建路局
-		r.POST("railway", func(ctx *gin.Context) {
+		r.POST("", func(ctx *gin.Context) {
 			var (
 				ret    *gorm.DB
 				repeat models.OrganizationRailwayModel
@@ -102,7 +102,7 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 		})
 
 		// 删除
-		r.DELETE("railway/:uuid", func(ctx *gin.Context) {
+		r.DELETE(":uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
 
 			// 查询
@@ -121,7 +121,7 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 		})
 
 		// 编辑
-		r.PUT("railway/:uuid", func(ctx *gin.Context) {
+		r.PUT(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                         *gorm.DB
 				organizationRailway, repeat models.OrganizationRailwayModel
@@ -172,7 +172,7 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 		})
 
 		// 详情
-		r.GET("railway/:uuid", func(ctx *gin.Context) {
+		r.GET(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                 *gorm.DB
 				organizationRailway models.OrganizationRailwayModel
@@ -188,7 +188,7 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 		})
 
 		// 列表
-		r.GET("railway", func(ctx *gin.Context) {
+		r.GET("", func(ctx *gin.Context) {
 			var organizationRailways []models.OrganizationRailwayModel
 
 			models.Init(models.OrganizationRailwayModel{}).

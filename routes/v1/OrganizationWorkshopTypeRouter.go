@@ -50,7 +50,7 @@ func (OrganizationWorkshopTypeRouter) Load(engine *gin.Engine) {
 	)
 	{
 		// 新建车间类型
-		r.POST("workshopType", func(ctx *gin.Context) {
+		r.POST("", func(ctx *gin.Context) {
 			var ret *gorm.DB
 
 			// 表单
@@ -83,7 +83,7 @@ func (OrganizationWorkshopTypeRouter) Load(engine *gin.Engine) {
 		})
 
 		// 删除
-		r.DELETE("workshopType/:uuid", func(ctx *gin.Context) {
+		r.DELETE(":uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
 
 			// 查询
@@ -98,7 +98,7 @@ func (OrganizationWorkshopTypeRouter) Load(engine *gin.Engine) {
 		})
 
 		// 编辑
-		r.PUT("workshopType/:uuid", func(ctx *gin.Context) {
+		r.PUT(":uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
 
 			// 表单
@@ -132,14 +132,14 @@ func (OrganizationWorkshopTypeRouter) Load(engine *gin.Engine) {
 		})
 
 		// 详情
-		r.GET("workshopType/:uuid", func(ctx *gin.Context) {
+		r.GET(":uuid", func(ctx *gin.Context) {
 			organizationWorkshopType := (&models.OrganizationWorkshopTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_workshop_type": organizationWorkshopType}))
 		})
 
 		// 列表
-		r.GET("workshopType", func(ctx *gin.Context) {
+		r.GET("", func(ctx *gin.Context) {
 			var organizationWorkshopTypes []models.OrganizationWorkshopTypeModel
 			models.Init(models.OrganizationWorkshopTypeModel{}).
 				SetWhereFields("sort", "unique_code", "name", "number").

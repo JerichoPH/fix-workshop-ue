@@ -27,7 +27,7 @@ func (cls *MySql) getConn() (db *gorm.DB) {
 	cls.Password = config.DB.Section("mysql").Key("password").MustString("root")
 	cls.Host = config.DB.Section("mysql").Key("host").MustString("127.0.0.1")
 	cls.Port = config.DB.Section("mysql").Key("port").MustString("3306")
-	cls.Database = config.DB.Section("mysql").Key("databases").MustString("FixWorkshop")
+	cls.Database = config.DB.Section("mysql").Key("database").MustString("FixWorkshop")
 	cls.Charset = config.DB.Section("mysql").Key("charset").MustString("utf8mb4")
 
 	dsn := fmt.Sprintf(

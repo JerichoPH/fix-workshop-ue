@@ -17,5 +17,5 @@ type LocationLineModel struct {
 
 // TableName 表名称
 func (LocationLineModel) TableName() string {
-	return "organization_lines"
+	return "location_lines"
 }

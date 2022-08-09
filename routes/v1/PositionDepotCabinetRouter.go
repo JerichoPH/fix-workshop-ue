@@ -55,13 +55,13 @@ func (cls PositionDepotCabinetStoreForm) ShouldBind(ctx *gin.Context) PositionDe
 //  @param router
 func (PositionDepotCabinetRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
-		"api/v1/location",
+		"api/v1/positionDepotCabinet",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),
 	)
 	{
 		// 新建
-		r.POST("depotCabinet", func(ctx *gin.Context) {
+		r.POST("", func(ctx *gin.Context) {
 			var (
 				ret    *gorm.DB
 				repeat models.PositionDepotCabinetModel
@@ -97,7 +97,7 @@ func (PositionDepotCabinetRouter) Load(engine *gin.Engine) {
 		})
 
 		// 删除
-		r.DELETE("depotCabinet/:uuid", func(ctx *gin.Context) {
+		r.DELETE(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                  *gorm.DB
 				positionDepotCabinet models.PositionDepotCabinetModel
@@ -119,7 +119,7 @@ func (PositionDepotCabinetRouter) Load(engine *gin.Engine) {
 		})
 
 		// 编辑
-		r.PUT("depotCabinet/:uuid", func(ctx *gin.Context) {
+		r.PUT(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                          *gorm.DB
 				positionDepotCabinet, repeat models.PositionDepotCabinetModel
@@ -162,7 +162,7 @@ func (PositionDepotCabinetRouter) Load(engine *gin.Engine) {
 		})
 
 		// 详情
-		r.GET("depotCabinet/:uuid", func(ctx *gin.Context) {
+		r.GET(":uuid", func(ctx *gin.Context) {
 			var (
 				ret                  *gorm.DB
 				positionDepotCabinet models.PositionDepotCabinetModel
@@ -177,7 +177,7 @@ func (PositionDepotCabinetRouter) Load(engine *gin.Engine) {
 		})
 
 		// 列表
-		r.GET("depotCabinet", func(ctx *gin.Context) {
+		r.GET("", func(ctx *gin.Context) {
 			var positionDepotCabinets []models.PositionDepotCabinetModel
 			models.Init(models.PositionDepotCabinetModel{}).
 				SetWhereFields().
