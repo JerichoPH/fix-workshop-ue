@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"fix-workshop-ue/databases"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -15,13 +16,13 @@ type OrganizationRailwayRouter struct{}
 
 // OrganizationRailwayStoreForm 新建路局表单
 type OrganizationRailwayStoreForm struct {
-	Sort                       int64    `form:"sort" json:"sort"`
-	UniqueCode                 string   `form:"unique_code" json:"unique_code"`
-	Name                       string   `form:"name" json:"name"`
-	ShortName                  string   `form:"short_name" json:"short_name"`
-	BeEnable                   bool     `form:"be_enable" json:"be_enable"`
-	OrganizationLineUUIDs      []string `form:"organization_line_uuids" json:"organization_line_uuids"`
-	OrganizationLines          []*models.LocationLineModel
+	Sort              int64    `form:"sort" json:"sort"`
+	UniqueCode        string   `form:"unique_code" json:"unique_code"`
+	Name              string   `form:"name" json:"name"`
+	ShortName         string   `form:"short_name" json:"short_name"`
+	BeEnable          bool     `form:"be_enable" json:"be_enable"`
+	LocationLineUUIDs []string `form:"location_line_uuids" json:"location_line_uuids"`
+	LocationLines     []*models.LocationLineModel
 }
 
 // ShouldBind 绑定表单
@@ -38,12 +39,34 @@ func (cls OrganizationRailwayStoreForm) ShouldBind(ctx *gin.Context) Organizatio
 	if cls.Name == "" {
 		wrongs.PanicValidate("路局名称必填")
 	}
-	if len(cls.OrganizationLineUUIDs) > 0 {
+	if len(cls.LocationLineUUIDs) > 0 {
 		models.Init(models.LocationLineModel{}).
 			GetSession().
-			Where("uuid in ?", cls.OrganizationLineUUIDs).
-			Find(&cls.OrganizationLines)
+			Where("uuid in ?", cls.LocationLineUUIDs).
+			Find(&cls.LocationLines)
 	}
+
+	return cls
+}
+
+// OrganizationRailwayBindLinesFrom 路局绑定线别
+type OrganizationRailwayBindLinesFrom struct {
+	LocationLineUUIDs []string `form:"location_line_uuids" json:"location_line_uuids"`
+	LocationLines     []*models.LocationLineModel
+}
+
+// ShouldBind 绑定表单
+//  @receiver cls
+//  @param ctx
+func (cls OrganizationRailwayBindLinesFrom) ShouldBind(ctx *gin.Context) OrganizationRailwayBindLinesFrom {
+	if err := ctx.ShouldBind(&cls); err != nil {
+		wrongs.PanicValidate(err.Error())
+	}
+
+	models.Init(models.LocationLineModel{}).
+		GetSession().
+		Where("uuid in ?", cls.LocationLineUUIDs).
+		Find(&cls.LocationLines)
 
 	return cls
 }
@@ -92,7 +115,7 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 				Name:          form.Name,
 				ShortName:     form.ShortName,
 				BeEnable:      form.BeEnable,
-				LocationLines: form.OrganizationLines,
+				LocationLines: form.LocationLines,
 			}
 			if ret = (&models.BaseModel{}).SetModel(models.OrganizationRailwayModel{}).GetSession().Create(&organizationRailway); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
@@ -163,12 +186,37 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 			organizationRailway.Name = form.Name
 			organizationRailway.ShortName = form.ShortName
 			organizationRailway.BeEnable = form.BeEnable
-			organizationRailway.LocationLines = form.OrganizationLines
+			organizationRailway.LocationLines = form.LocationLines
 			if ret = models.Init(models.OrganizationRailwayModel{}).GetSession().Save(&organizationRailway); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"organization_railway": organizationRailway}))
+		})
+
+		// 绑定线别
+		r.PUT(":uuid/bindLocationLines", func(ctx *gin.Context) {
+			var (
+				ret                 *gorm.DB
+				organizationRailway models.OrganizationRailwayModel
+			)
+
+			// 表单
+			form := (&OrganizationRailwayBindLinesFrom{}).ShouldBind(ctx)
+
+			ret = models.Init(models.OrganizationRailwayModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&organizationRailway)
+			wrongs.PanicWhenIsEmpty(ret, "路局")
+
+			// 清除原有绑定关系
+			(&databases.MySql{}).GetConn().Exec("delete from pivot_location_line_and_organization_railways where organization_railway_id = ?", organizationRailway.ID)
+			// 创建绑定关系
+			organizationRailway.LocationLines = form.LocationLines
+			models.Init(models.OrganizationRailwayModel{}).GetSession().Where("uuid = ?", ctx.Param("uuid")).Save(&organizationRailway)
+
+			ctx.JSON(tools.CorrectIns("绑定成功").Updated(tools.Map{"organization_railway": organizationRailway}))
 		})
 
 		// 详情
