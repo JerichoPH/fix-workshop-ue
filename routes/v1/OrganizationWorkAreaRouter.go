@@ -179,8 +179,8 @@ func (OrganizationWorkAreaRouter) Load(engine *gin.Engine) {
 			)
 			ret = models.Init(models.OrganizationWorkAreaModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				SetScopes((&models.BaseModel{}).ScopeBeEnable).
-				Prepare().
+				SetWhereFields("be_enable").
+				PrepareQuery(ctx).
 				First(&organizationWorkArea)
 			wrongs.PanicWhenIsEmpty(ret, "工区")
 
@@ -192,7 +192,6 @@ func (OrganizationWorkAreaRouter) Load(engine *gin.Engine) {
 			var organizationWorkAreas []models.OrganizationWorkAreaModel
 			models.Init(models.OrganizationWorkAreaModel{}).
 				SetWhereFields("unique_code", "name", "be_enable", "organization_work_area_type_uuid", "organization_workshop_uuid").
-				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				PrepareQuery(ctx).
 				Find(&organizationWorkAreas)
 

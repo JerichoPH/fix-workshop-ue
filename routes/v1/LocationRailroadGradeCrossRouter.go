@@ -179,8 +179,8 @@ func (LocationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 			)
 			ret = models.Init(models.LocationRailroadGradeCrossModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				SetScopes((&models.BaseModel{}).ScopeBeEnable).
-				Prepare().
+				SetWhereFields("be_enable").
+				PrepareQuery(ctx).
 				First(&locationRailroadGradeCross)
 			wrongs.PanicWhenIsEmpty(ret, "道口")
 
@@ -192,7 +192,6 @@ func (LocationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 			var locationRailroadGradeCrosses []models.LocationRailroadGradeCrossModel
 			models.Init(models.LocationRailroadGradeCrossModel{}).
 				SetWhereFields("unique_code", "name", "be_enable", "organization_workshop_uuid", "organization_work_area_uuid").
-				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				PrepareQuery(ctx).
 				Find(&locationRailroadGradeCrosses)
 

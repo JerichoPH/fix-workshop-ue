@@ -187,8 +187,8 @@ func (LocationStationRouter) Load(engine *gin.Engine) {
 			// 查询
 			ret = models.Init(models.LocationStationModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				SetScopes((&models.BaseModel{}).ScopeBeEnable).
-				Prepare().
+				SetWhereFields("be_enable").
+				PrepareQuery(ctx).
 				First(&locationStation)
 			wrongs.PanicWhenIsEmpty(ret, "站场")
 
@@ -200,7 +200,6 @@ func (LocationStationRouter) Load(engine *gin.Engine) {
 			var locationStations []models.LocationStationModel
 			models.Init(models.LocationStationModel{}).
 				SetWhereFields().
-				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				PrepareQuery(ctx).
 				Find(&locationStations)
 

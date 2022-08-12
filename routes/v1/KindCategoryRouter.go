@@ -160,7 +160,7 @@ func (KindCategoryRouter) Load(engine *gin.Engine) {
 				kindCategory models.KindCategoryModel
 			)
 			ret = models.Init(models.KindCategoryModel{}).
-				SetScopes((&models.BaseModel{}).ScopeBeEnable).
+				SetScopes((&models.BaseModel{}).ScopeBeEnableTrue).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&kindCategory)
@@ -173,7 +173,7 @@ func (KindCategoryRouter) Load(engine *gin.Engine) {
 		r.GET("", func(ctx *gin.Context) {
 			var kindCategories []models.KindCategoryModel
 			models.Init(models.KindCategoryModel{}).
-				SetScopes((&models.BaseModel{}).ScopeBeEnable).
+				SetScopes((&models.BaseModel{}).ScopeBeEnableTrue).
 				SetWhereFields().
 				PrepareQuery(ctx).
 				Find(&kindCategories)

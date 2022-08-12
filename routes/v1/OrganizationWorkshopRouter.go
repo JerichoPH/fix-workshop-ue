@@ -179,8 +179,8 @@ func (OrganizationWorkshopRouter) Load(engine *gin.Engine) {
 
 			ret = models.Init(models.OrganizationWorkshopModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				SetScopes((&models.BaseModel{}).ScopeBeEnable).
-				Prepare().
+				SetWhereFields("be_enable").
+				PrepareQuery(ctx).
 				First(&organizationWorkshop)
 			wrongs.PanicWhenIsEmpty(ret, "车间")
 
@@ -193,7 +193,6 @@ func (OrganizationWorkshopRouter) Load(engine *gin.Engine) {
 
 			models.Init(models.OrganizationWorkshopModel{}).
 				SetWhereFields("unique_code", "name", "be_enable", "organization_workshop_type_uuid", "organization_paragraph_uuid").
-				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				PrepareQuery(ctx).
 				Find(&organizationWorkshops)
 

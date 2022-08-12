@@ -16,8 +16,8 @@ type LocationLineRouter struct{}
 
 // LocationLineStoreForm 新建线别表单
 type LocationLineStoreForm struct {
-	Sort                                int64    `form:"sort" json:"sort"`
-	UniqueCode                          string   `form:"unique_code" json:"unique_code"`
+	Sort                            int64    `form:"sort" json:"sort"`
+	UniqueCode                      string   `form:"unique_code" json:"unique_code"`
 	Name                            string   `form:"name" json:"name"`
 	BeEnable                        bool     `form:"be_enable" json:"be_enable"`
 	OrganizationRailwayUUIDs        []string `form:"organization_railway_uuids" json:"organization_railway_uuids"`
@@ -551,8 +551,8 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 			// 查询
 			ret = models.Init(models.LocationLineModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				SetScopes((&models.BaseModel{}).ScopeBeEnable).
-				Prepare().
+				SetWhereFields("be_enable").
+				PrepareQuery(ctx).
 				First(&organizationLine)
 			wrongs.PanicWhenIsEmpty(ret, "线别")
 
@@ -564,7 +564,6 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 			var organizationLines []models.LocationLineModel
 			models.Init(models.LocationLineModel{}).
 				SetWhereFields("unique_code", "name", "be_enable", "sort").
-				SetScopes((&models.LocationLineModel{}).ScopeBeEnable).
 				PrepareQuery(ctx).
 				Find(&organizationLines)
 

@@ -60,8 +60,20 @@ func (cls *BaseModel) demoFind() {
 		Find(&b)
 }
 
-func (cls *BaseModel) ScopeBeEnable(db *gorm.DB) *gorm.DB {
-	return db.Where("be_enable = ?", 1)
+// ScopeBeEnableTrue 启用（查询域）
+//  @receiver cls
+//  @param db
+//  @return *gorm.DB
+func (BaseModel) ScopeBeEnableTrue(db *gorm.DB) *gorm.DB {
+	return db.Where("be_enable is true")
+}
+
+// ScopeBeEnableFalse 不启用（查询域）
+//  @receiver BaseModel
+//  @param db
+//  @return *gorm.DB
+func (BaseModel) ScopeBeEnableFalse(db *gorm.DB) *gorm.DB {
+	return db.Where("be_enable is false")
 }
 
 // SetModel 设置使用的模型

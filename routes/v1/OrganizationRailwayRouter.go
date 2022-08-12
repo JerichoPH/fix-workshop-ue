@@ -225,10 +225,11 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 				ret                 *gorm.DB
 				organizationRailway models.OrganizationRailwayModel
 			)
+
 			ret = models.Init(models.OrganizationRailwayModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				SetScopes((&models.BaseModel{}).ScopeBeEnable).
-				Prepare().
+				SetWhereFields("be_enable").
+				PrepareQuery(ctx).
 				First(&organizationRailway)
 			wrongs.PanicWhenIsEmpty(ret, "路局")
 
@@ -241,7 +242,6 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 
 			models.Init(models.OrganizationRailwayModel{}).
 				SetWhereFields("uuid", "sort", "unique_code", "name", "short_name", "be_enable").
-				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				PrepareQuery(ctx).
 				Find(&organizationRailways)
 

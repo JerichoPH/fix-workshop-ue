@@ -182,8 +182,8 @@ func (LocationSectionRouter) Load(engine *gin.Engine) {
 			)
 			ret = models.Init(models.LocationSectionModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				SetScopes((&models.BaseModel{}).ScopeBeEnable).
-				Prepare().
+				SetWhereFields("be_enable").
+				PrepareQuery(ctx).
 				First(&organizationSection)
 			wrongs.PanicWhenIsEmpty(ret, "区间")
 
@@ -195,7 +195,6 @@ func (LocationSectionRouter) Load(engine *gin.Engine) {
 			var locationSections []models.LocationSectionModel
 			models.Init(models.LocationSectionModel{}).
 				SetWhereFields("unique_code", "Name", "be_enable", "organization_workshop_uuid", "organization_work_area_uuid").
-				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				PrepareQuery(ctx).
 				Find(&locationSections)
 

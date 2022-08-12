@@ -15,15 +15,15 @@ type OrganizationParagraphRouter struct{}
 
 // OrganizationParagraphStoreForm 新建站段表单
 type OrganizationParagraphStoreForm struct {
-	Sort                      int64  `form:"sort" json:"sort"`
-	UniqueCode                string `form:"unique_code" json:"unique_code"`
-	Name                      string `form:"name" json:"name"`
-	ShortName                 string `form:"short_name" json:"short_name"`
-	BeEnable                  bool   `form:"be_enable" json:"be_enable"`
-	OrganizationRailwayUUID   string `form:"organization_railway_uuid" json:"organization_railway_uuid"`
-	OrganizationRailway       models.OrganizationRailwayModel
-	OrganizationLineUUIDs     []string `form:"organization_line_uuids" json:"organization_line_uuids"`
-	OrganizationLines         []*models.LocationLineModel
+	Sort                    int64  `form:"sort" json:"sort"`
+	UniqueCode              string `form:"unique_code" json:"unique_code"`
+	Name                    string `form:"name" json:"name"`
+	ShortName               string `form:"short_name" json:"short_name"`
+	BeEnable                bool   `form:"be_enable" json:"be_enable"`
+	OrganizationRailwayUUID string `form:"organization_railway_uuid" json:"organization_railway_uuid"`
+	OrganizationRailway     models.OrganizationRailwayModel
+	OrganizationLineUUIDs   []string `form:"organization_line_uuids" json:"organization_line_uuids"`
+	OrganizationLines       []*models.LocationLineModel
 }
 
 // ShouldBind 绑定表单
@@ -161,7 +161,7 @@ func (OrganizationParagraphRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsRepeat(ret, "站段名称")
 
 			// 查询
-			ret = models.Init(models.OrganizationRailwayModel{}).
+			ret = models.Init(models.OrganizationParagraphModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
 				First(&organizationParagraph)
@@ -189,10 +189,10 @@ func (OrganizationParagraphRouter) Load(engine *gin.Engine) {
 				organizationParagraph models.OrganizationParagraphModel
 			)
 
-			ret = models.Init(models.OrganizationRailwayModel{}).
+			ret = models.Init(models.OrganizationParagraphModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				SetScopes((&models.BaseModel{}).ScopeBeEnable).
-				Prepare().
+				SetWhereFields("be_enable").
+				PrepareQuery(ctx).
 				First(&organizationParagraph)
 			wrongs.PanicWhenIsEmpty(ret, "站段")
 
@@ -204,7 +204,6 @@ func (OrganizationParagraphRouter) Load(engine *gin.Engine) {
 			var organizationParagraphs []models.OrganizationParagraphModel
 			models.Init(models.OrganizationParagraphModel{}).
 				SetWhereFields("uuid", "sort", "unique_code", "name", "shot_name", "be_enable", "organization_railway_uuid").
-				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				PrepareQuery(ctx).
 				Find(&organizationParagraphs)
 

@@ -176,8 +176,8 @@ func (LocationCenterRouter) Load(engine *gin.Engine) {
 			var locationCenter models.LocationCenterModel
 			ret := models.Init(models.LocationCenterModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				SetScopes((&models.BaseModel{}).ScopeBeEnable).
-				Prepare().
+				SetWhereFields("be_enable").
+				PrepareQuery(ctx).
 				First(&locationCenter)
 			wrongs.PanicWhenIsEmpty(ret, "中心")
 
@@ -189,7 +189,6 @@ func (LocationCenterRouter) Load(engine *gin.Engine) {
 			var locationCenters []models.LocationCenterModel
 			models.Init(models.LocationCenterModel{}).
 				SetWhereFields().
-				SetScopes((&models.BaseModel{}).ScopeBeEnable).
 				PrepareQuery(ctx).
 				Find(&locationCenters)
 
