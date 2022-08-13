@@ -196,7 +196,7 @@ func (LocationStationRouter) Load(engine *gin.Engine) {
 		})
 
 		// 列表
-		r.GET("station", func(ctx *gin.Context) {
+		r.GET("", func(ctx *gin.Context) {
 			var locationStations []models.LocationStationModel
 			models.Init(models.LocationStationModel{}).
 				SetWhereFields().

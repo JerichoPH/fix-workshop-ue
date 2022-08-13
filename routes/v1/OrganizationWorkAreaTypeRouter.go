@@ -145,7 +145,7 @@ func (OrganizationWorkAreaTypeRouter) Load(engine *gin.Engine) {
 				PrepareQuery(ctx).
 				Find(&organizationWorkAreaType)
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_work_area_type": organizationWorkAreaType}))
+			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_work_area_types": organizationWorkAreaType}))
 		})
 	}
 }

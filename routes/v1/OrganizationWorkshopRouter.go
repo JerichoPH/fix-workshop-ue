@@ -100,7 +100,7 @@ func (OrganizationWorkshopRouter) Load(engine *gin.Engine) {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_workshop": organizationWorkshop}))
+			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"organization_workshop": organizationWorkshop}))
 		})
 
 		// 删除
@@ -167,7 +167,7 @@ func (OrganizationWorkshopRouter) Load(engine *gin.Engine) {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_workshop": organizationWorkshop}))
+			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"organization_workshop": organizationWorkshop}))
 		})
 
 		// 详情

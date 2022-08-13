@@ -3,7 +3,7 @@ package models
 // PositionDepotStorehouseModel 仓储仓库模型
 type PositionDepotStorehouseModel struct {
 	BaseModel
-	UniqueCode               string                      `gorm:"type:CHAR(4);UNIQUE;NOT NULL;COMMENT:仓储库房代码;" json:"unique_code"`
+	UniqueCode               string                      `gorm:"type:CHAR(4);NOT NULL;COMMENT:仓储库房代码;" json:"unique_code"`
 	Name                     string                      `gorm:"type:VARCHAR(36);NOT NULL;COMMENT:仓储库房名称;" json:"name"`
 	OrganizationWorkshopUUID string                      `gorm:"type:CHAR(36);NOT NULL;COMMENT:所属车间UUID;" json:"organization_workshop_uuid"`
 	OrganizationWorkshop     OrganizationWorkshopModel   `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;COMMENT:所属车间;" json:"organization_workshop"`

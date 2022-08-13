@@ -44,7 +44,7 @@ func (cls OrganizationWorkshopTypeStoreForm) ShouldBind(ctx *gin.Context) Organi
 //  @param router
 func (OrganizationWorkshopTypeRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
-		"api/v1/organization",
+		"api/v1/organizationWorkshopType",
 		middlewares.CheckJwt(),
 		middlewares.CheckPermission(),
 	)
