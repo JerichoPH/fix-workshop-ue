@@ -58,6 +58,12 @@ func (cls LocationStationStoreForm) ShouldBind(ctx *gin.Context) LocationStation
 			First(&cls.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "工区")
 	}
+	if len(cls.LocationLineUUIDs) > 0 {
+		models.Init(models.LocationLineModel{}).
+			GetSession().
+			Where("uuid in ?", cls.LocationLineUUIDs).
+			Find(&cls.LocationLines)
+	}
 
 	return cls
 }
