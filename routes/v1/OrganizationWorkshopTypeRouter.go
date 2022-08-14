@@ -75,7 +75,7 @@ func (OrganizationWorkshopTypeRouter) Load(engine *gin.Engine) {
 				Name:       form.Name,
 				Number:     form.Number,
 			}
-			if ret = models.Init(models.OrganizationWorkshopTypeModel{}).GetSession().Create(&organizationWorkshopType); ret.Error != nil {
+			if ret = models.Init(models.OrganizationWorkshopTypeModel{}).Prepare().Create(&organizationWorkshopType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -90,7 +90,7 @@ func (OrganizationWorkshopTypeRouter) Load(engine *gin.Engine) {
 			organizationWorkshopType := (&models.OrganizationWorkshopTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 删除
-			if ret = models.Init(models.OrganizationWorkshopTypeModel{}).GetSession().Delete(&organizationWorkshopType); ret.Error != nil {
+			if ret = models.Init(models.OrganizationWorkshopTypeModel{}).Prepare().Delete(&organizationWorkshopType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -126,7 +126,7 @@ func (OrganizationWorkshopTypeRouter) Load(engine *gin.Engine) {
 			organizationWorkshopType.UniqueCode = form.UniqueCode
 			organizationWorkshopType.Name = form.Name
 			organizationWorkshopType.Number = form.Number
-			models.Init(models.OrganizationWorkshopTypeModel{}).GetSession().Save(&organizationWorkshopType)
+			models.Init(models.OrganizationWorkshopTypeModel{}).Prepare().Save(&organizationWorkshopType)
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"organization_workshop_type": organizationWorkshopType}))
 		})

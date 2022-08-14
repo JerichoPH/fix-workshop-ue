@@ -74,7 +74,7 @@ func (PositionIndoorRoomTypeRouter) Load(engine *gin.Engine) {
 				UniqueCode:          form.UniqueCode,
 				Name:                form.Name,
 			}
-			if ret = models.Init(models.PositionIndoorRoomTypeModel{}).GetSession().Create(&positionIndoorRoomType); ret.Error != nil {
+			if ret = models.Init(models.PositionIndoorRoomTypeModel{}).Prepare().Create(&positionIndoorRoomType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -87,7 +87,7 @@ func (PositionIndoorRoomTypeRouter) Load(engine *gin.Engine) {
 			locationIndoorRoomType := (&models.PositionIndoorRoomTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 删除
-			if ret := models.Init(models.PositionIndoorRoomTypeModel{}).GetSession().Delete(&locationIndoorRoomType); ret.Error != nil {
+			if ret := models.Init(models.PositionIndoorRoomTypeModel{}).Prepare().Delete(&locationIndoorRoomType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -123,7 +123,7 @@ func (PositionIndoorRoomTypeRouter) Load(engine *gin.Engine) {
 			positionIndoorRoomType.BaseModel.Sort = form.Sort
 			positionIndoorRoomType.UniqueCode = form.UniqueCode
 			positionIndoorRoomType.Name = form.Name
-			if ret = models.Init(models.PositionIndoorRoomTypeModel{}).GetSession().Save(&positionIndoorRoomType); ret.Error != nil {
+			if ret = models.Init(models.PositionIndoorRoomTypeModel{}).Prepare().Save(&positionIndoorRoomType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 

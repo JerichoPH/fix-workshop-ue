@@ -55,56 +55,56 @@ func (cls LocationLineStoreForm) ShouldBind(ctx *gin.Context) LocationLineStoreF
 	// 查询路局
 	if len(cls.OrganizationRailwayUUIDs) > 0 {
 		models.Init(models.OrganizationRailwayModel{}).
-			GetSession().
+			Prepare().
 			Where("uuid in ?", cls.OrganizationRailwayUUIDs).
 			Find(&cls.OrganizationRailways)
 	}
 	// 查询站段
 	if len(cls.OrganizationParagraphUUIDs) > 0 {
 		models.Init(models.OrganizationParagraphModel{}).
-			GetSession().
+			Prepare().
 			Where("uuid in ?", cls.OrganizationParagraphUUIDs).
 			Find(&cls.OrganizationParagraphs)
 	}
 	// 查询车间
 	if len(cls.OrganizationWorkshopUUIDs) > 0 {
 		models.Init(models.OrganizationWorkshopModel{}).
-			GetSession().
+			Prepare().
 			Where("uuid in ?", cls.OrganizationWorkshopUUIDs).
 			Find(&cls.OrganizationWorkshops)
 	}
 	// 查询工区
 	if len(cls.OrganizationWorkAreaUUIDs) > 0 {
 		models.Init(models.OrganizationWorkAreaModel{}).
-			GetSession().
+			Prepare().
 			Where("uuid in ?", cls.OrganizationWorkAreaUUIDs).
 			Find(&cls.OrganizationWorkAreas)
 	}
 	// 查询区间
 	if len(cls.LocationSectionUUIDs) > 0 {
 		models.Init(models.LocationSectionModel{}).
-			GetSession().
+			Prepare().
 			Where("uuid in ?", cls.LocationSectionUUIDs).
 			Find(&cls.LocationSections)
 	}
 	// 查询站场
 	if len(cls.LocationStationUUIDs) > 0 {
 		models.Init(models.LocationStationModel{}).
-			GetSession().
+			Prepare().
 			Where("uuid in ?", cls.LocationStationUUIDs).
 			Find(&cls.LocationStations)
 	}
 	// 查询道口
 	if len(cls.LocationRailroadGradeCrossUUIDs) > 0 {
 		models.Init(models.LocationRailroadGradeCrossModel{}).
-			GetSession().
+			Prepare().
 			Where("uuid in ?", cls.LocationRailroadGradeCrossUUIDs).
 			Find(&cls.LocationRailroadGradeCrosses)
 	}
 	// 查询道口
 	if len(cls.LocationRailroadGradeCrossUUIDs) > 0 {
 		models.Init(models.LocationRailroadGradeCrossModel{}).
-			GetSession().
+			Prepare().
 			Where("uuid in ?", cls.LocationRailroadGradeCrossUUIDs).
 			Find(&cls.LocationRailroadGradeCrosses)
 	}
@@ -142,42 +142,42 @@ func (cls LocationLineBindForm) ShouldBind(ctx *gin.Context) LocationLineBindFor
 	}
 	// 查询路局
 	models.Init(models.OrganizationRailwayModel{}).
-		GetSession().
+		Prepare().
 		Where("uuid in ?", cls.OrganizationRailwayUUIDs).
 		Find(&cls.OrganizationRailways)
 	// 查询站段
 	models.Init(models.OrganizationParagraphModel{}).
-		GetSession().
+		Prepare().
 		Where("uuid in ?", cls.OrganizationParagraphUUIDs).
 		Find(&cls.OrganizationParagraphs)
 	// 查询车间
 	models.Init(models.OrganizationWorkshopModel{}).
-		GetSession().
+		Prepare().
 		Where("uuid in ?", cls.OrganizationWorkshopUUIDs).
 		Find(&cls.OrganizationWorkshops)
 	// 查询工区
 	models.Init(models.OrganizationWorkAreaModel{}).
-		GetSession().
+		Prepare().
 		Where("uuid in ?", cls.OrganizationWorkAreaUUIDs).
 		Find(&cls.OrganizationWorkAreas)
 	// 查询区间
 	models.Init(models.LocationSectionModel{}).
-		GetSession().
+		Prepare().
 		Where("uuid in ?", cls.LocationSectionUUIDs).
 		Find(&cls.LocationSections)
 	// 查询站场
 	models.Init(models.LocationStationModel{}).
-		GetSession().
+		Prepare().
 		Where("uuid in ?", cls.LocationStationUUIDs).
 		Find(&cls.LocationStations)
 	// 查询道口
 	models.Init(models.LocationRailroadGradeCrossModel{}).
-		GetSession().
+		Prepare().
 		Where("uuid in ?", cls.LocationRailroadGradeCrossUUIDs).
 		Find(&cls.LocationRailroadGradeCrosses)
 	// 查询中心
 	models.Init(models.LocationCenterModel{}).
-		GetSession().
+		Prepare().
 		Where("uuid in ?", cls.LocationCenterUUIDs).
 		Find(&cls.LocationCenters)
 
@@ -231,7 +231,7 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 				LocationRailroadGradeCrosses: form.LocationRailroadGradeCrosses,
 				LocationCenters:              form.LocationCenters,
 			}
-			if ret = models.Init(models.LocationLineModel{}).GetSession().Create(organizationLine); ret.Error != nil {
+			if ret = models.Init(models.LocationLineModel{}).Prepare().Create(organizationLine); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -252,7 +252,7 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsEmpty(ret, "线别")
 
 			// 删除
-			if ret = models.Init(models.LocationLineModel{}).GetSession().Delete(&organizationLine); ret.Error != nil {
+			if ret = models.Init(models.LocationLineModel{}).Prepare().Delete(&organizationLine); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -303,7 +303,7 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 			locationLine.LocationStations = form.LocationStations
 			locationLine.LocationRailroadGradeCrosses = form.LocationRailroadGradeCrosses
 			locationLine.LocationCenters = form.LocationCenters
-			if ret = (&models.BaseModel{}).SetModel(&models.LocationLineModel{}).GetSession().Save(&locationLine); ret.Error != nil {
+			if ret = (&models.BaseModel{}).SetModel(&models.LocationLineModel{}).Prepare().Save(&locationLine); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -332,7 +332,7 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 
 			// 编辑
 			locationLine.OrganizationRailways = form.OrganizationRailways
-			if ret = models.Init(models.LocationLineModel{}).GetSession().Save(&locationLine); ret.Error != nil {
+			if ret = models.Init(models.LocationLineModel{}).Prepare().Save(&locationLine); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -361,7 +361,7 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 
 			// 编辑
 			locationLine.OrganizationParagraphs = form.OrganizationParagraphs
-			if ret = models.Init(models.LocationLineModel{}).GetSession().Save(&locationLine); ret.Error != nil {
+			if ret = models.Init(models.LocationLineModel{}).Prepare().Save(&locationLine); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -390,7 +390,7 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 
 			// 编辑
 			locationLine.OrganizationWorkshops = form.OrganizationWorkshops
-			if ret = models.Init(models.LocationLineModel{}).GetSession().Save(&locationLine); ret.Error != nil {
+			if ret = models.Init(models.LocationLineModel{}).Prepare().Save(&locationLine); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -419,7 +419,7 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 
 			// 编辑
 			locationLine.OrganizationWorkAreas = form.OrganizationWorkAreas
-			if ret = models.Init(models.LocationLineModel{}).GetSession().Save(&locationLine); ret.Error != nil {
+			if ret = models.Init(models.LocationLineModel{}).Prepare().Save(&locationLine); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -448,7 +448,7 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 
 			// 编辑
 			locationLine.LocationSections = form.LocationSections
-			if ret = models.Init(models.LocationLineModel{}).GetSession().Save(&locationLine); ret.Error != nil {
+			if ret = models.Init(models.LocationLineModel{}).Prepare().Save(&locationLine); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -477,7 +477,7 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 
 			// 编辑
 			locationLine.LocationStations = form.LocationStations
-			if ret = models.Init(models.LocationLineModel{}).GetSession().Save(&locationLine); ret.Error != nil {
+			if ret = models.Init(models.LocationLineModel{}).Prepare().Save(&locationLine); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -506,7 +506,7 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 
 			// 编辑
 			locationLine.LocationRailroadGradeCrosses = form.LocationRailroadGradeCrosses
-			if ret = models.Init(models.LocationLineModel{}).GetSession().Save(&locationLine); ret.Error != nil {
+			if ret = models.Init(models.LocationLineModel{}).Prepare().Save(&locationLine); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -535,7 +535,7 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 
 			// 编辑
 			locationLine.LocationCenters = form.LocationCenters
-			if ret = models.Init(models.LocationLineModel{}).GetSession().Save(&locationLine); ret.Error != nil {
+			if ret = models.Init(models.LocationLineModel{}).Prepare().Save(&locationLine); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 

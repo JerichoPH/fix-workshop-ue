@@ -89,7 +89,7 @@ func (PositionDepotCabinetRouter) Load(engine *gin.Engine) {
 				Name:             form.Name,
 				PositionDepotRow: form.PositionDepotRow,
 			}
-			if ret = models.Init(models.PositionDepotCabinetModel{}).GetSession().Create(&positionDepotCabinet); ret.Error != nil {
+			if ret = models.Init(models.PositionDepotCabinetModel{}).Prepare().Create(&positionDepotCabinet); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -111,7 +111,7 @@ func (PositionDepotCabinetRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsEmpty(ret, "仓库柜架")
 
 			// 删除
-			if ret := models.Init(models.PositionDepotCabinetModel{}).GetSession().Delete(&positionDepotCabinet); ret.Error != nil {
+			if ret := models.Init(models.PositionDepotCabinetModel{}).Prepare().Delete(&positionDepotCabinet); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -154,7 +154,7 @@ func (PositionDepotCabinetRouter) Load(engine *gin.Engine) {
 			positionDepotCabinet.UniqueCode = form.UniqueCode
 			positionDepotCabinet.Name = form.Name
 			positionDepotCabinet.PositionDepotRow = form.PositionDepotRow
-			if ret = models.Init(models.PositionDepotCabinetModel{}).GetSession().Save(&positionDepotCabinet); ret.Error != nil {
+			if ret = models.Init(models.PositionDepotCabinetModel{}).Prepare().Save(&positionDepotCabinet); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 

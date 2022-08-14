@@ -106,7 +106,7 @@ func (AuthorizationRouter) Load(engine *gin.Engine) {
 			}
 			if ret = models.Init(models.AccountModel{}).
 				SetOmits(clause.Associations).
-				GetSession().
+				Prepare().
 				Create(&account); ret.Error != nil {
 				wrongs.PanicForbidden("创建失败：" + ret.Error.Error())
 			}
@@ -178,7 +178,7 @@ func (AuthorizationRouter) Load(engine *gin.Engine) {
 
 					var menus []models.MenuModel
 					models.Init(models.MenuModel{}).
-						GetSession().
+						Prepare().
 						Where("uuid in ?", menuUUIDs).
 						Where("parent_uuid is null").
 						Preload("Subs").

@@ -89,7 +89,7 @@ func (PositionDepotCellRouter) Load(engine *gin.Engine) {
 				Name:              form.Name,
 				PositionDepotTier: form.PositionDepotTier,
 			}
-			if ret = models.Init(models.PositionDepotCellModel{}).GetSession().Create(&positionDepotCell); ret.Error != nil {
+			if ret = models.Init(models.PositionDepotCellModel{}).Prepare().Create(&positionDepotCell); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -111,7 +111,7 @@ func (PositionDepotCellRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsEmpty(ret, "仓库柜架格位")
 
 			// 删除
-			if ret := models.Init(models.PositionDepotCellModel{}).GetSession().Delete(&positionDepotCell); ret.Error != nil {
+			if ret := models.Init(models.PositionDepotCellModel{}).Prepare().Delete(&positionDepotCell); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -154,7 +154,7 @@ func (PositionDepotCellRouter) Load(engine *gin.Engine) {
 			positionDepotCell.UniqueCode = form.UniqueCode
 			positionDepotCell.Name = form.Name
 			positionDepotCell.PositionDepotTier = form.PositionDepotTier
-			if ret = models.Init(models.PositionDepotCellModel{}).GetSession().Save(&positionDepotCell); ret.Error != nil {
+			if ret = models.Init(models.PositionDepotCellModel{}).Prepare().Save(&positionDepotCell); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 

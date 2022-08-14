@@ -138,7 +138,7 @@ func (AccountRouter) Load(engine *gin.Engine) {
 				Password:  string(bytes),
 				Nickname:  form.Nickname,
 			}
-			if ret = models.Init(models.AccountModel{}).SetOmits(clause.Associations).GetSession().Create(&account); ret.Error != nil {
+			if ret = models.Init(models.AccountModel{}).SetOmits(clause.Associations).Prepare().Create(&account); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -173,7 +173,7 @@ func (AccountRouter) Load(engine *gin.Engine) {
 			// 编辑
 			account.Username = form.Username
 			account.Nickname = form.Nickname
-			if ret = models.Init(models.AccountModel{}).GetSession().Save(&account); ret.Error != nil {
+			if ret = models.Init(models.AccountModel{}).Prepare().Save(&account); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -199,7 +199,7 @@ func (AccountRouter) Load(engine *gin.Engine) {
 			bytes, _ := bcrypt.GenerateFromPassword([]byte(form.NewPassword), 14)
 			account.Password = string(bytes)
 
-			if ret = models.Init(models.AccountModel{}).GetSession().Save(&account); ret.Error != nil {
+			if ret = models.Init(models.AccountModel{}).Prepare().Save(&account); ret.Error != nil {
 				wrongs.PanicForbidden("编辑失败：" + ret.Error.Error())
 			}
 

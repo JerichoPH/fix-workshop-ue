@@ -41,7 +41,7 @@ func (cls OrganizationRailwayStoreForm) ShouldBind(ctx *gin.Context) Organizatio
 	}
 	if len(cls.LocationLineUUIDs) > 0 {
 		models.Init(models.LocationLineModel{}).
-			GetSession().
+			Prepare().
 			Where("uuid in ?", cls.LocationLineUUIDs).
 			Find(&cls.LocationLines)
 	}
@@ -64,7 +64,7 @@ func (cls OrganizationRailwayBindLinesFrom) ShouldBind(ctx *gin.Context) Organiz
 	}
 
 	models.Init(models.LocationLineModel{}).
-		GetSession().
+		Prepare().
 		Where("uuid in ?", cls.LocationLineUUIDs).
 		Find(&cls.LocationLines)
 
@@ -117,7 +117,7 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 				BeEnable:      form.BeEnable,
 				LocationLines: form.LocationLines,
 			}
-			if ret = (&models.BaseModel{}).SetModel(models.OrganizationRailwayModel{}).GetSession().Create(&organizationRailway); ret.Error != nil {
+			if ret = (&models.BaseModel{}).SetModel(models.OrganizationRailwayModel{}).Prepare().Create(&organizationRailway); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -136,7 +136,7 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 				First(&organizationRailway)
 			wrongs.PanicWhenIsEmpty(ret, "路局")
 			// 删除
-			if ret = models.Init(models.OrganizationRailwayModel{}).GetSession().Delete(&organizationRailway); ret.Error != nil {
+			if ret = models.Init(models.OrganizationRailwayModel{}).Prepare().Delete(&organizationRailway); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -187,7 +187,7 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 			organizationRailway.ShortName = form.ShortName
 			organizationRailway.BeEnable = form.BeEnable
 			organizationRailway.LocationLines = form.LocationLines
-			if ret = models.Init(models.OrganizationRailwayModel{}).GetSession().Save(&organizationRailway); ret.Error != nil {
+			if ret = models.Init(models.OrganizationRailwayModel{}).Prepare().Save(&organizationRailway); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -214,7 +214,7 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 			(&databases.MySql{}).GetConn().Exec("delete from pivot_location_line_and_organization_railways where organization_railway_id = ?", organizationRailway.ID)
 			// 创建绑定关系
 			organizationRailway.LocationLines = form.LocationLines
-			models.Init(models.OrganizationRailwayModel{}).GetSession().Where("uuid = ?", ctx.Param("uuid")).Save(&organizationRailway)
+			models.Init(models.OrganizationRailwayModel{}).Prepare().Where("uuid = ?", ctx.Param("uuid")).Save(&organizationRailway)
 
 			ctx.JSON(tools.CorrectIns("绑定成功").Updated(tools.Map{"organization_railway": organizationRailway}))
 		})

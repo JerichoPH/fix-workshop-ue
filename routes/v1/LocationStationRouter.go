@@ -57,10 +57,12 @@ func (cls LocationStationStoreForm) ShouldBind(ctx *gin.Context) LocationStation
 			Prepare().
 			First(&cls.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "工区")
+	} else {
+
 	}
 	if len(cls.LocationLineUUIDs) > 0 {
 		models.Init(models.LocationLineModel{}).
-			GetSession().
+			Prepare().
 			Where("uuid in ?", cls.LocationLineUUIDs).
 			Find(&cls.LocationLines)
 	}
@@ -110,7 +112,7 @@ func (LocationStationRouter) Load(engine *gin.Engine) {
 				OrganizationWorkArea: form.OrganizationWorkArea,
 				LocationLines:        form.LocationLines,
 			}
-			if ret = models.Init(models.LocationStationModel{}).GetSession().Create(&locationStation); ret.Error != nil {
+			if ret = models.Init(models.LocationStationModel{}).Prepare().Create(&locationStation); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -118,7 +120,7 @@ func (LocationStationRouter) Load(engine *gin.Engine) {
 		})
 
 		// 删除
-		r.DELETE("station/:uuid", func(ctx *gin.Context) {
+		r.DELETE(":uuid", func(ctx *gin.Context) {
 			var (
 				ret             *gorm.DB
 				locationStation models.LocationStationModel
@@ -131,7 +133,7 @@ func (LocationStationRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsEmpty(ret, "站场")
 
 			// 删除
-			if ret := models.Init(models.LocationStationModel{}).GetSession().Delete(&locationStation); ret.Error != nil {
+			if ret := models.Init(models.LocationStationModel{}).Prepare().Delete(&locationStation); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -141,8 +143,8 @@ func (LocationStationRouter) Load(engine *gin.Engine) {
 		// 编辑
 		r.PUT(":uuid", func(ctx *gin.Context) {
 			var (
-				ret                         *gorm.DB
-				organizationStation, repeat models.LocationStationModel
+				ret                     *gorm.DB
+				locationStation, repeat models.LocationStationModel
 			)
 
 			// 表单
@@ -166,22 +168,41 @@ func (LocationStationRouter) Load(engine *gin.Engine) {
 			ret = models.Init(models.LocationStationModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare().
-				First(&organizationStation)
+				First(&locationStation)
 			wrongs.PanicWhenIsEmpty(ret, "站场")
 
 			// 编辑
-			organizationStation.BaseModel.Sort = form.Sort
-			organizationStation.UniqueCode = form.UniqueCode
-			organizationStation.Name = form.Name
-			organizationStation.BeEnable = form.BeEnable
-			organizationStation.OrganizationWorkshop = form.OrganizationWorkshop
-			organizationStation.OrganizationWorkArea = form.OrganizationWorkArea
-			organizationStation.LocationLines = form.LocationLines
-			if ret = models.Init(models.LocationStationModel{}).GetSession().Save(&organizationStation); ret.Error != nil {
+			locationStation.BaseModel.Sort = form.Sort
+			locationStation.UniqueCode = form.UniqueCode
+			locationStation.Name = form.Name
+			locationStation.BeEnable = form.BeEnable
+			locationStation.OrganizationWorkshop = form.OrganizationWorkshop
+			locationStation.OrganizationWorkAreaUUID = form.OrganizationWorkAreaUUID
+			locationStation.LocationLines = form.LocationLines
+			if ret = models.
+				Init(models.LocationStationModel{}).
+				SetSelects(
+					"sort",
+					"unique_code",
+					"name",
+					"be_enable",
+					"organization_workshop_uuid",
+					"organization_work_area_uuid",
+				).
+				Prepare().
+				Where("uuid = ?", ctx.Param("uuid")).
+				Updates(map[string]interface{}{
+					"sort":                        form.Sort,
+					"unique_code":                 form.UniqueCode,
+					"name":                        form.Name,
+					"be_enable":                   form.BeEnable,
+					"organization_workshop_uuid":  form.OrganizationWorkshopUUID,
+					"organization_work_area_uuid": form.OrganizationWorkAreaUUID,
+				}); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"location_station": organizationStation}))
+			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"location_station": locationStation}))
 		})
 
 		// 详情

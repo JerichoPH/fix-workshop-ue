@@ -101,7 +101,7 @@ func (LocationSectionRouter) Load(engine *gin.Engine) {
 				OrganizationWorkshop: form.OrganizationWorkshop,
 				OrganizationWorkArea: form.OrganizationWorkArea,
 			}
-			if ret = models.Init(models.LocationSectionModel{}).GetSession().Create(&organizationSection); ret.Error != nil {
+			if ret = models.Init(models.LocationSectionModel{}).Prepare().Create(&organizationSection); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -122,7 +122,7 @@ func (LocationSectionRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsEmpty(ret, "区间")
 
 			// 删除
-			if ret := models.Init(models.LocationSectionModel{}).GetSession().Delete(&locationSection); ret.Error != nil {
+			if ret := models.Init(models.LocationSectionModel{}).Prepare().Delete(&locationSection); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -167,7 +167,7 @@ func (LocationSectionRouter) Load(engine *gin.Engine) {
 			locationSection.BeEnable = form.BeEnable
 			locationSection.OrganizationWorkshop = form.OrganizationWorkshop
 			locationSection.OrganizationWorkArea = form.OrganizationWorkArea
-			if ret = models.Init(models.LocationSectionModel{}).GetSession().Save(&locationSection); ret.Error != nil {
+			if ret = models.Init(models.LocationSectionModel{}).Prepare().Save(&locationSection); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 

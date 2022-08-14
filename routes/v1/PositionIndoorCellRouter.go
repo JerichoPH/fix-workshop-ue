@@ -89,7 +89,7 @@ func (PositionIndoorCellRouter) Load(engine *gin.Engine) {
 				Name:               form.Name,
 				PositionIndoorTier: form.PositionIndoorTier,
 			}
-			if ret = models.Init(models.PositionIndoorCellModel{}).GetSession().Create(&positionIndoorCell); ret.Error != nil {
+			if ret = models.Init(models.PositionIndoorCellModel{}).Prepare().Create(&positionIndoorCell); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -111,7 +111,7 @@ func (PositionIndoorCellRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsEmpty(ret, "机柜格位")
 
 			// 删除
-			if ret := models.Init(models.PositionIndoorCellModel{}).GetSession().Delete(&positionIndoorCell); ret.Error != nil {
+			if ret := models.Init(models.PositionIndoorCellModel{}).Prepare().Delete(&positionIndoorCell); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -154,7 +154,7 @@ func (PositionIndoorCellRouter) Load(engine *gin.Engine) {
 			positionIndoorCell.UniqueCode = form.UniqueCode
 			positionIndoorCell.Name = form.Name
 			positionIndoorCell.PositionIndoorTier = form.PositionIndoorTier
-			if ret = models.Init(models.PositionIndoorCellModel{}).GetSession().Save(&positionIndoorCell); ret.Error != nil {
+			if ret = models.Init(models.PositionIndoorCellModel{}).Prepare().Save(&positionIndoorCell); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 

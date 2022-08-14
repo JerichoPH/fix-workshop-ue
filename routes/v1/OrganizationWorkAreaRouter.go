@@ -98,7 +98,7 @@ func (OrganizationWorkAreaRouter) Load(engine *gin.Engine) {
 				OrganizationWorkAreaType: form.OrganizationWorkAreaType,
 				OrganizationWorkshop:     form.OrganizationWorkshop,
 			}
-			if ret = models.Init(models.OrganizationWorkAreaModel{}).GetSession().Create(&organizationWorkArea); ret.Error != nil {
+			if ret = models.Init(models.OrganizationWorkAreaModel{}).Prepare().Create(&organizationWorkArea); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -119,7 +119,7 @@ func (OrganizationWorkAreaRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsEmpty(ret, "工区")
 
 			// 删除
-			if ret := models.Init(models.OrganizationWorkAreaModel{}).GetSession().Delete(&organizationWorkArea); ret.Error != nil {
+			if ret := models.Init(models.OrganizationWorkAreaModel{}).Prepare().Delete(&organizationWorkArea); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -164,7 +164,7 @@ func (OrganizationWorkAreaRouter) Load(engine *gin.Engine) {
 			organizationWorkArea.BeEnable = form.BeEnable
 			organizationWorkArea.OrganizationWorkAreaType = form.OrganizationWorkAreaType
 			organizationWorkArea.OrganizationWorkshop = form.OrganizationWorkshop
-			if ret = models.Init(models.OrganizationWorkAreaModel{}).GetSession().Save(&organizationWorkArea); ret.Error != nil {
+			if ret = models.Init(models.OrganizationWorkAreaModel{}).Prepare().Save(&organizationWorkArea); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 

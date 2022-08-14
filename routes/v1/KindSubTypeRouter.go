@@ -93,7 +93,7 @@ func (KindSubTypeRouter) Load(engine *gin.Engine) {
 				Nickname:       form.Nickname,
 				KindEntireType: form.KindEntireType,
 			}
-			if ret = models.Init(models.KindSubTypeModel{}).GetSession().Create(&kindSubType); ret.Error != nil {
+			if ret = models.Init(models.KindSubTypeModel{}).Prepare().Create(&kindSubType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -115,7 +115,7 @@ func (KindSubTypeRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsEmpty(ret, "型号")
 
 			// 删除
-			if ret := models.Init(models.KindSubTypeModel{}).GetSession().Delete(&kindSubType); ret.Error != nil {
+			if ret := models.Init(models.KindSubTypeModel{}).Prepare().Delete(&kindSubType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -160,7 +160,7 @@ func (KindSubTypeRouter) Load(engine *gin.Engine) {
 			kindSubType.BeEnable = form.BeEnable
 			kindSubType.Nickname = form.Nickname
 			kindSubType.KindEntireType = form.KindEntireType
-			if ret = models.Init(models.KindSubTypeModel{}).GetSession().Save(&kindSubType); ret.Error != nil {
+			if ret = models.Init(models.KindSubTypeModel{}).Prepare().Save(&kindSubType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 

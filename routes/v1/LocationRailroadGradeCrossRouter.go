@@ -99,7 +99,7 @@ func (LocationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 				Name:       form.Name,
 				BeEnable:   form.BeEnable,
 			}
-			if ret = models.Init(models.LocationRailroadGradeCrossModel{}).GetSession().Create(&locationRailroadGradeCross); ret.Error != nil {
+			if ret = models.Init(models.LocationRailroadGradeCrossModel{}).Prepare().Create(&locationRailroadGradeCross); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -121,7 +121,7 @@ func (LocationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsEmpty(ret, "道口")
 
 			// 删除
-			if ret := models.Init(models.LocationRailroadGradeCrossModel{}).GetSession().Delete(&locationRailroadGradeCross); ret.Error != nil {
+			if ret := models.Init(models.LocationRailroadGradeCrossModel{}).Prepare().Delete(&locationRailroadGradeCross); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -164,7 +164,7 @@ func (LocationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 			locationRailroadGradeCross.UniqueCode = form.UniqueCode
 			locationRailroadGradeCross.Name = form.Name
 			locationRailroadGradeCross.BeEnable = form.BeEnable
-			if ret = models.Init(models.LocationRailroadGradeCrossModel{}).GetSession().Save(&locationRailroadGradeCross); ret.Error != nil {
+			if ret = models.Init(models.LocationRailroadGradeCrossModel{}).Prepare().Save(&locationRailroadGradeCross); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 

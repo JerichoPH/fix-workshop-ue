@@ -51,7 +51,7 @@ func (cls OrganizationParagraphStoreForm) ShouldBind(ctx *gin.Context) Organizat
 	wrongs.PanicWhenIsEmpty(ret, "路局")
 	if len(cls.OrganizationLineUUIDs) > 0 {
 		models.Init(models.LocationLineModel{}).
-			GetSession().
+			Prepare().
 			Where("uuid in ?", cls.OrganizationLineUUIDs).
 			Find(&cls.OrganizationLines)
 	}
@@ -106,7 +106,7 @@ func (OrganizationParagraphRouter) Load(engine *gin.Engine) {
 				OrganizationRailway: form.OrganizationRailway,
 				LocationLines:       form.OrganizationLines,
 			}
-			if ret = models.Init(models.OrganizationParagraphModel{}).GetSession().Create(&organizationParagraph); ret.Error != nil {
+			if ret = models.Init(models.OrganizationParagraphModel{}).Prepare().Create(&organizationParagraph); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -128,7 +128,7 @@ func (OrganizationParagraphRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsEmpty(ret, "站段")
 
 			// 删除
-			if ret = models.Init(models.OrganizationParagraphModel{}).GetSession().Delete(&organizationParagraph); ret.Error != nil {
+			if ret = models.Init(models.OrganizationParagraphModel{}).Prepare().Delete(&organizationParagraph); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -175,7 +175,7 @@ func (OrganizationParagraphRouter) Load(engine *gin.Engine) {
 			organizationParagraph.BeEnable = form.BeEnable
 			organizationParagraph.OrganizationRailway = form.OrganizationRailway
 			organizationParagraph.LocationLines = form.OrganizationLines
-			if ret = models.Init(models.OrganizationParagraphModel{}).GetSession().Save(&organizationParagraph); ret.Error != nil {
+			if ret = models.Init(models.OrganizationParagraphModel{}).Prepare().Save(&organizationParagraph); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 

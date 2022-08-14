@@ -96,7 +96,7 @@ func (OrganizationWorkshopRouter) Load(engine *gin.Engine) {
 				OrganizationWorkshopType: form.OrganizationWorkshopType,
 				OrganizationParagraph:    form.OrganizationParagraph,
 			}
-			if ret = models.Init(models.OrganizationWorkshopModel{}).GetSession().Create(&organizationWorkshop); ret.Error != nil {
+			if ret = models.Init(models.OrganizationWorkshopModel{}).Prepare().Create(&organizationWorkshop); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -118,7 +118,7 @@ func (OrganizationWorkshopRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsEmpty(ret, "车间")
 
 			// 删除
-			if ret = models.Init(models.OrganizationWorkshopModel{}).GetSession().Delete(&organizationWorkshop); ret.Error != nil {
+			if ret = models.Init(models.OrganizationWorkshopModel{}).Prepare().Delete(&organizationWorkshop); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -163,7 +163,7 @@ func (OrganizationWorkshopRouter) Load(engine *gin.Engine) {
 			organizationWorkshop.BeEnable = form.BeEnable
 			organizationWorkshop.OrganizationWorkshopType = form.OrganizationWorkshopType
 			organizationWorkshop.OrganizationParagraph = form.OrganizationParagraph
-			if ret = models.Init(models.OrganizationWorkshopModel{}).GetSession().Save(&organizationWorkshop); ret.Error != nil {
+			if ret = models.Init(models.OrganizationWorkshopModel{}).Prepare().Save(&organizationWorkshop); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 

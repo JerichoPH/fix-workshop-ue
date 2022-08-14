@@ -84,7 +84,7 @@ func (cls PositionDepotStorehouseRouter) Load(engine *gin.Engine) {
 				Name:                  form.Name,
 				OrganizationWorkshop:  form.OrganizationWorkshop,
 			}
-			if ret = models.Init(models.PositionDepotStorehouseModel{}).GetSession().Create(&positionDepotStorehouse); ret.Error != nil {
+			if ret = models.Init(models.PositionDepotStorehouseModel{}).Prepare().Create(&positionDepotStorehouse); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -106,7 +106,7 @@ func (cls PositionDepotStorehouseRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsEmpty(ret, "仓库")
 
 			// 删除
-			if ret := models.Init(models.PositionDepotStorehouseModel{}).GetSession().Delete(&positionDepotStorehouse); ret.Error != nil {
+			if ret := models.Init(models.PositionDepotStorehouseModel{}).Prepare().Delete(&positionDepotStorehouse); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -143,7 +143,7 @@ func (cls PositionDepotStorehouseRouter) Load(engine *gin.Engine) {
 			positionDepotStorehouse.UniqueCode = form.UniqueCode
 			positionDepotStorehouse.Name = form.Name
 			positionDepotStorehouse.OrganizationWorkshop = form.OrganizationWorkshop
-			if ret = models.Init(models.PositionDepotStorehouseModel{}).GetSession().Save(&positionDepotStorehouse); ret.Error != nil {
+			if ret = models.Init(models.PositionDepotStorehouseModel{}).Prepare().Save(&positionDepotStorehouse); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 

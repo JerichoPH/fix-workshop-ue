@@ -92,7 +92,7 @@ func (KindEntireTypeRouter) Load(engine *gin.Engine) {
 				BeEnable:     form.BeEnable,
 				KindCategory: form.KindCategory,
 			}
-			if ret = models.Init(models.KindEntireTypeModel{}).GetSession().Create(&kindEntireType); ret.Error != nil {
+			if ret = models.Init(models.KindEntireTypeModel{}).Prepare().Create(&kindEntireType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -114,7 +114,7 @@ func (KindEntireTypeRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsEmpty(ret, "类型")
 
 			// 删除
-			if ret := models.Init(models.KindEntireTypeModel{}).GetSession().Delete(&kindEntireType); ret.Error != nil {
+			if ret := models.Init(models.KindEntireTypeModel{}).Prepare().Delete(&kindEntireType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -158,7 +158,7 @@ func (KindEntireTypeRouter) Load(engine *gin.Engine) {
 			kindEntireType.Name = form.Name
 			kindEntireType.BeEnable = form.BeEnable
 			kindEntireType.KindCategory = form.KindCategory
-			if ret = models.Init(models.KindEntireTypeModel{}).GetSession().Save(&kindEntireType); ret.Error != nil {
+			if ret = models.Init(models.KindEntireTypeModel{}).Prepare().Save(&kindEntireType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 

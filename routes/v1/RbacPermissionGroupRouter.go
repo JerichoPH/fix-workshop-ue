@@ -62,7 +62,7 @@ func (RbacPermissionGroupRouter) Load(engine *gin.Engine) {
 			// 保存
 			rbacPermissionGroup := &models.RbacPermissionGroupModel{Name: form.Name}
 			if ret = models.Init(models.RbacPermissionGroupModel{}).
-				GetSession().
+				Prepare().
 				Create(&rbacPermissionGroup); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
@@ -85,11 +85,11 @@ func (RbacPermissionGroupRouter) Load(engine *gin.Engine) {
 
 			// 删除权限分组
 			if len(rbacPermissionGroup.RbacPermissions) > 0 {
-				models.Init(models.RbacPermissionGroupModel{}).GetSession().Delete(&rbacPermissionGroup.RbacPermissions)
+				models.Init(models.RbacPermissionGroupModel{}).Prepare().Delete(&rbacPermissionGroup.RbacPermissions)
 			}
 
 			// 删除
-			if ret = models.Init(models.RbacPermissionGroupModel{}).GetSession().Delete(&rbacPermissionGroup); ret.Error != nil {
+			if ret = models.Init(models.RbacPermissionGroupModel{}).Prepare().Delete(&rbacPermissionGroup); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -125,7 +125,7 @@ func (RbacPermissionGroupRouter) Load(engine *gin.Engine) {
 
 			// 修改
 			rbacPermissionGroup.Name = form.Name
-			models.Init(models.RbacPermissionGroupModel{}).GetSession().Save(&rbacPermissionGroup)
+			models.Init(models.RbacPermissionGroupModel{}).Prepare().Save(&rbacPermissionGroup)
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"rbac_permission_group": rbacPermissionGroup}))
 		})

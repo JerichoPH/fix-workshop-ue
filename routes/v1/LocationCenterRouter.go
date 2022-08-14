@@ -99,7 +99,7 @@ func (LocationCenterRouter) Load(engine *gin.Engine) {
 				Name:       form.Name,
 				BeEnable:   form.BeEnable,
 			}
-			if ret = models.Init(models.LocationCenterModel{}).GetSession().Create(&locationCenter); ret.Error != nil {
+			if ret = models.Init(models.LocationCenterModel{}).Prepare().Create(&locationCenter); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -121,7 +121,7 @@ func (LocationCenterRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsEmpty(ret, "中心")
 
 			// 删除
-			if ret := models.Init(models.LocationCenterModel{}).GetSession().Delete(&locationCenter); ret.Error != nil {
+			if ret := models.Init(models.LocationCenterModel{}).Prepare().Delete(&locationCenter); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -164,7 +164,7 @@ func (LocationCenterRouter) Load(engine *gin.Engine) {
 			locationCenter.UniqueCode = form.UniqueCode
 			locationCenter.Name = form.Name
 			locationCenter.BeEnable = form.BeEnable
-			if ret = models.Init(models.LocationCenterModel{}).GetSession().Save(&locationCenter); ret.Error != nil {
+			if ret = models.Init(models.LocationCenterModel{}).Prepare().Save(&locationCenter); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 

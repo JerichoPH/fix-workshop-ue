@@ -105,7 +105,7 @@ func (RbacPermissionRouter) Load(engine *gin.Engine) {
 				RbacPermissionGroupUUID: form.RbacPermissionGroup.UUID,
 			}
 			if ret = models.Init(&models.RbacPermissionModel{}).
-				GetSession().
+				Prepare().
 				Create(&rbacPermission); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
@@ -132,7 +132,7 @@ func (RbacPermissionRouter) Load(engine *gin.Engine) {
 					First(&repeat)
 				if !wrongs.PanicWhenIsEmpty(ret, "") {
 					if ret = models.Init(models.RbacPermissionModel{}).
-						GetSession().
+						Prepare().
 						Create(&models.RbacPermissionModel{
 							BaseModel:               models.BaseModel{UUID: uuid.NewV4().String()},
 							Name:                    name,
@@ -165,7 +165,7 @@ func (RbacPermissionRouter) Load(engine *gin.Engine) {
 
 			// 删除
 			if ret = models.Init(&models.RbacPermissionModel{}).
-				GetSession().
+				Prepare().
 				Delete(&rbacPermission); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
@@ -196,7 +196,7 @@ func (RbacPermissionRouter) Load(engine *gin.Engine) {
 			rbacPermission.Method = form.Method
 			rbacPermission.RbacPermissionGroupUUID = form.RbacPermissionGroupUUID
 			if ret = models.Init(models.RbacPermissionModel{}).
-				GetSession().
+				Prepare().
 				Save(&rbacPermission); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}

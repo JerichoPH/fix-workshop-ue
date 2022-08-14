@@ -120,7 +120,7 @@ func (LocationIndoorRoomRouter) Load(engine *gin.Engine) {
 				PositionIndoorRoomType: form.PositionIndoorRoomType,
 				LocationStation:        form.LocationStation,
 			}
-			if ret = models.Init(models.PositionIndoorRoomModel{}).GetSession().Create(&positionIndoorRoom); ret.Error != nil {
+			if ret = models.Init(models.PositionIndoorRoomModel{}).Prepare().Create(&positionIndoorRoom); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -142,7 +142,7 @@ func (LocationIndoorRoomRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsEmpty(ret, "机房")
 
 			// 删除
-			if ret := models.Init(models.PositionIndoorRoomModel{}).GetSession().Delete(&locationIndoorRoom); ret.Error != nil {
+			if ret := models.Init(models.PositionIndoorRoomModel{}).Prepare().Delete(&locationIndoorRoom); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -186,7 +186,7 @@ func (LocationIndoorRoomRouter) Load(engine *gin.Engine) {
 			positionIndoorRoom.Name = form.Name
 			positionIndoorRoom.PositionIndoorRoomType = form.PositionIndoorRoomType
 			positionIndoorRoom.LocationStation = form.LocationStation
-			if ret = models.Init(models.PositionIndoorRoomModel{}).GetSession().Save(&positionIndoorRoom); ret.Error != nil {
+			if ret = models.Init(models.PositionIndoorRoomModel{}).Prepare().Save(&positionIndoorRoom); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 

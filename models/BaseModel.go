@@ -159,10 +159,10 @@ func (cls *BaseModel) BeforeSave(db *gorm.DB) (err error) {
 }
 
 // GetSession 获取对象
-func (cls *BaseModel) GetSession() (dbSession *gorm.DB) {
-	dbSession = (&databases.MySql{}).GetConn()
-	return
-}
+//func (cls *BaseModel) Prepare() (dbSession *gorm.DB) {
+//	dbSession = (&databases.MySql{}).GetConn()
+//	return
+//}
 
 // Prepare 初始化
 func (cls *BaseModel) Prepare() (dbSession *gorm.DB) {

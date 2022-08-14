@@ -79,7 +79,7 @@ func (KindCategoryRouter) Load(engine *gin.Engine) {
 				Nickname:        form.Nickname,
 				Race:            form.Race,
 			}
-			if ret = models.Init(models.KindCategoryModel{}).GetSession().Create(&kindCategory); ret.Error != nil {
+			if ret = models.Init(models.KindCategoryModel{}).Prepare().Create(&kindCategory); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -101,7 +101,7 @@ func (KindCategoryRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsEmpty(ret, "种类")
 
 			// 删除
-			if ret := models.Init(models.KindCategoryModel{}).GetSession().Delete(&kindCategory); ret.Error != nil {
+			if ret := models.Init(models.KindCategoryModel{}).Prepare().Delete(&kindCategory); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -146,7 +146,7 @@ func (KindCategoryRouter) Load(engine *gin.Engine) {
 			kindCategory.Nickname = form.Nickname
 			kindCategory.BeEnable = form.BeEnable
 			kindCategory.Race = form.Race
-			if ret = models.Init(models.KindCategoryModel{}).GetSession().Save(&kindCategory); ret.Error != nil {
+			if ret = models.Init(models.KindCategoryModel{}).Prepare().Save(&kindCategory); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 

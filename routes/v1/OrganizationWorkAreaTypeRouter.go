@@ -74,7 +74,7 @@ func (OrganizationWorkAreaTypeRouter) Load(engine *gin.Engine) {
 				UniqueCode: form.UniqueCode,
 				Name:       form.Name,
 			}
-			if ret = models.Init(models.OrganizationWorkAreaTypeModel{}).GetSession().Create(&organizationWorkAreaType); ret.Error != nil {
+			if ret = models.Init(models.OrganizationWorkAreaTypeModel{}).Prepare().Create(&organizationWorkAreaType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -87,7 +87,7 @@ func (OrganizationWorkAreaTypeRouter) Load(engine *gin.Engine) {
 			organizationWorkAreaType := (&models.OrganizationWorkAreaTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 删除
-			if ret := models.Init(models.OrganizationWorkAreaTypeModel{}).GetSession().Delete(&organizationWorkAreaType); ret.Error != nil {
+			if ret := models.Init(models.OrganizationWorkAreaTypeModel{}).Prepare().Delete(&organizationWorkAreaType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -123,7 +123,7 @@ func (OrganizationWorkAreaTypeRouter) Load(engine *gin.Engine) {
 			organizationWorkAreaType.BaseModel.Sort = form.Sort
 			organizationWorkAreaType.UniqueCode = form.UniqueCode
 			organizationWorkAreaType.Name = form.Name
-			if ret = models.Init(models.OrganizationWorkAreaTypeModel{}).GetSession().Save(&organizationWorkAreaType); ret.Error != nil {
+			if ret = models.Init(models.OrganizationWorkAreaTypeModel{}).Prepare().Save(&organizationWorkAreaType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 

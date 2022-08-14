@@ -37,7 +37,7 @@ func (cls MenuStoreForm) ShouldBind(ctx *gin.Context) MenuStoreForm {
 		wrongs.PanicValidate("菜单名称必填")
 	}
 	if len(cls.RbacRoleUUIDs) > 0 {
-		models.Init(models.RbacRoleModel{}).GetSession().Where("uuid in ?", cls.RbacRoleUUIDs).Find(&cls.RbacRoles)
+		models.Init(models.RbacRoleModel{}).Prepare().Where("uuid in ?", cls.RbacRoleUUIDs).Find(&cls.RbacRoles)
 	}
 
 	return cls
@@ -79,7 +79,7 @@ func (MenuRouter) Load(engine *gin.Engine) {
 				ParentUUID: form.ParentUUID,
 				RbacRoles:  form.RbacRoles,
 			}
-			if ret = (&models.BaseModel{}).SetModel(models.MenuModel{}).GetSession().Create(&menu); ret.Error != nil {
+			if ret = (&models.BaseModel{}).SetModel(models.MenuModel{}).Prepare().Create(&menu); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -94,7 +94,7 @@ func (MenuRouter) Load(engine *gin.Engine) {
 			menu := (&models.MenuModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 删除
-			if ret = models.Init(models.MenuModel{}).GetSession().Delete(&menu); ret.Error != nil {
+			if ret = models.Init(models.MenuModel{}).Prepare().Delete(&menu); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -128,7 +128,7 @@ func (MenuRouter) Load(engine *gin.Engine) {
 			menu.Icon = form.Icon
 			menu.ParentUUID = form.ParentUUID
 			menu.RbacRoles = form.RbacRoles
-			if ret = models.Init(models.MenuModel{}).GetSession().Save(&menu); ret.Error != nil {
+			if ret = models.Init(models.MenuModel{}).Prepare().Save(&menu); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
