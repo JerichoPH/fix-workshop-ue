@@ -19,6 +19,9 @@ type MySql struct {
 
 var mySqlConn *gorm.DB
 
+// getConn 获取数据库链接
+//  @receiver cls
+//  @return db
 func (cls *MySql) getConn() (db *gorm.DB) {
 	ctf := settings.Setting{}
 	config := ctf.Init()
@@ -41,7 +44,7 @@ func (cls *MySql) getConn() (db *gorm.DB) {
 	)
 
 	mySqlConn, _ := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		CreateBatchSize: 1000,
+		CreateBatchSize:                          1000,
 		DisableForeignKeyConstraintWhenMigrating: true,
 	})
 

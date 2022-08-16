@@ -16,11 +16,11 @@ require (
 	github.com/stretchr/testify v1.7.1-0.20210427113832-6241f9ab9942 // indirect
 	github.com/xuri/excelize/v2 v2.6.0 // indirect
 	golang.org/x/crypto v0.0.0-20220408190544-5352b0902921
-	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/ini.v1 v1.66.6
 	gorm.io/driver/mysql v1.3.2
+	gorm.io/driver/postgres v1.3.2
 	gorm.io/driver/sqlserver v1.3.2
 	gorm.io/gorm v1.23.4
 )
