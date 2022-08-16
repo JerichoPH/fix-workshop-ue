@@ -60,6 +60,24 @@ func (cls LocationSectionStoreForm) ShouldBind(ctx *gin.Context) LocationSection
 	return cls
 }
 
+// LocationSectionBindLocationLinesForm 区间绑定线别表单
+type LocationSectionBindLocationLinesForm struct {
+	LocationLineUUIDs []string
+	LocationLines     []*models.LocationLineModel
+}
+
+// ShouldBind 绑定表单
+//  @receiver cls
+//  @param ctx
+//  @return LocationSectionBindLocationLinesForm
+func (cls LocationSectionBindLocationLinesForm) ShouldBind(ctx *gin.Context) LocationSectionBindLocationLinesForm {
+	if err := ctx.ShouldBind(&cls); err != nil {
+		wrongs.PanicValidate(err.Error())
+	}
+
+	return cls
+}
+
 // Load 加载路由
 //  @receiver cls
 //  @param router
@@ -172,6 +190,43 @@ func (LocationSectionRouter) Load(engine *gin.Engine) {
 			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"location_section": locationSection}))
+		})
+
+		// 区间绑定线别
+		r.PUT(":uuid/bindLocationLines", func(ctx *gin.Context) {
+			var (
+				ret                                  *gorm.DB
+				locationSection                      models.LocationSectionModel
+				pivotLocationLineAndLocationSections []models.PivotLocationLineAndLocationSection
+			)
+
+			// 表单
+			form := (&LocationSectionBindLocationLinesForm{}).ShouldBind(ctx)
+
+			if ret = models.Init(models.LocationSectionModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&locationSection); ret.Error != nil {
+				wrongs.PanicWhenIsEmpty(ret, "区间")
+			}
+
+			// 删除原有绑定关系
+			ret = models.Init(models.BaseModel{}).Prepare().Exec("delete from pivot_location_line_and_location_sections where location_section_id = ?", locationSection.ID)
+
+			// 创建绑定关系
+			if len(form.LocationLines) > 0 {
+				for _, locationLine := range form.LocationLines {
+					pivotLocationLineAndLocationSections = append(pivotLocationLineAndLocationSections, models.PivotLocationLineAndLocationSection{
+						LocationLineID:    locationLine.ID,
+						LocationSectionID: locationSection.ID,
+					})
+				}
+				models.Init(models.PivotLocationLineAndLocationSection{}).
+					Prepare().
+					CreateInBatches(&pivotLocationLineAndLocationSections, 100)
+			}
+
+			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{}))
 		})
 
 		// 详情

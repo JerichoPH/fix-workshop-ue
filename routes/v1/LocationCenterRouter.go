@@ -60,6 +60,31 @@ func (cls LocationCenterStoreForm) ShouldBind(ctx *gin.Context) LocationCenterSt
 	return cls
 }
 
+// LocationCenterBindLocationLinesForm 中心绑定线别表单
+type LocationCenterBindLocationLinesForm struct {
+	LocationLineUUIDs []string
+	LocationLines     []*models.LocationLineModel
+}
+
+// ShouldBind 绑定表单
+//  @receiver cls
+//  @param ctx
+//  @return LocationCenterBindLocationLinesForm
+func (cls LocationCenterBindLocationLinesForm) ShouldBind(ctx *gin.Context) LocationCenterBindLocationLinesForm {
+	if err := ctx.ShouldBind(&cls); err != nil {
+		wrongs.PanicValidate(err.Error())
+	}
+
+	if len(cls.LocationLineUUIDs) > 0 {
+		models.Init(models.LocationLineModel{}).
+			Prepare().
+			Where("uuid in ?", cls.LocationLineUUIDs).
+			Find(&cls.LocationLines)
+	}
+
+	return cls
+}
+
 // Load 加载路由
 //  @receiver cls
 //  @param router
@@ -169,6 +194,43 @@ func (LocationCenterRouter) Load(engine *gin.Engine) {
 			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"location_center": locationCenter}))
+		})
+
+		// 中心绑定线别
+		r.PUT(":uuid/bindLocationLines", func(ctx *gin.Context) {
+			var (
+				ret                                 *gorm.DB
+				locationCenter                      models.LocationCenterModel
+				pivotLocationLineAndLocationCenters []models.PivotLocationLineAndLocationCenter
+			)
+
+			// 表单
+			form := (&LocationCenterBindLocationLinesForm{}).ShouldBind(ctx)
+
+			if ret = models.Init(models.LocationCenterModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&locationCenter); ret.Error != nil {
+				wrongs.PanicWhenIsEmpty(ret, "中心")
+			}
+
+			// 删除原有绑定关系
+			ret = models.Init(models.BaseModel{}).Prepare().Exec("delete from pivot_location_line_and_location_centers where location_center_id = ?", locationCenter.ID)
+
+			// 创建绑定关系
+			if len(form.LocationLines) > 0 {
+				for _, locationLine := range form.LocationLines {
+					pivotLocationLineAndLocationCenters = append(pivotLocationLineAndLocationCenters, models.PivotLocationLineAndLocationCenter{
+						LocationLineID:   locationLine.ID,
+						LocationCenterID: locationCenter.ID,
+					})
+				}
+				models.Init(models.PivotLocationLineAndLocationCenter{}).
+					Prepare().
+					CreateInBatches(&pivotLocationLineAndLocationCenters, 100)
+			}
+
+			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{}))
 		})
 
 		// 详情
