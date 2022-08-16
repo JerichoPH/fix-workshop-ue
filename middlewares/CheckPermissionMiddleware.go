@@ -30,16 +30,18 @@ func CheckPermission() gin.HandlerFunc {
 
 			// 获取权限
 			var rbacPermission models.RbacPermissionModel
-			ret = (&models.BaseModel{}).
-				SetPreloads("RbacRoles").
+			ret = models.Init(models.RbacPermissionModel{}).
 				SetWheres(tools.Map{
 					"uri":    ctx.FullPath(),
 					"method": ctx.Request.Method,
 				}).
 				Prepare().
 				First(&rbacPermission)
-			if errors.Is(ret.Error, gorm.ErrRecordNotFound) {
-				wrongs.PanicUnAuth(fmt.Sprintf("权限不存在（%s %s）", ctx.Request.Method, ctx.FullPath()))
+			fmt.Println(ret.Error,ctx.Request.Method)
+			if ret.Error != nil {
+				if errors.Is(ret.Error, gorm.ErrRecordNotFound) {
+					wrongs.PanicUnAuth(fmt.Sprintf("权限不存在（%s %s）", ctx.Request.Method, ctx.FullPath()))
+				}
 			}
 
 			(&databases.MySql{}).

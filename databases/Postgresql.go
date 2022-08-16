@@ -42,8 +42,15 @@ func (cls *Postgresql) getConn() (db *gorm.DB) {
 		cls.SSLMode,
 	)
 
-	db, _ = gorm.Open(postgres.Open(dsn), &gorm.Config{
+	mySqlConn, _ := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		CreateBatchSize:                          1000,
 		DisableForeignKeyConstraintWhenMigrating: true,
+	})
+
+	db = mySqlConn.Session(&gorm.Session{
+		SkipDefaultTransaction: true,
+		QueryFields:            true,
+		PrepareStmt:            true,
 	})
 
 	return
