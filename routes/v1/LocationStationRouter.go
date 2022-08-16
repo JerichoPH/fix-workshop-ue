@@ -70,6 +70,31 @@ func (cls LocationStationStoreForm) ShouldBind(ctx *gin.Context) LocationStation
 	return cls
 }
 
+// LocationStationBindLocationLinesForm 站场绑定线别表单
+type LocationStationBindLocationLinesForm struct {
+	LocationLineUUIDs []string `json:"location_line_uuids"`
+	LocationLines     []*models.LocationLineModel
+}
+
+// ShouldBind 绑定表单
+//  @receiver cls
+//  @param ctx
+//  @return LocationStationBindLocationLinesForm
+func (cls LocationStationBindLocationLinesForm) ShouldBind(ctx *gin.Context) LocationStationBindLocationLinesForm {
+	if err := ctx.ShouldBind(&cls); err != nil {
+		wrongs.PanicValidate(err.Error())
+	}
+
+	if len(cls.LocationLineUUIDs) > 0 {
+		models.Init(models.LocationLineModel{}).
+			Prepare().
+			Where("uuid in ?", cls.LocationLineUUIDs).
+			Find(&cls.LocationLines)
+	}
+
+	return cls
+}
+
 // Load 加载路由
 //  @receiver cls
 //  @param router
@@ -181,14 +206,6 @@ func (LocationStationRouter) Load(engine *gin.Engine) {
 			locationStation.LocationLines = form.LocationLines
 			if ret = models.
 				Init(models.LocationStationModel{}).
-				SetSelects(
-					"sort",
-					"unique_code",
-					"name",
-					"be_enable",
-					"organization_workshop_uuid",
-					"organization_work_area_uuid",
-				).
 				Prepare().
 				Where("uuid = ?", ctx.Param("uuid")).
 				Updates(map[string]interface{}{
@@ -203,6 +220,43 @@ func (LocationStationRouter) Load(engine *gin.Engine) {
 			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"location_station": locationStation}))
+		})
+
+		// 站场绑定线别
+		r.PUT(":uuid/bindLocationLines", func(ctx *gin.Context) {
+			var (
+				ret                                  *gorm.DB
+				locationStation                      models.LocationStationModel
+				pivotLocationLineAndLocationStations []models.PivotLocationLineAndLocationStation
+			)
+
+			// 表单
+			form := (&LocationStationBindLocationLinesForm{}).ShouldBind(ctx)
+
+			if ret = models.Init(models.LocationStationModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare().
+				First(&locationStation); ret.Error != nil {
+				wrongs.PanicWhenIsEmpty(ret, "站场")
+			}
+
+			// 删除原有绑定关系
+			ret = models.Init(models.BaseModel{}).Prepare().Exec("delete from pivot_location_line_and_location_stations where location_station_id = ?", locationStation.ID)
+
+			// 创建绑定关系
+			if len(form.LocationLines) > 0 {
+				for _, locationLine := range form.LocationLines {
+					pivotLocationLineAndLocationStations = append(pivotLocationLineAndLocationStations, models.PivotLocationLineAndLocationStation{
+						LocationLineID:    locationLine.ID,
+						LocationStationID: locationStation.ID,
+					})
+				}
+				models.Init(models.PivotLocationLineAndLocationStation{}).
+					Prepare().
+					CreateInBatches(&pivotLocationLineAndLocationStations, 100)
+			}
+
+			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{}))
 		})
 
 		// 详情

@@ -104,7 +104,6 @@ func (OrganizationParagraphRouter) Load(engine *gin.Engine) {
 				ShortName:           form.ShortName,
 				BeEnable:            form.BeEnable,
 				OrganizationRailway: form.OrganizationRailway,
-				LocationLines:       form.OrganizationLines,
 			}
 			if ret = models.Init(models.OrganizationParagraphModel{}).Prepare().Create(&organizationParagraph); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
@@ -174,7 +173,6 @@ func (OrganizationParagraphRouter) Load(engine *gin.Engine) {
 			organizationParagraph.ShortName = form.ShortName
 			organizationParagraph.BeEnable = form.BeEnable
 			organizationParagraph.OrganizationRailway = form.OrganizationRailway
-			organizationParagraph.LocationLines = form.OrganizationLines
 			if ret = models.Init(models.OrganizationParagraphModel{}).Prepare().Save(&organizationParagraph); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}

@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"errors"
-	"fix-workshop-ue/databases"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/settings"
 	"fix-workshop-ue/tools"
@@ -37,16 +36,13 @@ func CheckPermission() gin.HandlerFunc {
 				}).
 				Prepare().
 				First(&rbacPermission)
-			fmt.Println(ret.Error,ctx.Request.Method)
 			if ret.Error != nil {
 				if errors.Is(ret.Error, gorm.ErrRecordNotFound) {
 					wrongs.PanicUnAuth(fmt.Sprintf("权限不存在（%s %s）", ctx.Request.Method, ctx.FullPath()))
 				}
 			}
 
-			(&databases.MySql{}).
-				GetConn().
-				Raw(`select prp.rbac_role_id
+			models.Init(models.BaseModel{}).Prepare().Raw(`select prp.rbac_role_id
 from pivot_rbac_role_and_rbac_permissions as prp
          join rbac_roles r on prp.rbac_role_id = r.id
          join rbac_permissions p on prp.rbac_permission_id = p.id

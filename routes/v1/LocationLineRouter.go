@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"fix-workshop-ue/databases"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -132,58 +131,6 @@ type LocationLineBindForm struct {
 	LocationCenters                 []*models.LocationCenterModel
 }
 
-// ShouldBind 绑定路由
-//  @receiver cls
-//  @param ctx
-//  @return LocationLineBindForm
-func (cls LocationLineBindForm) ShouldBind(ctx *gin.Context) LocationLineBindForm {
-	if err := ctx.ShouldBind(&cls); err != nil {
-		wrongs.PanicValidate(err.Error())
-	}
-	// 查询路局
-	models.Init(models.OrganizationRailwayModel{}).
-		Prepare().
-		Where("uuid in ?", cls.OrganizationRailwayUUIDs).
-		Find(&cls.OrganizationRailways)
-	// 查询站段
-	models.Init(models.OrganizationParagraphModel{}).
-		Prepare().
-		Where("uuid in ?", cls.OrganizationParagraphUUIDs).
-		Find(&cls.OrganizationParagraphs)
-	// 查询车间
-	models.Init(models.OrganizationWorkshopModel{}).
-		Prepare().
-		Where("uuid in ?", cls.OrganizationWorkshopUUIDs).
-		Find(&cls.OrganizationWorkshops)
-	// 查询工区
-	models.Init(models.OrganizationWorkAreaModel{}).
-		Prepare().
-		Where("uuid in ?", cls.OrganizationWorkAreaUUIDs).
-		Find(&cls.OrganizationWorkAreas)
-	// 查询区间
-	models.Init(models.LocationSectionModel{}).
-		Prepare().
-		Where("uuid in ?", cls.LocationSectionUUIDs).
-		Find(&cls.LocationSections)
-	// 查询站场
-	models.Init(models.LocationStationModel{}).
-		Prepare().
-		Where("uuid in ?", cls.LocationStationUUIDs).
-		Find(&cls.LocationStations)
-	// 查询道口
-	models.Init(models.LocationRailroadGradeCrossModel{}).
-		Prepare().
-		Where("uuid in ?", cls.LocationRailroadGradeCrossUUIDs).
-		Find(&cls.LocationRailroadGradeCrosses)
-	// 查询中心
-	models.Init(models.LocationCenterModel{}).
-		Prepare().
-		Where("uuid in ?", cls.LocationCenterUUIDs).
-		Find(&cls.LocationCenters)
-
-	return cls
-}
-
 // Load 加载路由
 //  @receiver cls
 //  @param router
@@ -222,10 +169,6 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 				UniqueCode:                   form.UniqueCode,
 				Name:                         form.Name,
 				BeEnable:                     form.BeEnable,
-				OrganizationRailways:         form.OrganizationRailways,
-				OrganizationParagraphs:       form.OrganizationParagraphs,
-				OrganizationWorkshops:        form.OrganizationWorkshops,
-				OrganizationWorkAreas:        form.OrganizationWorkAreas,
 				LocationSections:             form.LocationSections,
 				LocationStations:             form.LocationStations,
 				LocationRailroadGradeCrosses: form.LocationRailroadGradeCrosses,
@@ -295,251 +238,24 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 			locationLine.Name = form.Name
 			locationLine.Sort = form.Sort
 			locationLine.BeEnable = form.BeEnable
-			locationLine.OrganizationRailways = form.OrganizationRailways
-			locationLine.OrganizationParagraphs = form.OrganizationParagraphs
-			locationLine.OrganizationWorkshops = form.OrganizationWorkshops
-			locationLine.OrganizationWorkAreas = form.OrganizationWorkAreas
-			locationLine.LocationSections = form.LocationSections
-			locationLine.LocationStations = form.LocationStations
-			locationLine.LocationRailroadGradeCrosses = form.LocationRailroadGradeCrosses
-			locationLine.LocationCenters = form.LocationCenters
+
 			if ret = (&models.BaseModel{}).SetModel(&models.LocationLineModel{}).Prepare().Save(&locationLine); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
+			if ret = models.Init(models.LocationLineModel{}).
+				Prepare().
+				Where("uuid = ?", ctx.Param("uuid")).
+				Updates(map[string]interface{}{
+					"sort":        form.Sort,
+					"unique_code": form.UniqueCode,
+					"name":        form.Name,
+					"be_enable":   form.BeEnable,
+				}); ret.Error != nil {
+				wrongs.PanicForbidden(ret.Error.Error())
+			}
+
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"location_line": locationLine}))
-		})
-
-		// 绑定路局
-		r.PUT(":uuid/bindOrganizationRailways", func(ctx *gin.Context) {
-			var (
-				ret          *gorm.DB
-				locationLine models.LocationLineModel
-			)
-
-			// 表单
-			form := (&LocationLineBindForm{}).ShouldBind(ctx)
-
-			// 查询
-			ret = models.Init(models.LocationLineModel{}).
-				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
-				First(&locationLine)
-			wrongs.PanicWhenIsEmpty(ret, "线别")
-
-			// 删除原有绑定关系
-			ret = (&databases.MySql{}).GetConn().Exec("delete from pivot_location_line_and_organization_railways where location_line_id = ?", locationLine.ID)
-
-			// 编辑
-			locationLine.OrganizationRailways = form.OrganizationRailways
-			if ret = models.Init(models.LocationLineModel{}).Prepare().Save(&locationLine); ret.Error != nil {
-				wrongs.PanicForbidden(ret.Error.Error())
-			}
-
-			ctx.JSON(tools.CorrectIns("绑定成功").OK(tools.Map{}))
-		})
-
-		// 绑定路局
-		r.PUT(":uuid/bindOrganizationParagraphs", func(ctx *gin.Context) {
-			var (
-				ret          *gorm.DB
-				locationLine models.LocationLineModel
-			)
-
-			// 表单
-			form := (&LocationLineBindForm{}).ShouldBind(ctx)
-
-			// 查询
-			ret = models.Init(models.LocationLineModel{}).
-				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
-				First(&locationLine)
-			wrongs.PanicWhenIsEmpty(ret, "线别")
-
-			// 删除原有绑定关系
-			ret = (&databases.MySql{}).GetConn().Exec("delete from pivot_location_line_and_organization_paragraphs where location_line_id = ?", locationLine.ID)
-
-			// 编辑
-			locationLine.OrganizationParagraphs = form.OrganizationParagraphs
-			if ret = models.Init(models.LocationLineModel{}).Prepare().Save(&locationLine); ret.Error != nil {
-				wrongs.PanicForbidden(ret.Error.Error())
-			}
-
-			ctx.JSON(tools.CorrectIns("绑定成功").OK(tools.Map{}))
-		})
-
-		// 绑定车间
-		r.PUT(":uuid/bindOrganizationWorkshops", func(ctx *gin.Context) {
-			var (
-				ret          *gorm.DB
-				locationLine models.LocationLineModel
-			)
-
-			// 表单
-			form := (&LocationLineBindForm{}).ShouldBind(ctx)
-
-			// 查询
-			ret = models.Init(models.LocationLineModel{}).
-				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
-				First(&locationLine)
-			wrongs.PanicWhenIsEmpty(ret, "线别")
-
-			// 删除原有绑定关系
-			ret = (&databases.MySql{}).GetConn().Exec("delete from pivot_location_line_and_organization_workshops where location_line_id = ?", locationLine.ID)
-
-			// 编辑
-			locationLine.OrganizationWorkshops = form.OrganizationWorkshops
-			if ret = models.Init(models.LocationLineModel{}).Prepare().Save(&locationLine); ret.Error != nil {
-				wrongs.PanicForbidden(ret.Error.Error())
-			}
-
-			ctx.JSON(tools.CorrectIns("绑定成功").OK(tools.Map{}))
-		})
-
-		// 绑定工区
-		r.PUT(":uuid/bindOrganizationWorkAreas", func(ctx *gin.Context) {
-			var (
-				ret          *gorm.DB
-				locationLine models.LocationLineModel
-			)
-
-			// 表单
-			form := (&LocationLineBindForm{}).ShouldBind(ctx)
-
-			// 查询
-			ret = models.Init(models.LocationLineModel{}).
-				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
-				First(&locationLine)
-			wrongs.PanicWhenIsEmpty(ret, "线别")
-
-			// 删除原有绑定关系
-			ret = (&databases.MySql{}).GetConn().Exec("delete from pivot_location_line_and_organization_work_areas where location_line_id = ?", locationLine.ID)
-
-			// 编辑
-			locationLine.OrganizationWorkAreas = form.OrganizationWorkAreas
-			if ret = models.Init(models.LocationLineModel{}).Prepare().Save(&locationLine); ret.Error != nil {
-				wrongs.PanicForbidden(ret.Error.Error())
-			}
-
-			ctx.JSON(tools.CorrectIns("绑定成功").OK(tools.Map{}))
-		})
-
-		// 绑定区间
-		r.PUT(":uuid/bindOrganizationSections", func(ctx *gin.Context) {
-			var (
-				ret          *gorm.DB
-				locationLine models.LocationLineModel
-			)
-
-			// 表单
-			form := (&LocationLineBindForm{}).ShouldBind(ctx)
-
-			// 查询
-			ret = models.Init(models.LocationLineModel{}).
-				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
-				First(&locationLine)
-			wrongs.PanicWhenIsEmpty(ret, "线别")
-
-			// 删除原有绑定关系
-			ret = (&databases.MySql{}).GetConn().Exec("delete from pivot_location_line_and_location_sections where location_line_id = ?", locationLine.ID)
-
-			// 编辑
-			locationLine.LocationSections = form.LocationSections
-			if ret = models.Init(models.LocationLineModel{}).Prepare().Save(&locationLine); ret.Error != nil {
-				wrongs.PanicForbidden(ret.Error.Error())
-			}
-
-			ctx.JSON(tools.CorrectIns("绑定成功").OK(tools.Map{}))
-		})
-
-		// 绑定站场
-		r.PUT(":uuid/bindOrganizationStations", func(ctx *gin.Context) {
-			var (
-				ret          *gorm.DB
-				locationLine models.LocationLineModel
-			)
-
-			// 表单
-			form := (&LocationLineBindForm{}).ShouldBind(ctx)
-
-			// 查询
-			ret = models.Init(models.LocationLineModel{}).
-				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
-				First(&locationLine)
-			wrongs.PanicWhenIsEmpty(ret, "线别")
-
-			// 删除原有绑定关系
-			ret = (&databases.MySql{}).GetConn().Exec("delete from pivot_location_line_and_location_stations where location_line_id = ?", locationLine.ID)
-
-			// 编辑
-			locationLine.LocationStations = form.LocationStations
-			if ret = models.Init(models.LocationLineModel{}).Prepare().Save(&locationLine); ret.Error != nil {
-				wrongs.PanicForbidden(ret.Error.Error())
-			}
-
-			ctx.JSON(tools.CorrectIns("绑定成功").OK(tools.Map{}))
-		})
-
-		// 绑定道口
-		r.PUT(":uuid/bindOrganizationRailroadGradeCrosses", func(ctx *gin.Context) {
-			var (
-				ret          *gorm.DB
-				locationLine models.LocationLineModel
-			)
-
-			// 表单
-			form := (&LocationLineBindForm{}).ShouldBind(ctx)
-
-			// 查询
-			ret = models.Init(models.LocationLineModel{}).
-				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
-				First(&locationLine)
-			wrongs.PanicWhenIsEmpty(ret, "线别")
-
-			// 删除原有绑定关系
-			ret = (&databases.MySql{}).GetConn().Exec("delete from pivot_location_line_and_location_railroad_grade_crosses where location_line_id = ?", locationLine.ID)
-
-			// 编辑
-			locationLine.LocationRailroadGradeCrosses = form.LocationRailroadGradeCrosses
-			if ret = models.Init(models.LocationLineModel{}).Prepare().Save(&locationLine); ret.Error != nil {
-				wrongs.PanicForbidden(ret.Error.Error())
-			}
-
-			ctx.JSON(tools.CorrectIns("绑定成功").OK(tools.Map{}))
-		})
-
-		// 绑定中心
-		r.PUT(":uuid/bindOrganizationCenters", func(ctx *gin.Context) {
-			var (
-				ret          *gorm.DB
-				locationLine models.LocationLineModel
-			)
-
-			// 表单
-			form := (&LocationLineBindForm{}).ShouldBind(ctx)
-
-			// 查询
-			ret = models.Init(models.LocationLineModel{}).
-				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
-				First(&locationLine)
-			wrongs.PanicWhenIsEmpty(ret, "线别")
-
-			// 删除原有绑定关系
-			ret = (&databases.MySql{}).GetConn().Exec("delete from pivot_location_line_and_location_centers where location_line_id = ?", locationLine.ID)
-
-			// 编辑
-			locationLine.LocationCenters = form.LocationCenters
-			if ret = models.Init(models.LocationLineModel{}).Prepare().Save(&locationLine); ret.Error != nil {
-				wrongs.PanicForbidden(ret.Error.Error())
-			}
-
-			ctx.JSON(tools.CorrectIns("绑定成功").OK(tools.Map{}))
 		})
 
 		// 详情

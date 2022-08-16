@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"fix-workshop-ue/databases"
 	"fix-workshop-ue/middlewares"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/tools"
@@ -115,7 +114,6 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 				Name:          form.Name,
 				ShortName:     form.ShortName,
 				BeEnable:      form.BeEnable,
-				LocationLines: form.LocationLines,
 			}
 			if ret = (&models.BaseModel{}).SetModel(models.OrganizationRailwayModel{}).Prepare().Create(&organizationRailway); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
@@ -186,37 +184,11 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 			organizationRailway.Name = form.Name
 			organizationRailway.ShortName = form.ShortName
 			organizationRailway.BeEnable = form.BeEnable
-			organizationRailway.LocationLines = form.LocationLines
 			if ret = models.Init(models.OrganizationRailwayModel{}).Prepare().Save(&organizationRailway); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"organization_railway": organizationRailway}))
-		})
-
-		// 绑定线别
-		r.PUT(":uuid/bindLocationLines", func(ctx *gin.Context) {
-			var (
-				ret                 *gorm.DB
-				organizationRailway models.OrganizationRailwayModel
-			)
-
-			// 表单
-			form := (&OrganizationRailwayBindLinesFrom{}).ShouldBind(ctx)
-
-			ret = models.Init(models.OrganizationRailwayModel{}).
-				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
-				First(&organizationRailway)
-			wrongs.PanicWhenIsEmpty(ret, "路局")
-
-			// 清除原有绑定关系
-			(&databases.MySql{}).GetConn().Exec("delete from pivot_location_line_and_organization_railways where organization_railway_id = ?", organizationRailway.ID)
-			// 创建绑定关系
-			organizationRailway.LocationLines = form.LocationLines
-			models.Init(models.OrganizationRailwayModel{}).Prepare().Where("uuid = ?", ctx.Param("uuid")).Save(&organizationRailway)
-
-			ctx.JSON(tools.CorrectIns("绑定成功").Updated(tools.Map{"organization_railway": organizationRailway}))
 		})
 
 		// 详情

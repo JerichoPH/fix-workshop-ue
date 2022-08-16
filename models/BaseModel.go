@@ -13,7 +13,7 @@ import (
 
 // BaseModel 出厂数据、财务数据、检修数据、仓储数据、流转数据、运用数据
 type BaseModel struct {
-	ID             uint           `gorm:"primaryKey" json:"id"`
+	ID             uint64         `gorm:"primaryKey" json:"id"`
 	CreatedAt      time.Time      `gorm:"auto_now_add;" json:"created_at"`
 	UpdatedAt      time.Time      `json:"updated_at"`
 	DeletedAt      gorm.DeletedAt `gorm:"index" json:"deleted_at"`

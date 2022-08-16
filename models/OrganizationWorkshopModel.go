@@ -10,7 +10,6 @@ type OrganizationWorkshopModel struct {
 	OrganizationWorkshopType        OrganizationWorkshopTypeModel     `gorm:"foreignKey:OrganizationWorkshopTypeUUID;references:UUID;COMMENT:所属类型;" json:"organization_workshop_type"`
 	OrganizationParagraphUUID       string                            `gorm:"type:CHAR(36);COMMENT:所属站段UUID;" json:"organization_paragraph_uuid"`
 	OrganizationParagraph           OrganizationParagraphModel        `gorm:"foreignKey:OrganizationParagraphUUID;references:UUID;COMMENT:所属站段;" json:"organization_paragraph"`
-	LocationLines                   []*LocationLineModel              `gorm:"many2many:pivot_location_line_and_organization_workshops;foreignKey:id;joinForeignKey:organization_workshop_id;references:id;location_line_id;COMMENT:线别与车间多对多;" json:"location_lines"`
 	OrganizationWorkAreas           []OrganizationWorkAreaModel       `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;COMMENT:相关工区;" json:"organization_work_areas"`
 	LocationSections                []LocationSectionModel            `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;COMMENT:相关区间;" json:"location_sections"`
 	LocationStations                []LocationStationModel            `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;COMMENT:相关站场;" json:"location_stations"`
