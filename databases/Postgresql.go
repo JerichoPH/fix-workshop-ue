@@ -42,7 +42,9 @@ func (cls *Postgresql) getConn() (db *gorm.DB) {
 		cls.SSLMode,
 	)
 
-	db, _ = gorm.Open(postgres.Open(dsn))
+	db, _ = gorm.Open(postgres.Open(dsn), &gorm.Config{
+		DisableForeignKeyConstraintWhenMigrating: true,
+	})
 
 	return
 }
