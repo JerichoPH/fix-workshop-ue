@@ -7,7 +7,7 @@ import (
 
 type OrganizationWorkAreaTypeModel struct {
 	BaseModel
-	UniqueCode            string                      `gorm:"type:VARCHAR(64);UNIQUE;NOT NULL;COMMENT:工区类型代码;" json:"unique_code"`
+	UniqueCode            string                      `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:工区类型代码;" json:"unique_code"`
 	Name                  string                      `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:工区类型名称;" json:"name"`
 	OrganizationWorkAreas []OrganizationWorkAreaModel `gorm:"foreignKey:OrganizationWorkAreaTypeUUID;references:UUID;COMMENT:相关工区;" json:"organization_work_areas"`
 }

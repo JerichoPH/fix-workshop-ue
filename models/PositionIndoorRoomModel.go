@@ -2,7 +2,7 @@ package models
 
 type PositionIndoorRoomModel struct {
 	BaseModel
-	UniqueCode                 string                      `gorm:"type:CHAR(7);UNIQUE;NOT NULL;COMMENT:机房代码;" json:"unique_code"`
+	UniqueCode                 string                      `gorm:"type:CHAR(7);NOT NULL;COMMENT:机房代码;" json:"unique_code"`
 	Name                       string                      `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:机房名称;" json:"name"`
 	PositionIndoorRoomTypeUUID string                      `gorm:"type:CHAR(36);COMMENT:所属机房类型;" json:"position_indoor_room_type_uuid"`
 	PositionIndoorRoomType     PositionIndoorRoomTypeModel `gorm:"foreignKey:PositionIndoorRoomTypeUUID;references:UUID;COMMENT:所属机房类型;" json:"position_indoor_room_type"`

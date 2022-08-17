@@ -7,7 +7,7 @@ import (
 
 type PositionIndoorRoomTypeModel struct {
 	BaseModel
-	UniqueCode          string                    `gorm:"type:CHAR(2);UNIQUE;NOT NULL;COMMENT:机房类型代码;" json:"unique_code"`
+	UniqueCode          string                    `gorm:"type:CHAR(2);NOT NULL;COMMENT:机房类型代码;" json:"unique_code"`
 	Name                string                    `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:机房类型名称;" json:"name"`
 	PositionIndoorRooms []PositionIndoorRoomModel `gorm:"foreignKey:PositionIndoorRoomTypeUUID;references:UUID;COMMENT:相关机房;" json:"location_indoor_rooms"`
 }

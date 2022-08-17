@@ -2,7 +2,7 @@ package models
 
 type PositionIndoorCabinetModel struct {
 	BaseModel
-	UniqueCode            string                    `gorm:"type:CHAR(11);UNIQUE;NOT NULL;COMMENT:柜架代码;" json:"unique_code"`
+	UniqueCode            string                    `gorm:"type:CHAR(11);NOT NULL;COMMENT:柜架代码;" json:"unique_code"`
 	Name                  string                    `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:柜架名称;" json:"name"`
 	PositionIndoorRowUUID string                    `gorm:"type:CHAR(36);NOT NULL;COMMENT:所属排;" json:"position_indoor_row_uuid"`
 	PositionIndoorRow     PositionIndoorRowModel    `gorm:"foreignKey:PositionIndoorRowUUID;references:UUID;COMMENT:所属排;" json:"position_indoor_row"`

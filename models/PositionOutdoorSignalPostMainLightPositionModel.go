@@ -2,7 +2,7 @@ package models
 
 type PositionOutdoorSignalPostMainLightPositionModel struct {
 	BaseModel
-	UniqueCode string `gorm:"type:CHAR(2);UNIQUE;NOT NULL;COMMENT:信号机主体灯位代码;" json:"unique_code"`
+	UniqueCode string `gorm:"type:CHAR(2);NOT NULL;COMMENT:信号机主体灯位代码;" json:"unique_code"`
 	Name       string `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:信号机主体灯位名称;" json:"name"`
 }
 

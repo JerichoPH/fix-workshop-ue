@@ -3,7 +3,7 @@ package models
 // PositionDepotRowModel 仓储仓库排
 type PositionDepotRowModel struct {
 	BaseModel
-	UniqueCode               string                      `gorm:"type:CHAR(8);UNIQUE;NOT NULL;COMMENT:仓储仓库排代码;" json:"unique_code"`
+	UniqueCode               string                      `gorm:"type:CHAR(8);NOT NULL;COMMENT:仓储仓库排代码;" json:"unique_code"`
 	Name                     string                      `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:仓储仓库排名称;" json:"name"`
 	PositionDepotRowTypeUUID string                      `gorm:"type:CHAR(36);NOT NULL;COMMENT:所属仓储仓库排类型UUID;" json:"position_depot_row_type_uuid"`
 	PositionDepotRowType     PositionDepotRowTypeModel   `gorm:"foreignKey:PositionDepotRowTypeUUID;references:UUID;COMMENT:所属仓储仓库排类型;" json:"position_depot_row_type"`

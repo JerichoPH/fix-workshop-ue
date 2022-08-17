@@ -62,17 +62,18 @@ func runAutoMigrate() {
 		&models.RbacPermissionGroupModel{}, //权限分组
 
 		// 组织机构
-		&models.OrganizationRailwayModel{},        //路局
-		&models.OrganizationParagraphModel{},      // 站段
-		&models.LocationLineModel{},               // 线别
-		&models.OrganizationWorkshopTypeModel{},   // 车间类型
-		&models.OrganizationWorkshopModel{},       // 车间
-		&models.OrganizationWorkAreaTypeModel{},   // 工区类型
-		&models.OrganizationWorkAreaModel{},       // 工区
-		&models.LocationSectionModel{},            // 区间
-		&models.LocationCenterModel{},             // 中心
-		&models.LocationRailroadGradeCrossModel{}, // 道口
-		&models.LocationStationModel{},            // 站场
+		&models.OrganizationRailwayModel{},            //路局
+		&models.OrganizationParagraphModel{},          // 站段
+		&models.LocationLineModel{},                   // 线别
+		&models.OrganizationWorkshopTypeModel{},       // 车间类型
+		&models.OrganizationWorkshopModel{},           // 车间
+		&models.OrganizationWorkAreaTypeModel{},       // 工区类型
+		&models.OrganizationWorkAreaProfessionModel{}, // 工区专业
+		&models.OrganizationWorkAreaModel{},           // 工区
+		&models.LocationSectionModel{},                // 区间
+		&models.LocationCenterModel{},                 // 中心
+		&models.LocationRailroadGradeCrossModel{},     // 道口
+		&models.LocationStationModel{},                // 站场
 
 		// 仓储
 		&models.PositionDepotStorehouseModel{}, // 仓储仓库

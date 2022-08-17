@@ -3,7 +3,7 @@ package models
 // PositionDepotCabinetModel 仓储柜架模型
 type PositionDepotCabinetModel struct {
 	BaseModel
-	UniqueCode           string                   `gorm:"type:CHAR(10);UNIQUE;NOT NULL;COMMENT:仓储柜架代码;" json:"unique_code"`
+	UniqueCode           string                   `gorm:"type:CHAR(10);NOT NULL;COMMENT:仓储柜架代码;" json:"unique_code"`
 	Name                 string                   `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:仓储柜架名称;" json:"name"`
 	PositionDepotRowUUID string                   `gorm:"type:CHAR(36);NOT NULL;COMMENT:仓储柜架排UUID;" json:"position_depot_row_uuid"`
 	PositionDepotRow     PositionDepotRowModel    `gorm:"foreignKey:PositionDepotRowUUID;references:UUID;COMMENT:所属仓储排;" json:"position_depot_row"`

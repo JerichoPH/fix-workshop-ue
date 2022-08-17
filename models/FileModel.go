@@ -2,7 +2,7 @@ package models
 
 type FileModel struct {
 	BaseModel
-	UUID               string       `gorm:"type:CHAR(36);UNIQUE;NOT NULL;COMMENT:UUID;" json:"uuid"`
+	UUID               string       `gorm:"type:CHAR(36);NOT NULL;COMMENT:UUID;" json:"uuid"`
 	Filename           string       `gorm:"type:VARCHAR(128);NOT NULL;COMMENT:文件存储名;" json:"filename"`
 	Type               string       `gorm:"type:VARCHAR(128);NOT NULL;COMMENT:文件类型;" json:"type"`
 	OriginalFilename   string       `gorm:"type:VARCHAR(128);NOT NULL;COMMENT:原始文件名;" json:"original_filename"`

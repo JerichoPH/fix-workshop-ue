@@ -16,7 +16,7 @@ type BaseModel struct {
 	CreatedAt      time.Time      `gorm:"auto_now_add;" json:"created_at"`
 	UpdatedAt      time.Time      `json:"updated_at"`
 	DeletedAt      gorm.DeletedAt `gorm:"index" json:"deleted_at"`
-	UUID           string         `gorm:"type:CHAR(36);UNIQUE;NOT NULL;COMMENT:uuid;" json:"uuid"`
+	UUID           string         `gorm:"type:CHAR(36);NOT NULL;COMMENT:uuid;" json:"uuid"`
 	Sort           int64          `gorm:"type:BIGINT;DEFAULT:0;NOT NULL;COMMENT:排序;" json:"sort"`
 	preloads       []string
 	selects        []string

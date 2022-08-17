@@ -2,7 +2,7 @@ package models
 
 type FixWorkflowReportModel struct {
 	BaseModel
-	SerialNumber               string               `gorm:"type:VARCHAR(64);UNIQUE;NOT NULL;COMMENT:检修单流水号;" json:"serial_number"`
+	SerialNumber               string               `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:检修单流水号;" json:"serial_number"`
 	//OperatorID                 string               `gorm:"type:BIGINT UNSIGNED;NOT NULL;COMMENT:操作人编号;" json:"operator_id"`
 	//Operator                   AccountModel              `gorm:"constraint:OnUpdate:CASCADE;foreignKey:OperatorID;references:ID;COMMENT:操作人;" json:"operator"`
 	FixWorkflowReportStage     string               `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:阶段;" json:"fix_workflow_report_stage"`

@@ -2,7 +2,7 @@ package models
 
 type FixWorkflowRecodeModel struct {
 	BaseModel
-	SerialNumber                   string                  `gorm:"type:VARCHAR(64);UNIQUE;NOT NULL;COMMENT:检修单流水号;" json:"serial_number"`
+	SerialNumber                   string                  `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:检修单流水号;" json:"serial_number"`
 	Note                           string                  `gorm:"type:LONGTEXT;COMMENT:备注说明;" json:"note"`
 	StandardValue                  string                  `gorm:"type:VARCHAR(64);COMMENT:标准值;" json:"standard_value"`
 	Unit                           string                  `gorm:"type:VARCHAR(64);COMMENT:单位;" json:"unit"`
