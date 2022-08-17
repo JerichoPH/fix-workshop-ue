@@ -8,7 +8,6 @@ type OrganizationRailwayModel struct {
 	ShortName              string                       `gorm:"type:VARCHAR(64);COMMENT:路局简称;" json:"short_name"`
 	BeEnable               bool                         `gorm:"type:BOOLEAN;DEFAULT:1;COMMENT:是否启用;" json:"be_enable"`
 	OrganizationParagraphs []OrganizationParagraphModel `gorm:"foreignKey:OrganizationRailwayUUID;references:UUID;COMMENT:相关站段;" json:"organization_paragraphs"`
-	EntireInstances        []EntireInstanceModel        `gorm:"foreignKey:OrganizationRailwayUUID;references:UUID;COMMENT:相关器材;" json:"entire_instances"`
 }
 
 // TableName 表名称
