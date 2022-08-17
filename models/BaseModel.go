@@ -166,7 +166,7 @@ func (cls *BaseModel) BeforeSave(db *gorm.DB) (err error) {
 
 // Prepare 初始化
 func (cls *BaseModel) Prepare(dbDriver string) (dbSession *gorm.DB) {
-	dbSession = (&databases.Database{DBDriver: dbDriver}).GetDatabase()
+	dbSession = (&databases.DatabaseLaunch{DBDriver: dbDriver}).GetDatabase()
 
 	dbSession = dbSession.Where(cls.wheres).Not(cls.notWheres)
 
