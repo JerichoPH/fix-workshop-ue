@@ -20,17 +20,17 @@ func (cls DatabaseLaunch) GetDatabase() (dbSession *gorm.DB) {
 		dbDriver = cls.DBDriver
 	} else {
 		setting := (&settings.Setting{}).Init()
-		setting.App.Section("app").Key("db_driver").MustString("")
+		setting.DB.Section("db").Key("db_driver").MustString("")
 	}
 
 	switch dbDriver {
+	case "postgresql":
+	default:
+		dbSession = (&Postgresql{}).GetConn()
 	case "mysql":
 		dbSession = (&MySql{}).GetConn()
 	case "mssql":
 		dbSession = (&MsSql{}).GetConn()
-	case "postgresql":
-	default:
-		dbSession = (&Postgresql{}).GetConn()
 	}
 
 	return

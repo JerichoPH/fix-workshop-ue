@@ -18,8 +18,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// initServer 启动服务
-func initServer(router *gin.Engine, addr string) {
+// runServer 启动服务
+func runServer(router *gin.Engine, addr string) {
 	server := &http.Server{
 		Addr:           addr,
 		Handler:        router,
@@ -52,11 +52,9 @@ func initServer(router *gin.Engine, addr string) {
 	log.Println("服务关闭")
 }
 
-func main() {
-	// 获取参数
-	setting := (&settings.Setting{}).Init()
-
-	if errAutoMigrate := (&databases.Postgresql{}).GetConn().AutoMigrate(
+// runAutoMigrate 初始化数据库迁移
+func runAutoMigrate() {
+	if errAutoMigrate := (&databases.DatabaseLaunch{}).GetDatabase().AutoMigrate(
 		// 用户与权鉴
 		&models.AccountModel{},             // 用户
 		&models.RbacRoleModel{},            // 角色
@@ -101,62 +99,16 @@ func main() {
 		fmt.Println("数据库迁移错误")
 		os.Exit(1)
 	}
+}
 
-	//if errAutoMigrate := (&databases.MySql{}).GetConn().
-	//	Set("gorm:table_options", "ENGINE=Distributed(cluster, default, hits)").
-	//	Set("gorm:table_options", "ENGINE=InnoDB").
-	//	AutoMigrate(
-	//		// 用户与权鉴
-	//		&models.AccountModel{},             // 用户
-	//		&models.RbacRoleModel{},            // 角色
-	//		&models.RbacPermissionModel{},      // 权限
-	//		&models.RbacPermissionGroupModel{}, //权限分组
-	//
-	//		// 组织机构
-	//		&models.OrganizationRailwayModel{},        //路局
-	//		&models.OrganizationParagraphModel{},      // 站段
-	//		&models.LocationLineModel{},               // 线别
-	//		&models.OrganizationWorkshopTypeModel{},   // 车间类型
-	//		&models.OrganizationWorkshopModel{},       // 车间
-	//		&models.OrganizationWorkAreaTypeModel{},   // 工区类型
-	//		&models.OrganizationWorkAreaModel{},       // 工区
-	//		&models.LocationSectionModel{},            // 区间
-	//		&models.LocationCenterModel{},             // 中心
-	//		&models.LocationRailroadGradeCrossModel{}, // 道口
-	//		&models.LocationStationModel{},            // 站场
-	//
-	//		// 仓储
-	//		&models.PositionDepotStorehouseModel{}, // 仓储仓库
-	//		&models.PositionDepotSectionModel{},    // 仓储仓库区域
-	//		&models.PositionDepotRowTypeModel{},    // 仓储仓库排类型
-	//		&models.PositionDepotRowModel{},        // 仓储仓库排
-	//		&models.PositionDepotCabinetModel{},    // 仓储柜架
-	//		&models.PositionDepotTierModel{},       // 仓储柜架层
-	//		&models.PositionDepotCellModel{},       // 仓储柜架格位
-	//
-	//		// 室内上道位置
-	//		&models.PositionIndoorRoomTypeModel{}, // 机房类型
-	//		&models.PositionIndoorRoomModel{},     // 机房
-	//		&models.PositionIndoorRowModel{},      // 排
-	//		&models.PositionIndoorCabinetModel{},  // 架
-	//		&models.PositionIndoorTierModel{},     // 层
-	//		&models.PositionIndoorCellModel{},     // 位
-	//
-	//		// 种类型
-	//		&models.KindCategoryModel{},   // 种类
-	//		&models.KindEntireTypeModel{}, // 类型
-	//		&models.KindSubTypeModel{},    // 型号
-	//
-	//	); errAutoMigrate != nil {
-	//	fmt.Println("自动迁移错误：", errAutoMigrate)
-	//	os.Exit(1)
-	//}
+// main 程序入口
+func main() {
+	settingApp := (&settings.Setting{}).Init().App // 加载参数（程序）
+	runAutoMigrate()                               // 数据库迁移
+	engine := gin.Default()                        // 启动服务引擎
+	engine.Use(wrongs.RecoverHandler)              // 异常处理
+	(&web.Router{}).Load(engine)                   // 加载web路由
+	(&v1.Router{}).Load(engine)                    // 加载v1路由
 
-	engine := gin.Default()
-	engine.Use(wrongs.RecoverHandler) // 异常处理
-
-	(&web.Router{}).Load(engine) // 加载web路由
-	(&v1.Router{}).Load(engine)  // 加载v1路由
-
-	initServer(engine, setting.App.Section("app").Key("addr").MustString(":8080")) // 启动服务
+	runServer(engine, settingApp.Section("app").Key("addr").MustString(":8080")) // 启动服务
 }
