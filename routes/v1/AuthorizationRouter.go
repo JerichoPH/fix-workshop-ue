@@ -85,12 +85,12 @@ func (AuthorizationRouter) Load(engine *gin.Engine) {
 			var ret *gorm.DB
 			ret = (&models.BaseModel{}).
 				SetWheres(tools.Map{"username": form.Username}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "用户名")
 			ret = (&models.BaseModel{}).
 				SetWheres(tools.Map{"nickname": form.Nickname}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "昵称")
 
@@ -106,7 +106,7 @@ func (AuthorizationRouter) Load(engine *gin.Engine) {
 			}
 			if ret = models.Init(models.AccountModel{}).
 				SetOmits(clause.Associations).
-				Prepare().
+				Prepare("").
 				Create(&account); ret.Error != nil {
 				wrongs.PanicForbidden("创建失败：" + ret.Error.Error())
 			}
@@ -124,7 +124,7 @@ func (AuthorizationRouter) Load(engine *gin.Engine) {
 			var ret *gorm.DB
 			ret = models.Init(models.AccountModel{}).
 				SetWheres(tools.Map{"username": form.Username}).
-				Prepare().
+				Prepare("").
 				First(&account)
 			wrongs.PanicWhenIsEmpty(ret, "用户")
 
@@ -161,7 +161,7 @@ func (AuthorizationRouter) Load(engine *gin.Engine) {
 					ret = models.Init(models.AccountModel{}).
 						SetWheres(tools.Map{"uuid": accountUUID}).
 						SetPreloads("RbacRoles", "RbacRoles.Menus").
-						Prepare().
+						Prepare("").
 						First(&account)
 					wrongs.PanicWhenIsEmpty(ret, "当前令牌指向用户")
 
@@ -178,7 +178,7 @@ func (AuthorizationRouter) Load(engine *gin.Engine) {
 
 					var menus []models.MenuModel
 					models.Init(models.MenuModel{}).
-						Prepare().
+						Prepare("").
 						Where("uuid in ?", menuUUIDs).
 						Where("parent_uuid is null").
 						Preload("Subs").

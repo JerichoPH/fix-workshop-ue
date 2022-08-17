@@ -45,7 +45,7 @@ func (cls KindSubTypeStoreForm) ShouldBind(ctx *gin.Context) KindSubTypeStoreFor
 	}
 	ret = models.Init(models.KindEntireTypeModel{}).
 		SetWheres(tools.Map{"uuid": cls.KindEntireTypeUUID}).
-		Prepare().
+		Prepare("").
 		First(&cls.KindEntireType)
 	wrongs.PanicWhenIsEmpty(ret, "所属类型")
 
@@ -75,12 +75,12 @@ func (KindSubTypeRouter) Load(engine *gin.Engine) {
 			// 查重
 			ret = models.Init(models.KindSubTypeModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "型号代码")
 			ret = models.Init(models.KindSubTypeModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "型号名称")
 
@@ -93,7 +93,7 @@ func (KindSubTypeRouter) Load(engine *gin.Engine) {
 				Nickname:       form.Nickname,
 				KindEntireType: form.KindEntireType,
 			}
-			if ret = models.Init(models.KindSubTypeModel{}).Prepare().Create(&kindSubType); ret.Error != nil {
+			if ret = models.Init(models.KindSubTypeModel{}).Prepare("").Create(&kindSubType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -110,12 +110,12 @@ func (KindSubTypeRouter) Load(engine *gin.Engine) {
 			// 查询
 			ret = models.Init(models.KindSubTypeModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&kindSubType)
 			wrongs.PanicWhenIsEmpty(ret, "型号")
 
 			// 删除
-			if ret := models.Init(models.KindSubTypeModel{}).Prepare().Delete(&kindSubType); ret.Error != nil {
+			if ret := models.Init(models.KindSubTypeModel{}).Prepare("").Delete(&kindSubType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -136,20 +136,20 @@ func (KindSubTypeRouter) Load(engine *gin.Engine) {
 			ret = models.Init(models.KindSubTypeModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "型号代码")
 			ret = models.Init(models.KindSubTypeModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "型号名称")
 
 			// 查询
 			ret = models.Init(models.KindSubTypeModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&kindSubType)
 			wrongs.PanicWhenIsEmpty(ret, "型号")
 
@@ -160,7 +160,7 @@ func (KindSubTypeRouter) Load(engine *gin.Engine) {
 			kindSubType.BeEnable = form.BeEnable
 			kindSubType.Nickname = form.Nickname
 			kindSubType.KindEntireType = form.KindEntireType
-			if ret = models.Init(models.KindSubTypeModel{}).Prepare().Save(&kindSubType); ret.Error != nil {
+			if ret = models.Init(models.KindSubTypeModel{}).Prepare("").Save(&kindSubType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -175,7 +175,7 @@ func (KindSubTypeRouter) Load(engine *gin.Engine) {
 			)
 			ret = models.Init(models.KindSubTypeModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&kindSubType)
 			wrongs.PanicWhenIsEmpty(ret, "型号")
 
@@ -187,7 +187,7 @@ func (KindSubTypeRouter) Load(engine *gin.Engine) {
 			var kindSubTypes []models.KindSubTypeModel
 			models.Init(models.KindSubTypeModel{}).
 				SetWhereFields().
-				PrepareQuery(ctx).
+				PrepareQuery(ctx,"").
 				Find(&kindSubTypes)
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"kind_sub_types": kindSubTypes}))

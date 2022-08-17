@@ -49,7 +49,7 @@ func (cls OrganizationWorkshopStoreForm) ShouldBind(ctx *gin.Context) Organizati
 	}
 	ret = models.Init(models.OrganizationParagraphModel{}).
 		SetWheres(tools.Map{"uuid": cls.OrganizationParagraphUUID}).
-		Prepare().
+		Prepare("").
 		First(&cls.OrganizationParagraph)
 	wrongs.PanicWhenIsEmpty(ret, "站段")
 
@@ -79,12 +79,12 @@ func (OrganizationWorkshopRouter) Load(engine *gin.Engine) {
 			// 查重
 			ret = models.Init(models.OrganizationWorkshopModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "车间代码")
 			ret = models.Init(models.OrganizationWorkshopModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "车间名称")
 
@@ -96,7 +96,7 @@ func (OrganizationWorkshopRouter) Load(engine *gin.Engine) {
 				OrganizationWorkshopType: form.OrganizationWorkshopType,
 				OrganizationParagraph:    form.OrganizationParagraph,
 			}
-			if ret = models.Init(models.OrganizationWorkshopModel{}).Prepare().Create(&organizationWorkshop); ret.Error != nil {
+			if ret = models.Init(models.OrganizationWorkshopModel{}).Prepare("").Create(&organizationWorkshop); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -113,12 +113,12 @@ func (OrganizationWorkshopRouter) Load(engine *gin.Engine) {
 			// 查询
 			ret = models.Init(models.OrganizationWorkshopModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&organizationWorkshop)
 			wrongs.PanicWhenIsEmpty(ret, "车间")
 
 			// 删除
-			if ret = models.Init(models.OrganizationWorkshopModel{}).Prepare().Delete(&organizationWorkshop); ret.Error != nil {
+			if ret = models.Init(models.OrganizationWorkshopModel{}).Prepare("").Delete(&organizationWorkshop); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -140,20 +140,20 @@ func (OrganizationWorkshopRouter) Load(engine *gin.Engine) {
 			ret = models.Init(models.OrganizationWorkshopModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "车间代码")
 			ret = models.Init(models.OrganizationWorkshopModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "车间名称")
 
 			// 查询
 			ret = models.Init(models.OrganizationWorkshopModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&organizationWorkshop)
 			wrongs.PanicWhenIsEmpty(ret, "车间")
 
@@ -163,7 +163,7 @@ func (OrganizationWorkshopRouter) Load(engine *gin.Engine) {
 			organizationWorkshop.BeEnable = form.BeEnable
 			organizationWorkshop.OrganizationWorkshopType = form.OrganizationWorkshopType
 			organizationWorkshop.OrganizationParagraph = form.OrganizationParagraph
-			if ret = models.Init(models.OrganizationWorkshopModel{}).Prepare().Save(&organizationWorkshop); ret.Error != nil {
+			if ret = models.Init(models.OrganizationWorkshopModel{}).Prepare("").Save(&organizationWorkshop); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -180,7 +180,7 @@ func (OrganizationWorkshopRouter) Load(engine *gin.Engine) {
 			ret = models.Init(models.OrganizationWorkshopModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				SetWhereFields("be_enable").
-				PrepareQuery(ctx).
+				PrepareQuery(ctx,"").
 				First(&organizationWorkshop)
 			wrongs.PanicWhenIsEmpty(ret, "车间")
 
@@ -193,7 +193,7 @@ func (OrganizationWorkshopRouter) Load(engine *gin.Engine) {
 
 			models.Init(models.OrganizationWorkshopModel{}).
 				SetWhereFields("unique_code", "name", "be_enable", "organization_workshop_type_uuid", "organization_paragraph_uuid").
-				PrepareQuery(ctx).
+				PrepareQuery(ctx,"").
 				Find(&organizationWorkshops)
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_workshops": organizationWorkshops}))

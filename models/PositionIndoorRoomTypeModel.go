@@ -22,7 +22,7 @@ func (PositionIndoorRoomTypeModel) TableName() string {
 //  @param uuid
 //  @return PositionIndoorRoomTypeModel
 func (cls PositionIndoorRoomTypeModel) FindOneByUUID(uuid string) PositionIndoorRoomTypeModel {
-	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
+	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare("").First(&cls); ret.Error != nil {
 		panic(wrongs.PanicWhenIsEmpty(ret, "工区"))
 	}
 

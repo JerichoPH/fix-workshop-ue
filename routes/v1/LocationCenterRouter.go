@@ -46,13 +46,13 @@ func (cls LocationCenterStoreForm) ShouldBind(ctx *gin.Context) LocationCenterSt
 	}
 	ret = models.Init(models.OrganizationWorkshopModel{}).
 		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).
-		Prepare().
+		Prepare("").
 		First(&cls.OrganizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "所属车间")
 	if cls.OrganizationWorkAreaUUID != "" {
 		models.Init(models.OrganizationWorkAreaModel{}).
 			SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUUID}).
-			Prepare().
+			Prepare("").
 			First(&cls.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "工区")
 	}
@@ -77,7 +77,7 @@ func (cls LocationCenterBindLocationLinesForm) ShouldBind(ctx *gin.Context) Loca
 
 	if len(cls.LocationLineUUIDs) > 0 {
 		models.Init(models.LocationLineModel{}).
-			Prepare().
+			Prepare("").
 			Where("uuid in ?", cls.LocationLineUUIDs).
 			Find(&cls.LocationLines)
 	}
@@ -108,12 +108,12 @@ func (LocationCenterRouter) Load(engine *gin.Engine) {
 			// 查重
 			ret = models.Init(models.LocationCenterModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "中心代码")
 			ret = models.Init(models.LocationCenterModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "中心名称")
 
@@ -124,7 +124,7 @@ func (LocationCenterRouter) Load(engine *gin.Engine) {
 				Name:       form.Name,
 				BeEnable:   form.BeEnable,
 			}
-			if ret = models.Init(models.LocationCenterModel{}).Prepare().Create(&locationCenter); ret.Error != nil {
+			if ret = models.Init(models.LocationCenterModel{}).Prepare("").Create(&locationCenter); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -141,12 +141,12 @@ func (LocationCenterRouter) Load(engine *gin.Engine) {
 			// 查询
 			ret = models.Init(models.LocationCenterModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&locationCenter)
 			wrongs.PanicWhenIsEmpty(ret, "中心")
 
 			// 删除
-			if ret := models.Init(models.LocationCenterModel{}).Prepare().Delete(&locationCenter); ret.Error != nil {
+			if ret := models.Init(models.LocationCenterModel{}).Prepare("").Delete(&locationCenter); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -167,20 +167,20 @@ func (LocationCenterRouter) Load(engine *gin.Engine) {
 			ret = models.Init(models.LocationCenterModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "中心代码")
 			ret = models.Init(models.LocationCenterModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "中心名称")
 
 			// 查询
 			ret = models.Init(models.LocationCenterModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&locationCenter)
 			wrongs.PanicWhenIsEmpty(ret, "中心")
 
@@ -189,7 +189,7 @@ func (LocationCenterRouter) Load(engine *gin.Engine) {
 			locationCenter.UniqueCode = form.UniqueCode
 			locationCenter.Name = form.Name
 			locationCenter.BeEnable = form.BeEnable
-			if ret = models.Init(models.LocationCenterModel{}).Prepare().Save(&locationCenter); ret.Error != nil {
+			if ret = models.Init(models.LocationCenterModel{}).Prepare("").Save(&locationCenter); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -209,13 +209,13 @@ func (LocationCenterRouter) Load(engine *gin.Engine) {
 
 			if ret = models.Init(models.LocationCenterModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&locationCenter); ret.Error != nil {
 				wrongs.PanicWhenIsEmpty(ret, "中心")
 			}
 
 			// 删除原有绑定关系
-			ret = models.Init(models.BaseModel{}).Prepare().Exec("delete from pivot_location_line_and_location_centers where location_center_id = ?", locationCenter.ID)
+			ret = models.Init(models.BaseModel{}).Prepare("").Exec("delete from pivot_location_line_and_location_centers where location_center_id = ?", locationCenter.ID)
 
 			// 创建绑定关系
 			if len(form.LocationLines) > 0 {
@@ -226,7 +226,7 @@ func (LocationCenterRouter) Load(engine *gin.Engine) {
 					})
 				}
 				models.Init(models.PivotLocationLineAndLocationCenter{}).
-					Prepare().
+					Prepare("").
 					CreateInBatches(&pivotLocationLineAndLocationCenters, 100)
 			}
 
@@ -239,7 +239,7 @@ func (LocationCenterRouter) Load(engine *gin.Engine) {
 			ret := models.Init(models.LocationCenterModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				SetWhereFields("be_enable").
-				PrepareQuery(ctx).
+				PrepareQuery(ctx,"").
 				First(&locationCenter)
 			wrongs.PanicWhenIsEmpty(ret, "中心")
 
@@ -251,7 +251,7 @@ func (LocationCenterRouter) Load(engine *gin.Engine) {
 			var locationCenters []models.LocationCenterModel
 			models.Init(models.LocationCenterModel{}).
 				SetWhereFields().
-				PrepareQuery(ctx).
+				PrepareQuery(ctx,"").
 				Find(&locationCenters)
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"location_centers": locationCenters}))

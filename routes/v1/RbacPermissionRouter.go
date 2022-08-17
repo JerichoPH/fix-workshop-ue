@@ -48,7 +48,7 @@ func (cls RbacPermissionStoreForm) ShouldBind(ctx *gin.Context) RbacPermissionSt
 	}
 	ret = models.Init(models.RbacPermissionGroupModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		Prepare().
+		Prepare("").
 		First(&cls.RbacPermissionGroup)
 	wrongs.PanicWhenIsEmpty(ret, "权限分组")
 
@@ -105,7 +105,7 @@ func (RbacPermissionRouter) Load(engine *gin.Engine) {
 				RbacPermissionGroupUUID: form.RbacPermissionGroup.UUID,
 			}
 			if ret = models.Init(&models.RbacPermissionModel{}).
-				Prepare().
+				Prepare("").
 				Create(&rbacPermission); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
@@ -128,11 +128,11 @@ func (RbacPermissionRouter) Load(engine *gin.Engine) {
 				var repeat models.RbacPermissionModel
 				ret = models.Init(models.RbacPermissionModel{}).
 					SetWheres(tools.Map{"name": name, "method": method, "uri": form.Uri}).
-					Prepare().
+					Prepare("").
 					First(&repeat)
 				if !wrongs.PanicWhenIsEmpty(ret, "") {
 					if ret = models.Init(models.RbacPermissionModel{}).
-						Prepare().
+						Prepare("").
 						Create(&models.RbacPermissionModel{
 							BaseModel:               models.BaseModel{UUID: uuid.NewV4().String()},
 							Name:                    name,
@@ -159,13 +159,13 @@ func (RbacPermissionRouter) Load(engine *gin.Engine) {
 			// 查询
 			ret = models.Init(models.RbacPermissionModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&rbacPermission)
 			wrongs.PanicWhenIsEmpty(ret, "权限")
 
 			// 删除
 			if ret = models.Init(&models.RbacPermissionModel{}).
-				Prepare().
+				Prepare("").
 				Delete(&rbacPermission); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
@@ -186,7 +186,7 @@ func (RbacPermissionRouter) Load(engine *gin.Engine) {
 			// 查询
 			ret = models.Init(models.RbacPermissionModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&rbacPermission)
 			wrongs.PanicWhenIsEmpty(ret, "权限")
 
@@ -196,7 +196,7 @@ func (RbacPermissionRouter) Load(engine *gin.Engine) {
 			rbacPermission.Method = form.Method
 			rbacPermission.RbacPermissionGroupUUID = form.RbacPermissionGroupUUID
 			if ret = models.Init(models.RbacPermissionModel{}).
-				Prepare().
+				Prepare("").
 				Save(&rbacPermission); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
@@ -214,7 +214,7 @@ func (RbacPermissionRouter) Load(engine *gin.Engine) {
 			ret = models.Init(&models.RbacPermissionModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				SetPreloads("RbacPermissionGroup").
-				Prepare().
+				Prepare("").
 				First(&rbacPermission)
 			wrongs.PanicWhenIsEmpty(ret, "权限")
 
@@ -227,7 +227,7 @@ func (RbacPermissionRouter) Load(engine *gin.Engine) {
 			models.Init(models.RbacPermissionModel{}).
 				SetPreloads("RbacPermissionGroup").
 				SetWhereFields("name", "uri", "method", "rbac_permission_group_uuid").
-				PrepareQuery(ctx).
+				PrepareQuery(ctx,"").
 				Find(&rbacPermissions)
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"rbac_permissions": rbacPermissions}))

@@ -50,7 +50,7 @@ func CheckJwt() gin.HandlerFunc {
 					ret = (&models.BaseModel{}).
 						SetModel(models.AccountModel{}).
 						SetWheres(tools.Map{"uuid": claims.UUID}).
-						Prepare().
+						Prepare("").
 						First(&account)
 
 					wrongs.PanicWhenIsEmpty(ret, "用户")

@@ -56,7 +56,7 @@ func main() {
 	// 获取参数
 	setting := (&settings.Setting{}).Init()
 
-	(&databases.Postgresql{}).GetConn().AutoMigrate(
+	if errAutoMigrate := (&databases.Postgresql{}).GetConn().AutoMigrate(
 		// 用户与权鉴
 		&models.AccountModel{},             // 用户
 		&models.RbacRoleModel{},            // 角色
@@ -97,57 +97,60 @@ func main() {
 		&models.KindCategoryModel{},   // 种类
 		&models.KindEntireTypeModel{}, // 类型
 		&models.KindSubTypeModel{},    // 型号
-	)
-
-	if errAutoMigrate := (&databases.MySql{}).GetConn().
-		Set("gorm:table_options", "ENGINE=Distributed(cluster, default, hits)").
-		Set("gorm:table_options", "ENGINE=InnoDB").
-		AutoMigrate(
-			// 用户与权鉴
-			&models.AccountModel{},             // 用户
-			&models.RbacRoleModel{},            // 角色
-			&models.RbacPermissionModel{},      // 权限
-			&models.RbacPermissionGroupModel{}, //权限分组
-
-			// 组织机构
-			&models.OrganizationRailwayModel{},        //路局
-			&models.OrganizationParagraphModel{},      // 站段
-			&models.LocationLineModel{},               // 线别
-			&models.OrganizationWorkshopTypeModel{},   // 车间类型
-			&models.OrganizationWorkshopModel{},       // 车间
-			&models.OrganizationWorkAreaTypeModel{},   // 工区类型
-			&models.OrganizationWorkAreaModel{},       // 工区
-			&models.LocationSectionModel{},            // 区间
-			&models.LocationCenterModel{},             // 中心
-			&models.LocationRailroadGradeCrossModel{}, // 道口
-			&models.LocationStationModel{},            // 站场
-
-			// 仓储
-			&models.PositionDepotStorehouseModel{}, // 仓储仓库
-			&models.PositionDepotSectionModel{},    // 仓储仓库区域
-			&models.PositionDepotRowTypeModel{},    // 仓储仓库排类型
-			&models.PositionDepotRowModel{},        // 仓储仓库排
-			&models.PositionDepotCabinetModel{},    // 仓储柜架
-			&models.PositionDepotTierModel{},       // 仓储柜架层
-			&models.PositionDepotCellModel{},       // 仓储柜架格位
-
-			// 室内上道位置
-			&models.PositionIndoorRoomTypeModel{}, // 机房类型
-			&models.PositionIndoorRoomModel{},     // 机房
-			&models.PositionIndoorRowModel{},      // 排
-			&models.PositionIndoorCabinetModel{},  // 架
-			&models.PositionIndoorTierModel{},     // 层
-			&models.PositionIndoorCellModel{},     // 位
-
-			// 种类型
-			&models.KindCategoryModel{},   // 种类
-			&models.KindEntireTypeModel{}, // 类型
-			&models.KindSubTypeModel{},    // 型号
-
-		); errAutoMigrate != nil {
-		fmt.Println("自动迁移错误：", errAutoMigrate)
+	); errAutoMigrate != nil {
+		fmt.Println("数据库迁移错误")
 		os.Exit(1)
 	}
+
+	//if errAutoMigrate := (&databases.MySql{}).GetConn().
+	//	Set("gorm:table_options", "ENGINE=Distributed(cluster, default, hits)").
+	//	Set("gorm:table_options", "ENGINE=InnoDB").
+	//	AutoMigrate(
+	//		// 用户与权鉴
+	//		&models.AccountModel{},             // 用户
+	//		&models.RbacRoleModel{},            // 角色
+	//		&models.RbacPermissionModel{},      // 权限
+	//		&models.RbacPermissionGroupModel{}, //权限分组
+	//
+	//		// 组织机构
+	//		&models.OrganizationRailwayModel{},        //路局
+	//		&models.OrganizationParagraphModel{},      // 站段
+	//		&models.LocationLineModel{},               // 线别
+	//		&models.OrganizationWorkshopTypeModel{},   // 车间类型
+	//		&models.OrganizationWorkshopModel{},       // 车间
+	//		&models.OrganizationWorkAreaTypeModel{},   // 工区类型
+	//		&models.OrganizationWorkAreaModel{},       // 工区
+	//		&models.LocationSectionModel{},            // 区间
+	//		&models.LocationCenterModel{},             // 中心
+	//		&models.LocationRailroadGradeCrossModel{}, // 道口
+	//		&models.LocationStationModel{},            // 站场
+	//
+	//		// 仓储
+	//		&models.PositionDepotStorehouseModel{}, // 仓储仓库
+	//		&models.PositionDepotSectionModel{},    // 仓储仓库区域
+	//		&models.PositionDepotRowTypeModel{},    // 仓储仓库排类型
+	//		&models.PositionDepotRowModel{},        // 仓储仓库排
+	//		&models.PositionDepotCabinetModel{},    // 仓储柜架
+	//		&models.PositionDepotTierModel{},       // 仓储柜架层
+	//		&models.PositionDepotCellModel{},       // 仓储柜架格位
+	//
+	//		// 室内上道位置
+	//		&models.PositionIndoorRoomTypeModel{}, // 机房类型
+	//		&models.PositionIndoorRoomModel{},     // 机房
+	//		&models.PositionIndoorRowModel{},      // 排
+	//		&models.PositionIndoorCabinetModel{},  // 架
+	//		&models.PositionIndoorTierModel{},     // 层
+	//		&models.PositionIndoorCellModel{},     // 位
+	//
+	//		// 种类型
+	//		&models.KindCategoryModel{},   // 种类
+	//		&models.KindEntireTypeModel{}, // 类型
+	//		&models.KindSubTypeModel{},    // 型号
+	//
+	//	); errAutoMigrate != nil {
+	//	fmt.Println("自动迁移错误：", errAutoMigrate)
+	//	os.Exit(1)
+	//}
 
 	engine := gin.Default()
 	engine.Use(wrongs.RecoverHandler) // 异常处理

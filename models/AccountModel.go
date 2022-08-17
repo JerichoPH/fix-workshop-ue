@@ -25,7 +25,7 @@ func (AccountModel) TableName() string {
 //  @param uuid
 //  @return AccountModel
 func (cls AccountModel) FindOneByUUID(uuid string) AccountModel {
-	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
+	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare("").First(&cls); ret.Error != nil {
 		panic(wrongs.PanicWhenIsEmpty(ret, "用户"))
 	}
 

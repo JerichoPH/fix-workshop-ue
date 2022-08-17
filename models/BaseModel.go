@@ -2,7 +2,6 @@ package models
 
 import (
 	"fix-workshop-ue/databases"
-	"fix-workshop-ue/settings"
 	"fix-workshop-ue/tools"
 	"fix-workshop-ue/wrongs"
 	"github.com/gin-gonic/gin"
@@ -45,7 +44,7 @@ func (cls *BaseModel) demoFindOne() {
 		SetModel(BaseModel{}).
 		SetWheres(tools.Map{}).
 		SetNotWheres(tools.Map{}).
-		Prepare().
+		Prepare("").
 		First(b)
 	wrongs.PanicWhenIsEmpty(ret, "XX")
 }
@@ -57,7 +56,7 @@ func (cls *BaseModel) demoFind() {
 	cls.
 		SetModel(BaseModel{}).
 		SetWhereFields("a", "b", "c").
-		PrepareQuery(ctx).
+		PrepareQuery(ctx, "").
 		Find(&b)
 }
 
@@ -166,17 +165,10 @@ func (cls *BaseModel) BeforeSave(db *gorm.DB) (err error) {
 //}
 
 // Prepare 初始化
-func (cls *BaseModel) Prepare() (dbSession *gorm.DB) {
-	setting := (&settings.Setting{}).Init()
-	switch setting.App.Section("app").Key("db_driver").MustString("") {
-	case "mysql":
-	default:
-		dbSession = (&databases.MySql{}).GetConn().Where(cls.wheres).Not(cls.notWheres)
-	case "mssql":
-		dbSession = (&databases.MsSql{}).GetConn().Where(cls.wheres).Not(cls.notWheres)
-	case "postgresql":
-		dbSession = (&databases.Postgresql{}).GetConn().Where(cls.wheres).Not(cls.notWheres)
-	}
+func (cls *BaseModel) Prepare(dbDriver string) (dbSession *gorm.DB) {
+	dbSession = (&databases.Database{DBDriver: dbDriver}).GetDatabase()
+
+	dbSession = dbSession.Where(cls.wheres).Not(cls.notWheres)
 
 	if cls.model != nil {
 		dbSession = dbSession.Model(&cls.model)
@@ -210,8 +202,8 @@ func (cls *BaseModel) Prepare() (dbSession *gorm.DB) {
 }
 
 // PrepareQuery 根据Query参数初始化
-func (cls *BaseModel) PrepareQuery(ctx *gin.Context) *gorm.DB {
-	dbSession := cls.Prepare()
+func (cls *BaseModel) PrepareQuery(ctx *gin.Context, dbDriver string) *gorm.DB {
+	dbSession := cls.Prepare(dbDriver)
 
 	wheres := make(map[string]interface{})
 	notWheres := make(map[string]interface{})

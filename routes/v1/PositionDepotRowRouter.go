@@ -45,7 +45,7 @@ func (cls PositionDepotRowStoreForm) ShouldBind(ctx *gin.Context) PositionDepotR
 	}
 	models.Init(models.PositionDepotRowTypeModel{}).
 		SetWheres(tools.Map{"uuid": cls.PositionDepotRowTypeUUID}).
-		Prepare().
+		Prepare("").
 		First(&cls.PositionDepotRowType)
 	wrongs.PanicWhenIsEmpty(ret, "所属仓库排类型")
 	if cls.PositionDepotSectionUUID == "" {
@@ -53,7 +53,7 @@ func (cls PositionDepotRowStoreForm) ShouldBind(ctx *gin.Context) PositionDepotR
 	}
 	ret = models.Init(models.PositionDepotSectionModel{}).
 		SetWheres(tools.Map{"uuid": cls.PositionDepotSectionUUID}).
-		Prepare().
+		Prepare("").
 		First(&cls.PositionDepotSection)
 	wrongs.PanicWhenIsEmpty(ret, "所属仓库区域")
 
@@ -83,12 +83,12 @@ func (PositionDepotRowRouter) Load(engine *gin.Engine) {
 			// 查重
 			ret = models.Init(models.PositionDepotRowModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "仓库排代码")
 			ret = models.Init(models.PositionDepotRowModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "仓库排名称")
 
@@ -100,7 +100,7 @@ func (PositionDepotRowRouter) Load(engine *gin.Engine) {
 				PositionDepotRowType: form.PositionDepotRowType,
 				PositionDepotSection: form.PositionDepotSection,
 			}
-			if ret = models.Init(models.PositionDepotRowModel{}).Prepare().Create(&positionDepotRow); ret.Error != nil {
+			if ret = models.Init(models.PositionDepotRowModel{}).Prepare("").Create(&positionDepotRow); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -117,12 +117,12 @@ func (PositionDepotRowRouter) Load(engine *gin.Engine) {
 			// 查询
 			ret = models.Init(models.PositionDepotRowModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&positionDepotRow)
 			wrongs.PanicWhenIsEmpty(ret, "仓库排")
 
 			// 删除
-			if ret := models.Init(models.PositionDepotRowModel{}).Prepare().Delete(&positionDepotRow); ret.Error != nil {
+			if ret := models.Init(models.PositionDepotRowModel{}).Prepare("").Delete(&positionDepotRow); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -143,20 +143,20 @@ func (PositionDepotRowRouter) Load(engine *gin.Engine) {
 			ret = models.Init(models.PositionDepotRowModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "仓库排代码")
 			ret = models.Init(models.PositionDepotRowModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "仓库排名称")
 
 			// 查询
 			ret = models.Init(models.PositionDepotRowModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&positionDepotRow)
 			wrongs.PanicWhenIsEmpty(ret, "仓库排")
 
@@ -166,7 +166,7 @@ func (PositionDepotRowRouter) Load(engine *gin.Engine) {
 			positionDepotRow.Name = form.Name
 			positionDepotRow.PositionDepotRowType = form.PositionDepotRowType
 			positionDepotRow.PositionDepotSection = form.PositionDepotSection
-			if ret = models.Init(models.PositionDepotRowModel{}).Prepare().Save(&positionDepotRow); ret.Error != nil {
+			if ret = models.Init(models.PositionDepotRowModel{}).Prepare("").Save(&positionDepotRow); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -181,7 +181,7 @@ func (PositionDepotRowRouter) Load(engine *gin.Engine) {
 			)
 			ret = models.Init(models.PositionDepotRowModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&locationDepotRow)
 			wrongs.PanicWhenIsEmpty(ret, "仓库排")
 
@@ -193,7 +193,7 @@ func (PositionDepotRowRouter) Load(engine *gin.Engine) {
 			var locationDepotRows []models.PositionDepotRowModel
 			models.Init(models.PositionDepotRowModel{}).
 				SetWhereFields().
-				PrepareQuery(ctx).
+				PrepareQuery(ctx,"").
 				Find(&locationDepotRows)
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"position_depot_rows": locationDepotRows}))

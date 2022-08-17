@@ -55,14 +55,14 @@ func (RbacPermissionGroupRouter) Load(engine *gin.Engine) {
 			// 查重
 			ret = models.Init(models.RbacPermissionGroupModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "权限分组名称")
 
 			// 保存
 			rbacPermissionGroup := &models.RbacPermissionGroupModel{Name: form.Name}
 			if ret = models.Init(models.RbacPermissionGroupModel{}).
-				Prepare().
+				Prepare("").
 				Create(&rbacPermissionGroup); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
@@ -79,17 +79,17 @@ func (RbacPermissionGroupRouter) Load(engine *gin.Engine) {
 			// 查询
 			ret = models.Init(models.RbacPermissionGroupModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&rbacPermissionGroup)
 			wrongs.PanicWhenIsEmpty(ret, "权限分组")
 
 			// 删除权限分组
 			if len(rbacPermissionGroup.RbacPermissions) > 0 {
-				models.Init(models.RbacPermissionGroupModel{}).Prepare().Delete(&rbacPermissionGroup.RbacPermissions)
+				models.Init(models.RbacPermissionGroupModel{}).Prepare("").Delete(&rbacPermissionGroup.RbacPermissions)
 			}
 
 			// 删除
-			if ret = models.Init(models.RbacPermissionGroupModel{}).Prepare().Delete(&rbacPermissionGroup); ret.Error != nil {
+			if ret = models.Init(models.RbacPermissionGroupModel{}).Prepare("").Delete(&rbacPermissionGroup); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -112,20 +112,20 @@ func (RbacPermissionGroupRouter) Load(engine *gin.Engine) {
 			ret = models.Init(models.RbacPermissionGroupModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": uuid}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "权限分组名称")
 
 			// 查询
 			ret = models.Init(models.RbacPermissionGroupModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&rbacPermissionGroup)
 			wrongs.PanicWhenIsEmpty(ret, "权限分组")
 
 			// 修改
 			rbacPermissionGroup.Name = form.Name
-			models.Init(models.RbacPermissionGroupModel{}).Prepare().Save(&rbacPermissionGroup)
+			models.Init(models.RbacPermissionGroupModel{}).Prepare("").Save(&rbacPermissionGroup)
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"rbac_permission_group": rbacPermissionGroup}))
 		})
@@ -140,7 +140,7 @@ func (RbacPermissionGroupRouter) Load(engine *gin.Engine) {
 			ret = models.Init(models.RbacPermissionGroupModel{}).
 				SetWheres(tools.Map{"uuid": uuid}).
 				SetPreloads("RbacPermissions").
-				Prepare().
+				Prepare("").
 				First(&rbacPermissionGroup)
 			wrongs.PanicWhenIsEmpty(ret, "权限分组")
 
@@ -152,7 +152,7 @@ func (RbacPermissionGroupRouter) Load(engine *gin.Engine) {
 			var rbacPermissionGroups []models.RbacPermissionGroupModel
 			models.Init(models.RbacPermissionGroupModel{}).
 				SetPreloads("RbacPermissions").
-				PrepareQuery(ctx).
+				PrepareQuery(ctx,"").
 				Find(&rbacPermissionGroups)
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"rbac_permission_groups": rbacPermissionGroups}))

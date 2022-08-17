@@ -120,12 +120,12 @@ func (AccountRouter) Load(engine *gin.Engine) {
 			var ret *gorm.DB
 			ret = (&models.BaseModel{}).
 				SetWheres(tools.Map{"username": form.Username}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "用户名")
 			ret = (&models.BaseModel{}).
 				SetWheres(tools.Map{"nickname": form.Nickname}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "昵称")
 
@@ -138,7 +138,7 @@ func (AccountRouter) Load(engine *gin.Engine) {
 				Password:  string(bytes),
 				Nickname:  form.Nickname,
 			}
-			if ret = models.Init(models.AccountModel{}).SetOmits(clause.Associations).Prepare().Create(&account); ret.Error != nil {
+			if ret = models.Init(models.AccountModel{}).SetOmits(clause.Associations).Prepare("").Create(&account); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -157,13 +157,13 @@ func (AccountRouter) Load(engine *gin.Engine) {
 			ret = models.Init(models.AccountModel{}).
 				SetWheres(tools.Map{"username": form.Username}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "用户账号")
 			ret = models.Init(models.AccountModel{}).
 				SetWheres(tools.Map{"nickname": form.Nickname}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "用户昵称")
 
@@ -173,7 +173,7 @@ func (AccountRouter) Load(engine *gin.Engine) {
 			// 编辑
 			account.Username = form.Username
 			account.Nickname = form.Nickname
-			if ret = models.Init(models.AccountModel{}).Prepare().Save(&account); ret.Error != nil {
+			if ret = models.Init(models.AccountModel{}).Prepare("").Save(&account); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -199,7 +199,7 @@ func (AccountRouter) Load(engine *gin.Engine) {
 			bytes, _ := bcrypt.GenerateFromPassword([]byte(form.NewPassword), 14)
 			account.Password = string(bytes)
 
-			if ret = models.Init(models.AccountModel{}).Prepare().Save(&account); ret.Error != nil {
+			if ret = models.Init(models.AccountModel{}).Prepare("").Save(&account); ret.Error != nil {
 				wrongs.PanicForbidden("编辑失败：" + ret.Error.Error())
 			}
 
@@ -213,7 +213,7 @@ func (AccountRouter) Load(engine *gin.Engine) {
 			ret = models.Init(models.AccountModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				SetPreloads("RbacRoles","RbacRoles.RbacPermissions").
-				Prepare().
+				Prepare("").
 				First(&account)
 			wrongs.PanicWhenIsEmpty(ret, "用户")
 
@@ -225,7 +225,7 @@ func (AccountRouter) Load(engine *gin.Engine) {
 			var accounts []models.AccountModel
 			models.Init(models.AccountModel{}).
 				SetPreloads("AccountStatus").
-				PrepareQuery(ctx).
+				PrepareQuery(ctx,"").
 				Find(&accounts)
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"accounts": accounts}))

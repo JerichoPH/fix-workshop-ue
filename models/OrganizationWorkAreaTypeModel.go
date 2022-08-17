@@ -22,7 +22,7 @@ func (OrganizationWorkAreaTypeModel) TableName() string {
 //  @param uuid
 //  @return OrganizationWorkAreaTypeModel
 func (cls OrganizationWorkAreaTypeModel) FindOneByUUID(uuid string) OrganizationWorkAreaTypeModel {
-	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare().First(&cls); ret.Error != nil {
+	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare("").First(&cls); ret.Error != nil {
 		panic(wrongs.PanicWhenIsEmpty(ret, "工区类型"))
 	}
 

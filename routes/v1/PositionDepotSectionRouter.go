@@ -43,7 +43,7 @@ func (cls PositionDepotSectionStoreForm) ShouldBind(ctx *gin.Context) PositionDe
 	}
 	ret = models.Init(models.PositionDepotStorehouseModel{}).
 		SetWheres(tools.Map{"uuid": cls.PositionDepotStorehouseUUID}).
-		Prepare().
+		Prepare("").
 		First(&cls.PositionDepotStorehouse)
 	wrongs.PanicWhenIsEmpty(ret, "所属仓库")
 
@@ -73,12 +73,12 @@ func (cls PositionDepotSectionRouter) Load(engine *gin.Engine) {
 			// 查重
 			ret = models.Init(models.PositionDepotSectionModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "仓库区域代码")
 			ret = models.Init(models.PositionDepotSectionModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "仓库区域名称")
 
@@ -89,7 +89,7 @@ func (cls PositionDepotSectionRouter) Load(engine *gin.Engine) {
 				Name:                    form.Name,
 				PositionDepotStorehouse: form.PositionDepotStorehouse,
 			}
-			if ret = models.Init(models.PositionDepotSectionModel{}).Prepare().Create(&positionDepotSection); ret.Error != nil {
+			if ret = models.Init(models.PositionDepotSectionModel{}).Prepare("").Create(&positionDepotSection); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -106,12 +106,12 @@ func (cls PositionDepotSectionRouter) Load(engine *gin.Engine) {
 			// 查询
 			ret = models.Init(models.PositionDepotSectionModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&positionDepotSection)
 			wrongs.PanicWhenIsEmpty(ret, "仓库区域")
 
 			// 删除
-			if ret := models.Init(models.PositionDepotSectionModel{}).Prepare().Delete(&positionDepotSection); ret.Error != nil {
+			if ret := models.Init(models.PositionDepotSectionModel{}).Prepare("").Delete(&positionDepotSection); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -132,20 +132,20 @@ func (cls PositionDepotSectionRouter) Load(engine *gin.Engine) {
 			ret = models.Init(models.PositionDepotSectionModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "仓库区域代码")
 			ret = models.Init(models.PositionDepotSectionModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "仓库区域名称")
 
 			// 查询
 			ret = models.Init(models.PositionDepotSectionModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&positionDepotSection)
 			wrongs.PanicWhenIsEmpty(ret, "仓库区域")
 
@@ -154,7 +154,7 @@ func (cls PositionDepotSectionRouter) Load(engine *gin.Engine) {
 			positionDepotSection.UniqueCode = form.UniqueCode
 			positionDepotSection.Name = form.Name
 			positionDepotSection.PositionDepotStorehouse = form.PositionDepotStorehouse
-			if ret = models.Init(models.PositionDepotSectionModel{}).Prepare().Save(&positionDepotSection); ret.Error != nil {
+			if ret = models.Init(models.PositionDepotSectionModel{}).Prepare("").Save(&positionDepotSection); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -169,7 +169,7 @@ func (cls PositionDepotSectionRouter) Load(engine *gin.Engine) {
 			)
 			ret = models.Init(models.PositionDepotSectionModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&positionDepotSection)
 			wrongs.PanicWhenIsEmpty(ret, "仓库区域")
 
@@ -181,7 +181,7 @@ func (cls PositionDepotSectionRouter) Load(engine *gin.Engine) {
 			var positionDepotSections []models.PositionDepotSectionModel
 			models.Init(models.PositionDepotSectionModel{}).
 				SetWhereFields().
-				PrepareQuery(ctx).
+				PrepareQuery(ctx,"").
 				Find(&positionDepotSections)
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"position_depot_sections": positionDepotSections}))

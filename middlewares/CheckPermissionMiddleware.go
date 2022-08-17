@@ -34,7 +34,7 @@ func CheckPermission() gin.HandlerFunc {
 					"uri":    ctx.FullPath(),
 					"method": ctx.Request.Method,
 				}).
-				Prepare().
+				Prepare("").
 				First(&rbacPermission)
 			if ret.Error != nil {
 				if errors.Is(ret.Error, gorm.ErrRecordNotFound) {
@@ -42,7 +42,7 @@ func CheckPermission() gin.HandlerFunc {
 				}
 			}
 
-			models.Init(models.BaseModel{}).Prepare().Raw(`select prp.rbac_role_id
+			models.Init(models.BaseModel{}).Prepare("").Raw(`select prp.rbac_role_id
 from pivot_rbac_role_and_rbac_permissions as prp
          join rbac_roles r on prp.rbac_role_id = r.id
          join rbac_permissions p on prp.rbac_permission_id = p.id

@@ -43,7 +43,7 @@ func (cls PositionIndoorRowStoreForm) ShouldBind(ctx *gin.Context) PositionIndoo
 	}
 	ret = models.Init(models.PositionIndoorRoomModel{}).
 		SetWheres(tools.Map{"uuid": cls.PositionIndoorRoomUUID}).
-		Prepare().
+		Prepare("").
 		First(&cls.PositionIndoorRoom)
 	wrongs.PanicWhenIsEmpty(ret, "所属机房")
 
@@ -73,12 +73,12 @@ func (PositionIndoorRowRouter) Load(engine *gin.Engine) {
 			// 查重
 			ret = models.Init(models.PositionIndoorRowModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "排代码")
 			ret = models.Init(models.PositionIndoorRowModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "排名称")
 
@@ -89,7 +89,7 @@ func (PositionIndoorRowRouter) Load(engine *gin.Engine) {
 				Name:               form.Name,
 				PositionIndoorRoom: form.PositionIndoorRoom,
 			}
-			if ret = models.Init(models.PositionIndoorRowModel{}).Prepare().Create(&positionIndoorRow); ret.Error != nil {
+			if ret = models.Init(models.PositionIndoorRowModel{}).Prepare("").Create(&positionIndoorRow); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -106,12 +106,12 @@ func (PositionIndoorRowRouter) Load(engine *gin.Engine) {
 			// 查询
 			ret = models.Init(models.PositionIndoorRowModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&positionIndoorRow)
 			wrongs.PanicWhenIsEmpty(ret, "排")
 
 			// 删除
-			if ret := models.Init(models.PositionIndoorRowModel{}).Prepare().Delete(&positionIndoorRow); ret.Error != nil {
+			if ret := models.Init(models.PositionIndoorRowModel{}).Prepare("").Delete(&positionIndoorRow); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -132,20 +132,20 @@ func (PositionIndoorRowRouter) Load(engine *gin.Engine) {
 			ret = models.Init(models.PositionIndoorRowModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "排代码")
 			ret = models.Init(models.PositionIndoorRowModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "排名称")
 
 			// 查询
 			ret = models.Init(models.PositionIndoorRowModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&positionIndoorRow)
 			wrongs.PanicWhenIsEmpty(ret, "排")
 
@@ -154,7 +154,7 @@ func (PositionIndoorRowRouter) Load(engine *gin.Engine) {
 			positionIndoorRow.UniqueCode = form.UniqueCode
 			positionIndoorRow.Name = form.Name
 			positionIndoorRow.PositionIndoorRoom = form.PositionIndoorRoom
-			if ret = models.Init(models.PositionIndoorRowModel{}).Prepare().Save(&positionIndoorRow); ret.Error != nil {
+			if ret = models.Init(models.PositionIndoorRowModel{}).Prepare("").Save(&positionIndoorRow); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -169,7 +169,7 @@ func (PositionIndoorRowRouter) Load(engine *gin.Engine) {
 			)
 			ret = models.Init(models.PositionIndoorRowModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&positionIndoorRow)
 			wrongs.PanicWhenIsEmpty(ret, "排")
 
@@ -181,7 +181,7 @@ func (PositionIndoorRowRouter) Load(engine *gin.Engine) {
 			var positionIndoorRows []models.PositionIndoorRowModel
 			models.Init(models.PositionIndoorRowModel{}).
 				SetWhereFields().
-				PrepareQuery(ctx).
+				PrepareQuery(ctx,"").
 				Find(&positionIndoorRows)
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"position_indoor_rows": positionIndoorRows}))

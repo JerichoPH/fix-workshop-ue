@@ -59,12 +59,12 @@ func (PositionIndoorRoomTypeRouter) Load(engine *gin.Engine) {
 			var repeat models.PositionIndoorRoomTypeModel
 			ret = models.Init(models.PositionIndoorRoomTypeModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "机房代码")
 			ret = models.Init(models.PositionIndoorRoomTypeModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "机房名称")
 
@@ -74,7 +74,7 @@ func (PositionIndoorRoomTypeRouter) Load(engine *gin.Engine) {
 				UniqueCode:          form.UniqueCode,
 				Name:                form.Name,
 			}
-			if ret = models.Init(models.PositionIndoorRoomTypeModel{}).Prepare().Create(&positionIndoorRoomType); ret.Error != nil {
+			if ret = models.Init(models.PositionIndoorRoomTypeModel{}).Prepare("").Create(&positionIndoorRoomType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -87,7 +87,7 @@ func (PositionIndoorRoomTypeRouter) Load(engine *gin.Engine) {
 			locationIndoorRoomType := (&models.PositionIndoorRoomTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 删除
-			if ret := models.Init(models.PositionIndoorRoomTypeModel{}).Prepare().Delete(&locationIndoorRoomType); ret.Error != nil {
+			if ret := models.Init(models.PositionIndoorRoomTypeModel{}).Prepare("").Delete(&locationIndoorRoomType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -106,13 +106,13 @@ func (PositionIndoorRoomTypeRouter) Load(engine *gin.Engine) {
 			ret = models.Init(models.PositionIndoorRoomTypeModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "机房代码")
 			ret = models.Init(models.PositionIndoorRoomTypeModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "机房名称")
 
@@ -123,7 +123,7 @@ func (PositionIndoorRoomTypeRouter) Load(engine *gin.Engine) {
 			positionIndoorRoomType.BaseModel.Sort = form.Sort
 			positionIndoorRoomType.UniqueCode = form.UniqueCode
 			positionIndoorRoomType.Name = form.Name
-			if ret = models.Init(models.PositionIndoorRoomTypeModel{}).Prepare().Save(&positionIndoorRoomType); ret.Error != nil {
+			if ret = models.Init(models.PositionIndoorRoomTypeModel{}).Prepare("").Save(&positionIndoorRoomType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -142,7 +142,7 @@ func (PositionIndoorRoomTypeRouter) Load(engine *gin.Engine) {
 			var positionIndoorRoomTypes []models.PositionIndoorRoomTypeModel
 			models.Init(models.PositionIndoorRoomTypeModel{}).
 				SetWhereFields().
-				PrepareQuery(ctx).
+				PrepareQuery(ctx,"").
 				Find(&positionIndoorRoomTypes)
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"position_indoor_room_types": positionIndoorRoomTypes}))

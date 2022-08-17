@@ -37,7 +37,7 @@ func (cls MenuStoreForm) ShouldBind(ctx *gin.Context) MenuStoreForm {
 		wrongs.PanicValidate("菜单名称必填")
 	}
 	if len(cls.RbacRoleUUIDs) > 0 {
-		models.Init(models.RbacRoleModel{}).Prepare().Where("uuid in ?", cls.RbacRoleUUIDs).Find(&cls.RbacRoles)
+		models.Init(models.RbacRoleModel{}).Prepare("").Where("uuid in ?", cls.RbacRoleUUIDs).Find(&cls.RbacRoles)
 	}
 
 	return cls
@@ -65,7 +65,7 @@ func (MenuRouter) Load(engine *gin.Engine) {
 			ret = (&models.BaseModel{}).
 				SetModel(models.MenuModel{}).
 				SetWheres(tools.Map{"name": form.Name, "url": form.URL}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "菜单名称和URL")
 
@@ -79,7 +79,7 @@ func (MenuRouter) Load(engine *gin.Engine) {
 				ParentUUID: form.ParentUUID,
 				RbacRoles:  form.RbacRoles,
 			}
-			if ret = (&models.BaseModel{}).SetModel(models.MenuModel{}).Prepare().Create(&menu); ret.Error != nil {
+			if ret = (&models.BaseModel{}).SetModel(models.MenuModel{}).Prepare("").Create(&menu); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -94,7 +94,7 @@ func (MenuRouter) Load(engine *gin.Engine) {
 			menu := (&models.MenuModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 删除
-			if ret = models.Init(models.MenuModel{}).Prepare().Delete(&menu); ret.Error != nil {
+			if ret = models.Init(models.MenuModel{}).Prepare("").Delete(&menu); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -114,7 +114,7 @@ func (MenuRouter) Load(engine *gin.Engine) {
 				SetModel(models.MenuModel{}).
 				SetWheres(tools.Map{"name": form.Name, "url": form.URL}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare().
+				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "菜单名称和URL")
 
@@ -128,7 +128,7 @@ func (MenuRouter) Load(engine *gin.Engine) {
 			menu.Icon = form.Icon
 			menu.ParentUUID = form.ParentUUID
 			menu.RbacRoles = form.RbacRoles
-			if ret = models.Init(models.MenuModel{}).Prepare().Save(&menu); ret.Error != nil {
+			if ret = models.Init(models.MenuModel{}).Prepare("").Save(&menu); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -147,7 +147,7 @@ func (MenuRouter) Load(engine *gin.Engine) {
 			models.Init(models.MenuModel{}).
 				SetWhereFields("uuid", "name", "url", "parent_uuid").
 				SetPreloads("Parent", "Subs", "RbacRoles").
-				PrepareQuery(ctx).
+				PrepareQuery(ctx,"").
 				Find(&menus)
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"menus": menus}))
