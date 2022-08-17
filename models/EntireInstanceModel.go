@@ -35,7 +35,7 @@ type EntireInstanceModel struct {
 	SaidRod                        string                    `gorm:"type:VARCHAR(64);NOT NULL;DEFAULT:'';COMMENT:表示杆特征;" json:"said_rod"`
 
 	// 使用信息
-	UseExpirationAt                   time.Time              `gorm:"COMMENT:到期日期;" json:"use_expiration_at"`
+	UseExpireAt                       time.Time              `gorm:"COMMENT:到期日期;" json:"use_expire_at"`
 	UseDestroyAt                      time.Time              `gorm:"COMMENT:报废日期；" json:"use_destroy_at"`
 	UseNextCycleRepairAt              time.Time              `gorm:"COMMENT:下次周期修日期;" json:"use_next_cycle_repair_at"`
 	UseWarehouseInAt                  time.Time              `gorm:"COMMENT:入库时间;'" json:"use_warehouse_in_at"`
@@ -104,6 +104,9 @@ type EntireInstanceModel struct {
 	ExCycleRepairYear int16 `gorm:"type:INT2;NOT NULL;DEFAULT:0;COMMENT:周期修年;" json:"ex_cycle_repair_year"`
 	ExLifeYear        int16 `gorm:"type:INT2;NOT NULL;DEFAULT:15;COMMENT:;" json:"ex_life_year"`
 
+	// 关联
+	EntireInstanceLock *EntireInstanceLockModel `gorm:"foreignKey:EntireInstanceIdentityCode;references:IdentityCode;COMMENT:相关锁;" json:"entire_instance_lock"`
+
 	//LockName        string `gorm:"type:VARCHAR(64);COMMENT:锁名称;" json:"lock_name"`
 	//LockDescription string `gorm:"type:TEXT;COMMENT:锁说明;" json:"lock_description"`
 	//EntireInstanceUses             []EntireInstanceUseModel   `gorm:"foreignKey:EntireInstanceIdentityCode;references:IdentityCode;COMMENT:使用信息;" json:"entire_instance_uses"`
@@ -112,6 +115,8 @@ type EntireInstanceModel struct {
 }
 
 // TableName 表名称
+//  @receiver EntireInstanceModel
+//  @return string
 func (EntireInstanceModel) TableName() string {
 	return "entire_instances"
 }

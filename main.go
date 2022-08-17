@@ -97,8 +97,11 @@ func runAutoMigrate() {
 		&models.KindSubTypeModel{},    // 型号
 
 		// 器材
-		&models.EntireInstanceModel{},       // 器材
-		&models.EntireInstanceStatusModel{}, // 器材状态
+		&models.EntireInstanceModel{},        // 器材
+		&models.EntireInstanceStatusModel{},  // 器材状态
+		&models.EntireInstanceLockModel{},    // 器材锁
+		&models.EntireInstanceLogTypeModel{}, // 器材日志类型
+		&models.EntireInstanceLogModel{},     // 器材日志
 	); errAutoMigrate != nil {
 		fmt.Println("数据库迁移错误")
 		os.Exit(1)
