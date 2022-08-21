@@ -96,20 +96,19 @@ func (OrganizationWorkAreaRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsRepeat(ret, "工区名称")
 
 			// 新建
-			organizationWorkArea := &models.OrganizationWorkAreaModel{
-				BaseModel:                          models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
-				UniqueCode:                         form.UniqueCode,
-				Name:                               form.Name,
-				BeEnable:                           form.BeEnable,
-				OrganizationWorkAreaType:           form.OrganizationWorkAreaType,
-				OrganizationWorkAreaProfessionUUID: "",
-				OrganizationWorkshop:               form.OrganizationWorkshop,
-			}
-			if ret = models.Init(models.OrganizationWorkAreaModel{}).Prepare("").Create(&organizationWorkArea); ret.Error != nil {
+			if ret = models.Init(models.OrganizationWorkAreaModel{}).Prepare("").Create(map[string]interface{}{
+				"sort":                                   form.Sort,
+				"uuid":                                   uuid.NewV4().String(),
+				"unique_code":                            form.UniqueCode,
+				"name":                                   form.Name,
+				"organization_work_area_type_uuid":       form.OrganizationWorkAreaTypeUUID,
+				"organization_work_area_profession_uuid": form.OrganizationWorkAreaProfessionUUID,
+				"organization_workshop_uuid":             form.OrganizationWorkshopUUID,
+			}); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"organization_work_area": organizationWorkArea}))
+			ctx.JSON(tools.CorrectIns("").Created(tools.Map{}))
 		})
 
 		// 删除
