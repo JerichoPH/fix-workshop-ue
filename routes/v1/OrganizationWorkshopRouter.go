@@ -180,7 +180,7 @@ func (OrganizationWorkshopRouter) Load(engine *gin.Engine) {
 			ret = models.Init(models.OrganizationWorkshopModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				SetWhereFields("be_enable").
-				PrepareQuery(ctx,"").
+				PrepareQuery(ctx, "").
 				First(&organizationWorkshop)
 			wrongs.PanicWhenIsEmpty(ret, "车间")
 
@@ -189,12 +189,22 @@ func (OrganizationWorkshopRouter) Load(engine *gin.Engine) {
 
 		// 列表
 		r.GET("", func(ctx *gin.Context) {
-			var organizationWorkshops []models.OrganizationWorkshopModel
+			var (
+				organizationWorkshops []models.OrganizationWorkshopModel
+				dbSession             *gorm.DB
+			)
 
-			models.Init(models.OrganizationWorkshopModel{}).
+			dbSession = models.Init(models.OrganizationWorkshopModel{}).
 				SetWhereFields("unique_code", "name", "be_enable", "organization_workshop_type_uuid", "organization_paragraph_uuid").
-				PrepareQuery(ctx,"").
-				Find(&organizationWorkshops)
+				PrepareQuery(ctx, "")
+
+			organizationWorkshopTypeUniqueCodes, exists := ctx.GetQueryArray("organization_workshop_type_unique_codes")
+			if exists {
+				dbSession = dbSession.Joins("join organization_workshop_types owt on organization_workshops.organization_workshop_type_uuid = owt.uuid").
+					Where("owt.unique_code in ?", organizationWorkshopTypeUniqueCodes)
+			}
+
+			dbSession.Find(&organizationWorkshops)
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_workshops": organizationWorkshops}))
 		})

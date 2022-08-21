@@ -109,11 +109,11 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 
 			// 新建
 			organizationRailway := &models.OrganizationRailwayModel{
-				BaseModel:     models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
-				UniqueCode:    form.UniqueCode,
-				Name:          form.Name,
-				ShortName:     form.ShortName,
-				BeEnable:      form.BeEnable,
+				BaseModel:  models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
+				UniqueCode: form.UniqueCode,
+				Name:       form.Name,
+				ShortName:  form.ShortName,
+				BeEnable:   form.BeEnable,
 			}
 			if ret = (&models.BaseModel{}).SetModel(models.OrganizationRailwayModel{}).Prepare("").Create(&organizationRailway); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
@@ -201,7 +201,7 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 			ret = models.Init(models.OrganizationRailwayModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				SetWhereFields("be_enable").
-				PrepareQuery(ctx,"").
+				PrepareQuery(ctx, "").
 				First(&organizationRailway)
 			wrongs.PanicWhenIsEmpty(ret, "路局")
 
@@ -210,11 +210,13 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 
 		// 列表
 		r.GET("", func(ctx *gin.Context) {
-			var organizationRailways []models.OrganizationRailwayModel
+			var (
+				organizationRailways []models.OrganizationRailwayModel
+			)
 
 			models.Init(models.OrganizationRailwayModel{}).
 				SetWhereFields("uuid", "sort", "unique_code", "name", "short_name", "be_enable").
-				PrepareQuery(ctx,"").
+				PrepareQuery(ctx, "").
 				Find(&organizationRailways)
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_railways": organizationRailways}))

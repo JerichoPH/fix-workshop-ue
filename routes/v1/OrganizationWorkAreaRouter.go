@@ -15,14 +15,16 @@ type OrganizationWorkAreaRouter struct{}
 
 // OrganizationWorkAreaStoreForm 新建工区表单
 type OrganizationWorkAreaStoreForm struct {
-	Sort                         int64  `form:"sort" json:"sort"`
-	UniqueCode                   string `form:"unique_code" json:"unique_code"`
-	Name                         string `form:"name" json:"name"`
-	BeEnable                     bool   `form:"be_enable" json:"be_enable"`
-	OrganizationWorkAreaTypeUUID string `form:"organization_work_area_type_uuid" json:"organization_work_area_type_uuid"`
-	OrganizationWorkAreaType     models.OrganizationWorkAreaTypeModel
-	OrganizationWorkshopUUID     string `form:"organization_workshop_uuid" json:"organization_workshop_uuid"`
-	OrganizationWorkshop         models.OrganizationWorkshopModel
+	Sort                               int64  `form:"sort" json:"sort"`
+	UniqueCode                         string `form:"unique_code" json:"unique_code"`
+	Name                               string `form:"name" json:"name"`
+	BeEnable                           bool   `form:"be_enable" json:"be_enable"`
+	OrganizationWorkAreaTypeUUID       string `form:"organization_work_area_type_uuid" json:"organization_work_area_type_uuid"`
+	OrganizationWorkAreaType           models.OrganizationWorkAreaTypeModel
+	OrganizationWorkAreaProfessionUUID string `form:"organization_work_area_profession_uuid" json:"organization_work_area_profession_uuid"`
+	OrganizationWorkAreaProfession     models.OrganizationWorkAreaProfessionModel
+	OrganizationWorkshopUUID           string `form:"organization_workshop_uuid" json:"organization_workshop_uuid"`
+	OrganizationWorkshop               models.OrganizationWorkshopModel
 }
 
 // ShouldBind 绑定表单
@@ -41,19 +43,23 @@ func (cls OrganizationWorkAreaStoreForm) ShouldBind(ctx *gin.Context) Organizati
 	if cls.Name == "" {
 		wrongs.PanicValidate("工区名称必填")
 	}
+
 	if cls.OrganizationWorkAreaTypeUUID == "" {
 		wrongs.PanicValidate("工区类型必选")
 	}
-	cls.OrganizationWorkAreaType = (&models.OrganizationWorkAreaTypeModel{}).FindOneByUUID(cls.OrganizationWorkAreaTypeUUID)
+	ret = models.Init(models.OrganizationWorkAreaTypeModel{}).SetWheres(map[string]interface{}{"uuid": cls.OrganizationWorkAreaTypeUUID}).Prepare("").First(&cls.OrganizationWorkAreaType)
+	wrongs.PanicWhenIsEmpty(ret, "工区类型")
+
 	if cls.OrganizationWorkshopUUID == "" {
 		wrongs.PanicValidate("所属车间必选")
 	}
-	ret = models.Init(models.OrganizationWorkshopModel{}).
-		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).
-		Prepare("").
-		First(&cls.OrganizationWorkshop)
-	wrongs.PanicWhenIsEmpty(ret, "车间")
+	ret = models.Init(models.OrganizationWorkshopModel{}).SetWheres(map[string]interface{}{"uuid": cls.OrganizationWorkshopUUID}).Prepare("").First(&cls.OrganizationWorkshop)
+	wrongs.PanicWhenIsEmpty(ret, "所属车间")
 
+	if cls.OrganizationWorkAreaProfessionUUID != "" {
+		ret = models.Init(models.OrganizationWorkAreaProfessionModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaProfessionUUID}).Prepare("").First(&cls.OrganizationWorkAreaProfession)
+		wrongs.PanicWhenIsEmpty(ret, "工区专业")
+	}
 	return cls
 }
 
@@ -91,12 +97,13 @@ func (OrganizationWorkAreaRouter) Load(engine *gin.Engine) {
 
 			// 新建
 			organizationWorkArea := &models.OrganizationWorkAreaModel{
-				BaseModel:                models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
-				UniqueCode:               form.UniqueCode,
-				Name:                     form.Name,
-				BeEnable:                 form.BeEnable,
-				OrganizationWorkAreaType: form.OrganizationWorkAreaType,
-				OrganizationWorkshop:     form.OrganizationWorkshop,
+				BaseModel:                          models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
+				UniqueCode:                         form.UniqueCode,
+				Name:                               form.Name,
+				BeEnable:                           form.BeEnable,
+				OrganizationWorkAreaType:           form.OrganizationWorkAreaType,
+				OrganizationWorkAreaProfessionUUID: "",
+				OrganizationWorkshop:               form.OrganizationWorkshop,
 			}
 			if ret = models.Init(models.OrganizationWorkAreaModel{}).Prepare("").Create(&organizationWorkArea); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
@@ -164,7 +171,18 @@ func (OrganizationWorkAreaRouter) Load(engine *gin.Engine) {
 			organizationWorkArea.BeEnable = form.BeEnable
 			organizationWorkArea.OrganizationWorkAreaType = form.OrganizationWorkAreaType
 			organizationWorkArea.OrganizationWorkshop = form.OrganizationWorkshop
-			if ret = models.Init(models.OrganizationWorkAreaModel{}).Prepare("").Save(&organizationWorkArea); ret.Error != nil {
+			if ret = models.Init(models.OrganizationWorkAreaModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+				Prepare("").
+				Updates(map[string]interface{}{
+					"unique_code":                            form.UniqueCode,
+					"name":                                   form.Name,
+					"organization_work_area_type_uuid":       form.OrganizationWorkAreaType.UUID,
+					"organization_work_area_profession_uuid": form.OrganizationWorkAreaProfessionUUID,
+					"be_enable":                              form.BeEnable,
+					"organization_workshop_uuid":             form.OrganizationWorkshopUUID,
+				}).
+				Save(&organizationWorkArea); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -180,7 +198,7 @@ func (OrganizationWorkAreaRouter) Load(engine *gin.Engine) {
 			ret = models.Init(models.OrganizationWorkAreaModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				SetWhereFields("be_enable").
-				PrepareQuery(ctx,"").
+				PrepareQuery(ctx, "").
 				First(&organizationWorkArea)
 			wrongs.PanicWhenIsEmpty(ret, "工区")
 
@@ -192,7 +210,7 @@ func (OrganizationWorkAreaRouter) Load(engine *gin.Engine) {
 			var organizationWorkAreas []models.OrganizationWorkAreaModel
 			models.Init(models.OrganizationWorkAreaModel{}).
 				SetWhereFields("unique_code", "name", "be_enable", "organization_work_area_type_uuid", "organization_workshop_uuid").
-				PrepareQuery(ctx,"").
+				PrepareQuery(ctx, "").
 				Find(&organizationWorkAreas)
 
 			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_work_areas": organizationWorkAreas}))

@@ -15,5 +15,5 @@ type LocationRailroadGradeCrossModel struct {
 
 // TableName 表名称
 func (LocationRailroadGradeCrossModel) TableName() string {
-	return "organization_railroad_grade_crosses"
+	return "location_railroad_grade_crosses"
 }
