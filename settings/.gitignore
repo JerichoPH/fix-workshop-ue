@@ -1,1 +1,2 @@
-*.ini
+./app.ini
+./db.ini
