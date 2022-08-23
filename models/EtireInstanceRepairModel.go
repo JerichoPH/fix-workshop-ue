@@ -6,7 +6,7 @@ import (
 
 type EntireInstanceRepairModel struct {
 	BaseModel
-	EntireInstanceIdentityCode string              `gorm:"type:VARCHAR(19);NOT NULL;COMMENT:所属器材唯一编号;" json:"entire_instance_identity_code"`
+	EntireInstanceIdentityCode string              `gorm:"type:VARCHAR(19);COMMENT:所属器材唯一编号;" json:"entire_instance_identity_code"`
 	EntireInstance             EntireInstanceModel `gorm:"constraint:OnUpdate:CASCADE;foreignKey:EntireInstanceIdentityCode;references:IdentityCode;COMMENT:所属器材;" json:"entire_instance"`
 	FixerName                  string              `gorm:"type:VARCHAR(64);COMMENT:检修人;" json:"fixer_name"`
 	FixedAt                    time.Time           `gorm:"type:DATETIME;COMMENT:检修时间;" json:"fixed_at"`

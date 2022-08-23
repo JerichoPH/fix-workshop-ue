@@ -3,8 +3,8 @@ package models
 // OrganizationWorkshopModel 车间
 type OrganizationWorkshopModel struct {
 	BaseModel
-	UniqueCode                      string                            `gorm:"type:CHAR(7);NOT NULL;COMMENT:车间代码;" json:"unique_code"`
-	Name                            string                            `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:车间名称;" json:"name"`
+	UniqueCode                      string                            `gorm:"type:CHAR(7);COMMENT:车间代码;" json:"unique_code"`
+	Name                            string                            `gorm:"type:VARCHAR(64);COMMENT:车间名称;" json:"name"`
 	BeEnable                        bool                              `gorm:"type:BOOLEAN;DEFAULT:1;COMMENT:是否启用;" json:"be_enable"`
 	OrganizationWorkshopTypeUUID    string                            `gorm:"type:CHAR(36);COMMENT:车间类型UUID;" json:"organization_workshop_type_uuid"`
 	OrganizationWorkshopType        OrganizationWorkshopTypeModel     `gorm:"foreignKey:OrganizationWorkshopTypeUUID;references:UUID;COMMENT:所属类型;" json:"organization_workshop_type"`
@@ -13,7 +13,7 @@ type OrganizationWorkshopModel struct {
 	OrganizationWorkAreas           []OrganizationWorkAreaModel       `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;COMMENT:相关工区;" json:"organization_work_areas"`
 	LocationSections                []LocationSectionModel            `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;COMMENT:相关区间;" json:"location_sections"`
 	LocationStations                []LocationStationModel            `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;COMMENT:相关站场;" json:"location_stations"`
-	LocationCenters                 []LocationCenterModel             `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;NOT NULL;COMMENT:相关中心;" json:"location_centers"`
+	LocationCenters                 []LocationCenterModel             `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;COMMENT:相关中心;" json:"location_centers"`
 	LocationRailroadGradeCrossModel []LocationRailroadGradeCrossModel `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;COMMENT:相关道口;" json:"location_railroad_grade_crosses"`
 	LocationDepotStorehouses        []PositionDepotStorehouseModel    `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;COMMENT:相关仓储库房;" json:"location_depot_storehouses"`
 }

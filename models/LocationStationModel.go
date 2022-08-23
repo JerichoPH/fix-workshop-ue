@@ -2,8 +2,8 @@ package models
 
 type LocationStationModel struct {
 	BaseModel
-	UniqueCode               string                    `gorm:"type:CHAR(6);NOT NULL;COMMENT:站场代码;" json:"unique_code"` // G00001
-	Name                     string                    `gorm:"type:VARCHAR(64);NOT NULL;COMMENT:站场名称;" json:"name"`
+	UniqueCode               string                    `gorm:"type:CHAR(6);COMMENT:站场代码;" json:"unique_code"` // G00001
+	Name                     string                    `gorm:"type:VARCHAR(64);COMMENT:站场名称;" json:"name"`
 	BeEnable                 bool                      `gorm:"type:BOOLEAN;DEFAULT:1;COMMENT:是否启用;" json:"be_enable"`
 	OrganizationWorkshopUUID string                    `gorm:"type:CHAR(36);COMMENT:所属车间uuid;" json:"organization_workshop_uuid"`
 	OrganizationWorkshop     OrganizationWorkshopModel `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;COMMENT:所属车间;" json:"organization_workshop"`

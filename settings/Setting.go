@@ -1,11 +1,16 @@
 package settings
 
-import "gopkg.in/ini.v1"
+import (
+	"gopkg.in/ini.v1"
+	"time"
+)
 
 // Setting 设置
 type Setting struct {
-	App *ini.File
-	DB  *ini.File
+	App      *ini.File
+	DB       *ini.File
+	Time     time.Time
+	Timezone *time.Location
 }
 
 // Init 获取配置文件
@@ -25,6 +30,8 @@ func (cls *Setting) Init() *Setting {
 
 	cls.App = appConfigFile
 	cls.DB = dbConfigFile
+	cls.Timezone, _ = time.LoadLocation(cls.App.Section("app").Key("timezone").MustString("Asia/Shanghai"))
+	cls.Time = (&time.Time{}).In(cls.Timezone)
 
 	return cls
 }

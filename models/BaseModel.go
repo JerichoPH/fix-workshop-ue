@@ -2,6 +2,7 @@ package models
 
 import (
 	"fix-workshop-ue/databases"
+	"fix-workshop-ue/settings"
 	"fix-workshop-ue/tools"
 	"fix-workshop-ue/wrongs"
 	"github.com/gin-gonic/gin"
@@ -13,11 +14,11 @@ import (
 // BaseModel 出厂数据、财务数据、检修数据、仓储数据、流转数据、运用数据
 type BaseModel struct {
 	ID             uint64         `gorm:"primaryKey" json:"id"`
-	CreatedAt      time.Time      `gorm:"auto_now_add;" json:"created_at"`
+	CreatedAt      time.Time      `json:"created_at"`
 	UpdatedAt      time.Time      `json:"updated_at"`
 	DeletedAt      gorm.DeletedAt `gorm:"index" json:"deleted_at"`
-	UUID           string         `gorm:"type:CHAR(36);NOT NULL;COMMENT:uuid;" json:"uuid"`
-	Sort           int64          `gorm:"type:BIGINT;DEFAULT:0;NOT NULL;COMMENT:排序;" json:"sort"`
+	UUID           string         `gorm:"type:CHAR(36);COMMENT:uuid;" json:"uuid"`
+	Sort           int64          `gorm:"type:BIGINT;DEFAULT:0;COMMENT:排序;" json:"sort"`
 	preloads       []string
 	selects        []string
 	omits          []string
@@ -144,17 +145,20 @@ func (cls *BaseModel) SetScopes(scopes ...func(*gorm.DB) *gorm.DB) *BaseModel {
 
 // BeforeCreate 插入数据前
 func (cls *BaseModel) BeforeCreate(db *gorm.DB) (err error) {
-	//cls.CreatedAt = sql.NullTime{Time: time.Now(), Valid: true}
-	//cls.UpdatedAt = sql.NullTime{Time: time.Now(), Valid: true}
-	cls.CreatedAt = time.Now()
-	cls.UpdatedAt = time.Now()
+	cfg := (&settings.Setting{}).Init()
+	cls.CreatedAt = time.Now().In(cfg.Timezone)
+	cls.UpdatedAt = time.Now().In(cfg.Timezone)
+
 	return
 }
 
 // BeforeSave 修改数据前
 func (cls *BaseModel) BeforeSave(db *gorm.DB) (err error) {
-	//cls.UpdatedAt = sql.NullTime{Time: time.Now(), Valid: true}
+	//cfg := (&settings.Setting{}).Init()
 	cls.UpdatedAt = time.Now()
+	//l, _ := time.LoadLocation("Asia/Shanghai")
+	//t := time.Now().In(l)
+	//cls.UpdatedAt = t
 	return
 }
 
