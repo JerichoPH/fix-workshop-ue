@@ -12,17 +12,17 @@ type EntireInstanceUseModel struct {
 	PrevInAt                     time.Time                 `gorm:"type:DATETIME;COMMENT:上一次入所时间;" json:"prev_in_at"`
 	OutAt                        time.Time                 `gorm:"type:DATETIME;COMMENT:出所时间;" json:"out_at"`
 	PrevOutAt                       time.Time                 `gorm:"type:DATETIME;COMMENT:上一次出所时间;" json:"prev_out_at"`
-	OrganizationLineUUID            string                    `gorm:"type:CHAR(36);COMMENT:所属线别代码;" json:"organization_line_unique_code"`
+	OrganizationLineUUID            string                    `gorm:"type:VARCHAR(36);COMMENT:所属线别代码;" json:"organization_line_unique_code"`
 	OrganizationLine                LocationLineModel         `gorm:"foreignKey:OrganizationLineUUID;references:UUID;COMMENT:所属线别;" json:"organization_line"`
-	PrevOrganizationLineUUID        string                    `gorm:"type:CHAR(36);COMMENT:上一次线别代码;" json:"prev_organization_line_uuid"`
+	PrevOrganizationLineUUID        string                    `gorm:"type:VARCHAR(36);COMMENT:上一次线别代码;" json:"prev_organization_line_uuid"`
 	PrevOrganizationLine            LocationLineModel         `gorm:"foreignKey:PrevOrganizationLineUUID;references:UUID;COMMENT:上一次所属线别;" json:"prev_organization_line"`
-	OrganizationWorkshopUUID        string                    `gorm:"type:CHAR(36);COMMENT:所属车间代码;" json:"organization_workshop_uuid"`
+	OrganizationWorkshopUUID        string                    `gorm:"type:VARCHAR(36);COMMENT:所属车间代码;" json:"organization_workshop_uuid"`
 	OrganizationWorkshop            OrganizationWorkshopModel `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;COMMENT:所属车间;" json:"organization_workshop"`
-	PrevOrganizationWorkshopUUID    string                    `gorm:"type:CHAR(36);COMMENT:上一次所属车间代码;" json:"prev_organization_workshop_uuid"`
+	PrevOrganizationWorkshopUUID    string                    `gorm:"type:VARCHAR(36);COMMENT:上一次所属车间代码;" json:"prev_organization_workshop_uuid"`
 	PrevOrganizationWorkshop          OrganizationWorkshopModel `gorm:"foreignKey:PrevOrganizationWorkshopUUID;references:UUID;COMMENT:上一次所属车间;" json:"prev_organization_workshop"`
-	OrganizationStationUUID           string                    `gorm:"type:CHAR(36);COMMENT:所属车站代码;" json:"organization_station_uuid"`
+	OrganizationStationUUID           string                    `gorm:"type:VARCHAR(36);COMMENT:所属车站代码;" json:"organization_station_uuid"`
 	OrganizationStation               LocationStationModel      `gorm:"foreignKey:LocationStationUUID;references:UUID;COMMENT:所属车间;" json:"organization_station"`
-	PrevOrganizationStationUUID       string                    `gorm:"type:CHAR(36);COMMENT:上一次所属车站代码;" json:"prev_organization_station_uuid"`
+	PrevOrganizationStationUUID       string                    `gorm:"type:VARCHAR(36);COMMENT:上一次所属车站代码;" json:"prev_organization_station_uuid"`
 	PrevOrganizationStation           LocationStationModel      `gorm:"foreignKey:PrevOrganizationWorkshopUUID;references:UUID;COMMENT:上一次所属车间;" json:"prev_organization_station"`
 	OrganizationWorkAreaUUID          string                    `gorm:"type:CHAR(8);COMMENT:所属现场工区代码;" json:"organization_work_area_uuid"`
 	OrganizationWorkArea              OrganizationWorkAreaModel `gorm:"foreignKey:OrganizationWorkAreaUUID;references:UUID;COMMENT:所属工区;" json:"organization_work_area"`

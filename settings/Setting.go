@@ -35,3 +35,9 @@ func (cls *Setting) Init() *Setting {
 
 	return cls
 }
+
+// Boot 获取配置
+//  @return *Setting
+func Boot() *Setting {
+	return (&Setting{}).Init()
+}

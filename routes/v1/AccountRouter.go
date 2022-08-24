@@ -6,6 +6,7 @@ import (
 	"fix-workshop-ue/tools"
 	"fix-workshop-ue/wrongs"
 	"github.com/gin-gonic/gin"
+	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -184,6 +185,7 @@ func (AccountRouter) Load(engine *gin.Engine) {
 			bytes, _ := bcrypt.GenerateFromPassword([]byte(form.Password), 14)
 
 			account := &models.AccountModel{
+				BaseModel:             models.BaseModel{UUID: uuid.NewV4().String()},
 				Username:              form.Username,
 				Nickname:              form.Nickname,
 				Password:              string(bytes),
@@ -287,7 +289,6 @@ func (AccountRouter) Load(engine *gin.Engine) {
 			var account models.AccountModel
 			ret = models.Init(models.AccountModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				SetPreloads("RbacRoles", "RbacRoles.RbacPermissions").
 				Prepare("").
 				First(&account)
 			wrongs.PanicWhenIsEmpty(ret, "用户")
@@ -299,7 +300,6 @@ func (AccountRouter) Load(engine *gin.Engine) {
 		r.GET("", func(ctx *gin.Context) {
 			var accounts []models.AccountModel
 			models.Init(models.AccountModel{}).
-				SetPreloads("AccountStatus").
 				PrepareQuery(ctx, "").
 				Find(&accounts)
 

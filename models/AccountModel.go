@@ -13,13 +13,13 @@ type AccountModel struct {
 	Nickname                  string                     `gorm:"type:VARCHAR(64);COMMENT:昵称;" json:"nickname"`
 	DeleteEntireInstances     []*EntireInstanceModel     `gorm:"constraint:OnUpdate:CASCADE;foreignKey:DeleteOperatorUUID;references:UUID;COMMENT:相关删除的器材;" json:"delete_entire_instances"`
 	RbacRoles                 []*RbacRoleModel           `gorm:"many2many:pivot_rbac_role_and_accounts;foreignKey:id;joinForeignKey:account_id;References:id;joinReferences:rbac_role_id;COMMENT:角色与用户多对多;" json:"rbac_roles"`
-	OrganizationRailwayUUID   string                     `gorm:"type:CHAR(36);COMMENT:所属路局UUID;" json:"organization_railway_uuid"`
+	OrganizationRailwayUUID   string                     `gorm:"type:VARCHAR(36);COMMENT:所属路局UUID;" json:"organization_railway_uuid"`
 	OrganizationRailway       OrganizationRailwayModel   `gorm:"foreignKey:OrganizationRailwayUUID;references:UUID;COMMENT:所属路局;" json:"organization_railway"`
-	OrganizationParagraphUUID string                     `gorm:"type:CHAR(36);COMMENT:所属站段UUID;" json:"organization_paragraph_uuid"`
+	OrganizationParagraphUUID string                     `gorm:"type:VARCHAR(36);COMMENT:所属站段UUID;" json:"organization_paragraph_uuid"`
 	OrganizationParagraph     OrganizationParagraphModel `gorm:"foreignKey:OrganizationParagraphUUID;references:UUID;COMMENT:所属站段;" json:"organization_paragraph"`
-	OrganizationWorkshopUUID  string                     `gorm:"type:CHAR(36);COMMENT:所属车间UUID;" json:"organization_workshop_uuid"`
+	OrganizationWorkshopUUID  string                     `gorm:"type:VARCHAR(36);COMMENT:所属车间UUID;" json:"organization_workshop_uuid"`
 	OrganizationWorkshop      OrganizationWorkshopModel  `gorm:"foreignKey:OrganizationWorkshopUUID;references:UUID;COMMENT:所属车间;" json:"organization_workshop"`
-	OrganizationWorkAreaUUID  string                     `gorm:"type:CHAR(36);COMMENT:所属工区UUID;" json:"organization_work_area_uuid"`
+	OrganizationWorkAreaUUID  string                     `gorm:"type:VARCHAR(36);COMMENT:所属工区UUID;" json:"organization_work_area_uuid"`
 	OrganizationWorkArea      OrganizationWorkAreaModel  `gorm:"foreignKey:OrganizationWorkAreaUUID;references:UUID;COMMENT:所属工区;" json:"organization_work_area"`
 }
 

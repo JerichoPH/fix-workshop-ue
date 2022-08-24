@@ -2,7 +2,6 @@ package models
 
 import (
 	"fix-workshop-ue/databases"
-	"fix-workshop-ue/settings"
 	"fix-workshop-ue/tools"
 	"fix-workshop-ue/wrongs"
 	"github.com/gin-gonic/gin"
@@ -14,10 +13,10 @@ import (
 // BaseModel 出厂数据、财务数据、检修数据、仓储数据、流转数据、运用数据
 type BaseModel struct {
 	ID             uint64         `gorm:"primaryKey" json:"id"`
-	CreatedAt      time.Time      `json:"created_at"`
-	UpdatedAt      time.Time      `json:"updated_at"`
+	CreatedAt      time.Time      `gorm:"timestamptz" json:"created_at"`
+	UpdatedAt      time.Time      `gorm:"timestamptz" json:"updated_at"`
 	DeletedAt      gorm.DeletedAt `gorm:"index" json:"deleted_at"`
-	UUID           string         `gorm:"type:CHAR(36);COMMENT:uuid;" json:"uuid"`
+	UUID           string         `gorm:"type:VARCHAR(36);COMMENT:uuid;" json:"uuid"`
 	Sort           int64          `gorm:"type:BIGINT;DEFAULT:0;COMMENT:排序;" json:"sort"`
 	preloads       []string
 	selects        []string
@@ -39,6 +38,7 @@ func Init(model interface{}) *BaseModel {
 }
 
 // demoFindOne 获取单条数据演示
+//  @receiver cls
 func (cls *BaseModel) demoFindOne() {
 	var b BaseModel
 	ret := cls.
@@ -51,6 +51,7 @@ func (cls *BaseModel) demoFindOne() {
 }
 
 // demoFind 获取多条数据演示
+//  @receiver cls
 func (cls *BaseModel) demoFind() {
 	var b BaseModel
 	var ctx *gin.Context
@@ -78,97 +79,126 @@ func (BaseModel) ScopeBeEnableFalse(db *gorm.DB) *gorm.DB {
 }
 
 // SetModel 设置使用的模型
+//  @receiver cls
+//  @param model
+//  @return *BaseModel
 func (cls *BaseModel) SetModel(model interface{}) *BaseModel {
 	cls.model = model
 	return cls
 }
 
 // SetPreloads 设置Preloads
+//  @receiver cls
+//  @param preloads
+//  @return *BaseModel
 func (cls *BaseModel) SetPreloads(preloads ...string) *BaseModel {
 	cls.preloads = preloads
 	return cls
 }
 
 // SetPreloadsDefault 设置Preloads为默认
+//  @receiver cls
+//  @return *BaseModel
 func (cls *BaseModel) SetPreloadsDefault() *BaseModel {
 	cls.preloads = tools.Strings{clause.Associations}
 	return cls
 }
 
 // SetSelects 设置Selects
+//  @receiver cls
+//  @param selects
+//  @return *BaseModel
 func (cls *BaseModel) SetSelects(selects ...string) *BaseModel {
 	cls.selects = selects
 	return cls
 }
 
 // SetOmits 设置Omits
+//  @receiver cls
+//  @param omits
+//  @return *BaseModel
 func (cls *BaseModel) SetOmits(omits ...string) *BaseModel {
 	cls.omits = omits
 	return cls
 }
 
 // SetWhereFields 设置WhereFields
+//  @receiver cls
+//  @param whereFields
+//  @return *BaseModel
 func (cls *BaseModel) SetWhereFields(whereFields ...string) *BaseModel {
 	cls.whereFields = whereFields
 	return cls
 }
 
 // SetNotWhereFields 设置NotWhereFields
+//  @receiver cls
+//  @param notWhereFields
+//  @return *BaseModel
 func (cls *BaseModel) SetNotWhereFields(notWhereFields ...string) *BaseModel {
 	cls.notWhereFields = notWhereFields
 	return cls
 }
 
 // SetIgnoreFields 设置IgnoreFields
+//  @receiver cls
+//  @param ignoreFields
+//  @return *BaseModel
 func (cls *BaseModel) SetIgnoreFields(ignoreFields ...string) *BaseModel {
 	cls.ignoreFields = ignoreFields
 	return cls
 }
 
 // SetWheres 通过Map设置Wheres
+//  @receiver cls
+//  @param wheres
+//  @return *BaseModel
 func (cls *BaseModel) SetWheres(wheres map[string]interface{}) *BaseModel {
 	cls.wheres = wheres
 	return cls
 }
 
 // SetNotWheres 设置NotWheres
+//  @receiver cls
+//  @param notWheres
+//  @return *BaseModel
 func (cls *BaseModel) SetNotWheres(notWheres map[string]interface{}) *BaseModel {
 	cls.notWheres = notWheres
 	return cls
 }
 
 // SetScopes 设置Scopes
+//  @receiver cls
+//  @param scopes
+//  @return *BaseModel
 func (cls *BaseModel) SetScopes(scopes ...func(*gorm.DB) *gorm.DB) *BaseModel {
 	cls.scopes = scopes
 	return cls
 }
 
 // BeforeCreate 插入数据前
+//  @receiver cls
+//  @param db
+//  @return err
 func (cls *BaseModel) BeforeCreate(db *gorm.DB) (err error) {
-	cfg := (&settings.Setting{}).Init()
-	cls.CreatedAt = time.Now().In(cfg.Timezone)
-	cls.UpdatedAt = time.Now().In(cfg.Timezone)
-
+	cls.CreatedAt = time.Now()
+	cls.UpdatedAt = time.Now()
 	return
 }
 
 // BeforeSave 修改数据前
+//  @receiver cls
+//  @param db
+//  @return err
 func (cls *BaseModel) BeforeSave(db *gorm.DB) (err error) {
-	//cfg := (&settings.Setting{}).Init()
 	cls.UpdatedAt = time.Now()
-	//l, _ := time.LoadLocation("Asia/Shanghai")
-	//t := time.Now().In(l)
-	//cls.UpdatedAt = t
 	return
 }
 
-// GetSession 获取对象
-//func (cls *BaseModel) Prepare() (dbSession *gorm.DB) {
-//	dbSession = (&databases.MySql{}).GetConn()
-//	return
-//}
-
 // Prepare 初始化
+//  @receiver cls
+//  @param dbDriver
+//  @return dbSession
 func (cls *BaseModel) Prepare(dbDriver string) (dbSession *gorm.DB) {
 	dbSession = (&databases.DatabaseLaunch{DBDriver: dbDriver}).GetDatabase()
 
@@ -188,8 +218,8 @@ func (cls *BaseModel) Prepare(dbDriver string) (dbSession *gorm.DB) {
 		for _, v := range cls.preloads {
 			dbSession = dbSession.Preload(v)
 		}
-	} else {
-		dbSession = dbSession.Preload(clause.Associations)
+		//} else {
+		//	dbSession = dbSession.Preload(clause.Associations)
 	}
 
 	// 拼接selects字段
@@ -206,6 +236,10 @@ func (cls *BaseModel) Prepare(dbDriver string) (dbSession *gorm.DB) {
 }
 
 // PrepareQuery 根据Query参数初始化
+//  @receiver cls
+//  @param ctx
+//  @param dbDriver
+//  @return *gorm.DB
 func (cls *BaseModel) PrepareQuery(ctx *gin.Context, dbDriver string) *gorm.DB {
 	dbSession := cls.Prepare(dbDriver)
 

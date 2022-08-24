@@ -9,13 +9,13 @@ type EntireInstanceModel struct {
 	SerialNumber                   string                    `gorm:"type:VARCHAR(64);COMMENT:所编号;" json:"serial_number"`
 	EntireInstanceStatusUniqueCode string                    `gorm:"type:VARCHAR(64);COMMENT:所属类型;" json:"entire_instance_status_unique_code"`
 	EntireInstanceStatus           EntireInstanceStatusModel `gorm:"foreignKey:EntireInstanceStatusUniqueCode;references:UniqueCode;COMMENT:所属状态;" json:"entire_instance_status"`
-	KindCategoryUUID               string                    `gorm:"type:CHAR(36);COMMENT:所属种类UUID;" json:"kind_category_uuid"`
+	KindCategoryUUID               string                    `gorm:"type:VARCHAR(36);COMMENT:所属种类UUID;" json:"kind_category_uuid"`
 	KindCategory                   KindCategoryModel         `gorm:"foreignKey:KindCategoryUUID;references:UUID;COMMENT:所属种类;" json:"kind_category"`
-	KindEntireTypeUUID             string                    `gorm:"type:CHAR(36);COMMENT:所属类型UUID;" json:"kind_entire_type_uuid"`
+	KindEntireTypeUUID             string                    `gorm:"type:VARCHAR(36);COMMENT:所属类型UUID;" json:"kind_entire_type_uuid"`
 	KindEntireType                 KindEntireTypeModel       `gorm:"foreignKey:KindEntireTypeUUID;references:UUID;COMMENT:所属类型;" json:"kind_entire_model"`
-	KindSubTypeUUID                string                    `gorm:"type:CHAR(36);COMMENT:所属型号UUID;" json:"kind_sub_model_uuid"`
+	KindSubTypeUUID                string                    `gorm:"type:VARCHAR(36);COMMENT:所属型号UUID;" json:"kind_sub_model_uuid"`
 	KindSubModel                   KindSubTypeModel          `gorm:"foreignKey:KindSubTypeUUID;references:UUID;COMMENT:所属型号;" json:"kind_sub_model"`
-	FactoryUUID                    string                    `gorm:"type:CHAR(36);COMMENT:所属供应商代码;" json:"factory_uuid"`
+	FactoryUUID                    string                    `gorm:"type:VARCHAR(36);COMMENT:所属供应商代码;" json:"factory_uuid"`
 	Factory                        FactoryModel              `gorm:"foreignKey:FactoryUUID;references:UUID;COMMENT:所属供应商;" json:"factory"`
 	FactoryMadeSerialNumber        string                    `gorm:"type:VARCHAR(64);COMMENT:出厂编号;" json:"factory_made_serial_number"`
 	FactoryMadeAt                  time.Time                 `gorm:"COMMENT:出厂日期;" json:"factory_made_at"`
@@ -26,9 +26,9 @@ type EntireInstanceModel struct {
 	Parts                          []*EntireInstanceModel    `gorm:"foreignKey:ParentIdentityCode;references:IdentityCode;COMMENT:相关部件;" json:"parts"`
 	BePart                         bool                      `gorm:"type:BOOLEAN;DEFAULT:0;COMMENT:是否是部件;" json:"be_part"`
 	Note                           string                    `gorm:"type:TEXT;COMMENT:备注;" json:"note"`
-	SourceNameUUID                 string                    `gorm:"type:CHAR(36);COMMENT:来源名称代码;" json:"source_name_UUID"`
+	SourceNameUUID                 string                    `gorm:"type:VARCHAR(36);COMMENT:来源名称代码;" json:"source_name_UUID"`
 	SourceName                     SourceNameModel           `gorm:"foreignKey:SourceNameUUID;references:UUID;COMMENT:所属来源名称;" json:"source_name"`
-	DeleteOperatorUUID             string                    `gorm:"type:CHAR(36);COMMENT:删除操作人UUID;" json:"delete_operator_uuid"`
+	DeleteOperatorUUID             string                    `gorm:"type:VARCHAR(36);COMMENT:删除操作人UUID;" json:"delete_operator_uuid"`
 	DeleteOperator                 AccountModel              `gorm:"foreignKey:DeleteOperatorUUID;references:UUID;COMMENT:删除操作人;" json:"delete_operator"`
 	WiringSystem                   string                    `gorm:"type:VARCHAR(64);COMMENT:线制;" json:"wiring_system"`
 	HasExtrusionShroud             bool                      `gorm:"type:BOOLEAN;DEFAULT:0;COMMENT:是否具备防挤压防护装置;" json:"has_extrusion_shroud"`
@@ -55,49 +55,49 @@ type EntireInstanceModel struct {
 	UseRepairLastSpotCheckerName      string                 `gorm:"type:VARCHAR(64);COMMENT:上次抽验人;" json:"use_repair_last_spot_checker_name"`
 
 	// 资产归属
-	BelongToOrganizationRailwayUUID   string                     `gorm:"type:CHAR(36);COMMENT:资产归属-所属路局;" json:"belong_to_organization_railway_uuid"`
+	BelongToOrganizationRailwayUUID   string                     `gorm:"type:VARCHAR(36);COMMENT:资产归属-所属路局;" json:"belong_to_organization_railway_uuid"`
 	BelongToOrganizationRailway       OrganizationRailwayModel   `gorm:"foreignKey:BelongToOrganizationRailwayUUID;references:UUID;COMMENT:资产归属-所属路局;" json:"belong_to_organization_railway"`
-	BelongToOrganizationParagraphUUID string                     `gorm:"type:CHAR(36);COMMENT:资产归属-所属站段;" json:"belong_to_organization_paragraph_uuid"`
+	BelongToOrganizationParagraphUUID string                     `gorm:"type:VARCHAR(36);COMMENT:资产归属-所属站段;" json:"belong_to_organization_paragraph_uuid"`
 	BelongToOrganizationParagraph     OrganizationParagraphModel `gorm:"foreignKey:BelongToOrganizationParagraphUUID;references:UUID;COMMENT:资产归属-所属站段;" json:"belong_to_organization_paragraph"`
-	BelongToOrganizationWorkshopUUID  string                     `gorm:"type:CHAR(36);COMMENT:资产归属-所属车间;" json:"belong_to_organization_workshop_uuid"`
+	BelongToOrganizationWorkshopUUID  string                     `gorm:"type:VARCHAR(36);COMMENT:资产归属-所属车间;" json:"belong_to_organization_workshop_uuid"`
 	BelongToOrganizationWorkshop      OrganizationWorkshopModel  `gorm:"foreignKey:BelongToOrganizationWorkshopUUID;references:UUID;COMMENT:资产归属-所属专业车间;" json:"belong_to_organization_workshop"`
-	BelongToOrganizationWorkAreaUUID  string                     `gorm:"type:CHAR(36);COMMENT:资产归属-所属工区;" json:"belong_to_organization_work_area_uuid"`
+	BelongToOrganizationWorkAreaUUID  string                     `gorm:"type:VARCHAR(36);COMMENT:资产归属-所属工区;" json:"belong_to_organization_work_area_uuid"`
 	BelongToOrganizationWorkArea      OrganizationWorkAreaModel  `gorm:"foreignKey:BelongToOrganizationWorkAreaUUID;references:UUID;COMMENT:资产归属-所属专业工区;" json:"belong_to_organization_work_area"`
 
 	// 使用处所
-	UsePlaceCurrentOrganizationWorkshopUUID       string                          `gorm:"type:CHAR(36);COMMENT:当前使用处所-车间UUID;" json:"use_place_current_organization_workshop_uuid"`
+	UsePlaceCurrentOrganizationWorkshopUUID       string                          `gorm:"type:VARCHAR(36);COMMENT:当前使用处所-车间UUID;" json:"use_place_current_organization_workshop_uuid"`
 	UsePlaceCurrentOrganizationWorkshop           OrganizationWorkshopModel       `gorm:"foreignKey:UsePlaceCurrentOrganizationWorkshopUUID;references:UUID;COMMENT:当前使用处所-车间;" json:"use_place_current_organization_workshop"`
-	UsePlaceCurrentOrganizationWorkAreaUUID       string                          `gorm:"type:CHAR(36);COMMENT:当前使用处所-工区UUID;" json:"use_place_current_organization_work_area_uuid"`
+	UsePlaceCurrentOrganizationWorkAreaUUID       string                          `gorm:"type:VARCHAR(36);COMMENT:当前使用处所-工区UUID;" json:"use_place_current_organization_work_area_uuid"`
 	UsePlaceCurrentOrganizationWorkArea           OrganizationWorkAreaModel       `gorm:"foreignKey:UsePlaceCurrentOrganizationWorkAreaUUID;references:UUID;COMMENT:当前使用处所-工区;" json:"use_place_current_organization_work_area"`
-	UsePlaceCurrentLocationLineUUID               string                          `gorm:"type:CHAR(36);COMMENT:当前使用处所-线别UUID;" json:"use_place_current_location_line_uuid"`
+	UsePlaceCurrentLocationLineUUID               string                          `gorm:"type:VARCHAR(36);COMMENT:当前使用处所-线别UUID;" json:"use_place_current_location_line_uuid"`
 	UsePlaceCurrentLocationLine                   LocationLineModel               `gorm:"foreignKey:UsePlaceCurrentLocationLineUUID;references:UUID;COMMENT:当前使用处所-线别" json:"use_place_current_location_line"`
-	UsePlaceCurrentLocationStationUUID            string                          `gorm:"type:CHAR(36);COMMENT:当前使用处所-站场UUID;" json:"use_place_current_location_station_uuid"`
+	UsePlaceCurrentLocationStationUUID            string                          `gorm:"type:VARCHAR(36);COMMENT:当前使用处所-站场UUID;" json:"use_place_current_location_station_uuid"`
 	UsePlaceCurrentLocationStation                LocationStationModel            `gorm:"foreignKey:UsePlaceCurrentLocationStationUUID;references:UUID;COMMENT:当前使用处所-站场" json:"use_place_current_location_station"`
-	UsePlaceCurrentLocationSectionUUID            string                          `gorm:"type:CHAR(36);COMMENT:当前使用处所-区间UUID;" json:"use_place_current_location_section_uuid"`
+	UsePlaceCurrentLocationSectionUUID            string                          `gorm:"type:VARCHAR(36);COMMENT:当前使用处所-区间UUID;" json:"use_place_current_location_section_uuid"`
 	UsePlaceCurrentLocationSection                LocationSectionModel            `gorm:"foreignKey:UsePlaceCurrentLocationSectionUUID;references:UUID;COMMENT:当前使用处所-区间" json:"use_place_current_location_section"`
-	UsePlaceCurrentLocationCenterUUID             string                          `gorm:"type:CHAR(36);COMMENT:当前使用处所-中心UUID;" json:"use_place_current_location_center_uuid"`
+	UsePlaceCurrentLocationCenterUUID             string                          `gorm:"type:VARCHAR(36);COMMENT:当前使用处所-中心UUID;" json:"use_place_current_location_center_uuid"`
 	UsePlaceCurrentLocationCenter                 LocationCenterModel             `gorm:"foreignKey:UsePlaceCurrentLocationCenterUUID;references:UUID;COMMENT:当前使用处所-中心" json:"use_place_current_location_center"`
-	UsePlaceCurrentLocationRailroadGradeCrossUUID string                          `gorm:"type:CHAR(36);COMMENT:当前使用处所-道口UUID;" json:"use_place_current_location_railroad_grade_cross_uuid"`
+	UsePlaceCurrentLocationRailroadGradeCrossUUID string                          `gorm:"type:VARCHAR(36);COMMENT:当前使用处所-道口UUID;" json:"use_place_current_location_railroad_grade_cross_uuid"`
 	UsePlaceCurrentLocationRailroadGradeCross     LocationRailroadGradeCrossModel `gorm:"foreignKey:UsePlaceCurrentLocationRailroadGradeCrossUUID;references:UUID;COMMENT:当前使用处所-道口" json:"use_place_current_location_railroad_grade_cross"`
-	UsePlaceLastOrganizationWorkshopUUID          string                          `gorm:"type:CHAR(36);COMMENT:上次使用处所-车间UUID;" json:"use_place_last_organization_workshop_uuid"`
+	UsePlaceLastOrganizationWorkshopUUID          string                          `gorm:"type:VARCHAR(36);COMMENT:上次使用处所-车间UUID;" json:"use_place_last_organization_workshop_uuid"`
 	UsePlaceLastOrganizationWorkshop              OrganizationWorkshopModel       `gorm:"foreignKey:UsePlaceLastOrganizationWorkshopUUID;references:UUID;COMMENT:上次使用处所-车间;" json:"use_place_last_organization_workshop"`
-	UsePlaceLastOrganizationWorkAreaUUID          string                          `gorm:"type:CHAR(36);COMMENT:上次使用处所-工区UUID;" json:"use_place_last_organization_work_area_uuid"`
+	UsePlaceLastOrganizationWorkAreaUUID          string                          `gorm:"type:VARCHAR(36);COMMENT:上次使用处所-工区UUID;" json:"use_place_last_organization_work_area_uuid"`
 	UsePlaceLastOrganizationWorkArea              OrganizationWorkAreaModel       `gorm:"foreignKey:UsePlaceLastOrganizationWorkAreaUUID;references:UUID;COMMENT:上次使用处所-工区;" json:"use_place_last_organization_work_area"`
-	UsePlaceLastLocationLineUUID                  string                          `gorm:"type:CHAR(36);COMMENT:上次使用处所-线别UUID;" json:"use_place_last_location_line_uuid"`
+	UsePlaceLastLocationLineUUID                  string                          `gorm:"type:VARCHAR(36);COMMENT:上次使用处所-线别UUID;" json:"use_place_last_location_line_uuid"`
 	UsePlaceLastLocationLine                      LocationLineModel               `gorm:"foreignKey:UsePlaceLastLocationLineUUID;references:UUID;COMMENT:上次使用处所-线别" json:"use_place_last_location_line"`
-	UsePlaceLastLocationStationUUID               string                          `gorm:"type:CHAR(36);COMMENT:上次使用处所-站场UUID;" json:"use_place_last_location_station_uuid"`
+	UsePlaceLastLocationStationUUID               string                          `gorm:"type:VARCHAR(36);COMMENT:上次使用处所-站场UUID;" json:"use_place_last_location_station_uuid"`
 	UsePlaceLastLocationStation                   LocationStationModel            `gorm:"foreignKey:UsePlaceLastLocationStationUUID;references:UUID;COMMENT:上次使用处所-站场" json:"use_place_last_location_station"`
-	UsePlaceLastLocationSectionUUID               string                          `gorm:"type:CHAR(36);COMMENT:上次使用处所-区间UUID;" json:"use_place_last_location_section_uuid"`
+	UsePlaceLastLocationSectionUUID               string                          `gorm:"type:VARCHAR(36);COMMENT:上次使用处所-区间UUID;" json:"use_place_last_location_section_uuid"`
 	UsePlaceLastLocationSection                   LocationSectionModel            `gorm:"foreignKey:UsePlaceLastLocationSectionUUID;references:UUID;COMMENT:上次使用处所-区间" json:"use_place_last_location_section"`
-	UsePlaceLastLocationCenterUUID                string                          `gorm:"type:CHAR(36);COMMENT:上次使用处所-中心UUID;" json:"use_place_last_location_center_uuid"`
+	UsePlaceLastLocationCenterUUID                string                          `gorm:"type:VARCHAR(36);COMMENT:上次使用处所-中心UUID;" json:"use_place_last_location_center_uuid"`
 	UsePlaceLastLocationCenter                    LocationCenterModel             `gorm:"foreignKey:UsePlaceLastLocationCenterUUID;references:UUID;COMMENT:上次使用处所-中心" json:"use_place_last_location_center"`
-	UsePlaceLastLocationRailroadGradeCrossUUID    string                          `gorm:"type:CHAR(36);COMMENT:上次使用处所-道口UUID;" json:"use_place_last_location_railroad_grade_cross_uuid"`
+	UsePlaceLastLocationRailroadGradeCrossUUID    string                          `gorm:"type:VARCHAR(36);COMMENT:上次使用处所-道口UUID;" json:"use_place_last_location_railroad_grade_cross_uuid"`
 	UsePlaceLastLocationRailroadGradeCross        LocationRailroadGradeCrossModel `gorm:"foreignKey:UsePlaceLastLocationRailroadGradeCrossUUID;references:UUID;COMMENT:上次使用处所-道口" json:"use_place_last_location_railroad_grade_cross"`
 
 	// 使用位置
-	UsePlaceCurrentPositionIndoorCellUUID string                  `gorm:"type:CHAR(36);COMMENT:当前使用位置-室内上道位置UUID;" json:"use_place_current_position_indoor_cell_uuid"`
+	UsePlaceCurrentPositionIndoorCellUUID string                  `gorm:"type:VARCHAR(36);COMMENT:当前使用位置-室内上道位置UUID;" json:"use_place_current_position_indoor_cell_uuid"`
 	UsePlaceCurrentPositionIndoorCell     PositionIndoorCellModel `gorm:"foreignKey:UsePlaceCurrentPositionIndoorCellUUID;references:UUID;COMMENT:当前使用位置-室内上道位置" json:"use_place_current_position_indoor_cell"`
-	UsePlaceLastPositionIndoorCellUUID    string                  `gorm:"type:CHAR(36);COMMENT:上次使用位置-室内上道位置UUID;" json:"use_place_last_position_indoor_cell_uuid"`
+	UsePlaceLastPositionIndoorCellUUID    string                  `gorm:"type:VARCHAR(36);COMMENT:上次使用位置-室内上道位置UUID;" json:"use_place_last_position_indoor_cell_uuid"`
 	UsePlaceLastPositionIndoorCell        PositionIndoorCellModel `gorm:"foreignKey:UsePlaceLastPositionIndoorCellUUID;references:UUID;COMMENT:上次使用位置-室内上道位置" json:"use_place_last_position_indoor_cell"`
 
 	// 其他
