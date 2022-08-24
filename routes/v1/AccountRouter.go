@@ -10,7 +10,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
-	"time"
 )
 
 // AccountRouter 用户路由
@@ -202,7 +201,7 @@ func (AccountRouter) Load(engine *gin.Engine) {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("新建成功").Created(tools.Map{}))
+			ctx.JSON(tools.CorrectIns("新建成功").Created(tools.Map{"account": account}))
 		})
 
 		// 编辑
@@ -248,9 +247,7 @@ func (AccountRouter) Load(engine *gin.Engine) {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			l, _ := time.LoadLocation("Asia/Shanghai")
-			t := time.Now().In(l).Format("2006-01-02 15:04:05")
-			ctx.JSON(tools.CorrectIns(t).Updated(tools.Map{}))
+			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"account": account}))
 		})
 
 		// 修改密码
