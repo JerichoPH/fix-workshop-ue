@@ -2,6 +2,7 @@ package databases
 
 import (
 	"fix-workshop-ue/settings"
+	"fix-workshop-ue/wrongs"
 	"gorm.io/gorm"
 )
 
@@ -24,8 +25,9 @@ func (cls DatabaseLaunch) GetDatabase() (dbSession *gorm.DB) {
 	}
 
 	switch dbDriver {
-	case "postgresql":
 	default:
+		wrongs.PanicForbidden("没有配置数据库")
+	case "postgresql":
 		dbSession = (&Postgresql{}).GetConn()
 	case "mysql":
 		dbSession = (&MySql{}).GetConn()
