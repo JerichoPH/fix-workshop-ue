@@ -20,7 +20,7 @@ func (cls DatabaseLaunch) GetDatabase() (dbSession *gorm.DB) {
 		dbDriver = cls.DBDriver
 	} else {
 		setting := (&settings.Setting{}).Init()
-		setting.DB.Section("db").Key("db_driver").MustString("")
+		dbDriver = setting.DB.Section("db").Key("db_driver").MustString("")
 	}
 
 	switch dbDriver {
