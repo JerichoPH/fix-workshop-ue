@@ -41,7 +41,7 @@ func (cls PositionIndoorCabinetStoreForm) ShouldBind(ctx *gin.Context) PositionI
 	if cls.PositionIndoorRowUUID == "" {
 		ret = models.BootByModel(models.PositionIndoorRowModel{}).
 			SetWheres(tools.Map{"uuid": cls.PositionIndoorRowUUID}).
-			Prepare("").
+			PrepareByDefault().
 			First(&cls.PositionIndoorRow)
 		wrongs.PanicWhenIsEmpty(ret, "所属排")
 	}
@@ -72,12 +72,12 @@ func (PositionIndoorCabinetRouter) Load(engine *gin.Engine) {
 			// 查重
 			ret = models.BootByModel(models.PositionIndoorCabinetModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "柜架代码")
 			ret = models.BootByModel(models.PositionIndoorCabinetModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "柜架名称")
 
@@ -88,11 +88,11 @@ func (PositionIndoorCabinetRouter) Load(engine *gin.Engine) {
 				Name:              form.Name,
 				PositionIndoorRow: form.PositionIndoorRow,
 			}
-			if ret = models.BootByModel(models.PositionIndoorCabinetModel{}).Prepare("").Create(&locationIndoorCabinet); ret.Error != nil {
+			if ret = models.BootByModel(models.PositionIndoorCabinetModel{}).PrepareByDefault().Create(&locationIndoorCabinet); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"position_indoor_cabinet": locationIndoorCabinet}))
+			ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"position_indoor_cabinet": locationIndoorCabinet}))
 		})
 
 		// 删除
@@ -105,16 +105,16 @@ func (PositionIndoorCabinetRouter) Load(engine *gin.Engine) {
 			// 查询
 			ret = models.BootByModel(models.PositionIndoorCabinetModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&positionIndoorCabinet)
 			wrongs.PanicWhenIsEmpty(ret, "柜架")
 
 			// 删除
-			if ret := models.BootByModel(models.PositionIndoorCabinetModel{}).Prepare("").Delete(&positionIndoorCabinet); ret.Error != nil {
+			if ret := models.BootByModel(models.PositionIndoorCabinetModel{}).PrepareByDefault().Delete(&positionIndoorCabinet); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Deleted())
+			ctx.JSON(tools.CorrectBootByDefault().Deleted())
 		})
 
 		// 编辑
@@ -131,20 +131,20 @@ func (PositionIndoorCabinetRouter) Load(engine *gin.Engine) {
 			ret = models.BootByModel(models.PositionIndoorCabinetModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "柜架代码")
 			ret = models.BootByModel(models.PositionIndoorCabinetModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "柜架名称")
 
 			// 查询
 			ret = models.BootByModel(models.PositionIndoorCabinetModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&positionIndoorCabinet)
 			wrongs.PanicWhenIsEmpty(ret, "柜架")
 
@@ -153,11 +153,11 @@ func (PositionIndoorCabinetRouter) Load(engine *gin.Engine) {
 			positionIndoorCabinet.UniqueCode = form.UniqueCode
 			positionIndoorCabinet.Name = form.Name
 			positionIndoorCabinet.PositionIndoorRow = form.PositionIndoorRow
-			if ret = models.BootByModel(models.PositionIndoorCabinetModel{}).Prepare("").Save(&positionIndoorCabinet); ret.Error != nil {
+			if ret = models.BootByModel(models.PositionIndoorCabinetModel{}).PrepareByDefault().Save(&positionIndoorCabinet); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"position_indoor_cabinet": positionIndoorCabinet}))
+			ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"position_indoor_cabinet": positionIndoorCabinet}))
 		})
 
 		// 详情
@@ -168,11 +168,11 @@ func (PositionIndoorCabinetRouter) Load(engine *gin.Engine) {
 			)
 			ret = models.BootByModel(models.PositionIndoorCabinetModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&positionIndoorCabinet)
 			wrongs.PanicWhenIsEmpty(ret, "柜架")
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"position_indoor_cabinet": positionIndoorCabinet}))
+			ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_indoor_cabinet": positionIndoorCabinet}))
 		})
 
 		// 列表
@@ -183,7 +183,7 @@ func (PositionIndoorCabinetRouter) Load(engine *gin.Engine) {
 				PrepareQuery(ctx,"").
 				Find(&positionIndoorCabinet)
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"position_indoor_cabinet": positionIndoorCabinet}))
+			ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_indoor_cabinet": positionIndoorCabinet}))
 		})
 	}
 }

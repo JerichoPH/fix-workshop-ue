@@ -46,12 +46,12 @@ func (cls OrganizationParagraphStoreForm) ShouldBind(ctx *gin.Context) Organizat
 	}
 	ret = models.BootByModel(models.OrganizationRailwayModel{}).
 		SetWheres(tools.Map{"uuid": cls.OrganizationRailwayUUID}).
-		Prepare("").
+		PrepareByDefault().
 		First(&cls.OrganizationRailway)
 	wrongs.PanicWhenIsEmpty(ret, "路局")
 	if len(cls.OrganizationLineUUIDs) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
-			Prepare("").
+			PrepareByDefault().
 			Where("uuid in ?", cls.OrganizationLineUUIDs).
 			Find(&cls.OrganizationLines)
 	}
@@ -82,17 +82,17 @@ func (OrganizationParagraphRouter) Load(engine *gin.Engine) {
 			// 查重
 			ret = models.BootByModel(models.OrganizationParagraphModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "站段代码")
 			ret = models.BootByModel(models.OrganizationParagraphModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "站段名称")
 			ret = models.BootByModel(models.OrganizationParagraphModel{}).
 				SetWheres(tools.Map{"short_name": form.ShortName}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "站段简称")
 
@@ -105,11 +105,11 @@ func (OrganizationParagraphRouter) Load(engine *gin.Engine) {
 				BeEnable:            form.BeEnable,
 				OrganizationRailway: form.OrganizationRailway,
 			}
-			if ret = models.BootByModel(models.OrganizationParagraphModel{}).Prepare("").Create(&organizationParagraph); ret.Error != nil {
+			if ret = models.BootByModel(models.OrganizationParagraphModel{}).PrepareByDefault().Create(&organizationParagraph); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"organization_paragraph": organizationParagraph}))
+			ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"organization_paragraph": organizationParagraph}))
 		})
 
 		// 删除
@@ -122,16 +122,16 @@ func (OrganizationParagraphRouter) Load(engine *gin.Engine) {
 			// 查询
 			ret = models.BootByModel(models.OrganizationRailwayModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&organizationParagraph)
 			wrongs.PanicWhenIsEmpty(ret, "站段")
 
 			// 删除
-			if ret = models.BootByModel(models.OrganizationParagraphModel{}).Prepare("").Delete(&organizationParagraph); ret.Error != nil {
+			if ret = models.BootByModel(models.OrganizationParagraphModel{}).PrepareByDefault().Delete(&organizationParagraph); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Deleted())
+			ctx.JSON(tools.CorrectBootByDefault().Deleted())
 		})
 
 		// 编辑
@@ -149,20 +149,20 @@ func (OrganizationParagraphRouter) Load(engine *gin.Engine) {
 			ret = models.BootByModel(models.OrganizationParagraphModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "站段代码")
 			ret = models.BootByModel(models.OrganizationParagraphModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "站段名称")
 
 			// 查询
 			ret = models.BootByModel(models.OrganizationParagraphModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&organizationParagraph)
 			wrongs.PanicWhenIsEmpty(ret, "站段")
 
@@ -173,11 +173,11 @@ func (OrganizationParagraphRouter) Load(engine *gin.Engine) {
 			organizationParagraph.ShortName = form.ShortName
 			organizationParagraph.BeEnable = form.BeEnable
 			organizationParagraph.OrganizationRailway = form.OrganizationRailway
-			if ret = models.BootByModel(models.OrganizationParagraphModel{}).Prepare("").Save(&organizationParagraph); ret.Error != nil {
+			if ret = models.BootByModel(models.OrganizationParagraphModel{}).PrepareByDefault().Save(&organizationParagraph); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"organization_paragraph": organizationParagraph}))
+			ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"organization_paragraph": organizationParagraph}))
 		})
 
 		// 详情
@@ -194,7 +194,7 @@ func (OrganizationParagraphRouter) Load(engine *gin.Engine) {
 				First(&organizationParagraph)
 			wrongs.PanicWhenIsEmpty(ret, "站段")
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_paragraph": organizationParagraph}))
+			ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"organization_paragraph": organizationParagraph}))
 		})
 
 		// 列表
@@ -205,7 +205,7 @@ func (OrganizationParagraphRouter) Load(engine *gin.Engine) {
 				PrepareQuery(ctx,"").
 				Find(&organizationParagraphs)
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_paragraphs": organizationParagraphs}))
+			ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"organization_paragraphs": organizationParagraphs}))
 		})
 	}
 }

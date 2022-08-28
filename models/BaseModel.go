@@ -275,11 +275,11 @@ func (cls *BaseModel) PrepareByDefault() (dbSession *gorm.DB) {
 	return cls.Prepare("")
 }
 
-// PrepareQueryByDefault 通过默认数据库初始化
+// PrepareUseQueryByDefault 通过默认数据库初始化
 //  @receiver cls
 //  @param ctx
 //  @return dbSession
-func (cls *BaseModel) PrepareQueryByDefault(ctx *gin.Context) (dbSession *gorm.DB) {
+func (cls *BaseModel) PrepareUseQueryByDefault(ctx *gin.Context) (dbSession *gorm.DB) {
 	return cls.PrepareQuery(ctx, "")
 }
 

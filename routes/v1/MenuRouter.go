@@ -37,7 +37,7 @@ func (cls MenuStoreForm) ShouldBind(ctx *gin.Context) MenuStoreForm {
 		wrongs.PanicValidate("菜单名称必填")
 	}
 	if len(cls.RbacRoleUUIDs) > 0 {
-		models.BootByModel(models.RbacRoleModel{}).Prepare("").Where("uuid in ?", cls.RbacRoleUUIDs).Find(&cls.RbacRoles)
+		models.BootByModel(models.RbacRoleModel{}).PrepareByDefault().Where("uuid in ?", cls.RbacRoleUUIDs).Find(&cls.RbacRoles)
 	}
 
 	return cls
@@ -65,7 +65,7 @@ func (MenuRouter) Load(engine *gin.Engine) {
 			ret = (&models.BaseModel{}).
 				SetModel(models.MenuModel{}).
 				SetWheres(tools.Map{"name": form.Name, "url": form.URL}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "菜单名称和URL")
 
@@ -79,11 +79,11 @@ func (MenuRouter) Load(engine *gin.Engine) {
 				ParentUUID: form.ParentUUID,
 				RbacRoles:  form.RbacRoles,
 			}
-			if ret = (&models.BaseModel{}).SetModel(models.MenuModel{}).Prepare("").Create(&menu); ret.Error != nil {
+			if ret = (&models.BaseModel{}).SetModel(models.MenuModel{}).PrepareByDefault().Create(&menu); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"menu": menu}))
+			ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"menu": menu}))
 		})
 
 		// 删除
@@ -94,11 +94,11 @@ func (MenuRouter) Load(engine *gin.Engine) {
 			menu := (&models.MenuModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 删除
-			if ret = models.BootByModel(models.MenuModel{}).Prepare("").Delete(&menu); ret.Error != nil {
+			if ret = models.BootByModel(models.MenuModel{}).PrepareByDefault().Delete(&menu); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Deleted())
+			ctx.JSON(tools.CorrectBootByDefault().Deleted())
 		})
 
 		// 编辑
@@ -114,7 +114,7 @@ func (MenuRouter) Load(engine *gin.Engine) {
 				SetModel(models.MenuModel{}).
 				SetWheres(tools.Map{"name": form.Name, "url": form.URL}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "菜单名称和URL")
 
@@ -128,17 +128,17 @@ func (MenuRouter) Load(engine *gin.Engine) {
 			menu.Icon = form.Icon
 			menu.ParentUUID = form.ParentUUID
 			menu.RbacRoles = form.RbacRoles
-			if ret = models.BootByModel(models.MenuModel{}).Prepare("").Save(&menu); ret.Error != nil {
+			if ret = models.BootByModel(models.MenuModel{}).PrepareByDefault().Save(&menu); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"menu": menu}))
+			ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"menu": menu}))
 		})
 
 		// 详情
 		r.GET(":uuid", func(ctx *gin.Context) {
 			menu := (&models.MenuModel{}).FindOneByUUID(ctx.Param("uuid"))
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"menu": menu}))
+			ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"menu": menu}))
 		})
 
 		// 列表
@@ -150,7 +150,7 @@ func (MenuRouter) Load(engine *gin.Engine) {
 				PrepareQuery(ctx,"").
 				Find(&menus)
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"menus": menus}))
+			ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"menus": menus}))
 		})
 	}
 }

@@ -59,12 +59,12 @@ func (OrganizationWorkshopTypeRouter) Load(engine *gin.Engine) {
 			// 查重
 			ret = models.BootByModel(models.OrganizationWorkshopTypeModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-				Prepare("").
+				PrepareByDefault().
 				First(&models.OrganizationWorkAreaTypeModel{})
 			wrongs.PanicWhenIsRepeat(ret, "车间类型代码")
 			ret = models.BootByModel(models.OrganizationWorkshopTypeModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
-				Prepare("").
+				PrepareByDefault().
 				First(&models.OrganizationWorkshopTypeModel{})
 			wrongs.PanicWhenIsRepeat(ret, "车间类型名称")
 
@@ -75,11 +75,11 @@ func (OrganizationWorkshopTypeRouter) Load(engine *gin.Engine) {
 				Name:       form.Name,
 				Number:     form.Number,
 			}
-			if ret = models.BootByModel(models.OrganizationWorkshopTypeModel{}).Prepare("").Create(&organizationWorkshopType); ret.Error != nil {
+			if ret = models.BootByModel(models.OrganizationWorkshopTypeModel{}).PrepareByDefault().Create(&organizationWorkshopType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"organization_workshop_type": organizationWorkshopType}))
+			ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"organization_workshop_type": organizationWorkshopType}))
 		})
 
 		// 删除
@@ -90,11 +90,11 @@ func (OrganizationWorkshopTypeRouter) Load(engine *gin.Engine) {
 			organizationWorkshopType := (&models.OrganizationWorkshopTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 删除
-			if ret = models.BootByModel(models.OrganizationWorkshopTypeModel{}).Prepare("").Delete(&organizationWorkshopType); ret.Error != nil {
+			if ret = models.BootByModel(models.OrganizationWorkshopTypeModel{}).PrepareByDefault().Delete(&organizationWorkshopType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Deleted())
+			ctx.JSON(tools.CorrectBootByDefault().Deleted())
 		})
 
 		// 编辑
@@ -108,13 +108,13 @@ func (OrganizationWorkshopTypeRouter) Load(engine *gin.Engine) {
 			ret = models.BootByModel(models.OrganizationWorkshopTypeModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&models.OrganizationWorkAreaTypeModel{})
 			wrongs.PanicWhenIsRepeat(ret, "车间类型代码")
 			ret = models.BootByModel(models.OrganizationWorkshopTypeModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&models.OrganizationWorkshopTypeModel{})
 			wrongs.PanicWhenIsRepeat(ret, "车间类型名称")
 
@@ -126,16 +126,16 @@ func (OrganizationWorkshopTypeRouter) Load(engine *gin.Engine) {
 			organizationWorkshopType.UniqueCode = form.UniqueCode
 			organizationWorkshopType.Name = form.Name
 			organizationWorkshopType.Number = form.Number
-			models.BootByModel(models.OrganizationWorkshopTypeModel{}).Prepare("").Save(&organizationWorkshopType)
+			models.BootByModel(models.OrganizationWorkshopTypeModel{}).PrepareByDefault().Save(&organizationWorkshopType)
 
-			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"organization_workshop_type": organizationWorkshopType}))
+			ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"organization_workshop_type": organizationWorkshopType}))
 		})
 
 		// 详情
 		r.GET(":uuid", func(ctx *gin.Context) {
 			organizationWorkshopType := (&models.OrganizationWorkshopTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_workshop_type": organizationWorkshopType}))
+			ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"organization_workshop_type": organizationWorkshopType}))
 		})
 
 		// 列表
@@ -146,7 +146,7 @@ func (OrganizationWorkshopTypeRouter) Load(engine *gin.Engine) {
 				PrepareQuery(ctx,"").
 				Find(&organizationWorkshopTypes)
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_workshop_types": organizationWorkshopTypes}))
+			ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"organization_workshop_types": organizationWorkshopTypes}))
 		})
 	}
 }

@@ -43,7 +43,7 @@ func (cls PositionDepotCellStoreForm) ShouldBind(ctx *gin.Context) PositionDepot
 	}
 	ret = models.BootByModel(models.PositionDepotTierModel{}).
 		SetWheres(tools.Map{"uuid": cls.PositionDepotTierUUID}).
-		Prepare("").
+		PrepareByDefault().
 		First(&cls.PositionDepotTier)
 	wrongs.PanicWhenIsEmpty(ret, "所属仓库柜架层")
 
@@ -73,12 +73,12 @@ func (PositionDepotCellRouter) Load(engine *gin.Engine) {
 			// 查重
 			ret = models.BootByModel(models.PositionDepotCellModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "仓库柜架格位代码")
 			ret = models.BootByModel(models.PositionDepotCellModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "仓库柜架格位名称")
 
@@ -89,11 +89,11 @@ func (PositionDepotCellRouter) Load(engine *gin.Engine) {
 				Name:              form.Name,
 				PositionDepotTier: form.PositionDepotTier,
 			}
-			if ret = models.BootByModel(models.PositionDepotCellModel{}).Prepare("").Create(&positionDepotCell); ret.Error != nil {
+			if ret = models.BootByModel(models.PositionDepotCellModel{}).PrepareByDefault().Create(&positionDepotCell); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"position_depot_cell": positionDepotCell}))
+			ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"position_depot_cell": positionDepotCell}))
 		})
 
 		// 删除
@@ -106,16 +106,16 @@ func (PositionDepotCellRouter) Load(engine *gin.Engine) {
 			// 查询
 			ret = models.BootByModel(models.PositionDepotCellModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&positionDepotCell)
 			wrongs.PanicWhenIsEmpty(ret, "仓库柜架格位")
 
 			// 删除
-			if ret := models.BootByModel(models.PositionDepotCellModel{}).Prepare("").Delete(&positionDepotCell); ret.Error != nil {
+			if ret := models.BootByModel(models.PositionDepotCellModel{}).PrepareByDefault().Delete(&positionDepotCell); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Deleted())
+			ctx.JSON(tools.CorrectBootByDefault().Deleted())
 		})
 
 		// 编辑
@@ -132,20 +132,20 @@ func (PositionDepotCellRouter) Load(engine *gin.Engine) {
 			ret = models.BootByModel(models.PositionDepotCellModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "仓库柜架格位代码")
 			ret = models.BootByModel(models.PositionDepotCellModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "仓库柜架格位名称")
 
 			// 查询
 			ret = models.BootByModel(models.PositionDepotCellModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&positionDepotCell)
 			wrongs.PanicWhenIsEmpty(ret, "仓库柜架格位")
 
@@ -154,11 +154,11 @@ func (PositionDepotCellRouter) Load(engine *gin.Engine) {
 			positionDepotCell.UniqueCode = form.UniqueCode
 			positionDepotCell.Name = form.Name
 			positionDepotCell.PositionDepotTier = form.PositionDepotTier
-			if ret = models.BootByModel(models.PositionDepotCellModel{}).Prepare("").Save(&positionDepotCell); ret.Error != nil {
+			if ret = models.BootByModel(models.PositionDepotCellModel{}).PrepareByDefault().Save(&positionDepotCell); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"position_depot_cell": positionDepotCell}))
+			ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"position_depot_cell": positionDepotCell}))
 		})
 
 		// 详情
@@ -169,11 +169,11 @@ func (PositionDepotCellRouter) Load(engine *gin.Engine) {
 			)
 			ret = models.BootByModel(models.PositionDepotCellModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&positionDepotCell)
 			wrongs.PanicWhenIsEmpty(ret, "仓库柜架格位")
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"position_depot_cell": positionDepotCell}))
+			ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_depot_cell": positionDepotCell}))
 		})
 
 		// 列表
@@ -184,7 +184,7 @@ func (PositionDepotCellRouter) Load(engine *gin.Engine) {
 				PrepareQuery(ctx,"").
 				Find(&positionDepotCells)
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"position_depot_cells": positionDepotCells}))
+			ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_depot_cells": positionDepotCells}))
 		})
 	}
 }

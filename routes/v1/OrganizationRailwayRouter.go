@@ -40,7 +40,7 @@ func (cls OrganizationRailwayStoreForm) ShouldBind(ctx *gin.Context) Organizatio
 	}
 	if len(cls.LocationLineUUIDs) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
-			Prepare("").
+			PrepareByDefault().
 			Where("uuid in ?", cls.LocationLineUUIDs).
 			Find(&cls.LocationLines)
 	}
@@ -63,7 +63,7 @@ func (cls OrganizationRailwayBindLinesFrom) ShouldBind(ctx *gin.Context) Organiz
 	}
 
 	models.BootByModel(models.LocationLineModel{}).
-		Prepare("").
+		PrepareByDefault().
 		Where("uuid in ?", cls.LocationLineUUIDs).
 		Find(&cls.LocationLines)
 
@@ -93,17 +93,17 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 			// 查重
 			ret = models.BootByModel(models.OrganizationRailwayModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "路局代码")
 			ret = models.BootByModel(models.OrganizationRailwayModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "路局名称")
 			ret = models.BootByModel(models.OrganizationRailwayModel{}).
 				SetWheres(tools.Map{"short_name": form.ShortName}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "路局简称")
 
@@ -115,11 +115,11 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 				ShortName:  form.ShortName,
 				BeEnable:   form.BeEnable,
 			}
-			if ret = (&models.BaseModel{}).SetModel(models.OrganizationRailwayModel{}).Prepare("").Create(&organizationRailway); ret.Error != nil {
+			if ret = (&models.BaseModel{}).SetModel(models.OrganizationRailwayModel{}).PrepareByDefault().Create(&organizationRailway); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"organization_railway": organizationRailway}))
+			ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"organization_railway": organizationRailway}))
 		})
 
 		// 删除
@@ -130,15 +130,15 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 			var organizationRailway models.OrganizationRailwayModel
 			ret = models.BootByModel(models.OrganizationRailwayModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&organizationRailway)
 			wrongs.PanicWhenIsEmpty(ret, "路局")
 			// 删除
-			if ret = models.BootByModel(models.OrganizationRailwayModel{}).Prepare("").Delete(&organizationRailway); ret.Error != nil {
+			if ret = models.BootByModel(models.OrganizationRailwayModel{}).PrepareByDefault().Delete(&organizationRailway); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Deleted())
+			ctx.JSON(tools.CorrectBootByDefault().Deleted())
 		})
 
 		// 编辑
@@ -155,26 +155,26 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 			ret = models.BootByModel(models.OrganizationRailwayModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "路局代码")
 			ret = models.BootByModel(models.OrganizationRailwayModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "路局名称")
 			ret = models.BootByModel(models.OrganizationRailwayModel{}).
 				SetWheres(tools.Map{"short_name": form.ShortName}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "路局简称")
 
 			// 查询
 			ret = models.BootByModel(models.OrganizationRailwayModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&organizationRailway)
 			wrongs.PanicWhenIsEmpty(ret, "路局")
 
@@ -184,11 +184,11 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 			organizationRailway.Name = form.Name
 			organizationRailway.ShortName = form.ShortName
 			organizationRailway.BeEnable = form.BeEnable
-			if ret = models.BootByModel(models.OrganizationRailwayModel{}).Prepare("").Save(&organizationRailway); ret.Error != nil {
+			if ret = models.BootByModel(models.OrganizationRailwayModel{}).PrepareByDefault().Save(&organizationRailway); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"organization_railway": organizationRailway}))
+			ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"organization_railway": organizationRailway}))
 		})
 
 		// 详情
@@ -201,11 +201,11 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 			ret = models.BootByModel(models.OrganizationRailwayModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				SetWhereFields("be_enable").
-				PrepareQuery(ctx, "").
+				PrepareUseQueryByDefault(ctx).
 				First(&organizationRailway)
 			wrongs.PanicWhenIsEmpty(ret, "路局")
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_railway": organizationRailway}))
+			ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"organization_railway": organizationRailway}))
 		})
 
 		// 列表
@@ -216,10 +216,10 @@ func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 
 			models.BootByModel(models.OrganizationRailwayModel{}).
 				SetWhereFields("uuid", "sort", "unique_code", "name", "short_name", "be_enable").
-				PrepareQuery(ctx, "").
+				PrepareUseQueryByDefault(ctx).
 				Find(&organizationRailways)
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_railways": organizationRailways}))
+			ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"organization_railways": organizationRailways}))
 		})
 	}
 }

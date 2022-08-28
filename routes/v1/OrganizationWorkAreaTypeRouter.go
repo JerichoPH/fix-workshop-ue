@@ -59,12 +59,12 @@ func (OrganizationWorkAreaTypeRouter) Load(engine *gin.Engine) {
 			var repeat models.OrganizationWorkAreaTypeModel
 			ret = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "工区类型代码")
 			ret = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "工区类型名称")
 
@@ -74,11 +74,11 @@ func (OrganizationWorkAreaTypeRouter) Load(engine *gin.Engine) {
 				UniqueCode: form.UniqueCode,
 				Name:       form.Name,
 			}
-			if ret = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).Prepare("").Create(&organizationWorkAreaType); ret.Error != nil {
+			if ret = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).PrepareByDefault().Create(&organizationWorkAreaType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"organization_work_area_type": organizationWorkAreaType}))
+			ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"organization_work_area_type": organizationWorkAreaType}))
 		})
 
 		// 删除
@@ -87,11 +87,11 @@ func (OrganizationWorkAreaTypeRouter) Load(engine *gin.Engine) {
 			organizationWorkAreaType := (&models.OrganizationWorkAreaTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 			// 删除
-			if ret := models.BootByModel(models.OrganizationWorkAreaTypeModel{}).Prepare("").Delete(&organizationWorkAreaType); ret.Error != nil {
+			if ret := models.BootByModel(models.OrganizationWorkAreaTypeModel{}).PrepareByDefault().Delete(&organizationWorkAreaType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Deleted())
+			ctx.JSON(tools.CorrectBootByDefault().Deleted())
 		})
 
 		// 编辑
@@ -106,13 +106,13 @@ func (OrganizationWorkAreaTypeRouter) Load(engine *gin.Engine) {
 			ret = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "工区类型代码")
 			ret = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "工区类型名称")
 
@@ -123,18 +123,18 @@ func (OrganizationWorkAreaTypeRouter) Load(engine *gin.Engine) {
 			organizationWorkAreaType.BaseModel.Sort = form.Sort
 			organizationWorkAreaType.UniqueCode = form.UniqueCode
 			organizationWorkAreaType.Name = form.Name
-			if ret = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).Prepare("").Save(&organizationWorkAreaType); ret.Error != nil {
+			if ret = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).PrepareByDefault().Save(&organizationWorkAreaType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"organization_work_area_type": organizationWorkAreaType}))
+			ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"organization_work_area_type": organizationWorkAreaType}))
 		})
 
 		// 详情
 		r.GET(":uuid", func(ctx *gin.Context) {
 			organizationWorkAreaType := (&models.OrganizationWorkAreaTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_work_area_type": organizationWorkAreaType}))
+			ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"organization_work_area_type": organizationWorkAreaType}))
 		})
 
 		// 列表
@@ -145,7 +145,7 @@ func (OrganizationWorkAreaTypeRouter) Load(engine *gin.Engine) {
 				PrepareQuery(ctx,"").
 				Find(&organizationWorkAreaType)
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"organization_work_area_types": organizationWorkAreaType}))
+			ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"organization_work_area_types": organizationWorkAreaType}))
 		})
 	}
 }
