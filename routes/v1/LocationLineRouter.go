@@ -238,20 +238,10 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 			locationLine.Name = form.Name
 			locationLine.Sort = form.Sort
 			locationLine.BeEnable = form.BeEnable
-
-			if ret = (&models.BaseModel{}).SetModel(&models.LocationLineModel{}).PrepareByDefault().Save(&locationLine); ret.Error != nil {
-				wrongs.PanicForbidden(ret.Error.Error())
-			}
-
-			if ret = models.BootByModel(models.LocationLineModel{}).
+			if ret = models.BootByModel(&models.LocationLineModel{}).
+				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				PrepareByDefault().
-				Where("uuid = ?", ctx.Param("uuid")).
-				Updates(map[string]interface{}{
-					"sort":        form.Sort,
-					"unique_code": form.UniqueCode,
-					"name":        form.Name,
-					"be_enable":   form.BeEnable,
-				}); ret.Error != nil {
+				Save(&locationLine); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -268,7 +258,7 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 			ret = models.BootByModel(models.LocationLineModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				SetWhereFields("be_enable").
-				PrepareQuery(ctx,"").
+				PrepareQuery(ctx, "").
 				First(&organizationLine)
 			wrongs.PanicWhenIsEmpty(ret, "线别")
 
@@ -280,7 +270,7 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 			var organizationLines []models.LocationLineModel
 			models.BootByModel(models.LocationLineModel{}).
 				SetWhereFields("unique_code", "name", "be_enable", "sort").
-				PrepareQuery(ctx,"").
+				PrepareQuery(ctx, "").
 				Find(&organizationLines)
 
 			ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"location_lines": organizationLines}))
