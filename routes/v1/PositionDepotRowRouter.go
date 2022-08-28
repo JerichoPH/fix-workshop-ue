@@ -43,7 +43,7 @@ func (cls PositionDepotRowStoreForm) ShouldBind(ctx *gin.Context) PositionDepotR
 	if cls.PositionDepotRowTypeUUID == "" {
 		wrongs.PanicValidate("所属排类型必选")
 	}
-	models.Init(models.PositionDepotRowTypeModel{}).
+	models.BootByModel(models.PositionDepotRowTypeModel{}).
 		SetWheres(tools.Map{"uuid": cls.PositionDepotRowTypeUUID}).
 		Prepare("").
 		First(&cls.PositionDepotRowType)
@@ -51,7 +51,7 @@ func (cls PositionDepotRowStoreForm) ShouldBind(ctx *gin.Context) PositionDepotR
 	if cls.PositionDepotSectionUUID == "" {
 		wrongs.PanicValidate("所属仓库区域必选")
 	}
-	ret = models.Init(models.PositionDepotSectionModel{}).
+	ret = models.BootByModel(models.PositionDepotSectionModel{}).
 		SetWheres(tools.Map{"uuid": cls.PositionDepotSectionUUID}).
 		Prepare("").
 		First(&cls.PositionDepotSection)
@@ -81,12 +81,12 @@ func (PositionDepotRowRouter) Load(engine *gin.Engine) {
 			form := (&PositionDepotRowStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.PositionDepotRowModel{}).
+			ret = models.BootByModel(models.PositionDepotRowModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "仓库排代码")
-			ret = models.Init(models.PositionDepotRowModel{}).
+			ret = models.BootByModel(models.PositionDepotRowModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare("").
 				First(&repeat)
@@ -100,7 +100,7 @@ func (PositionDepotRowRouter) Load(engine *gin.Engine) {
 				PositionDepotRowType: form.PositionDepotRowType,
 				PositionDepotSection: form.PositionDepotSection,
 			}
-			if ret = models.Init(models.PositionDepotRowModel{}).Prepare("").Create(&positionDepotRow); ret.Error != nil {
+			if ret = models.BootByModel(models.PositionDepotRowModel{}).Prepare("").Create(&positionDepotRow); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -115,14 +115,14 @@ func (PositionDepotRowRouter) Load(engine *gin.Engine) {
 			)
 
 			// 查询
-			ret = models.Init(models.PositionDepotRowModel{}).
+			ret = models.BootByModel(models.PositionDepotRowModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&positionDepotRow)
 			wrongs.PanicWhenIsEmpty(ret, "仓库排")
 
 			// 删除
-			if ret := models.Init(models.PositionDepotRowModel{}).Prepare("").Delete(&positionDepotRow); ret.Error != nil {
+			if ret := models.BootByModel(models.PositionDepotRowModel{}).Prepare("").Delete(&positionDepotRow); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -140,13 +140,13 @@ func (PositionDepotRowRouter) Load(engine *gin.Engine) {
 			form := (&PositionDepotRowStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.PositionDepotRowModel{}).
+			ret = models.BootByModel(models.PositionDepotRowModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "仓库排代码")
-			ret = models.Init(models.PositionDepotRowModel{}).
+			ret = models.BootByModel(models.PositionDepotRowModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
@@ -154,7 +154,7 @@ func (PositionDepotRowRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsRepeat(ret, "仓库排名称")
 
 			// 查询
-			ret = models.Init(models.PositionDepotRowModel{}).
+			ret = models.BootByModel(models.PositionDepotRowModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&positionDepotRow)
@@ -166,7 +166,7 @@ func (PositionDepotRowRouter) Load(engine *gin.Engine) {
 			positionDepotRow.Name = form.Name
 			positionDepotRow.PositionDepotRowType = form.PositionDepotRowType
 			positionDepotRow.PositionDepotSection = form.PositionDepotSection
-			if ret = models.Init(models.PositionDepotRowModel{}).Prepare("").Save(&positionDepotRow); ret.Error != nil {
+			if ret = models.BootByModel(models.PositionDepotRowModel{}).Prepare("").Save(&positionDepotRow); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -179,7 +179,7 @@ func (PositionDepotRowRouter) Load(engine *gin.Engine) {
 				ret              *gorm.DB
 				locationDepotRow models.PositionDepotRowModel
 			)
-			ret = models.Init(models.PositionDepotRowModel{}).
+			ret = models.BootByModel(models.PositionDepotRowModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&locationDepotRow)
@@ -191,7 +191,7 @@ func (PositionDepotRowRouter) Load(engine *gin.Engine) {
 		// 列表
 		r.GET("", func(ctx *gin.Context) {
 			var locationDepotRows []models.PositionDepotRowModel
-			models.Init(models.PositionDepotRowModel{}).
+			models.BootByModel(models.PositionDepotRowModel{}).
 				SetWhereFields().
 				PrepareQuery(ctx,"").
 				Find(&locationDepotRows)

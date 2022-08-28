@@ -59,12 +59,12 @@ func (KindCategoryRouter) Load(engine *gin.Engine) {
 			form := (&KindCategoryStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.KindCategoryModel{}).
+			ret = models.BootByModel(models.KindCategoryModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "种类代码")
-			ret = models.Init(models.KindCategoryModel{}).
+			ret = models.BootByModel(models.KindCategoryModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare("").
 				First(&repeat)
@@ -79,7 +79,7 @@ func (KindCategoryRouter) Load(engine *gin.Engine) {
 				Nickname:        form.Nickname,
 				Race:            form.Race,
 			}
-			if ret = models.Init(models.KindCategoryModel{}).Prepare("").Create(&kindCategory); ret.Error != nil {
+			if ret = models.BootByModel(models.KindCategoryModel{}).Prepare("").Create(&kindCategory); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -94,14 +94,14 @@ func (KindCategoryRouter) Load(engine *gin.Engine) {
 			)
 
 			// 查询
-			ret = models.Init(models.KindCategoryModel{}).
+			ret = models.BootByModel(models.KindCategoryModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&kindCategory)
 			wrongs.PanicWhenIsEmpty(ret, "种类")
 
 			// 删除
-			if ret := models.Init(models.KindCategoryModel{}).Prepare("").Delete(&kindCategory); ret.Error != nil {
+			if ret := models.BootByModel(models.KindCategoryModel{}).Prepare("").Delete(&kindCategory); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -119,13 +119,13 @@ func (KindCategoryRouter) Load(engine *gin.Engine) {
 			form := (&KindCategoryStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.KindCategoryModel{}).
+			ret = models.BootByModel(models.KindCategoryModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "种类代码")
-			ret = models.Init(models.KindCategoryModel{}).
+			ret = models.BootByModel(models.KindCategoryModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
@@ -133,7 +133,7 @@ func (KindCategoryRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsRepeat(ret, "种类名称")
 
 			// 查询
-			ret = models.Init(models.KindCategoryModel{}).
+			ret = models.BootByModel(models.KindCategoryModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&kindCategory)
@@ -146,7 +146,7 @@ func (KindCategoryRouter) Load(engine *gin.Engine) {
 			kindCategory.Nickname = form.Nickname
 			kindCategory.BeEnable = form.BeEnable
 			kindCategory.Race = form.Race
-			if ret = models.Init(models.KindCategoryModel{}).Prepare("").Save(&kindCategory); ret.Error != nil {
+			if ret = models.BootByModel(models.KindCategoryModel{}).Prepare("").Save(&kindCategory); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -159,7 +159,7 @@ func (KindCategoryRouter) Load(engine *gin.Engine) {
 				ret          *gorm.DB
 				kindCategory models.KindCategoryModel
 			)
-			ret = models.Init(models.KindCategoryModel{}).
+			ret = models.BootByModel(models.KindCategoryModel{}).
 				SetScopes((&models.BaseModel{}).ScopeBeEnableTrue).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
@@ -172,7 +172,7 @@ func (KindCategoryRouter) Load(engine *gin.Engine) {
 		// 列表
 		r.GET("", func(ctx *gin.Context) {
 			var kindCategories []models.KindCategoryModel
-			models.Init(models.KindCategoryModel{}).
+			models.BootByModel(models.KindCategoryModel{}).
 				SetScopes((&models.BaseModel{}).ScopeBeEnableTrue).
 				SetWhereFields().
 				PrepareQuery(ctx,"").

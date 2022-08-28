@@ -31,10 +31,10 @@ type BaseModel struct {
 	model          interface{}
 }
 
-// Init 获取数据库查询对象
+// BootByModel 获取数据库查询对象
 //  @param model
 //  @return *BaseModel
-func Init(model interface{}) *BaseModel {
+func BootByModel(model interface{}) *BaseModel {
 	return (&BaseModel{}).SetModel(model)
 }
 
@@ -154,7 +154,7 @@ func (cls *BaseModel) BeforeCreate(db *gorm.DB) (err error) {
 
 // BeforeSave 修改数据前
 func (cls *BaseModel) BeforeSave(db *gorm.DB) (err error) {
-	//cfg := (&settings.Setting{}).Init()
+	//cfg := (&settings.Setting{}).BootByModel()
 	cls.UpdatedAt = time.Now()
 	//l, _ := time.LoadLocation("Asia/Shanghai")
 	//t := time.Now().In(l)
@@ -169,6 +169,9 @@ func (cls *BaseModel) BeforeSave(db *gorm.DB) (err error) {
 //}
 
 // Prepare 初始化
+//  @receiver cls
+//  @param dbDriver
+//  @return dbSession
 func (cls *BaseModel) Prepare(dbDriver string) (dbSession *gorm.DB) {
 	dbSession = (&databases.DatabaseLaunch{DBDriver: dbDriver}).GetDatabase()
 
@@ -206,6 +209,10 @@ func (cls *BaseModel) Prepare(dbDriver string) (dbSession *gorm.DB) {
 }
 
 // PrepareQuery 根据Query参数初始化
+//  @receiver cls
+//  @param ctx
+//  @param dbDriver
+//  @return *gorm.DB
 func (cls *BaseModel) PrepareQuery(ctx *gin.Context, dbDriver string) *gorm.DB {
 	dbSession := cls.Prepare(dbDriver)
 
@@ -213,7 +220,7 @@ func (cls *BaseModel) PrepareQuery(ctx *gin.Context, dbDriver string) *gorm.DB {
 	notWheres := make(map[string]interface{})
 
 	// 拼接需要跳过的字段
-	ignoreFields := make(map[string]int8)
+	ignoreFields := make(map[string]int32)
 	if len(cls.ignoreFields) > 0 {
 		for _, v := range cls.ignoreFields {
 			ignoreFields[v] = 1
@@ -259,6 +266,21 @@ func (cls *BaseModel) PrepareQuery(ctx *gin.Context, dbDriver string) *gorm.DB {
 	}
 
 	return dbSession
+}
+
+// PrepareByDefault 通过默认数据库初始化
+//  @receiver cls
+//  @return dbSession
+func (cls *BaseModel) PrepareByDefault() (dbSession *gorm.DB) {
+	return cls.Prepare("")
+}
+
+// PrepareQueryByDefault 通过默认数据库初始化
+//  @receiver cls
+//  @param ctx
+//  @return dbSession
+func (cls *BaseModel) PrepareQueryByDefault(ctx *gin.Context) (dbSession *gorm.DB) {
+	return cls.PrepareQuery(ctx, "")
 }
 
 // BaseOption 基础查询条件

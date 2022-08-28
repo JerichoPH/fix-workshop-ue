@@ -29,7 +29,7 @@ func CheckPermission() gin.HandlerFunc {
 
 			// 获取权限
 			var rbacPermission models.RbacPermissionModel
-			ret = models.Init(models.RbacPermissionModel{}).
+			ret = models.BootByModel(models.RbacPermissionModel{}).
 				SetWheres(tools.Map{
 					"uri":    ctx.FullPath(),
 					"method": ctx.Request.Method,
@@ -42,7 +42,7 @@ func CheckPermission() gin.HandlerFunc {
 				}
 			}
 
-			models.Init(models.BaseModel{}).Prepare("").Raw(`select prp.rbac_role_id
+			models.BootByModel(models.BaseModel{}).Prepare("").Raw(`select prp.rbac_role_id
 from pivot_rbac_role_and_rbac_permissions as prp
          join rbac_roles r on prp.rbac_role_id = r.id
          join rbac_permissions p on prp.rbac_permission_id = p.id

@@ -39,7 +39,7 @@ func (cls PositionIndoorCabinetStoreForm) ShouldBind(ctx *gin.Context) PositionI
 		wrongs.PanicValidate("柜架名称必填")
 	}
 	if cls.PositionIndoorRowUUID == "" {
-		ret = models.Init(models.PositionIndoorRowModel{}).
+		ret = models.BootByModel(models.PositionIndoorRowModel{}).
 			SetWheres(tools.Map{"uuid": cls.PositionIndoorRowUUID}).
 			Prepare("").
 			First(&cls.PositionIndoorRow)
@@ -70,12 +70,12 @@ func (PositionIndoorCabinetRouter) Load(engine *gin.Engine) {
 			form := (&PositionIndoorCabinetStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.PositionIndoorCabinetModel{}).
+			ret = models.BootByModel(models.PositionIndoorCabinetModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "柜架代码")
-			ret = models.Init(models.PositionIndoorCabinetModel{}).
+			ret = models.BootByModel(models.PositionIndoorCabinetModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare("").
 				First(&repeat)
@@ -88,7 +88,7 @@ func (PositionIndoorCabinetRouter) Load(engine *gin.Engine) {
 				Name:              form.Name,
 				PositionIndoorRow: form.PositionIndoorRow,
 			}
-			if ret = models.Init(models.PositionIndoorCabinetModel{}).Prepare("").Create(&locationIndoorCabinet); ret.Error != nil {
+			if ret = models.BootByModel(models.PositionIndoorCabinetModel{}).Prepare("").Create(&locationIndoorCabinet); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -103,14 +103,14 @@ func (PositionIndoorCabinetRouter) Load(engine *gin.Engine) {
 			)
 
 			// 查询
-			ret = models.Init(models.PositionIndoorCabinetModel{}).
+			ret = models.BootByModel(models.PositionIndoorCabinetModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&positionIndoorCabinet)
 			wrongs.PanicWhenIsEmpty(ret, "柜架")
 
 			// 删除
-			if ret := models.Init(models.PositionIndoorCabinetModel{}).Prepare("").Delete(&positionIndoorCabinet); ret.Error != nil {
+			if ret := models.BootByModel(models.PositionIndoorCabinetModel{}).Prepare("").Delete(&positionIndoorCabinet); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -128,13 +128,13 @@ func (PositionIndoorCabinetRouter) Load(engine *gin.Engine) {
 			form := (&PositionIndoorCabinetStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.PositionIndoorCabinetModel{}).
+			ret = models.BootByModel(models.PositionIndoorCabinetModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "柜架代码")
-			ret = models.Init(models.PositionIndoorCabinetModel{}).
+			ret = models.BootByModel(models.PositionIndoorCabinetModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
@@ -142,7 +142,7 @@ func (PositionIndoorCabinetRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsRepeat(ret, "柜架名称")
 
 			// 查询
-			ret = models.Init(models.PositionIndoorCabinetModel{}).
+			ret = models.BootByModel(models.PositionIndoorCabinetModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&positionIndoorCabinet)
@@ -153,7 +153,7 @@ func (PositionIndoorCabinetRouter) Load(engine *gin.Engine) {
 			positionIndoorCabinet.UniqueCode = form.UniqueCode
 			positionIndoorCabinet.Name = form.Name
 			positionIndoorCabinet.PositionIndoorRow = form.PositionIndoorRow
-			if ret = models.Init(models.PositionIndoorCabinetModel{}).Prepare("").Save(&positionIndoorCabinet); ret.Error != nil {
+			if ret = models.BootByModel(models.PositionIndoorCabinetModel{}).Prepare("").Save(&positionIndoorCabinet); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -166,7 +166,7 @@ func (PositionIndoorCabinetRouter) Load(engine *gin.Engine) {
 				ret                   *gorm.DB
 				positionIndoorCabinet models.PositionIndoorCabinetModel
 			)
-			ret = models.Init(models.PositionIndoorCabinetModel{}).
+			ret = models.BootByModel(models.PositionIndoorCabinetModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&positionIndoorCabinet)
@@ -178,7 +178,7 @@ func (PositionIndoorCabinetRouter) Load(engine *gin.Engine) {
 		// 列表
 		r.GET("", func(ctx *gin.Context) {
 			var positionIndoorCabinet []models.PositionIndoorCabinetModel
-			models.Init(models.PositionIndoorCabinetModel{}).
+			models.BootByModel(models.PositionIndoorCabinetModel{}).
 				SetWhereFields().
 				PrepareQuery(ctx,"").
 				Find(&positionIndoorCabinet)

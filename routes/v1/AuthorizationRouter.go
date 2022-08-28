@@ -104,7 +104,7 @@ func (AuthorizationRouter) Load(engine *gin.Engine) {
 				Password:  string(bytes),
 				Nickname:  form.Nickname,
 			}
-			if ret = models.Init(models.AccountModel{}).
+			if ret = models.BootByModel(models.AccountModel{}).
 				SetOmits(clause.Associations).
 				Prepare("").
 				Create(&account); ret.Error != nil {
@@ -122,7 +122,7 @@ func (AuthorizationRouter) Load(engine *gin.Engine) {
 			// 获取用户
 			var account models.AccountModel
 			var ret *gorm.DB
-			ret = models.Init(models.AccountModel{}).
+			ret = models.BootByModel(models.AccountModel{}).
 				SetWheres(tools.Map{"username": form.Username}).
 				Prepare("").
 				First(&account)
@@ -158,7 +158,7 @@ func (AuthorizationRouter) Load(engine *gin.Engine) {
 				} else {
 					// 获取当前用户信息
 					var account models.AccountModel
-					ret = models.Init(models.AccountModel{}).
+					ret = models.BootByModel(models.AccountModel{}).
 						SetWheres(tools.Map{"uuid": accountUUID}).
 						SetPreloads("RbacRoles", "RbacRoles.Menus").
 						Prepare("").
@@ -177,7 +177,7 @@ func (AuthorizationRouter) Load(engine *gin.Engine) {
 					}
 
 					var menus []models.MenuModel
-					models.Init(models.MenuModel{}).
+					models.BootByModel(models.MenuModel{}).
 						Prepare("").
 						Where("uuid in ?", menuUUIDs).
 						Where("parent_uuid is null").

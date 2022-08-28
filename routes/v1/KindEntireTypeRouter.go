@@ -43,7 +43,7 @@ func (cls KindEntireTypeStoreForm) ShouldBind(ctx *gin.Context) KindEntireTypeSt
 	if cls.KindCategoryUUID == "" {
 		wrongs.PanicValidate("所属种类必选")
 	}
-	ret = models.Init(models.KindCategoryModel{}).
+	ret = models.BootByModel(models.KindCategoryModel{}).
 		SetWheres(tools.Map{"uuid": cls.KindCategoryUUID}).
 		Prepare("").
 		First(&cls.KindCategory)
@@ -73,12 +73,12 @@ func (KindEntireTypeRouter) Load(engine *gin.Engine) {
 			form := (&KindEntireTypeStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.KindEntireTypeModel{}).
+			ret = models.BootByModel(models.KindEntireTypeModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "类型代码")
-			ret = models.Init(models.KindEntireTypeModel{}).
+			ret = models.BootByModel(models.KindEntireTypeModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare("").
 				First(&repeat)
@@ -92,7 +92,7 @@ func (KindEntireTypeRouter) Load(engine *gin.Engine) {
 				BeEnable:     form.BeEnable,
 				KindCategory: form.KindCategory,
 			}
-			if ret = models.Init(models.KindEntireTypeModel{}).Prepare("").Create(&kindEntireType); ret.Error != nil {
+			if ret = models.BootByModel(models.KindEntireTypeModel{}).Prepare("").Create(&kindEntireType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -107,14 +107,14 @@ func (KindEntireTypeRouter) Load(engine *gin.Engine) {
 			)
 
 			// 查询
-			ret = models.Init(models.KindEntireTypeModel{}).
+			ret = models.BootByModel(models.KindEntireTypeModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&kindEntireType)
 			wrongs.PanicWhenIsEmpty(ret, "类型")
 
 			// 删除
-			if ret := models.Init(models.KindEntireTypeModel{}).Prepare("").Delete(&kindEntireType); ret.Error != nil {
+			if ret := models.BootByModel(models.KindEntireTypeModel{}).Prepare("").Delete(&kindEntireType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -132,13 +132,13 @@ func (KindEntireTypeRouter) Load(engine *gin.Engine) {
 			form := (&KindEntireTypeStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.KindEntireTypeModel{}).
+			ret = models.BootByModel(models.KindEntireTypeModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "类型代码")
-			ret = models.Init(models.KindEntireTypeModel{}).
+			ret = models.BootByModel(models.KindEntireTypeModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
@@ -146,7 +146,7 @@ func (KindEntireTypeRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsRepeat(ret, "类型名称")
 
 			// 查询
-			ret = models.Init(models.KindEntireTypeModel{}).
+			ret = models.BootByModel(models.KindEntireTypeModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&kindEntireType)
@@ -158,7 +158,7 @@ func (KindEntireTypeRouter) Load(engine *gin.Engine) {
 			kindEntireType.Name = form.Name
 			kindEntireType.BeEnable = form.BeEnable
 			kindEntireType.KindCategory = form.KindCategory
-			if ret = models.Init(models.KindEntireTypeModel{}).Prepare("").Save(&kindEntireType); ret.Error != nil {
+			if ret = models.BootByModel(models.KindEntireTypeModel{}).Prepare("").Save(&kindEntireType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -171,7 +171,7 @@ func (KindEntireTypeRouter) Load(engine *gin.Engine) {
 				ret            *gorm.DB
 				kindEntireType models.KindEntireTypeModel
 			)
-			ret = models.Init(models.KindEntireTypeModel{}).
+			ret = models.BootByModel(models.KindEntireTypeModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&kindEntireType)
@@ -183,7 +183,7 @@ func (KindEntireTypeRouter) Load(engine *gin.Engine) {
 		// 列表
 		r.GET("", func(ctx *gin.Context) {
 			var kindEntireTypes []models.KindEntireTypeModel
-			models.Init(models.KindEntireTypeModel{}).
+			models.BootByModel(models.KindEntireTypeModel{}).
 				SetWhereFields().
 				PrepareQuery(ctx,"").
 				Find(&kindEntireTypes)

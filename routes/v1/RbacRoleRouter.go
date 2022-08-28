@@ -55,7 +55,7 @@ func (cls RbacRoleBindAccountsForm) ShouldBind(ctx *gin.Context) RbacRoleBindAcc
 	}
 
 	if len(cls.AccountUUIDs) > 0 {
-		models.Init(models.AccountModel{}).
+		models.BootByModel(models.AccountModel{}).
 			Prepare("").
 			Where("uuid in ?", cls.AccountUUIDs).
 			Find(&cls.Accounts)
@@ -80,7 +80,7 @@ func (cls RbacRoleBindPermissionsForm) ShouldBind(ctx *gin.Context) RbacRoleBind
 	}
 
 	if len(cls.RbacPermissionUUIDs) > 0 {
-		models.Init(models.RbacPermissionModel{}).
+		models.BootByModel(models.RbacPermissionModel{}).
 			Prepare("").
 			Where("uuid in ?", cls.RbacPermissionUUIDs).
 			Find(&cls.RbacPermissions)
@@ -110,7 +110,7 @@ func (RbacRoleRouter) Load(engine *gin.Engine) {
 			form := (&RbacRoleStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.RbacRoleModel{}).
+			ret = models.BootByModel(models.RbacRoleModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare("").
 				First(&repeat)
@@ -121,7 +121,7 @@ func (RbacRoleRouter) Load(engine *gin.Engine) {
 				BaseModel: models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
 				Name:      form.Name,
 			}
-			if ret = models.Init(models.RbacRoleModel{}).Prepare("").Create(rbacRole); ret.Error != nil {
+			if ret = models.BootByModel(models.RbacRoleModel{}).Prepare("").Create(rbacRole); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -135,14 +135,14 @@ func (RbacRoleRouter) Load(engine *gin.Engine) {
 				rbacRole models.RbacRoleModel
 			)
 			// 查询
-			ret = models.Init(models.RbacRoleModel{}).
+			ret = models.BootByModel(models.RbacRoleModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&rbacRole)
 			wrongs.PanicWhenIsEmpty(ret, "角色")
 
 			// 删除
-			if ret = models.Init(models.RbacRoleModel{}).Prepare("").Delete(&rbacRole); ret.Error != nil {
+			if ret = models.BootByModel(models.RbacRoleModel{}).Prepare("").Delete(&rbacRole); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -160,7 +160,7 @@ func (RbacRoleRouter) Load(engine *gin.Engine) {
 			form := (&RbacRoleStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.RbacRoleModel{}).
+			ret = models.BootByModel(models.RbacRoleModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
@@ -168,7 +168,7 @@ func (RbacRoleRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsRepeat(ret, "角色名称")
 
 			// 查询
-			ret = models.Init(models.RbacRoleModel{}).
+			ret = models.BootByModel(models.RbacRoleModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&rbacRole)
@@ -176,7 +176,7 @@ func (RbacRoleRouter) Load(engine *gin.Engine) {
 
 			// 修改
 			rbacRole.Name = form.Name
-			models.Init(models.RbacRoleModel{}).Prepare("").Save(&rbacRole)
+			models.BootByModel(models.RbacRoleModel{}).Prepare("").Save(&rbacRole)
 
 			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"rbac_role": rbacRole}))
 		})
@@ -192,7 +192,7 @@ func (RbacRoleRouter) Load(engine *gin.Engine) {
 			form := (&RbacRoleBindAccountsForm{}).ShouldBind(ctx)
 
 			// 查询
-			ret = models.Init(models.RbacRoleModel{}).
+			ret = models.BootByModel(models.RbacRoleModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&rbacRole)
@@ -203,7 +203,7 @@ func (RbacRoleRouter) Load(engine *gin.Engine) {
 
 			// 绑定
 			rbacRole.Accounts = form.Accounts
-			if ret = models.Init(models.RbacRoleModel{}).Prepare("").Save(&rbacRole); ret.Error != nil {
+			if ret = models.BootByModel(models.RbacRoleModel{}).Prepare("").Save(&rbacRole); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -221,7 +221,7 @@ func (RbacRoleRouter) Load(engine *gin.Engine) {
 			form := (&RbacRoleBindPermissionsForm{}).ShouldBind(ctx)
 
 			// 查询
-			ret = models.Init(models.RbacRoleModel{}).
+			ret = models.BootByModel(models.RbacRoleModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&rbacRole)
@@ -232,7 +232,7 @@ func (RbacRoleRouter) Load(engine *gin.Engine) {
 
 			// 绑定
 			rbacRole.RbacPermissions = form.RbacPermissions
-			if ret = models.Init(models.RbacRoleModel{}).Prepare("").Save(&rbacRole); ret.Error != nil {
+			if ret = models.BootByModel(models.RbacRoleModel{}).Prepare("").Save(&rbacRole); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -246,7 +246,7 @@ func (RbacRoleRouter) Load(engine *gin.Engine) {
 				rbacRole models.RbacRoleModel
 			)
 
-			ret = models.Init(models.RbacRoleModel{}).
+			ret = models.BootByModel(models.RbacRoleModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				SetPreloads(
 					"RbacPermissions",
@@ -264,7 +264,7 @@ func (RbacRoleRouter) Load(engine *gin.Engine) {
 		// 角色列表
 		r.GET("", func(ctx *gin.Context) {
 			var rbacRoles []models.RbacRoleModel
-			models.Init(models.RbacRoleModel{}).
+			models.BootByModel(models.RbacRoleModel{}).
 				PrepareQuery(ctx,"").
 				Find(&rbacRoles)
 

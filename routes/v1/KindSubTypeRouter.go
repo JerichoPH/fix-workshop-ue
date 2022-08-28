@@ -43,7 +43,7 @@ func (cls KindSubTypeStoreForm) ShouldBind(ctx *gin.Context) KindSubTypeStoreFor
 	if cls.KindEntireTypeUUID == "" {
 		wrongs.PanicValidate("所属类型必选")
 	}
-	ret = models.Init(models.KindEntireTypeModel{}).
+	ret = models.BootByModel(models.KindEntireTypeModel{}).
 		SetWheres(tools.Map{"uuid": cls.KindEntireTypeUUID}).
 		Prepare("").
 		First(&cls.KindEntireType)
@@ -73,12 +73,12 @@ func (KindSubTypeRouter) Load(engine *gin.Engine) {
 			form := (&KindSubTypeStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.KindSubTypeModel{}).
+			ret = models.BootByModel(models.KindSubTypeModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "型号代码")
-			ret = models.Init(models.KindSubTypeModel{}).
+			ret = models.BootByModel(models.KindSubTypeModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare("").
 				First(&repeat)
@@ -93,7 +93,7 @@ func (KindSubTypeRouter) Load(engine *gin.Engine) {
 				Nickname:       form.Nickname,
 				KindEntireType: form.KindEntireType,
 			}
-			if ret = models.Init(models.KindSubTypeModel{}).Prepare("").Create(&kindSubType); ret.Error != nil {
+			if ret = models.BootByModel(models.KindSubTypeModel{}).Prepare("").Create(&kindSubType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -108,14 +108,14 @@ func (KindSubTypeRouter) Load(engine *gin.Engine) {
 			)
 
 			// 查询
-			ret = models.Init(models.KindSubTypeModel{}).
+			ret = models.BootByModel(models.KindSubTypeModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&kindSubType)
 			wrongs.PanicWhenIsEmpty(ret, "型号")
 
 			// 删除
-			if ret := models.Init(models.KindSubTypeModel{}).Prepare("").Delete(&kindSubType); ret.Error != nil {
+			if ret := models.BootByModel(models.KindSubTypeModel{}).Prepare("").Delete(&kindSubType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -133,13 +133,13 @@ func (KindSubTypeRouter) Load(engine *gin.Engine) {
 			form := (&KindSubTypeStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.KindSubTypeModel{}).
+			ret = models.BootByModel(models.KindSubTypeModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "型号代码")
-			ret = models.Init(models.KindSubTypeModel{}).
+			ret = models.BootByModel(models.KindSubTypeModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
@@ -147,7 +147,7 @@ func (KindSubTypeRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsRepeat(ret, "型号名称")
 
 			// 查询
-			ret = models.Init(models.KindSubTypeModel{}).
+			ret = models.BootByModel(models.KindSubTypeModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&kindSubType)
@@ -160,7 +160,7 @@ func (KindSubTypeRouter) Load(engine *gin.Engine) {
 			kindSubType.BeEnable = form.BeEnable
 			kindSubType.Nickname = form.Nickname
 			kindSubType.KindEntireType = form.KindEntireType
-			if ret = models.Init(models.KindSubTypeModel{}).Prepare("").Save(&kindSubType); ret.Error != nil {
+			if ret = models.BootByModel(models.KindSubTypeModel{}).Prepare("").Save(&kindSubType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -173,7 +173,7 @@ func (KindSubTypeRouter) Load(engine *gin.Engine) {
 				ret         *gorm.DB
 				kindSubType models.KindSubTypeModel
 			)
-			ret = models.Init(models.KindSubTypeModel{}).
+			ret = models.BootByModel(models.KindSubTypeModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&kindSubType)
@@ -185,7 +185,7 @@ func (KindSubTypeRouter) Load(engine *gin.Engine) {
 		// 列表
 		r.GET("", func(ctx *gin.Context) {
 			var kindSubTypes []models.KindSubTypeModel
-			models.Init(models.KindSubTypeModel{}).
+			models.BootByModel(models.KindSubTypeModel{}).
 				SetWhereFields().
 				PrepareQuery(ctx,"").
 				Find(&kindSubTypes)

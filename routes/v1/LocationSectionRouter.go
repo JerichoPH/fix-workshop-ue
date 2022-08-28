@@ -44,13 +44,13 @@ func (cls LocationSectionStoreForm) ShouldBind(ctx *gin.Context) LocationSection
 	if cls.OrganizationWorkshopUUID == "" {
 		wrongs.PanicValidate("所属车间不能为空")
 	}
-	ret = models.Init(models.OrganizationWorkshopModel{}).
+	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
 		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).
 		Prepare("").
 		First(&cls.OrganizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "车间")
 	if cls.OrganizationWorkAreaUUID != "" {
-		ret = models.Init(models.OrganizationWorkAreaModel{}).
+		ret = models.BootByModel(models.OrganizationWorkAreaModel{}).
 			SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUUID}).
 			Prepare("").
 			First(&cls.OrganizationWorkArea)
@@ -99,12 +99,12 @@ func (LocationSectionRouter) Load(engine *gin.Engine) {
 			form := (&LocationSectionStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.LocationSectionModel{}).
+			ret = models.BootByModel(models.LocationSectionModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "区间代码")
-			ret = models.Init(models.LocationSectionModel{}).
+			ret = models.BootByModel(models.LocationSectionModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare("").
 				First(&repeat)
@@ -119,7 +119,7 @@ func (LocationSectionRouter) Load(engine *gin.Engine) {
 				OrganizationWorkshop: form.OrganizationWorkshop,
 				OrganizationWorkArea: form.OrganizationWorkArea,
 			}
-			if ret = models.Init(models.LocationSectionModel{}).Prepare("").Create(&organizationSection); ret.Error != nil {
+			if ret = models.BootByModel(models.LocationSectionModel{}).Prepare("").Create(&organizationSection); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -133,14 +133,14 @@ func (LocationSectionRouter) Load(engine *gin.Engine) {
 				locationSection models.LocationSectionModel
 			)
 			// 查询
-			ret = models.Init(models.LocationSectionModel{}).
+			ret = models.BootByModel(models.LocationSectionModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&locationSection)
 			wrongs.PanicWhenIsEmpty(ret, "区间")
 
 			// 删除
-			if ret := models.Init(models.LocationSectionModel{}).Prepare("").Delete(&locationSection); ret.Error != nil {
+			if ret := models.BootByModel(models.LocationSectionModel{}).Prepare("").Delete(&locationSection); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -158,13 +158,13 @@ func (LocationSectionRouter) Load(engine *gin.Engine) {
 			form := (&LocationSectionStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.LocationSectionModel{}).
+			ret = models.BootByModel(models.LocationSectionModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "区间代码")
-			ret = models.Init(models.LocationSectionModel{}).
+			ret = models.BootByModel(models.LocationSectionModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
@@ -172,7 +172,7 @@ func (LocationSectionRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsRepeat(ret, "区间名称")
 
 			// 查询
-			ret = models.Init(models.LocationSectionModel{}).
+			ret = models.BootByModel(models.LocationSectionModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&locationSection)
@@ -185,7 +185,7 @@ func (LocationSectionRouter) Load(engine *gin.Engine) {
 			locationSection.BeEnable = form.BeEnable
 			locationSection.OrganizationWorkshop = form.OrganizationWorkshop
 			locationSection.OrganizationWorkArea = form.OrganizationWorkArea
-			if ret = models.Init(models.LocationSectionModel{}).Prepare("").Save(&locationSection); ret.Error != nil {
+			if ret = models.BootByModel(models.LocationSectionModel{}).Prepare("").Save(&locationSection); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -203,7 +203,7 @@ func (LocationSectionRouter) Load(engine *gin.Engine) {
 			// 表单
 			form := (&LocationSectionBindLocationLinesForm{}).ShouldBind(ctx)
 
-			if ret = models.Init(models.LocationSectionModel{}).
+			if ret = models.BootByModel(models.LocationSectionModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&locationSection); ret.Error != nil {
@@ -211,7 +211,7 @@ func (LocationSectionRouter) Load(engine *gin.Engine) {
 			}
 
 			// 删除原有绑定关系
-			ret = models.Init(models.BaseModel{}).Prepare("").Exec("delete from pivot_location_line_and_location_sections where location_section_id = ?", locationSection.ID)
+			ret = models.BootByModel(models.BaseModel{}).Prepare("").Exec("delete from pivot_location_line_and_location_sections where location_section_id = ?", locationSection.ID)
 
 			// 创建绑定关系
 			if len(form.LocationLines) > 0 {
@@ -221,7 +221,7 @@ func (LocationSectionRouter) Load(engine *gin.Engine) {
 						LocationSectionID: locationSection.ID,
 					})
 				}
-				models.Init(models.PivotLocationLineAndLocationSection{}).
+				models.BootByModel(models.PivotLocationLineAndLocationSection{}).
 					Prepare("").
 					CreateInBatches(&pivotLocationLineAndLocationSections, 100)
 			}
@@ -235,7 +235,7 @@ func (LocationSectionRouter) Load(engine *gin.Engine) {
 				ret                 *gorm.DB
 				organizationSection models.LocationSectionModel
 			)
-			ret = models.Init(models.LocationSectionModel{}).
+			ret = models.BootByModel(models.LocationSectionModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				SetWhereFields("be_enable").
 				PrepareQuery(ctx,"").
@@ -248,7 +248,7 @@ func (LocationSectionRouter) Load(engine *gin.Engine) {
 		// 列表
 		r.GET("", func(ctx *gin.Context) {
 			var locationSections []models.LocationSectionModel
-			models.Init(models.LocationSectionModel{}).
+			models.BootByModel(models.LocationSectionModel{}).
 				SetWhereFields("unique_code", "Name", "be_enable", "organization_workshop_uuid", "organization_work_area_uuid").
 				PrepareQuery(ctx,"").
 				Find(&locationSections)

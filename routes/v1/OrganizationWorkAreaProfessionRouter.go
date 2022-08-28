@@ -59,12 +59,12 @@ func (OrganizationWorkAreaProfessionRouter) Load(engine *gin.Engine) {
 			form := (&OrganizationWorkAreaProfessionStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.OrganizationWorkAreaProfessionModel{}).
+			ret = models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "工区专业代码")
-			ret = models.Init(models.OrganizationWorkAreaProfessionModel{}).
+			ret = models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare("").
 				First(&repeat)
@@ -76,7 +76,7 @@ func (OrganizationWorkAreaProfessionRouter) Load(engine *gin.Engine) {
 				UniqueCode: form.UniqueCode,
 				Name:       form.Name,
 			}
-			ret = models.Init(models.OrganizationWorkAreaProfessionModel{}).Prepare("").Create(&organizationWorkAreaProfession)
+			ret = models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).Prepare("").Create(&organizationWorkAreaProfession)
 			if ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
@@ -92,14 +92,14 @@ func (OrganizationWorkAreaProfessionRouter) Load(engine *gin.Engine) {
 			)
 
 			// 查询
-			ret = models.Init(models.OrganizationWorkAreaProfessionModel{}).
+			ret = models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&organizationWorkAreaProfession)
 			wrongs.PanicWhenIsEmpty(ret, "工区专业")
 
 			// 删除
-			if ret := models.Init(models.OrganizationWorkAreaProfessionModel{}).Prepare("").Delete(&organizationWorkAreaProfession); ret.Error != nil {
+			if ret := models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).Prepare("").Delete(&organizationWorkAreaProfession); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -117,13 +117,13 @@ func (OrganizationWorkAreaProfessionRouter) Load(engine *gin.Engine) {
 			form := (&OrganizationWorkAreaProfessionStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.OrganizationWorkAreaProfessionModel{}).
+			ret = models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "工区专业代码")
-			ret = models.Init(models.OrganizationWorkAreaProfessionModel{}).
+			ret = models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
@@ -131,7 +131,7 @@ func (OrganizationWorkAreaProfessionRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsRepeat(ret, "工区专业名称")
 
 			// 查询
-			ret = models.Init(models.OrganizationWorkAreaProfessionModel{}).
+			ret = models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&organizationWorkAreaProfession)
@@ -141,7 +141,7 @@ func (OrganizationWorkAreaProfessionRouter) Load(engine *gin.Engine) {
 			organizationWorkAreaProfession.UniqueCode = form.UniqueCode
 			organizationWorkAreaProfession.Name = form.Name
 			if ret = models.
-				Init(models.OrganizationWorkAreaProfessionModel{}).
+				BootByModel(models.OrganizationWorkAreaProfessionModel{}).
 				Prepare("").
 				Where("uuid = ?", ctx.Param("uuid")).
 				Updates(map[string]interface{}{
@@ -160,7 +160,7 @@ func (OrganizationWorkAreaProfessionRouter) Load(engine *gin.Engine) {
 				ret                            *gorm.DB
 				organizationWorkAreaProfession models.OrganizationWorkAreaProfessionModel
 			)
-			ret = models.Init(models.OrganizationWorkAreaProfessionModel{}).
+			ret = models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&organizationWorkAreaProfession)
@@ -172,7 +172,7 @@ func (OrganizationWorkAreaProfessionRouter) Load(engine *gin.Engine) {
 		// 列表
 		r.GET("", func(ctx *gin.Context) {
 			var organizationWorkAreaProfessions []models.OrganizationWorkAreaProfessionModel
-			models.Init(models.OrganizationWorkAreaProfessionModel{}).
+			models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).
 				SetWhereFields().
 				PrepareQuery(ctx, "").
 				Find(&organizationWorkAreaProfessions)

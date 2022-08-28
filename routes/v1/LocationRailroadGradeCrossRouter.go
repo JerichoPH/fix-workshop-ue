@@ -44,13 +44,13 @@ func (cls LocationRailroadGradeCrossStoreForm) ShouldBind(ctx *gin.Context) Loca
 	if cls.OrganizationWorkshopUUID == "" {
 		wrongs.PanicValidate("所属车间必选")
 	}
-	ret = models.Init(models.OrganizationWorkshopModel{}).
+	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
 		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).
 		Prepare("").
 		First(&cls.OrganizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "车间")
 	if cls.OrganizationWorkAreaUUID != "" {
-		ret = models.Init(models.OrganizationWorkAreaModel{}).
+		ret = models.BootByModel(models.OrganizationWorkAreaModel{}).
 			SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUUID}).
 			Prepare("").
 			First(&cls.OrganizationWorkArea)
@@ -76,7 +76,7 @@ func (cls LocationRailroadGradeCrossBindLocationLinesForm) ShouldBind(ctx *gin.C
 	}
 
 	if len(cls.LocationLineUUIDs)>0{
-		models.Init(models.LocationLineModel{}).
+		models.BootByModel(models.LocationLineModel{}).
 			Prepare("").
 			Where("uuid in ?",cls.LocationLineUUIDs).
 			Find(&cls.LocationLines)
@@ -106,12 +106,12 @@ func (LocationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 			form := (&LocationRailroadGradeCrossStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.LocationRailroadGradeCrossModel{}).
+			ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "道口代码")
-			ret = models.Init(models.LocationRailroadGradeCrossModel{}).
+			ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				Prepare("").
 				First(&repeat)
@@ -124,7 +124,7 @@ func (LocationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 				Name:       form.Name,
 				BeEnable:   form.BeEnable,
 			}
-			if ret = models.Init(models.LocationRailroadGradeCrossModel{}).Prepare("").Create(&locationRailroadGradeCross); ret.Error != nil {
+			if ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).Prepare("").Create(&locationRailroadGradeCross); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -139,14 +139,14 @@ func (LocationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 			)
 
 			// 查询
-			ret = models.Init(models.LocationRailroadGradeCrossModel{}).
+			ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&locationRailroadGradeCross)
 			wrongs.PanicWhenIsEmpty(ret, "道口")
 
 			// 删除
-			if ret := models.Init(models.LocationRailroadGradeCrossModel{}).Prepare("").Delete(&locationRailroadGradeCross); ret.Error != nil {
+			if ret := models.BootByModel(models.LocationRailroadGradeCrossModel{}).Prepare("").Delete(&locationRailroadGradeCross); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -164,13 +164,13 @@ func (LocationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 			form := (&LocationRailroadGradeCrossStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.LocationRailroadGradeCrossModel{}).
+			ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "道口代码")
-			ret = models.Init(models.LocationRailroadGradeCrossModel{}).
+			ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
@@ -178,7 +178,7 @@ func (LocationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsRepeat(ret, "道口名称")
 
 			// 查询
-			ret = models.Init(models.LocationRailroadGradeCrossModel{}).
+			ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&locationRailroadGradeCross)
@@ -189,7 +189,7 @@ func (LocationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 			locationRailroadGradeCross.UniqueCode = form.UniqueCode
 			locationRailroadGradeCross.Name = form.Name
 			locationRailroadGradeCross.BeEnable = form.BeEnable
-			if ret = models.Init(models.LocationRailroadGradeCrossModel{}).Prepare("").Save(&locationRailroadGradeCross); ret.Error != nil {
+			if ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).Prepare("").Save(&locationRailroadGradeCross); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -207,7 +207,7 @@ func (LocationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 			// 表单
 			form := (&LocationRailroadGradeCrossBindLocationLinesForm{}).ShouldBind(ctx)
 
-			if ret = models.Init(models.LocationRailroadGradeCrossModel{}).
+			if ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&locationRailroadGradeCross); ret.Error != nil {
@@ -215,7 +215,7 @@ func (LocationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 			}
 
 			// 删除原有绑定关系
-			ret = models.Init(models.BaseModel{}).Prepare("").Exec("delete from pivot_location_line_and_location_railroad_grade_crosses where location_railroad_grade_crosses_id = ?", locationRailroadGradeCross.ID)
+			ret = models.BootByModel(models.BaseModel{}).Prepare("").Exec("delete from pivot_location_line_and_location_railroad_grade_crosses where location_railroad_grade_crosses_id = ?", locationRailroadGradeCross.ID)
 
 			// 创建绑定关系
 			if len(form.LocationLines) > 0 {
@@ -225,7 +225,7 @@ func (LocationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 						LocationRailroadGradeCrossID: locationRailroadGradeCross.ID,
 					})
 				}
-				models.Init(models.PivotLocationLineAndLocationRailroadGradeCross{}).
+				models.BootByModel(models.PivotLocationLineAndLocationRailroadGradeCross{}).
 					Prepare("").
 					CreateInBatches(&pivotLocationLineAndLocationRailroadGradeCrosses, 100)
 			}
@@ -239,7 +239,7 @@ func (LocationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 				ret                        *gorm.DB
 				locationRailroadGradeCross models.LocationRailroadGradeCrossModel
 			)
-			ret = models.Init(models.LocationRailroadGradeCrossModel{}).
+			ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				SetWhereFields("be_enable").
 				PrepareQuery(ctx,"").
@@ -252,7 +252,7 @@ func (LocationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 		// 列表
 		r.GET("", func(ctx *gin.Context) {
 			var locationRailroadGradeCrosses []models.LocationRailroadGradeCrossModel
-			models.Init(models.LocationRailroadGradeCrossModel{}).
+			models.BootByModel(models.LocationRailroadGradeCrossModel{}).
 				SetWhereFields("unique_code", "name", "be_enable", "organization_workshop_uuid", "organization_work_area_uuid").
 				PrepareQuery(ctx,"").
 				Find(&locationRailroadGradeCrosses)

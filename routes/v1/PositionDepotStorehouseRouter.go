@@ -41,7 +41,7 @@ func (cls PositionDepotStorehouseStoreForm) ShouldBind(ctx *gin.Context) Positio
 	if cls.OrganizationWorkshopUUID == "" {
 		wrongs.PanicValidate("所属车间必选")
 	}
-	ret = models.Init(models.OrganizationWorkshopModel{}).
+	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
 		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).
 		Prepare("").
 		First(&cls.OrganizationWorkshop)
@@ -71,7 +71,7 @@ func (cls PositionDepotStorehouseRouter) Load(engine *gin.Engine) {
 			form := (&PositionDepotStorehouseStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.PositionDepotStorehouseModel{}).
+			ret = models.BootByModel(models.PositionDepotStorehouseModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				Prepare("").
 				First(&repeat)
@@ -84,7 +84,7 @@ func (cls PositionDepotStorehouseRouter) Load(engine *gin.Engine) {
 				Name:                  form.Name,
 				OrganizationWorkshop:  form.OrganizationWorkshop,
 			}
-			if ret = models.Init(models.PositionDepotStorehouseModel{}).Prepare("").Create(&positionDepotStorehouse); ret.Error != nil {
+			if ret = models.BootByModel(models.PositionDepotStorehouseModel{}).Prepare("").Create(&positionDepotStorehouse); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -99,14 +99,14 @@ func (cls PositionDepotStorehouseRouter) Load(engine *gin.Engine) {
 			)
 
 			// 查询
-			ret = models.Init(models.PositionDepotStorehouseModel{}).
+			ret = models.BootByModel(models.PositionDepotStorehouseModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&positionDepotStorehouse)
 			wrongs.PanicWhenIsEmpty(ret, "仓库")
 
 			// 删除
-			if ret := models.Init(models.PositionDepotStorehouseModel{}).Prepare("").Delete(&positionDepotStorehouse); ret.Error != nil {
+			if ret := models.BootByModel(models.PositionDepotStorehouseModel{}).Prepare("").Delete(&positionDepotStorehouse); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -124,7 +124,7 @@ func (cls PositionDepotStorehouseRouter) Load(engine *gin.Engine) {
 			form := (&PositionDepotStorehouseStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.PositionDepotStorehouseModel{}).
+			ret = models.BootByModel(models.PositionDepotStorehouseModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
@@ -132,7 +132,7 @@ func (cls PositionDepotStorehouseRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsRepeat(ret, "仓库代码")
 
 			// 查询
-			ret = models.Init(models.PositionDepotStorehouseModel{}).
+			ret = models.BootByModel(models.PositionDepotStorehouseModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&positionDepotStorehouse)
@@ -143,7 +143,7 @@ func (cls PositionDepotStorehouseRouter) Load(engine *gin.Engine) {
 			positionDepotStorehouse.UniqueCode = form.UniqueCode
 			positionDepotStorehouse.Name = form.Name
 			positionDepotStorehouse.OrganizationWorkshop = form.OrganizationWorkshop
-			if ret = models.Init(models.PositionDepotStorehouseModel{}).Prepare("").Save(&positionDepotStorehouse); ret.Error != nil {
+			if ret = models.BootByModel(models.PositionDepotStorehouseModel{}).Prepare("").Save(&positionDepotStorehouse); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
@@ -156,7 +156,7 @@ func (cls PositionDepotStorehouseRouter) Load(engine *gin.Engine) {
 				ret                     *gorm.DB
 				positionDepotStorehouse models.PositionDepotStorehouseModel
 			)
-			ret = models.Init(models.PositionDepotStorehouseModel{}).
+			ret = models.BootByModel(models.PositionDepotStorehouseModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&positionDepotStorehouse)
@@ -168,7 +168,7 @@ func (cls PositionDepotStorehouseRouter) Load(engine *gin.Engine) {
 		// 列表
 		r.GET("", func(ctx *gin.Context) {
 			var positionDepotStorehouses []models.PositionDepotStorehouseModel
-			models.Init(models.PositionDepotStorehouseModel{}).
+			models.BootByModel(models.PositionDepotStorehouseModel{}).
 				SetWhereFields().
 				PrepareQuery(ctx,"").
 				Find(&positionDepotStorehouses)

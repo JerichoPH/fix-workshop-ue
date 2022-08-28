@@ -6,9 +6,9 @@ import (
 	"fix-workshop-ue/tools"
 	"fix-workshop-ue/wrongs"
 	"github.com/gin-gonic/gin"
+	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 	"time"
 )
 
@@ -51,19 +51,19 @@ func (cls AccountStoreForm) ShouldBind(ctx *gin.Context) AccountStoreForm {
 		wrongs.PanicValidate("两次密码输入不一致")
 	}
 	if cls.OrganizationRailwayUUID != "" {
-		ret = models.Init(models.OrganizationRailwayModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationRailwayUUID}).Prepare("").First(&cls.OrganizationRailway)
+		ret = models.BootByModel(models.OrganizationRailwayModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationRailwayUUID}).Prepare("").First(&cls.OrganizationRailway)
 		wrongs.PanicWhenIsEmpty(ret, "路局")
 	}
 	if cls.OrganizationParagraphUUID != "" {
-		ret = models.Init(models.OrganizationParagraphModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationParagraphUUID}).Prepare("").First(&cls.OrganizationParagraph)
+		ret = models.BootByModel(models.OrganizationParagraphModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationParagraphUUID}).Prepare("").First(&cls.OrganizationParagraph)
 		wrongs.PanicWhenIsEmpty(ret, "站段")
 	}
 	if cls.OrganizationWorkshopUUID != "" {
-		ret = models.Init(models.OrganizationWorkshopModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).Prepare("").First(&cls.OrganizationWorkshop)
+		ret = models.BootByModel(models.OrganizationWorkshopModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).Prepare("").First(&cls.OrganizationWorkshop)
 		wrongs.PanicWhenIsEmpty(ret, "车间")
 	}
 	if cls.OrganizationWorkAreaUUID != "" {
-		ret = models.Init(models.OrganizationWorkAreaModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUUID}).Prepare("").First(&cls.OrganizationWorkArea)
+		ret = models.BootByModel(models.OrganizationWorkAreaModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUUID}).Prepare("").First(&cls.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "工区")
 	}
 
@@ -101,19 +101,19 @@ func (cls AccountUpdateForm) ShouldBind(ctx *gin.Context) AccountUpdateForm {
 		wrongs.PanicValidate("昵称必填")
 	}
 	if cls.OrganizationRailwayUUID != "" {
-		ret = models.Init(models.OrganizationRailwayModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationRailwayUUID}).Prepare("").First(&cls.OrganizationRailway)
+		ret = models.BootByModel(models.OrganizationRailwayModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationRailwayUUID}).Prepare("").First(&cls.OrganizationRailway)
 		wrongs.PanicWhenIsEmpty(ret, "路局")
 	}
 	if cls.OrganizationParagraphUUID != "" {
-		ret = models.Init(models.OrganizationParagraphModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationParagraphUUID}).Prepare("").First(&cls.OrganizationParagraph)
+		ret = models.BootByModel(models.OrganizationParagraphModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationParagraphUUID}).Prepare("").First(&cls.OrganizationParagraph)
 		wrongs.PanicWhenIsEmpty(ret, "站段")
 	}
 	if cls.OrganizationWorkshopUUID != "" {
-		ret = models.Init(models.OrganizationWorkshopModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).Prepare("").First(&cls.OrganizationWorkshop)
+		ret = models.BootByModel(models.OrganizationWorkshopModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).Prepare("").First(&cls.OrganizationWorkshop)
 		wrongs.PanicWhenIsEmpty(ret, "车间")
 	}
 	if cls.OrganizationWorkAreaUUID != "" {
-		ret = models.Init(models.OrganizationWorkAreaModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUUID}).Prepare("").First(&cls.OrganizationWorkArea)
+		ret = models.BootByModel(models.OrganizationWorkAreaModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUUID}).Prepare("").First(&cls.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "工区")
 	}
 
@@ -184,6 +184,7 @@ func (AccountRouter) Load(engine *gin.Engine) {
 			bytes, _ := bcrypt.GenerateFromPassword([]byte(form.Password), 14)
 
 			account := &models.AccountModel{
+				BaseModel:             models.BaseModel{UUID: uuid.NewV4().String()},
 				Username:              form.Username,
 				Nickname:              form.Nickname,
 				Password:              string(bytes),
@@ -193,9 +194,8 @@ func (AccountRouter) Load(engine *gin.Engine) {
 				OrganizationWorkArea:  form.OrganizationWorkArea,
 			}
 
-			if ret = models.Init(models.AccountModel{}).
-				SetOmits(clause.Associations).
-				Prepare("").
+			if ret = models.BootByModel(models.AccountModel{}).
+				PrepareByDefault().
 				Create(&account); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
@@ -215,13 +215,13 @@ func (AccountRouter) Load(engine *gin.Engine) {
 
 			// 查重
 			var repeat models.AccountModel
-			ret = models.Init(models.AccountModel{}).
+			ret = models.BootByModel(models.AccountModel{}).
 				SetWheres(tools.Map{"username": form.Username}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "用户账号")
-			ret = models.Init(models.AccountModel{}).
+			ret = models.BootByModel(models.AccountModel{}).
 				SetWheres(tools.Map{"nickname": form.Nickname}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
@@ -229,7 +229,7 @@ func (AccountRouter) Load(engine *gin.Engine) {
 			wrongs.PanicWhenIsRepeat(ret, "用户昵称")
 
 			// 查询
-			ret = models.Init(models.AccountModel{}).SetWheres(map[string]interface{}{"uuid": ctx.Param("uuid")}).Prepare("").First(&account)
+			ret = models.BootByModel(models.AccountModel{}).SetWheres(map[string]interface{}{"uuid": ctx.Param("uuid")}).Prepare("").First(&account)
 			wrongs.PanicWhenIsEmpty(ret, "用户")
 
 			// 编辑
@@ -239,7 +239,7 @@ func (AccountRouter) Load(engine *gin.Engine) {
 			account.OrganizationParagraph = form.OrganizationParagraph
 			account.OrganizationWorkshop = form.OrganizationWorkshop
 			account.OrganizationWorkArea = form.OrganizationWorkArea
-			if ret = models.Init(models.AccountModel{}).
+			if ret = models.BootByModel(models.AccountModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				Prepare("").
 				Save(&account); ret.Error != nil {
@@ -270,7 +270,7 @@ func (AccountRouter) Load(engine *gin.Engine) {
 			bytes, _ := bcrypt.GenerateFromPassword([]byte(form.NewPassword), 14)
 			account.Password = string(bytes)
 
-			if ret = models.Init(models.AccountModel{}).
+			if ret = models.BootByModel(models.AccountModel{}).
 				Prepare("").
 				Updates(map[string]interface{}{
 					"password": string(bytes),
@@ -285,7 +285,7 @@ func (AccountRouter) Load(engine *gin.Engine) {
 		r.GET(":uuid", func(ctx *gin.Context) {
 			var ret *gorm.DB
 			var account models.AccountModel
-			ret = models.Init(models.AccountModel{}).
+			ret = models.BootByModel(models.AccountModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 				SetPreloads("RbacRoles", "RbacRoles.RbacPermissions").
 				Prepare("").
@@ -298,8 +298,7 @@ func (AccountRouter) Load(engine *gin.Engine) {
 		// 用户列表
 		r.GET("", func(ctx *gin.Context) {
 			var accounts []models.AccountModel
-			models.Init(models.AccountModel{}).
-				SetPreloads("AccountStatus").
+			models.BootByModel(models.AccountModel{}).
 				PrepareQuery(ctx, "").
 				Find(&accounts)
 
