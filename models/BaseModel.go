@@ -191,10 +191,6 @@ func (cls *BaseModel) BeforeCreate(db *gorm.DB) (err error) {
 //  @param db
 //  @return err
 func (cls *BaseModel) BeforeSave(db *gorm.DB) (err error) {
-<<<<<<< HEAD
-=======
-	//cfg := (&settings.Setting{}).BootByModel()
->>>>>>> 5c1e5a7bb10f03b2afd775f65d771f09ae755c91
 	cls.UpdatedAt = time.Now()
 	return
 }
