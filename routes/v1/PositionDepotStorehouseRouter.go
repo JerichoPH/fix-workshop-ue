@@ -41,9 +41,9 @@ func (cls PositionDepotStorehouseStoreForm) ShouldBind(ctx *gin.Context) Positio
 	if cls.OrganizationWorkshopUUID == "" {
 		wrongs.PanicValidate("所属车间必选")
 	}
-	ret = models.Init(models.OrganizationWorkshopModel{}).
+	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
 		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).
-		Prepare("").
+		PrepareByDefault().
 		First(&cls.OrganizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "所属车间")
 
@@ -71,9 +71,9 @@ func (cls PositionDepotStorehouseRouter) Load(engine *gin.Engine) {
 			form := (&PositionDepotStorehouseStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.PositionDepotStorehouseModel{}).
+			ret = models.BootByModel(models.PositionDepotStorehouseModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "仓库代码")
 
@@ -84,11 +84,11 @@ func (cls PositionDepotStorehouseRouter) Load(engine *gin.Engine) {
 				Name:                  form.Name,
 				OrganizationWorkshop:  form.OrganizationWorkshop,
 			}
-			if ret = models.Init(models.PositionDepotStorehouseModel{}).Prepare("").Create(&positionDepotStorehouse); ret.Error != nil {
+			if ret = models.BootByModel(models.PositionDepotStorehouseModel{}).PrepareByDefault().Create(&positionDepotStorehouse); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"position_depot_storehouse": positionDepotStorehouse}))
+			ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"position_depot_storehouse": positionDepotStorehouse}))
 		})
 
 		// 删除
@@ -99,18 +99,18 @@ func (cls PositionDepotStorehouseRouter) Load(engine *gin.Engine) {
 			)
 
 			// 查询
-			ret = models.Init(models.PositionDepotStorehouseModel{}).
+			ret = models.BootByModel(models.PositionDepotStorehouseModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&positionDepotStorehouse)
 			wrongs.PanicWhenIsEmpty(ret, "仓库")
 
 			// 删除
-			if ret := models.Init(models.PositionDepotStorehouseModel{}).Prepare("").Delete(&positionDepotStorehouse); ret.Error != nil {
+			if ret := models.BootByModel(models.PositionDepotStorehouseModel{}).PrepareByDefault().Delete(&positionDepotStorehouse); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Deleted())
+			ctx.JSON(tools.CorrectBootByDefault().Deleted())
 		})
 
 		// 编辑
@@ -124,17 +124,17 @@ func (cls PositionDepotStorehouseRouter) Load(engine *gin.Engine) {
 			form := (&PositionDepotStorehouseStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.PositionDepotStorehouseModel{}).
+			ret = models.BootByModel(models.PositionDepotStorehouseModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "仓库代码")
 
 			// 查询
-			ret = models.Init(models.PositionDepotStorehouseModel{}).
+			ret = models.BootByModel(models.PositionDepotStorehouseModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&positionDepotStorehouse)
 			wrongs.PanicWhenIsEmpty(ret, "仓库")
 
@@ -143,11 +143,11 @@ func (cls PositionDepotStorehouseRouter) Load(engine *gin.Engine) {
 			positionDepotStorehouse.UniqueCode = form.UniqueCode
 			positionDepotStorehouse.Name = form.Name
 			positionDepotStorehouse.OrganizationWorkshop = form.OrganizationWorkshop
-			if ret = models.Init(models.PositionDepotStorehouseModel{}).Prepare("").Save(&positionDepotStorehouse); ret.Error != nil {
+			if ret = models.BootByModel(models.PositionDepotStorehouseModel{}).PrepareByDefault().Save(&positionDepotStorehouse); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"position_depot_storehouse": positionDepotStorehouse}))
+			ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"position_depot_storehouse": positionDepotStorehouse}))
 		})
 
 		// 详情
@@ -156,24 +156,24 @@ func (cls PositionDepotStorehouseRouter) Load(engine *gin.Engine) {
 				ret                     *gorm.DB
 				positionDepotStorehouse models.PositionDepotStorehouseModel
 			)
-			ret = models.Init(models.PositionDepotStorehouseModel{}).
+			ret = models.BootByModel(models.PositionDepotStorehouseModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&positionDepotStorehouse)
 			wrongs.PanicWhenIsEmpty(ret, "仓库")
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"position_depot_storehouse": positionDepotStorehouse}))
+			ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_depot_storehouse": positionDepotStorehouse}))
 		})
 
 		// 列表
 		r.GET("", func(ctx *gin.Context) {
 			var positionDepotStorehouses []models.PositionDepotStorehouseModel
-			models.Init(models.PositionDepotStorehouseModel{}).
+			models.BootByModel(models.PositionDepotStorehouseModel{}).
 				SetWhereFields().
 				PrepareQuery(ctx,"").
 				Find(&positionDepotStorehouses)
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"position_depot_storehouses": positionDepotStorehouses}))
+			ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_depot_storehouses": positionDepotStorehouses}))
 		})
 	}
 }

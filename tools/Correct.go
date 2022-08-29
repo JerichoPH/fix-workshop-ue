@@ -12,9 +12,20 @@ type correct struct {
 var responseIns *correct
 var correctOnce sync.Once
 
-func CorrectIns(msg string) *correct {
+// CorrectBoot 正确返回值
+//  @param msg
+//  @return *correct
+func CorrectBoot(msg string) *correct {
 	correctOnce.Do(func() { responseIns = &correct{m: ""} })
 	responseIns.m = msg
+	return responseIns
+}
+
+// CorrectBootByDefault
+//  @return *correct
+func CorrectBootByDefault() *correct{
+	correctOnce.Do(func() { responseIns = &correct{m: ""} })
+	responseIns.m = ""
 	return responseIns
 }
 

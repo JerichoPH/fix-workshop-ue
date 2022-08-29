@@ -24,7 +24,7 @@ func (OrganizationWorkshopTypeModel) TableName() string {
 //  @param uuid
 //  @return OrganizationWorkshopTypeModel
 func (cls OrganizationWorkshopTypeModel) FindOneByUUID(uuid string) OrganizationWorkshopTypeModel {
-	if ret := Init(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare("").First(&cls); ret.Error != nil {
+	if ret := BootByModel(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare("").First(&cls); ret.Error != nil {
 		panic(wrongs.PanicWhenIsEmpty(ret, "车间类型"))
 	}
 

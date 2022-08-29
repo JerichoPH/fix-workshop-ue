@@ -30,10 +30,10 @@ type BaseModel struct {
 	model          interface{}
 }
 
-// Init 获取数据库查询对象
+// BootByModel 获取数据库查询对象
 //  @param model
 //  @return *BaseModel
-func Init(model interface{}) *BaseModel {
+func BootByModel(model interface{}) *BaseModel {
 	return (&BaseModel{}).SetModel(model)
 }
 
@@ -191,6 +191,10 @@ func (cls *BaseModel) BeforeCreate(db *gorm.DB) (err error) {
 //  @param db
 //  @return err
 func (cls *BaseModel) BeforeSave(db *gorm.DB) (err error) {
+<<<<<<< HEAD
+=======
+	//cfg := (&settings.Setting{}).BootByModel()
+>>>>>>> 5c1e5a7bb10f03b2afd775f65d771f09ae755c91
 	cls.UpdatedAt = time.Now()
 	return
 }
@@ -247,7 +251,7 @@ func (cls *BaseModel) PrepareQuery(ctx *gin.Context, dbDriver string) *gorm.DB {
 	notWheres := make(map[string]interface{})
 
 	// 拼接需要跳过的字段
-	ignoreFields := make(map[string]int8)
+	ignoreFields := make(map[string]int32)
 	if len(cls.ignoreFields) > 0 {
 		for _, v := range cls.ignoreFields {
 			ignoreFields[v] = 1
@@ -293,6 +297,21 @@ func (cls *BaseModel) PrepareQuery(ctx *gin.Context, dbDriver string) *gorm.DB {
 	}
 
 	return dbSession
+}
+
+// PrepareByDefault 通过默认数据库初始化
+//  @receiver cls
+//  @return dbSession
+func (cls *BaseModel) PrepareByDefault() (dbSession *gorm.DB) {
+	return cls.Prepare("")
+}
+
+// PrepareUseQueryByDefault 通过默认数据库初始化
+//  @receiver cls
+//  @param ctx
+//  @return dbSession
+func (cls *BaseModel) PrepareUseQueryByDefault(ctx *gin.Context) (dbSession *gorm.DB) {
+	return cls.PrepareQuery(ctx, "")
 }
 
 // BaseOption 基础查询条件

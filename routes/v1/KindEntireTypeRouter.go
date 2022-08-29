@@ -43,9 +43,9 @@ func (cls KindEntireTypeStoreForm) ShouldBind(ctx *gin.Context) KindEntireTypeSt
 	if cls.KindCategoryUUID == "" {
 		wrongs.PanicValidate("所属种类必选")
 	}
-	ret = models.Init(models.KindCategoryModel{}).
+	ret = models.BootByModel(models.KindCategoryModel{}).
 		SetWheres(tools.Map{"uuid": cls.KindCategoryUUID}).
-		Prepare("").
+		PrepareByDefault().
 		First(&cls.KindCategory)
 	wrongs.PanicWhenIsEmpty(ret, "所属种类")
 
@@ -73,14 +73,14 @@ func (KindEntireTypeRouter) Load(engine *gin.Engine) {
 			form := (&KindEntireTypeStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.KindEntireTypeModel{}).
+			ret = models.BootByModel(models.KindEntireTypeModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "类型代码")
-			ret = models.Init(models.KindEntireTypeModel{}).
+			ret = models.BootByModel(models.KindEntireTypeModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "类型名称")
 
@@ -92,11 +92,11 @@ func (KindEntireTypeRouter) Load(engine *gin.Engine) {
 				BeEnable:     form.BeEnable,
 				KindCategory: form.KindCategory,
 			}
-			if ret = models.Init(models.KindEntireTypeModel{}).Prepare("").Create(&kindEntireType); ret.Error != nil {
+			if ret = models.BootByModel(models.KindEntireTypeModel{}).PrepareByDefault().Create(&kindEntireType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"kind_entire_type": kindEntireType}))
+			ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"kind_entire_type": kindEntireType}))
 		})
 
 		// 删除
@@ -107,18 +107,18 @@ func (KindEntireTypeRouter) Load(engine *gin.Engine) {
 			)
 
 			// 查询
-			ret = models.Init(models.KindEntireTypeModel{}).
+			ret = models.BootByModel(models.KindEntireTypeModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&kindEntireType)
 			wrongs.PanicWhenIsEmpty(ret, "类型")
 
 			// 删除
-			if ret := models.Init(models.KindEntireTypeModel{}).Prepare("").Delete(&kindEntireType); ret.Error != nil {
+			if ret := models.BootByModel(models.KindEntireTypeModel{}).PrepareByDefault().Delete(&kindEntireType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Deleted())
+			ctx.JSON(tools.CorrectBootByDefault().Deleted())
 		})
 
 		// 编辑
@@ -132,23 +132,23 @@ func (KindEntireTypeRouter) Load(engine *gin.Engine) {
 			form := (&KindEntireTypeStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.KindEntireTypeModel{}).
+			ret = models.BootByModel(models.KindEntireTypeModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "类型代码")
-			ret = models.Init(models.KindEntireTypeModel{}).
+			ret = models.BootByModel(models.KindEntireTypeModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "类型名称")
 
 			// 查询
-			ret = models.Init(models.KindEntireTypeModel{}).
+			ret = models.BootByModel(models.KindEntireTypeModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&kindEntireType)
 			wrongs.PanicWhenIsEmpty(ret, "类型")
 
@@ -158,11 +158,11 @@ func (KindEntireTypeRouter) Load(engine *gin.Engine) {
 			kindEntireType.Name = form.Name
 			kindEntireType.BeEnable = form.BeEnable
 			kindEntireType.KindCategory = form.KindCategory
-			if ret = models.Init(models.KindEntireTypeModel{}).Prepare("").Save(&kindEntireType); ret.Error != nil {
+			if ret = models.BootByModel(models.KindEntireTypeModel{}).PrepareByDefault().Save(&kindEntireType); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"kind_entire_type": kindEntireType}))
+			ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"kind_entire_type": kindEntireType}))
 		})
 
 		// 详情
@@ -171,24 +171,24 @@ func (KindEntireTypeRouter) Load(engine *gin.Engine) {
 				ret            *gorm.DB
 				kindEntireType models.KindEntireTypeModel
 			)
-			ret = models.Init(models.KindEntireTypeModel{}).
+			ret = models.BootByModel(models.KindEntireTypeModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&kindEntireType)
 			wrongs.PanicWhenIsEmpty(ret, "类型")
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"kind_entire_type": kindEntireType}))
+			ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"kind_entire_type": kindEntireType}))
 		})
 
 		// 列表
 		r.GET("", func(ctx *gin.Context) {
 			var kindEntireTypes []models.KindEntireTypeModel
-			models.Init(models.KindEntireTypeModel{}).
+			models.BootByModel(models.KindEntireTypeModel{}).
 				SetWhereFields().
 				PrepareQuery(ctx,"").
 				Find(&kindEntireTypes)
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"kind_entire_types": kindEntireTypes}))
+			ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"kind_entire_types": kindEntireTypes}))
 		})
 	}
 }

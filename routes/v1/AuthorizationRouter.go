@@ -85,12 +85,12 @@ func (AuthorizationRouter) Load(engine *gin.Engine) {
 			var ret *gorm.DB
 			ret = (&models.BaseModel{}).
 				SetWheres(tools.Map{"username": form.Username}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "用户名")
 			ret = (&models.BaseModel{}).
 				SetWheres(tools.Map{"nickname": form.Nickname}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "昵称")
 
@@ -104,14 +104,14 @@ func (AuthorizationRouter) Load(engine *gin.Engine) {
 				Password:  string(bytes),
 				Nickname:  form.Nickname,
 			}
-			if ret = models.Init(models.AccountModel{}).
+			if ret = models.BootByModel(models.AccountModel{}).
 				SetOmits(clause.Associations).
-				Prepare("").
+				PrepareByDefault().
 				Create(&account); ret.Error != nil {
 				wrongs.PanicForbidden("创建失败：" + ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("注册成功").Created(tools.Map{"account": account}))
+			ctx.JSON(tools.CorrectBoot("注册成功").Created(tools.Map{"account": account}))
 		})
 
 		// 登录
@@ -122,9 +122,9 @@ func (AuthorizationRouter) Load(engine *gin.Engine) {
 			// 获取用户
 			var account models.AccountModel
 			var ret *gorm.DB
-			ret = models.Init(models.AccountModel{}).
+			ret = models.BootByModel(models.AccountModel{}).
 				SetWheres(tools.Map{"username": form.Username}).
-				Prepare("").
+				PrepareByDefault().
 				First(&account)
 			wrongs.PanicWhenIsEmpty(ret, "用户")
 
@@ -138,7 +138,7 @@ func (AuthorizationRouter) Load(engine *gin.Engine) {
 				// 生成jwt错误
 				wrongs.PanicForbidden(err.Error())
 			} else {
-				ctx.JSON(tools.CorrectIns("登陆成功").OK(tools.Map{
+				ctx.JSON(tools.CorrectBoot("登陆成功").OK(tools.Map{
 					"token":    token,
 					"username": account.Username,
 					"nickname": account.Nickname,
@@ -158,10 +158,10 @@ func (AuthorizationRouter) Load(engine *gin.Engine) {
 				} else {
 					// 获取当前用户信息
 					var account models.AccountModel
-					ret = models.Init(models.AccountModel{}).
+					ret = models.BootByModel(models.AccountModel{}).
 						SetWheres(tools.Map{"uuid": accountUUID}).
 						SetPreloads("RbacRoles", "RbacRoles.Menus").
-						Prepare("").
+						PrepareByDefault().
 						First(&account)
 					wrongs.PanicWhenIsEmpty(ret, "当前令牌指向用户")
 
@@ -177,14 +177,14 @@ func (AuthorizationRouter) Load(engine *gin.Engine) {
 					}
 
 					var menus []models.MenuModel
-					models.Init(models.MenuModel{}).
-						Prepare("").
+					models.BootByModel(models.MenuModel{}).
+						PrepareByDefault().
 						Where("uuid in ?", menuUUIDs).
 						Where("parent_uuid is null").
 						Preload("Subs").
 						Find(&menus)
 
-					ctx.JSON(tools.CorrectIns("").OK(tools.Map{"menus": menus}))
+					ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"menus": menus}))
 				}
 			},
 		)

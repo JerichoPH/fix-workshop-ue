@@ -41,9 +41,9 @@ func (cls PositionDepotSectionStoreForm) ShouldBind(ctx *gin.Context) PositionDe
 	if cls.PositionDepotStorehouseUUID == "" {
 		wrongs.PanicValidate("所属仓库必选")
 	}
-	ret = models.Init(models.PositionDepotStorehouseModel{}).
+	ret = models.BootByModel(models.PositionDepotStorehouseModel{}).
 		SetWheres(tools.Map{"uuid": cls.PositionDepotStorehouseUUID}).
-		Prepare("").
+		PrepareByDefault().
 		First(&cls.PositionDepotStorehouse)
 	wrongs.PanicWhenIsEmpty(ret, "所属仓库")
 
@@ -71,14 +71,14 @@ func (cls PositionDepotSectionRouter) Load(engine *gin.Engine) {
 			form := (&PositionDepotSectionStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.PositionDepotSectionModel{}).
+			ret = models.BootByModel(models.PositionDepotSectionModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "仓库区域代码")
-			ret = models.Init(models.PositionDepotSectionModel{}).
+			ret = models.BootByModel(models.PositionDepotSectionModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "仓库区域名称")
 
@@ -89,11 +89,11 @@ func (cls PositionDepotSectionRouter) Load(engine *gin.Engine) {
 				Name:                    form.Name,
 				PositionDepotStorehouse: form.PositionDepotStorehouse,
 			}
-			if ret = models.Init(models.PositionDepotSectionModel{}).Prepare("").Create(&positionDepotSection); ret.Error != nil {
+			if ret = models.BootByModel(models.PositionDepotSectionModel{}).PrepareByDefault().Create(&positionDepotSection); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Created(tools.Map{"position_depot_section": positionDepotSection}))
+			ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"position_depot_section": positionDepotSection}))
 		})
 
 		// 删除
@@ -104,18 +104,18 @@ func (cls PositionDepotSectionRouter) Load(engine *gin.Engine) {
 			)
 
 			// 查询
-			ret = models.Init(models.PositionDepotSectionModel{}).
+			ret = models.BootByModel(models.PositionDepotSectionModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&positionDepotSection)
 			wrongs.PanicWhenIsEmpty(ret, "仓库区域")
 
 			// 删除
-			if ret := models.Init(models.PositionDepotSectionModel{}).Prepare("").Delete(&positionDepotSection); ret.Error != nil {
+			if ret := models.BootByModel(models.PositionDepotSectionModel{}).PrepareByDefault().Delete(&positionDepotSection); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Deleted())
+			ctx.JSON(tools.CorrectBootByDefault().Deleted())
 		})
 
 		// 编辑
@@ -129,23 +129,23 @@ func (cls PositionDepotSectionRouter) Load(engine *gin.Engine) {
 			form := (&PositionDepotSectionStoreForm{}).ShouldBind(ctx)
 
 			// 查重
-			ret = models.Init(models.PositionDepotSectionModel{}).
+			ret = models.BootByModel(models.PositionDepotSectionModel{}).
 				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "仓库区域代码")
-			ret = models.Init(models.PositionDepotSectionModel{}).
+			ret = models.BootByModel(models.PositionDepotSectionModel{}).
 				SetWheres(tools.Map{"name": form.Name}).
 				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&repeat)
 			wrongs.PanicWhenIsRepeat(ret, "仓库区域名称")
 
 			// 查询
-			ret = models.Init(models.PositionDepotSectionModel{}).
+			ret = models.BootByModel(models.PositionDepotSectionModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&positionDepotSection)
 			wrongs.PanicWhenIsEmpty(ret, "仓库区域")
 
@@ -154,11 +154,11 @@ func (cls PositionDepotSectionRouter) Load(engine *gin.Engine) {
 			positionDepotSection.UniqueCode = form.UniqueCode
 			positionDepotSection.Name = form.Name
 			positionDepotSection.PositionDepotStorehouse = form.PositionDepotStorehouse
-			if ret = models.Init(models.PositionDepotSectionModel{}).Prepare("").Save(&positionDepotSection); ret.Error != nil {
+			if ret = models.BootByModel(models.PositionDepotSectionModel{}).PrepareByDefault().Save(&positionDepotSection); ret.Error != nil {
 				wrongs.PanicForbidden(ret.Error.Error())
 			}
 
-			ctx.JSON(tools.CorrectIns("").Updated(tools.Map{"position_depot_section": positionDepotSection}))
+			ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"position_depot_section": positionDepotSection}))
 		})
 
 		// 详情
@@ -167,24 +167,24 @@ func (cls PositionDepotSectionRouter) Load(engine *gin.Engine) {
 				ret                  *gorm.DB
 				positionDepotSection models.PositionDepotSectionModel
 			)
-			ret = models.Init(models.PositionDepotSectionModel{}).
+			ret = models.BootByModel(models.PositionDepotSectionModel{}).
 				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				Prepare("").
+				PrepareByDefault().
 				First(&positionDepotSection)
 			wrongs.PanicWhenIsEmpty(ret, "仓库区域")
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"position_depot_section": positionDepotSection}))
+			ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_depot_section": positionDepotSection}))
 		})
 
 		// 列表
 		r.GET("", func(ctx *gin.Context) {
 			var positionDepotSections []models.PositionDepotSectionModel
-			models.Init(models.PositionDepotSectionModel{}).
+			models.BootByModel(models.PositionDepotSectionModel{}).
 				SetWhereFields().
 				PrepareQuery(ctx,"").
 				Find(&positionDepotSections)
 
-			ctx.JSON(tools.CorrectIns("").OK(tools.Map{"position_depot_sections": positionDepotSections}))
+			ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_depot_sections": positionDepotSections}))
 		})
 	}
 }
