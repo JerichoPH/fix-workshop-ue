@@ -6,6 +6,7 @@ import (
 	"fix-workshop-ue/models"
 	v1 "fix-workshop-ue/routes/v1"
 	web "fix-workshop-ue/routes/web"
+	"fix-workshop-ue/routes/webSocket"
 	"fix-workshop-ue/settings"
 	"fmt"
 	"log"
@@ -111,13 +112,14 @@ func runAutoMigrate() {
 
 // main 程序入口
 func main() {
-	setting := settings.Boot()        // 获取配置
-	settingApp := setting.App         // 加载参数（程序）
-	runAutoMigrate()                  // 数据库迁移
-	engine := gin.Default()           // 启动服务引擎
-	engine.Use(wrongs.RecoverHandler) // 异常处理
-	(&web.Router{}).Load(engine)      // 加载web路由
-	(&v1.Router{}).Load(engine)       // 加载v1路由
+	setting := settings.Boot()         // 获取配置
+	settingApp := setting.App          // 加载参数（程序）
+	runAutoMigrate()                   // 数据库迁移
+	engine := gin.Default()            // 启动服务引擎
+	engine.Use(wrongs.RecoverHandler)  // 异常处理
+	(&web.Router{}).Load(engine)       // 加载web路由
+	(&v1.Router{}).Load(engine)        // 加载v1路由
+	(&webSocket.Router{}).Load(engine) // 加载长连接
 
 	runServer(engine, settingApp.Section("app").Key("addr").MustString(":8080")) // 启动服务
 }
