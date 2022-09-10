@@ -4,10 +4,10 @@ import "gorm.io/gorm"
 
 // PivotLocationLineAndLocationSection 线别对区间多对多
 type PivotLocationLineAndLocationSection struct {
-	LocationLineID    uint64
-	LocationLine      LocationLineModel
-	LocationSectionID uint64
-	LocationSection   LocationSectionModel
+	LocationLineId    uint64               `json:"location_line_id"`
+	LocationLine      LocationLineModel    `json:"location_line"`
+	LocationSectionId uint64               `json:"location_section_id"`
+	LocationSection   LocationSectionModel `json:"location_section"`
 }
 
 // TableName 表名称

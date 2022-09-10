@@ -4,10 +4,10 @@ import "gorm.io/gorm"
 
 // PivotLocationLineAndLocationRailroadGradeCross 线别对道口多对多
 type PivotLocationLineAndLocationRailroadGradeCross struct {
-	LocationLineID    uint64
-	LocationLine      LocationLineModel
-	LocationRailroadGradeCrossID uint64
-	LocationRailroadGradeCross   LocationRailroadGradeCrossModel
+	LocationLineId               uint64                          `json:"location_line_id"`
+	LocationLine                 LocationLineModel               `json:"location_line"`
+	LocationRailroadGradeCrossId uint64                          `json:"location_railroad_grade_cross_id"`
+	LocationRailroadGradeCross   LocationRailroadGradeCrossModel `json:"location_railroad_grade_cross"`
 }
 
 // TableName 表名称

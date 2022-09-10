@@ -5,7 +5,7 @@ type OrganizationWorkAreaProfessionModel struct {
 	BaseModel
 	UniqueCode string `gorm:"type:VARCHAR(64);COMMENT:工区专业代码;" json:"unique_code"`
 	Name       string `gorm:"type:VARCHAR(64);COMMENT:工区专业名称;" json:"name"`
-	//OrganizationWorkAreas     []OrganizationWorkAreaModel `gorm:"foreignKey:OrganizationWorkAreaProfessionUUID:references:UUID;COMMENT:所属工区专业;" json:"organization_work_area"`
+	//OrganizationWorkAreas     []OrganizationWorkAreaModel `gorm:"foreignKey:OrganizationWorkAreaProfessionUuid:references:Uuid;COMMENT:所属工区专业;" json:"organization_work_area"`
 }
 
 // TableName 表名称

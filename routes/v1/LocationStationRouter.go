@@ -1,99 +1,13 @@
 package v1
 
 import (
+	"fix-workshop-ue/controllers"
 	"fix-workshop-ue/middlewares"
-	"fix-workshop-ue/models"
-	"fix-workshop-ue/tools"
-	"fix-workshop-ue/wrongs"
 	"github.com/gin-gonic/gin"
-	uuid "github.com/satori/go.uuid"
-	"gorm.io/gorm"
 )
 
 // LocationStationRouter 站场路由
 type LocationStationRouter struct{}
-
-// LocationStationStoreForm 新建站场表单
-type LocationStationStoreForm struct {
-	Sort                     int64  `form:"sort" json:"sort"`
-	UniqueCode               string `form:"unique_code" json:"unique_code"`
-	Name                     string `form:"name" json:"name"`
-	BeEnable                 bool   `form:"be_enable" json:"be_enable"`
-	OrganizationWorkshopUUID string `form:"organization_workshop_uuid" json:"organization_workshop_uuid"`
-	OrganizationWorkshop     models.OrganizationWorkshopModel
-	OrganizationWorkAreaUUID string `form:"organization_work_area_uuid" json:"organization_work_area_uuid"`
-	OrganizationWorkArea     models.OrganizationWorkAreaModel
-	LocationLineUUIDs        []string `form:"location_line_uuids" json:"location_line_uuids"`
-	LocationLines            []*models.LocationLineModel
-}
-
-// ShouldBind 绑定表单
-//  @receiver cls
-//  @param ctx
-//  @return LocationStationStoreForm
-func (cls LocationStationStoreForm) ShouldBind(ctx *gin.Context) LocationStationStoreForm {
-	var ret *gorm.DB
-
-	if err := ctx.ShouldBind(&cls); err != nil {
-		wrongs.PanicValidate(err.Error())
-	}
-	if cls.UniqueCode == "" {
-		wrongs.PanicValidate("站场代码必填")
-	}
-	if cls.Name == "" {
-		wrongs.PanicValidate("站场名称必填")
-	}
-	if cls.OrganizationWorkshopUUID == "" {
-		wrongs.PanicValidate("所属车间必选")
-	}
-	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
-		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).
-		PrepareByDefault().
-		First(&cls.OrganizationWorkshop)
-	wrongs.PanicWhenIsEmpty(ret, "车间")
-	if cls.OrganizationWorkAreaUUID != "" {
-		ret = models.BootByModel(models.OrganizationWorkAreaModel{}).
-			SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUUID}).
-			PrepareByDefault().
-			First(&cls.OrganizationWorkArea)
-		wrongs.PanicWhenIsEmpty(ret, "工区")
-	} else {
-
-	}
-	if len(cls.LocationLineUUIDs) > 0 {
-		models.BootByModel(models.LocationLineModel{}).
-			PrepareByDefault().
-			Where("uuid in ?", cls.LocationLineUUIDs).
-			Find(&cls.LocationLines)
-	}
-
-	return cls
-}
-
-// LocationStationBindLocationLinesForm 站场绑定线别表单
-type LocationStationBindLocationLinesForm struct {
-	LocationLineUUIDs []string `json:"location_line_uuids"`
-	LocationLines     []*models.LocationLineModel
-}
-
-// ShouldBind 绑定表单
-//  @receiver cls
-//  @param ctx
-//  @return LocationStationBindLocationLinesForm
-func (cls LocationStationBindLocationLinesForm) ShouldBind(ctx *gin.Context) LocationStationBindLocationLinesForm {
-	if err := ctx.ShouldBind(&cls); err != nil {
-		wrongs.PanicValidate(err.Error())
-	}
-
-	if len(cls.LocationLineUUIDs) > 0 {
-		models.BootByModel(models.LocationLineModel{}).
-			PrepareByDefault().
-			Where("uuid in ?", cls.LocationLineUUIDs).
-			Find(&cls.LocationLines)
-	}
-
-	return cls
-}
 
 // Load 加载路由
 //  @receiver cls
@@ -106,185 +20,21 @@ func (LocationStationRouter) Load(engine *gin.Engine) {
 	)
 	{
 		// 新建
-		r.POST("", func(ctx *gin.Context) {
-			var (
-				ret    *gorm.DB
-				repeat models.LocationStationModel
-			)
-
-			// 表单
-			form := (&LocationStationStoreForm{}).ShouldBind(ctx)
-
-			// 查重
-			ret = models.BootByModel(models.LocationStationModel{}).
-				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-				PrepareByDefault().
-				First(&repeat)
-			wrongs.PanicWhenIsRepeat(ret, "站场代码")
-			ret = models.BootByModel(models.LocationStationModel{}).
-				SetWheres(tools.Map{"name": form.Name}).
-				PrepareByDefault().
-				First(&repeat)
-			wrongs.PanicWhenIsRepeat(ret, "站场名称")
-
-			// 新建
-			locationStation := &models.LocationStationModel{
-				BaseModel:            models.BaseModel{Sort: form.Sort, UUID: uuid.NewV4().String()},
-				UniqueCode:           form.UniqueCode,
-				Name:                 form.Name,
-				BeEnable:             form.BeEnable,
-				OrganizationWorkshop: form.OrganizationWorkshop,
-				OrganizationWorkArea: form.OrganizationWorkArea,
-				LocationLines:        form.LocationLines,
-			}
-			if ret = models.BootByModel(models.LocationStationModel{}).PrepareByDefault().Create(&locationStation); ret.Error != nil {
-				wrongs.PanicForbidden(ret.Error.Error())
-			}
-
-			ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"organization_station": locationStation}))
-		})
+		r.POST("", func(ctx *gin.Context) {new(controllers.LocationStationController).Store(ctx)})
 
 		// 删除
-		r.DELETE(":uuid", func(ctx *gin.Context) {
-			var (
-				ret             *gorm.DB
-				locationStation models.LocationStationModel
-			)
-			// 查询
-			ret = models.BootByModel(models.LocationStationModel{}).
-				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				PrepareByDefault().
-				First(&locationStation)
-			wrongs.PanicWhenIsEmpty(ret, "站场")
-
-			// 删除
-			if ret := models.BootByModel(models.LocationStationModel{}).PrepareByDefault().Delete(&locationStation); ret.Error != nil {
-				wrongs.PanicForbidden(ret.Error.Error())
-			}
-
-			ctx.JSON(tools.CorrectBootByDefault().Deleted())
-		})
+		r.DELETE(":uuid", func(ctx *gin.Context) {new(controllers.LocationStationController).Destroy(ctx)})
 
 		// 编辑
-		r.PUT(":uuid", func(ctx *gin.Context) {
-			var (
-				ret                     *gorm.DB
-				locationStation, repeat models.LocationStationModel
-			)
-
-			// 表单
-			form := (&LocationStationStoreForm{}).ShouldBind(ctx)
-
-			// 查重
-			ret = models.BootByModel(models.LocationStationModel{}).
-				SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				PrepareByDefault().
-				First(&repeat)
-			wrongs.PanicWhenIsRepeat(ret, "站场代码")
-			ret = models.BootByModel(models.LocationStationModel{}).
-				SetWheres(tools.Map{"name": form.Name}).
-				SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				PrepareByDefault().
-				First(&repeat)
-			wrongs.PanicWhenIsRepeat(ret, "站场名称")
-
-			// 查询
-			ret = models.BootByModel(models.LocationStationModel{}).
-				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				PrepareByDefault().
-				First(&locationStation)
-			wrongs.PanicWhenIsEmpty(ret, "站场")
-
-			// 编辑
-			locationStation.BaseModel.Sort = form.Sort
-			locationStation.UniqueCode = form.UniqueCode
-			locationStation.Name = form.Name
-			locationStation.BeEnable = form.BeEnable
-			locationStation.OrganizationWorkshop = form.OrganizationWorkshop
-			locationStation.OrganizationWorkAreaUUID = form.OrganizationWorkAreaUUID
-			locationStation.LocationLines = form.LocationLines
-			if ret = models.
-				BootByModel(models.LocationStationModel{}).
-				PrepareByDefault().
-				Where("uuid = ?", ctx.Param("uuid")).
-				Updates(map[string]interface{}{
-					"sort":                        form.Sort,
-					"unique_code":                 form.UniqueCode,
-					"name":                        form.Name,
-					"be_enable":                   form.BeEnable,
-					"organization_workshop_uuid":  form.OrganizationWorkshopUUID,
-					"organization_work_area_uuid": form.OrganizationWorkAreaUUID,
-				}); ret.Error != nil {
-				wrongs.PanicForbidden(ret.Error.Error())
-			}
-
-			ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"location_station": locationStation}))
-		})
+		r.PUT(":uuid", func(ctx *gin.Context) {new(controllers.LocationStationController).Update(ctx)})
 
 		// 站场绑定线别
-		r.PUT(":uuid/bindLocationLines", func(ctx *gin.Context) {
-			var (
-				ret                                  *gorm.DB
-				locationStation                      models.LocationStationModel
-				pivotLocationLineAndLocationStations []models.PivotLocationLineAndLocationStation
-			)
-
-			// 表单
-			form := (&LocationStationBindLocationLinesForm{}).ShouldBind(ctx)
-
-			if ret = models.BootByModel(models.LocationStationModel{}).
-				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				PrepareByDefault().
-				First(&locationStation); ret.Error != nil {
-				wrongs.PanicWhenIsEmpty(ret, "站场")
-			}
-
-			// 删除原有绑定关系
-			ret = models.BootByModel(models.BaseModel{}).PrepareByDefault().Exec("delete from pivot_location_line_and_location_stations where location_station_id = ?", locationStation.ID)
-
-			// 创建绑定关系
-			if len(form.LocationLines) > 0 {
-				for _, locationLine := range form.LocationLines {
-					pivotLocationLineAndLocationStations = append(pivotLocationLineAndLocationStations, models.PivotLocationLineAndLocationStation{
-						LocationLineID:    locationLine.ID,
-						LocationStationID: locationStation.ID,
-					})
-				}
-				models.BootByModel(models.PivotLocationLineAndLocationStation{}).
-					PrepareByDefault().
-					CreateInBatches(&pivotLocationLineAndLocationStations, 100)
-			}
-
-			ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{}))
-		})
+		r.PUT(":uuid/bindLocationLines", func(ctx *gin.Context) {new(controllers.LocationStationController).PutBindLocationLines(ctx)})
 
 		// 详情
-		r.GET(":uuid", func(ctx *gin.Context) {
-			var (
-				ret             *gorm.DB
-				locationStation models.LocationStationModel
-			)
-			// 查询
-			ret = models.BootByModel(models.LocationStationModel{}).
-				SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-				SetWhereFields("be_enable").
-				PrepareQuery(ctx,"").
-				First(&locationStation)
-			wrongs.PanicWhenIsEmpty(ret, "站场")
-
-			ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"location_station": locationStation}))
-		})
+		r.GET(":uuid", func(ctx *gin.Context) {new(controllers.LocationStationController).Show(ctx)})
 
 		// 列表
-		r.GET("", func(ctx *gin.Context) {
-			var locationStations []models.LocationStationModel
-			models.BootByModel(models.LocationStationModel{}).
-				SetWhereFields().
-				PrepareQuery(ctx,"").
-				Find(&locationStations)
-
-			ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"location_stations": locationStations}))
-		})
+		r.GET("", func(ctx *gin.Context) {new(controllers.LocationStationController).Index(ctx)})
 	}
 }

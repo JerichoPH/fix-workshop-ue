@@ -58,7 +58,7 @@ func CheckJwt() gin.HandlerFunc {
 					wrongs.PanicForbidden("权鉴认证方式不支持")
 				}
 			}
-			ctx.Set("__ACCOUNT__", account.UUID)
+			ctx.Set("__ACCOUNT__", account.Uuid)
 		}
 
 		ctx.Next()

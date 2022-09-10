@@ -39,7 +39,7 @@ func (Router) Load(engine *gin.Engine) {
 
 	// 使用位置-室内上道位置
 	(&PositionIndoorRoomTypeRouter{}).Load(engine) // 室内上道位置机房类型
-	(&LocationIndoorRoomRouter{}).Load(engine)     // 室内上道位置机房
+	(&PositionIndoorRoomRouter{}).Load(engine)     // 室内上道位置机房
 	(&PositionIndoorRowRouter{}).Load(engine)      // 室内上道位置排
 	(&PositionIndoorCabinetRouter{}).Load(engine)  // 室内上道位置柜架
 	(&PositionIndoorTierRouter{}).Load(engine)     // 室内上道位置柜架层

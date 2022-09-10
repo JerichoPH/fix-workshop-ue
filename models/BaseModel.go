@@ -12,11 +12,11 @@ import (
 
 // BaseModel 出厂数据、财务数据、检修数据、仓储数据、流转数据、运用数据
 type BaseModel struct {
-	ID             uint64         `gorm:"primaryKey" json:"id"`
+	Id             uint64         `gorm:"primaryKey" json:"id"`
 	CreatedAt      time.Time      `gorm:"timestamptz" json:"created_at"`
 	UpdatedAt      time.Time      `gorm:"timestamptz" json:"updated_at"`
 	DeletedAt      gorm.DeletedAt `gorm:"index" json:"deleted_at"`
-	UUID           string         `gorm:"type:VARCHAR(36);COMMENT:uuid;" json:"uuid"`
+	Uuid           string         `gorm:"type:VARCHAR(36);COMMENT:uuid;" json:"uuid"`
 	Sort           int64          `gorm:"type:BIGINT;DEFAULT:0;COMMENT:排序;" json:"sort"`
 	preloads       []string
 	selects        []string
@@ -96,10 +96,10 @@ func (cls *BaseModel) SetPreloads(preloads ...string) *BaseModel {
 	return cls
 }
 
-// SetPreloadsDefault 设置Preloads为默认
+// SetPreloadsByDefault 设置Preloads为默认
 //  @receiver cls
 //  @return *BaseModel
-func (cls *BaseModel) SetPreloadsDefault() *BaseModel {
+func (cls *BaseModel) SetPreloadsByDefault() *BaseModel {
 	cls.preloads = tools.Strings{clause.Associations}
 	return cls
 }
@@ -200,7 +200,7 @@ func (cls *BaseModel) BeforeSave(db *gorm.DB) (err error) {
 //  @param dbDriver
 //  @return dbSession
 func (cls *BaseModel) Prepare(dbDriver string) (dbSession *gorm.DB) {
-	dbSession = (&databases.DatabaseLaunch{DBDriver: dbDriver}).GetDatabase()
+	dbSession = (&databases.Launcher{DbDriver: dbDriver}).GetDatabaseConn()
 
 	dbSession = dbSession.Where(cls.wheres).Not(cls.notWheres)
 

@@ -55,7 +55,7 @@ func runServer(router *gin.Engine, addr string) {
 
 // runAutoMigrate 初始化数据库迁移
 func runAutoMigrate() {
-	if errAutoMigrate := (&databases.DatabaseLaunch{}).GetDatabase().AutoMigrate(
+	if errAutoMigrate := (&databases.Launcher{}).GetDatabaseConn().AutoMigrate(
 		// 用户与权鉴
 		&models.AccountModel{},             // 用户
 		&models.RbacRoleModel{},            // 角色

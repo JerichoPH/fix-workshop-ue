@@ -148,8 +148,8 @@ func (cls AccountUpdatePasswordForm) ShouldBind(ctx *gin.Context) AccountUpdateP
 	return cls
 }
 
-// Post 新建用户
-func (cls AccountController) Post(ctx *gin.Context) {
+// C 新建用户
+func (cls AccountController) C(ctx *gin.Context) {
 	// 表单
 	form := (&AccountStoreForm{}).ShouldBind(ctx)
 
@@ -171,7 +171,7 @@ func (cls AccountController) Post(ctx *gin.Context) {
 	bytes, _ := bcrypt.GenerateFromPassword([]byte(form.Password), 14)
 
 	account := &models.AccountModel{
-		BaseModel:             models.BaseModel{UUID: uuid.NewV4().String()},
+		BaseModel:             models.BaseModel{Uuid: uuid.NewV4().String()},
 		Username:              form.Username,
 		Nickname:              form.Nickname,
 		Password:              string(bytes),
@@ -190,8 +190,8 @@ func (cls AccountController) Post(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBoot("新建成功").Created(tools.Map{}))
 }
 
-// Put 编辑用户
-func (AccountController) Put(ctx *gin.Context) {
+// U 编辑用户
+func (AccountController) U(ctx *gin.Context) {
 	var (
 		ret     *gorm.DB
 		account models.AccountModel
@@ -222,10 +222,10 @@ func (AccountController) Put(ctx *gin.Context) {
 	// 编辑
 	account.Username = form.Username
 	account.Nickname = form.Nickname
-	account.OrganizationRailwayUUID = form.OrganizationRailway.UUID
-	account.OrganizationParagraphUUID = form.OrganizationParagraph.UUID
-	account.OrganizationWorkshopUUID = form.OrganizationWorkshop.UUID
-	account.OrganizationWorkAreaUUID = form.OrganizationWorkArea.UUID
+	account.OrganizationRailwayUuid = form.OrganizationRailway.Uuid
+	account.OrganizationParagraphUuid = form.OrganizationParagraph.Uuid
+	account.OrganizationWorkshopUuid = form.OrganizationWorkshop.Uuid
+	account.OrganizationWorkAreaUuid = form.OrganizationWorkArea.Uuid
 	if ret = models.BootByModel(models.AccountModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 		//SetPreloads("OrganizationRailway", "OrganizationParagraph", "OrganizationWorkshop", "OrganizationWorkArea").
@@ -268,8 +268,8 @@ func (AccountController) PutPassword(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBoot("密码修改成功").Updated(tools.Map{}))
 }
 
-// Destroy 删除用户
-func (AccountController) Destroy(ctx *gin.Context) {
+// D 删除用户
+func (AccountController) D(ctx *gin.Context) {
 	var (
 		ret     *gorm.DB
 		account models.AccountModel
@@ -289,8 +289,8 @@ func (AccountController) Destroy(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
 
-// Show 详情
-func (AccountController) Show(ctx *gin.Context) {
+// S 详情
+func (AccountController) S(ctx *gin.Context) {
 	var (
 		ret     *gorm.DB
 		account models.AccountModel
@@ -305,8 +305,8 @@ func (AccountController) Show(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"account": account}))
 }
 
-// Index 列表
-func(AccountController) Index(ctx *gin.Context){
+// I 列表
+func(AccountController) I(ctx *gin.Context){
 	var accounts []models.AccountModel
 	models.BootByModel(models.AccountModel{}).
 		PrepareUseQueryByDefault(ctx).

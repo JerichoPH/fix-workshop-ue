@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type Postgresql struct {
+type PostgreSql struct {
 	Host     string
 	Port     string
 	Username string
@@ -21,7 +21,7 @@ var postgresqlConn *gorm.DB
 // getConn 获取链接
 //  @receiver cls
 //  @return db
-func (cls *Postgresql) getConn() (db *gorm.DB) {
+func (cls *PostgreSql) getConn() (db *gorm.DB) {
 	ctf := settings.Setting{}
 	config := ctf.Init()
 
@@ -57,7 +57,7 @@ func (cls *Postgresql) getConn() (db *gorm.DB) {
 }
 
 // GetConn 获取数据库链接
-func (cls *Postgresql) GetConn() *gorm.DB {
+func (cls *PostgreSql) GetConn() *gorm.DB {
 	if postgresqlConn == nil {
 		postgresqlConn = cls.getConn()
 	}
@@ -65,6 +65,6 @@ func (cls *Postgresql) GetConn() *gorm.DB {
 }
 
 // NewConn 获取新数据库链接
-func (cls *Postgresql) NewConn() *gorm.DB {
+func (cls *PostgreSql) NewConn() *gorm.DB {
 	return cls.getConn()
 }

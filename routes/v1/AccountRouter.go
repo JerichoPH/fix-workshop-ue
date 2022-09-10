@@ -20,21 +20,21 @@ func (AccountRouter) Load(engine *gin.Engine) {
 	)
 	{
 		// 新建
-		r.POST("", func(ctx *gin.Context) { (&controllers.AccountController{}).Post(ctx) })
+		r.POST("", func(ctx *gin.Context) { new(controllers.AccountController).C(ctx) })
 
 		// 编辑
-		r.PUT(":uuid", func(ctx *gin.Context) { (&controllers.AccountController{}).Put(ctx) })
+		r.PUT(":uuid", func(ctx *gin.Context) { new(controllers.AccountController).U(ctx) })
 
 		// 修改密码
-		r.PUT(":uuid/updatePassword", func(ctx *gin.Context) { (&controllers.AccountController{}).PutPassword(ctx) })
+		r.PUT(":uuid/updatePassword", func(ctx *gin.Context) { new(controllers.AccountController).PutPassword(ctx) })
 
 		// 删除用户
-		r.DELETE(":uuid", func(ctx *gin.Context) { (&controllers.AccountController{}).Destroy(ctx) })
+		r.DELETE(":uuid", func(ctx *gin.Context) { new(controllers.AccountController).D(ctx) })
 
 		// 用户详情
-		r.GET(":uuid", func(ctx *gin.Context) { (&controllers.AccountController{}).Show(ctx) })
+		r.GET(":uuid", func(ctx *gin.Context) { new(controllers.AccountController).S(ctx) })
 
 		// 用户列表
-		r.GET("", func(ctx *gin.Context) { (&controllers.AccountController{}).Index(ctx) })
+		r.GET("", func(ctx *gin.Context) { new(controllers.AccountController).I(ctx) })
 	}
 }
