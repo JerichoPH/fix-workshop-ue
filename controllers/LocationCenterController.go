@@ -14,13 +14,15 @@ type LocationCenterController struct{}
 // LocationCenterStoreForm 新建中心表单
 type LocationCenterStoreForm struct {
 	Sort                     int64  `form:"sort" json:"sort"`
-	UniqueCode               string `form:"" json:""`
+	UniqueCode               string `form:"unique_code" json:"unique_code"`
 	Name                     string `form:"name" json:"name"`
 	BeEnable                 bool   `form:"be_enable" json:"be_enable"`
 	OrganizationWorkshopUuid string `form:"organization_workshop_uuid" json:"organization_workshop_uuid"`
 	OrganizationWorkshop     models.OrganizationWorkshopModel
 	OrganizationWorkAreaUuid string `form:"organization_work_area_uuid" json:"organization_work_area_uuid"`
 	OrganizationWorkArea     models.OrganizationWorkAreaModel
+	LocationLineUuids        []string `form:"location_line_uuids" json:"location_line_uuids"`
+	LocationLines            []*models.LocationLineModel
 }
 
 // ShouldBind 表单绑定
@@ -30,7 +32,7 @@ type LocationCenterStoreForm struct {
 func (cls LocationCenterStoreForm) ShouldBind(ctx *gin.Context) LocationCenterStoreForm {
 	var ret *gorm.DB
 
-	if err := ctx.ShouldBind(ctx); err != nil {
+	if err := ctx.ShouldBind(&cls); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
 	if cls.UniqueCode == "" {
@@ -44,6 +46,7 @@ func (cls LocationCenterStoreForm) ShouldBind(ctx *gin.Context) LocationCenterSt
 	}
 	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
 		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUuid}).
+		SetPreloads("OrganizationParagraph","OrganizationParagraph.OrganizationRailway").
 		PrepareByDefault().
 		First(&cls.OrganizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "所属车间")
@@ -52,7 +55,13 @@ func (cls LocationCenterStoreForm) ShouldBind(ctx *gin.Context) LocationCenterSt
 			SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUuid}).
 			PrepareByDefault().
 			First(&cls.OrganizationWorkArea)
-		wrongs.PanicWhenIsEmpty(ret, "工区")
+		wrongs.PanicWhenIsEmpty(ret, "所属工区")
+	}
+	if len(cls.LocationLines) > 0 {
+		models.BootByModel(models.LocationLineModel{}).
+			PrepareByDefault().
+			Where("uuid in ?", cls.LocationLineUuids).
+			Find(&cls.LocationLines)
 	}
 
 	return cls
@@ -60,7 +69,7 @@ func (cls LocationCenterStoreForm) ShouldBind(ctx *gin.Context) LocationCenterSt
 
 // LocationCenterBindLocationLinesForm 中心绑定线别表单
 type LocationCenterBindLocationLinesForm struct {
-	LocationLineUuids []string
+	LocationLineUuids []string `json:"location_line_uuids"`
 	LocationLines     []*models.LocationLineModel
 }
 
@@ -91,7 +100,7 @@ func (LocationCenterController) C(ctx *gin.Context) {
 	)
 
 	// 表单
-	form := (&LocationCenterStoreForm{}).ShouldBind(ctx)
+	form := new(LocationCenterStoreForm).ShouldBind(ctx)
 
 	// 查重
 	ret = models.BootByModel(models.LocationCenterModel{}).
@@ -107,10 +116,13 @@ func (LocationCenterController) C(ctx *gin.Context) {
 
 	// 新建
 	locationCenter := &models.LocationCenterModel{
-		BaseModel:  models.BaseModel{Sort: form.Sort, Uuid: uuid.NewV4().String()},
-		UniqueCode: form.UniqueCode,
-		Name:       form.Name,
-		BeEnable:   form.BeEnable,
+		BaseModel:                models.BaseModel{Sort: form.Sort, Uuid: uuid.NewV4().String()},
+		UniqueCode:               form.OrganizationWorkshop.OrganizationParagraph.OrganizationRailway.UniqueCode + form.UniqueCode,
+		Name:                     form.Name,
+		BeEnable:                 form.BeEnable,
+		OrganizationWorkshopUuid: form.OrganizationWorkshop.Uuid,
+		OrganizationWorkAreaUuid: form.OrganizationWorkAreaUuid,
+		LocationLines:            form.LocationLines,
 	}
 	if ret = models.BootByModel(models.LocationCenterModel{}).PrepareByDefault().Create(&locationCenter); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
@@ -149,7 +161,7 @@ func (LocationCenterController) U(ctx *gin.Context) {
 	)
 
 	// 表单
-	form := (&LocationCenterStoreForm{}).ShouldBind(ctx)
+	form := new(LocationCenterStoreForm).ShouldBind(ctx)
 
 	// 查重
 	ret = models.BootByModel(models.LocationCenterModel{}).
@@ -176,7 +188,9 @@ func (LocationCenterController) U(ctx *gin.Context) {
 	locationCenter.BaseModel.Sort = form.Sort
 	locationCenter.Name = form.Name
 	locationCenter.BeEnable = form.BeEnable
-	if ret = models.BootByModel(models.LocationCenterModel{}).SetWheres(tools.Map{"uuid":ctx.Param("uuid")}).PrepareByDefault().Save(&locationCenter); ret.Error != nil {
+	locationCenter.OrganizationWorkshopUuid = form.OrganizationWorkshop.Uuid
+	locationCenter.OrganizationWorkAreaUuid = form.OrganizationWorkAreaUuid
+	if ret = models.BootByModel(models.LocationCenterModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&locationCenter); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 

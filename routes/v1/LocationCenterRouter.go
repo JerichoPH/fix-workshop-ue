@@ -20,7 +20,7 @@ func (LocationCenterRouter) Load(engine *gin.Engine) {
 	)
 	{
 		// 新建
-		r.POST("", func(ctx *gin.Context) { new(controllers.LocationCenterController).S(ctx) })
+		r.POST("", func(ctx *gin.Context) { new(controllers.LocationCenterController).C(ctx) })
 
 		// 删除
 		r.DELETE(":uuid", func(ctx *gin.Context) { new(controllers.LocationCenterController).D(ctx) })

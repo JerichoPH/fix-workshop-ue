@@ -21,6 +21,8 @@ type LocationSectionStoreForm struct {
 	OrganizationWorkshop     models.OrganizationWorkshopModel
 	OrganizationWorkAreaUuid string `form:"organization_work_area_uuid" json:"organization_work_area_uuid"`
 	OrganizationWorkArea     models.OrganizationWorkAreaModel
+	LocationLineUuids        []string `form:"location_line_uuids" json:"location_line_uuids"`
+	LocationLines            []*models.LocationLineModel
 }
 
 // ShouldBind 绑定表单
@@ -54,13 +56,19 @@ func (cls LocationSectionStoreForm) ShouldBind(ctx *gin.Context) LocationSection
 			First(&cls.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "工区")
 	}
+	if len(cls.LocationLines) > 0 {
+		models.BootByModel(models.LocationLineModel{}).
+			PrepareByDefault().
+			Where("uuid = ?", cls.LocationLineUuids).
+			Find(&cls.LocationLineUuids)
+	}
 
 	return cls
 }
 
 // LocationSectionBindLocationLinesForm 区间绑定线别表单
 type LocationSectionBindLocationLinesForm struct {
-	LocationLineUuids []string
+	LocationLineUuids []string `json:"location_line_uuids"`
 	LocationLines     []*models.LocationLineModel
 }
 
@@ -71,6 +79,13 @@ type LocationSectionBindLocationLinesForm struct {
 func (cls LocationSectionBindLocationLinesForm) ShouldBind(ctx *gin.Context) LocationSectionBindLocationLinesForm {
 	if err := ctx.ShouldBind(&cls); err != nil {
 		wrongs.PanicValidate(err.Error())
+	}
+
+	if len(cls.LocationLineUuids) > 0 {
+		models.BootByModel(models.LocationLineModel{}).
+			PrepareByDefault().
+			Where("uuid in ?", cls.LocationLineUuids).
+			Find(&cls.LocationLines)
 	}
 
 	return cls
@@ -105,6 +120,7 @@ func (LocationSectionController) C(ctx *gin.Context) {
 		BeEnable:             form.BeEnable,
 		OrganizationWorkshop: form.OrganizationWorkshop,
 		OrganizationWorkArea: form.OrganizationWorkArea,
+		LocationLines:        form.LocationLines,
 	}
 	if ret = models.BootByModel(models.LocationSectionModel{}).PrepareByDefault().Create(&organizationSection); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
@@ -167,8 +183,8 @@ func (LocationSectionController) U(ctx *gin.Context) {
 	locationSection.BaseModel.Sort = form.Sort
 	locationSection.Name = form.Name
 	locationSection.BeEnable = form.BeEnable
-	locationSection.OrganizationWorkshop = form.OrganizationWorkshop
-	locationSection.OrganizationWorkArea = form.OrganizationWorkArea
+	locationSection.OrganizationWorkshopUuid = form.OrganizationWorkshop.Uuid
+	locationSection.OrganizationWorkAreaUuid = form.OrganizationWorkAreaUuid
 	if ret = models.BootByModel(models.LocationSectionModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&locationSection); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
@@ -184,7 +200,7 @@ func (LocationSectionController) PutBindLines(ctx *gin.Context) {
 	)
 
 	// 表单
-	form := (&LocationSectionBindLocationLinesForm{}).ShouldBind(ctx)
+	form := new(LocationSectionBindLocationLinesForm).ShouldBind(ctx)
 
 	if ret = models.BootByModel(models.LocationSectionModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
@@ -220,7 +236,8 @@ func (LocationSectionController) S(ctx *gin.Context) {
 	ret = models.BootByModel(models.LocationSectionModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 		SetWhereFields("be_enable").
-		PrepareQuery(ctx, "").
+		SetPreloadsByDefault().
+		PrepareUseQueryByDefault(ctx).
 		First(&organizationSection)
 	wrongs.PanicWhenIsEmpty(ret, "区间")
 
@@ -231,7 +248,8 @@ func (LocationSectionController) I(ctx *gin.Context) {
 	var locationSections []models.LocationSectionModel
 	models.BootByModel(models.LocationSectionModel{}).
 		SetWhereFields("unique_code", "Name", "be_enable", "organization_workshop_uuid", "organization_work_area_uuid").
-		PrepareQuery(ctx, "").
+		SetPreloadsByDefault().
+		PrepareUseQueryByDefault(ctx).
 		Find(&locationSections)
 
 	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"location_sections": locationSections}))
