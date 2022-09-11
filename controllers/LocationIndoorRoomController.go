@@ -16,13 +16,13 @@ type PositionIndoorRoomStoreForm struct {
 	Sort                       int64  `form:"sort" json:"sort"`
 	UniqueCode                 string `form:"unique_code" json:"unique_code"`
 	Name                       string `form:"name" json:"name"`
-	PositionIndoorRoomTypeUUID string `form:"position_indoor_room_type_uuid" json:"position_indoor_room_type_uuid"`
+	PositionIndoorRoomTypeUuid string `form:"position_indoor_room_type_uuid" json:"position_indoor_room_type_uuid"`
 	PositionIndoorRoomType     models.PositionIndoorRoomTypeModel
-	LocationStationUUID        string `form:"location_station_uuid" json:"location_station_uuid"`
+	LocationStationUuid        string `form:"location_station_uuid" json:"location_station_uuid"`
 	LocationStation            models.LocationStationModel
-	LocationSectionUUID        string `form:"location_section_uuid" json:"location_section_uuid"`
+	LocationSectionUuid        string `form:"location_section_uuid" json:"location_section_uuid"`
 	LocationSection            models.LocationSectionModel
-	LocationCenterUUID         string `form:"location_center_uuid" json:"location_center_uuid"`
+	LocationCenterUuid         string `form:"location_center_uuid" json:"location_center_uuid"`
 	LocationCenter             models.LocationCenterModel
 }
 
@@ -42,32 +42,32 @@ func (cls PositionIndoorRoomStoreForm) ShouldBind(ctx *gin.Context) PositionIndo
 	if cls.Name == "" {
 		wrongs.PanicValidate("机房名称必填")
 	}
-	if cls.PositionIndoorRoomTypeUUID == "" {
+	if cls.PositionIndoorRoomTypeUuid == "" {
 		wrongs.PanicValidate("机房类型必选")
 	}
 	ret = models.BootByModel(models.PositionIndoorRoomTypeModel{}).
-		SetWheres(tools.Map{"uuid": cls.PositionIndoorRoomTypeUUID}).
+		SetWheres(tools.Map{"uuid": cls.PositionIndoorRoomTypeUuid}).
 		PrepareByDefault().
 		First(&cls.PositionIndoorRoomType)
 	wrongs.PanicWhenIsEmpty(ret, "机房类型")
-	if cls.LocationStationUUID == "" && cls.LocationSectionUUID == "" && cls.LocationCenterUUID == "" {
+	if cls.LocationStationUuid == "" && cls.LocationSectionUuid == "" && cls.LocationCenterUuid == "" {
 		wrongs.PanicValidate("归属单位必选")
 	}
-	if cls.LocationStationUUID != "" {
+	if cls.LocationStationUuid != "" {
 		ret = models.BootByModel(models.LocationStationModel{}).
-			SetWheres(tools.Map{"uuid": cls.LocationStationUUID}).
+			SetWheres(tools.Map{"uuid": cls.LocationStationUuid}).
 			PrepareByDefault().
 			First(&cls.LocationStation)
 		wrongs.PanicWhenIsEmpty(ret, "所属战场")
 	}
-	if cls.LocationSectionUUID != "" {
+	if cls.LocationSectionUuid != "" {
 		ret = models.BootByModel(models.LocationSectionModel{}).
 			SetWheres(tools.Map{"uuid": cls.LocationSection}).
 			PrepareByDefault().
 			First(&cls.LocationSection)
 		wrongs.PanicWhenIsEmpty(ret, "所属区间")
 	}
-	if cls.LocationCenterUUID != "" {
+	if cls.LocationCenterUuid != "" {
 		ret = models.BootByModel(models.LocationSectionModel{}).
 			SetWheres(tools.Map{"uuid": cls.LocationSection}).
 			PrepareByDefault().
@@ -78,7 +78,7 @@ func (cls PositionIndoorRoomStoreForm) ShouldBind(ctx *gin.Context) PositionIndo
 	return cls
 }
 
-func(PositionIndoorRoomController) C(ctx *gin.Context){
+func (PositionIndoorRoomController) C(ctx *gin.Context) {
 	var (
 		ret    *gorm.DB
 		repeat models.PositionIndoorRoomModel
@@ -113,7 +113,7 @@ func(PositionIndoorRoomController) C(ctx *gin.Context){
 
 	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"position_indoor_room": positionIndoorRoom}))
 }
-func(PositionIndoorRoomController) D(ctx *gin.Context){
+func (PositionIndoorRoomController) D(ctx *gin.Context) {
 	var (
 		ret                *gorm.DB
 		locationIndoorRoom models.PositionIndoorRoomModel
@@ -133,7 +133,7 @@ func(PositionIndoorRoomController) D(ctx *gin.Context){
 
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
-func(PositionIndoorRoomController) U(ctx *gin.Context){
+func (PositionIndoorRoomController) U(ctx *gin.Context) {
 	var (
 		ret                        *gorm.DB
 		positionIndoorRoom, repeat models.PositionIndoorRoomModel
@@ -165,7 +165,6 @@ func(PositionIndoorRoomController) U(ctx *gin.Context){
 
 	// 编辑
 	positionIndoorRoom.BaseModel.Sort = form.Sort
-	positionIndoorRoom.UniqueCode = form.UniqueCode
 	positionIndoorRoom.Name = form.Name
 	positionIndoorRoom.PositionIndoorRoomType = form.PositionIndoorRoomType
 	positionIndoorRoom.LocationStation = form.LocationStation
@@ -175,7 +174,7 @@ func(PositionIndoorRoomController) U(ctx *gin.Context){
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"position_indoor_room": positionIndoorRoom}))
 }
-func(PositionIndoorRoomController) S(ctx *gin.Context){
+func (PositionIndoorRoomController) S(ctx *gin.Context) {
 	var (
 		ret                *gorm.DB
 		positionIndoorRoom models.PositionIndoorRoomModel
@@ -188,11 +187,11 @@ func(PositionIndoorRoomController) S(ctx *gin.Context){
 
 	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_indoor_room": positionIndoorRoom}))
 }
-func(PositionIndoorRoomController) I(ctx *gin.Context){
+func (PositionIndoorRoomController) I(ctx *gin.Context) {
 	var positionIndoorRooms []models.PositionIndoorRoomModel
 	models.BootByModel(models.PositionIndoorRoomModel{}).
 		SetWhereFields().
-		PrepareQuery(ctx,"").
+		PrepareQuery(ctx, "").
 		Find(&positionIndoorRooms)
 
 	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_indoor_rooms": positionIndoorRooms}))

@@ -18,7 +18,7 @@ type RbacPermissionStoreForm struct {
 	Name                    string `form:"name" json:"name"`
 	Uri                     string `form:"uri" json:"uri"`
 	Method                  string `form:"method" json:"method"`
-	RbacPermissionGroupUUID string `form:"rbac_permission_group_uuid" json:"rbac_permission_group_uuid"`
+	RbacPermissionGroupUuid string `form:"rbac_permission_group_uuid" json:"rbac_permission_group_uuid"`
 	RbacPermissionGroup     models.RbacPermissionGroupModel
 }
 
@@ -41,7 +41,7 @@ func (cls RbacPermissionStoreForm) ShouldBind(ctx *gin.Context) RbacPermissionSt
 	if cls.Method == "" {
 		wrongs.PanicValidate("访问方法必选")
 	}
-	if cls.RbacPermissionGroupUUID == "" {
+	if cls.RbacPermissionGroupUuid == "" {
 		wrongs.PanicValidate("所属权限分组必选")
 	}
 	ret = models.BootByModel(models.RbacPermissionGroupModel{}).
@@ -56,7 +56,7 @@ func (cls RbacPermissionStoreForm) ShouldBind(ctx *gin.Context) RbacPermissionSt
 // RbacPermissionStoreResourceForm 批量添加资源权限
 type RbacPermissionStoreResourceForm struct {
 	Uri                     string `form:"uri" json:"uri"`
-	RbacPermissionGroupUUID string `form:"rbac_permission_group_uuid" json:"rbac_permission_group_uuid"`
+	RbacPermissionGroupUuid string `form:"rbac_permission_group_uuid" json:"rbac_permission_group_uuid"`
 }
 
 // ShouldBind 绑定表单
@@ -70,14 +70,14 @@ func (cls RbacPermissionStoreResourceForm) ShouldBind(ctx *gin.Context) RbacPerm
 	if cls.Uri == "" {
 		wrongs.PanicForbidden("URI必填")
 	}
-	if cls.RbacPermissionGroupUUID == "" {
+	if cls.RbacPermissionGroupUuid == "" {
 		wrongs.PanicForbidden("权限分组必选")
 	}
 
 	return cls
 }
 
-func(RbacPermissionController) C(ctx *gin.Context){
+func (RbacPermissionController) C(ctx *gin.Context) {
 	var ret *gorm.DB
 
 	// 表单
@@ -99,7 +99,7 @@ func(RbacPermissionController) C(ctx *gin.Context){
 
 	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"rbac_permission": rbacPermission}))
 }
-func(RbacPermissionController) PostResource(ctx *gin.Context){
+func (RbacPermissionController) PostResource(ctx *gin.Context) {
 	var ret *gorm.DB
 	resourceRbacPermission := map[string]string{"列表": "GET", "新建页面": "GET", "新建": "POST", "详情页面": "GET", "编辑页面": "GET", "编辑": "PUT", "删除": "DELETE"}
 
@@ -123,7 +123,7 @@ func(RbacPermissionController) PostResource(ctx *gin.Context){
 					Name:                    name,
 					URI:                     form.Uri,
 					Method:                  method,
-					RbacPermissionGroupUuid: form.RbacPermissionGroupUUID,
+					RbacPermissionGroupUuid: form.RbacPermissionGroupUuid,
 				}); ret.Error != nil {
 				wrongs.PanicForbidden("批量添加资源权限时错误：" + ret.Error.Error())
 			} else {
@@ -134,7 +134,7 @@ func(RbacPermissionController) PostResource(ctx *gin.Context){
 
 	ctx.JSON(tools.CorrectBoot("成功添加权限：" + strconv.Itoa(successCount) + "个").Created(tools.Map{}))
 }
-func(RbacPermissionController) D(ctx *gin.Context){
+func (RbacPermissionController) D(ctx *gin.Context) {
 	var (
 		ret            *gorm.DB
 		rbacPermission models.RbacPermissionModel
@@ -155,7 +155,7 @@ func(RbacPermissionController) D(ctx *gin.Context){
 
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
-func(RbacPermissionController) U(ctx *gin.Context){
+func (RbacPermissionController) U(ctx *gin.Context) {
 	var (
 		ret            *gorm.DB
 		rbacPermission models.RbacPermissionModel
@@ -175,8 +175,9 @@ func(RbacPermissionController) U(ctx *gin.Context){
 	rbacPermission.Name = form.Name
 	rbacPermission.URI = form.Uri
 	rbacPermission.Method = form.Method
-	rbacPermission.RbacPermissionGroupUuid = form.RbacPermissionGroupUUID
+	rbacPermission.RbacPermissionGroupUuid = form.RbacPermissionGroupUuid
 	if ret = models.BootByModel(models.RbacPermissionModel{}).
+		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 		PrepareByDefault().
 		Save(&rbacPermission); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
@@ -184,7 +185,7 @@ func(RbacPermissionController) U(ctx *gin.Context){
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"rbac_permission": rbacPermission}))
 }
-func(RbacPermissionController) S(ctx *gin.Context){
+func (RbacPermissionController) S(ctx *gin.Context) {
 	var (
 		ret            *gorm.DB
 		rbacPermission models.RbacPermissionModel
@@ -199,12 +200,12 @@ func(RbacPermissionController) S(ctx *gin.Context){
 
 	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"rbac_permission": rbacPermission}))
 }
-func(RbacPermissionController) I(ctx *gin.Context){
+func (RbacPermissionController) I(ctx *gin.Context) {
 	var rbacPermissions []models.RbacPermissionModel
 	models.BootByModel(models.RbacPermissionModel{}).
 		SetPreloads("RbacPermissionGroup").
 		SetWhereFields("name", "uri", "method", "rbac_permission_group_uuid").
-		PrepareQuery(ctx,"").
+		PrepareQuery(ctx, "").
 		Find(&rbacPermissions)
 
 	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"rbac_permissions": rbacPermissions}))

@@ -18,7 +18,7 @@ type KindEntireTypeStoreForm struct {
 	Name             string `form:"name" json:"name"`
 	Nickname         string `form:"nickname" json:"nickname"`
 	BeEnable         bool   `form:"be_enable" json:"be_enable"`
-	KindCategoryUUID string `form:"kind_category_uuid" json:"kind_category_uuid"`
+	KindCategoryUuid string `form:"kind_category_uuid" json:"kind_category_uuid"`
 	KindCategory     models.KindCategoryModel
 }
 
@@ -38,11 +38,11 @@ func (cls KindEntireTypeStoreForm) ShouldBind(ctx *gin.Context) KindEntireTypeSt
 	if cls.Name == "" {
 		wrongs.PanicValidate("类型名称必填")
 	}
-	if cls.KindCategoryUUID == "" {
+	if cls.KindCategoryUuid == "" {
 		wrongs.PanicValidate("所属种类必选")
 	}
 	ret = models.BootByModel(models.KindCategoryModel{}).
-		SetWheres(tools.Map{"uuid": cls.KindCategoryUUID}).
+		SetWheres(tools.Map{"uuid": cls.KindCategoryUuid}).
 		PrepareByDefault().
 		First(&cls.KindCategory)
 	wrongs.PanicWhenIsEmpty(ret, "所属种类")
@@ -142,11 +142,10 @@ func (KindEntireTypeController) U(ctx *gin.Context) {
 
 	// 编辑
 	kindEntireType.BaseModel.Sort = form.Sort
-	kindEntireType.UniqueCode = form.UniqueCode
 	kindEntireType.Name = form.Name
 	kindEntireType.BeEnable = form.BeEnable
 	kindEntireType.KindCategory = form.KindCategory
-	if ret = models.BootByModel(models.KindEntireTypeModel{}).PrepareByDefault().Save(&kindEntireType); ret.Error != nil {
+	if ret = models.BootByModel(models.KindEntireTypeModel{}).SetWheres(tools.Map{"uuid":ctx.Param("uuid")}).PrepareByDefault().Save(&kindEntireType); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 

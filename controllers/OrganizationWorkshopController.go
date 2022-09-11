@@ -17,9 +17,9 @@ type OrganizationWorkshopStoreForm struct {
 	UniqueCode                   string `form:"unique_code" json:"unique_code"`
 	Name                         string `form:"name" json:"name"`
 	BeEnable                     bool   `form:"be_enable" json:"be_enable"`
-	OrganizationWorkshopTypeUUID string `form:"organization_workshop_type_uuid" json:"organization_workshop_type_uuid"`
+	OrganizationWorkshopTypeUuid string `form:"organization_workshop_type_uuid" json:"organization_workshop_type_uuid"`
 	OrganizationWorkshopType     models.OrganizationWorkshopTypeModel
-	OrganizationParagraphUUID    string `form:"organization_paragraph_uuid" json:"organization_paragraph_uuid"`
+	OrganizationParagraphUuid    string `form:"organization_paragraph_uuid" json:"organization_paragraph_uuid"`
 	OrganizationParagraph        models.OrganizationParagraphModel
 }
 
@@ -38,15 +38,15 @@ func (cls OrganizationWorkshopStoreForm) ShouldBind(ctx *gin.Context) Organizati
 	if cls.Name == "" {
 		wrongs.PanicValidate("车间名称必填")
 	}
-	if cls.OrganizationWorkshopTypeUUID == "" {
+	if cls.OrganizationWorkshopTypeUuid == "" {
 		wrongs.PanicValidate("车间类型必选")
 	}
-	cls.OrganizationWorkshopType = (&models.OrganizationWorkshopTypeModel{}).FindOneByUUID(cls.OrganizationWorkshopTypeUUID)
-	if cls.OrganizationParagraphUUID == "" {
+	cls.OrganizationWorkshopType = (&models.OrganizationWorkshopTypeModel{}).FindOneByUUID(cls.OrganizationWorkshopTypeUuid)
+	if cls.OrganizationParagraphUuid == "" {
 		wrongs.PanicValidate("所属站段必选")
 	}
 	ret = models.BootByModel(models.OrganizationParagraphModel{}).
-		SetWheres(tools.Map{"uuid": cls.OrganizationParagraphUUID}).
+		SetWheres(tools.Map{"uuid": cls.OrganizationParagraphUuid}).
 		PrepareByDefault().
 		First(&cls.OrganizationParagraph)
 	wrongs.PanicWhenIsEmpty(ret, "站段")
@@ -141,12 +141,11 @@ func (OrganizationWorkshopController) U(ctx *gin.Context) {
 	wrongs.PanicWhenIsEmpty(ret, "车间")
 
 	// 编辑
-	organizationWorkshop.UniqueCode = form.UniqueCode
 	organizationWorkshop.Name = form.Name
 	organizationWorkshop.BeEnable = form.BeEnable
 	organizationWorkshop.OrganizationWorkshopType = form.OrganizationWorkshopType
 	organizationWorkshop.OrganizationParagraph = form.OrganizationParagraph
-	if ret = models.BootByModel(models.OrganizationWorkshopModel{}).PrepareByDefault().Save(&organizationWorkshop); ret.Error != nil {
+	if ret = models.BootByModel(models.OrganizationWorkshopModel{}).SetWheres(tools.Map{"uuid":ctx.Param("uuid")}).PrepareByDefault().Save(&organizationWorkshop); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 

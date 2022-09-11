@@ -17,11 +17,11 @@ type OrganizationWorkAreaStoreForm struct {
 	UniqueCode                         string `form:"unique_code" json:"unique_code"`
 	Name                               string `form:"name" json:"name"`
 	BeEnable                           bool   `form:"be_enable" json:"be_enable"`
-	OrganizationWorkAreaTypeUUID       string `form:"organization_work_area_type_uuid" json:"organization_work_area_type_uuid"`
+	OrganizationWorkAreaTypeUuid       string `form:"organization_work_area_type_uuid" json:"organization_work_area_type_uuid"`
 	OrganizationWorkAreaType           models.OrganizationWorkAreaTypeModel
-	OrganizationWorkAreaProfessionUUID string `form:"organization_work_area_profession_uuid" json:"organization_work_area_profession_uuid"`
+	OrganizationWorkAreaProfessionUuid string `form:"organization_work_area_profession_uuid" json:"organization_work_area_profession_uuid"`
 	OrganizationWorkAreaProfession     models.OrganizationWorkAreaProfessionModel
-	OrganizationWorkshopUUID           string `form:"organization_workshop_uuid" json:"organization_workshop_uuid"`
+	OrganizationWorkshopUuid           string `form:"organization_workshop_uuid" json:"organization_workshop_uuid"`
 	OrganizationWorkshop               models.OrganizationWorkshopModel
 }
 
@@ -42,27 +42,27 @@ func (cls OrganizationWorkAreaStoreForm) ShouldBind(ctx *gin.Context) Organizati
 		wrongs.PanicValidate("工区名称必填")
 	}
 
-	if cls.OrganizationWorkAreaTypeUUID == "" {
+	if cls.OrganizationWorkAreaTypeUuid == "" {
 		wrongs.PanicValidate("工区类型必选")
 	}
-	ret = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).SetWheres(map[string]interface{}{"uuid": cls.OrganizationWorkAreaTypeUUID}).PrepareByDefault().First(&cls.OrganizationWorkAreaType)
+	ret = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).SetWheres(map[string]interface{}{"uuid": cls.OrganizationWorkAreaTypeUuid}).PrepareByDefault().First(&cls.OrganizationWorkAreaType)
 	wrongs.PanicWhenIsEmpty(ret, "工区类型")
 
-	if cls.OrganizationWorkshopUUID == "" {
+	if cls.OrganizationWorkshopUuid == "" {
 		wrongs.PanicValidate("所属车间必选")
 	}
-	ret = models.BootByModel(models.OrganizationWorkshopModel{}).SetWheres(map[string]interface{}{"uuid": cls.OrganizationWorkshopUUID}).PrepareByDefault().First(&cls.OrganizationWorkshop)
+	ret = models.BootByModel(models.OrganizationWorkshopModel{}).SetWheres(map[string]interface{}{"uuid": cls.OrganizationWorkshopUuid}).PrepareByDefault().First(&cls.OrganizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "所属车间")
 
-	if cls.OrganizationWorkAreaProfessionUUID != "" {
-		ret = models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaProfessionUUID}).PrepareByDefault().First(&cls.OrganizationWorkAreaProfession)
+	if cls.OrganizationWorkAreaProfessionUuid != "" {
+		ret = models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaProfessionUuid}).PrepareByDefault().First(&cls.OrganizationWorkAreaProfession)
 		wrongs.PanicWhenIsEmpty(ret, "工区专业")
 	}
 	return cls
 }
 
-// Store 新建
-func (OrganizationWorkAreaController) Store(ctx *gin.Context) {
+// C 新建
+func (OrganizationWorkAreaController) C(ctx *gin.Context) {
 	var (
 		ret    *gorm.DB
 		repeat models.OrganizationWorkAreaModel
@@ -89,9 +89,9 @@ func (OrganizationWorkAreaController) Store(ctx *gin.Context) {
 			BaseModel:                          models.BaseModel{Sort: form.Sort, Uuid: uuid.NewV4().String()},
 			UniqueCode:                         form.UniqueCode,
 			Name:                               form.Name,
-			OrganizationWorkAreaProfessionUuid: form.OrganizationWorkAreaProfessionUUID,
-			OrganizationWorkAreaTypeUuid:       form.OrganizationWorkAreaTypeUUID,
-			OrganizationWorkshopUuid:           form.OrganizationWorkshopUUID,
+			OrganizationWorkAreaProfessionUuid: form.OrganizationWorkAreaProfessionUuid,
+			OrganizationWorkAreaTypeUuid:       form.OrganizationWorkAreaTypeUuid,
+			OrganizationWorkshopUuid:           form.OrganizationWorkshopUuid,
 		}); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
@@ -99,8 +99,8 @@ func (OrganizationWorkAreaController) Store(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{}))
 }
 
-// Destroy 删除
-func (OrganizationWorkAreaController) Destroy(ctx *gin.Context) {
+// D 删除
+func (OrganizationWorkAreaController) D(ctx *gin.Context) {
 	var (
 		ret                  *gorm.DB
 		organizationWorkArea models.OrganizationWorkAreaModel
@@ -120,8 +120,8 @@ func (OrganizationWorkAreaController) Destroy(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
 
-// Update 更新
-func (OrganizationWorkAreaController) Update(ctx *gin.Context) {
+// U 更新
+func (OrganizationWorkAreaController) U(ctx *gin.Context) {
 	var (
 		ret                          *gorm.DB
 		organizationWorkArea, repeat models.OrganizationWorkAreaModel
@@ -156,12 +156,11 @@ func (OrganizationWorkAreaController) Update(ctx *gin.Context) {
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 		PrepareByDefault().
 		Updates(map[string]interface{}{
-			"unique_code":                            form.UniqueCode,
 			"name":                                   form.Name,
 			"organization_work_area_type_uuid":       form.OrganizationWorkAreaType.Uuid,
-			"organization_work_area_profession_uuid": form.OrganizationWorkAreaProfessionUUID,
+			"organization_work_area_profession_uuid": form.OrganizationWorkAreaProfessionUuid,
 			"be_enable":                              form.BeEnable,
-			"organization_workshop_uuid":             form.OrganizationWorkshopUUID,
+			"organization_workshop_uuid":             form.OrganizationWorkshopUuid,
 		}); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
@@ -169,8 +168,8 @@ func (OrganizationWorkAreaController) Update(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"organization_work_area": organizationWorkArea}))
 }
 
-// Show 详情
-func (OrganizationWorkAreaController) Show(ctx *gin.Context) {
+// S 详情
+func (OrganizationWorkAreaController) S(ctx *gin.Context) {
 	var (
 		ret                  *gorm.DB
 		organizationWorkArea models.OrganizationWorkAreaModel
@@ -186,8 +185,8 @@ func (OrganizationWorkAreaController) Show(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"organization_work_area": organizationWorkArea}))
 }
 
-// Index 列表
-func (OrganizationWorkAreaController) Index(ctx *gin.Context) {
+// I 列表
+func (OrganizationWorkAreaController) I(ctx *gin.Context) {
 	var organizationWorkAreas []models.OrganizationWorkAreaModel
 	models.BootByModel(models.OrganizationWorkAreaModel{}).
 		SetWhereFields("unique_code", "name", "be_enable", "organization_work_area_type_uuid", "organization_workshop_uuid").

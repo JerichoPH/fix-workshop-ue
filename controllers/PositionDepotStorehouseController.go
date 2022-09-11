@@ -15,9 +15,9 @@ type PositionDepotStorehouseController struct{}
 type PositionDepotStorehouseStoreForm struct {
 	Sort                      int64  `form:"sort" json:"sort"`
 	UniqueCode                string `form:"unique_code" json:"unique_code"`
-	Name                      string `form:"name" json:"name"`
-	OrganizationWorkshopUUID  string `form:"organization_workshop_uuid" json:"organization_workshop_uuid"`
-	OrganizationWorkshop      models.OrganizationWorkshopModel
+	Name                     string `form:"name" json:"name"`
+	OrganizationWorkshopUuid string `form:"organization_workshop_uuid" json:"organization_workshop_uuid"`
+	OrganizationWorkshop     models.OrganizationWorkshopModel
 }
 
 // ShouldBind 绑定表单
@@ -36,11 +36,11 @@ func (cls PositionDepotStorehouseStoreForm) ShouldBind(ctx *gin.Context) Positio
 	if cls.Name == "" {
 		wrongs.PanicValidate("仓库名称必填")
 	}
-	if cls.OrganizationWorkshopUUID == "" {
+	if cls.OrganizationWorkshopUuid == "" {
 		wrongs.PanicValidate("所属车间必选")
 	}
 	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
-		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).
+		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUuid}).
 		PrepareByDefault().
 		First(&cls.OrganizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "所属车间")
@@ -123,10 +123,9 @@ func (PositionDepotStorehouseController) U(ctx *gin.Context) {
 
 	// 编辑
 	positionDepotStorehouse.BaseModel.Sort = form.Sort
-	positionDepotStorehouse.UniqueCode = form.UniqueCode
 	positionDepotStorehouse.Name = form.Name
 	positionDepotStorehouse.OrganizationWorkshop = form.OrganizationWorkshop
-	if ret = models.BootByModel(models.PositionDepotStorehouseModel{}).PrepareByDefault().Save(&positionDepotStorehouse); ret.Error != nil {
+	if ret = models.BootByModel(models.PositionDepotStorehouseModel{}).SetWheres(tools.Map{"uuid":ctx.Param("uuid")}).PrepareByDefault().Save(&positionDepotStorehouse); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 

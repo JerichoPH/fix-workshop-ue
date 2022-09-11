@@ -60,7 +60,7 @@ func (cls LocationRailroadGradeCrossStoreForm) ShouldBind(ctx *gin.Context) Loca
 
 // LocationRailroadGradeCrossBindLocationLinesForm 道口绑定线别表单
 type LocationRailroadGradeCrossBindLocationLinesForm struct {
-	LocationLineUUIDs []string
+	LocationLineUuids []string `json:"location_line_uuids"`
 	LocationLines     []*models.LocationLineModel
 }
 
@@ -73,10 +73,10 @@ func (cls LocationRailroadGradeCrossBindLocationLinesForm) ShouldBind(ctx *gin.C
 		wrongs.PanicValidate(err.Error())
 	}
 
-	if len(cls.LocationLineUUIDs) > 0 {
+	if len(cls.LocationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
 			PrepareByDefault().
-			Where("uuid in ?", cls.LocationLineUUIDs).
+			Where("uuid in ?", cls.LocationLineUuids).
 			Find(&cls.LocationLines)
 	}
 
@@ -170,7 +170,6 @@ func (LocationRailroadGradeCrossController) U(ctx *gin.Context) {
 
 	// 编辑
 	locationRailroadGradeCross.BaseModel.Sort = form.Sort
-	locationRailroadGradeCross.UniqueCode = form.UniqueCode
 	locationRailroadGradeCross.Name = form.Name
 	locationRailroadGradeCross.BeEnable = form.BeEnable
 	if ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&locationRailroadGradeCross); ret.Error != nil {
@@ -212,7 +211,7 @@ func (LocationRailroadGradeCrossController) PutBindLines(ctx *gin.Context) {
 			CreateInBatches(&pivotLocationLineAndLocationRailroadGradeCrosses, 100)
 	}
 
-	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{}))
+	ctx.JSON(tools.CorrectBoot("绑定成功").Updated(tools.Map{}))
 }
 func (LocationRailroadGradeCrossController) S(ctx *gin.Context) {
 	var (
@@ -222,7 +221,7 @@ func (LocationRailroadGradeCrossController) S(ctx *gin.Context) {
 	ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 		SetWhereFields("be_enable").
-		SetPreloads("OrganizationWorkshop", "OrganizationWorkArea").
+		SetPreloads("OrganizationWorkshop", "OrganizationWorkArea", "LocationLines").
 		SetPreloadsByDefault().
 		PrepareUseQueryByDefault(ctx).
 		First(&locationRailroadGradeCross)
@@ -234,7 +233,7 @@ func (LocationRailroadGradeCrossController) I(ctx *gin.Context) {
 	var locationRailroadGradeCrosses []models.LocationRailroadGradeCrossModel
 	models.BootByModel(models.LocationRailroadGradeCrossModel{}).
 		SetWhereFields("unique_code", "name", "be_enable", "organization_workshop_uuid", "organization_work_area_uuid").
-		SetPreloads("OrganizationWorkshop", "OrganizationWorkArea").
+		SetPreloads("OrganizationWorkshop", "OrganizationWorkArea", "LocationLines").
 		SetPreloadsByDefault().
 		PrepareUseQueryByDefault(ctx).
 		Find(&locationRailroadGradeCrosses)

@@ -16,9 +16,9 @@ type PositionDepotRowStoreForm struct {
 	Sort                     int64  `form:"sort" json:"sort"`
 	UniqueCode               string `form:"unique_code" json:"unique_code"`
 	Name                     string `form:"name" json:"name"`
-	PositionDepotRowTypeUUID string `form:"position_depot_row_type_uuid" json:"position_depot_row_type_uuid"`
+	PositionDepotRowTypeUuid string `form:"position_depot_row_type_uuid" json:"position_depot_row_type_uuid"`
 	PositionDepotRowType     models.PositionDepotRowTypeModel
-	PositionDepotSectionUUID string `form:"position_depot_section_uuid" json:"position_depot_section_uuid"`
+	PositionDepotSectionUuid string `form:"position_depot_section_uuid" json:"position_depot_section_uuid"`
 	PositionDepotSection     models.PositionDepotSectionModel
 }
 
@@ -38,19 +38,19 @@ func (cls PositionDepotRowStoreForm) ShouldBind(ctx *gin.Context) PositionDepotR
 	if cls.Name == "" {
 		wrongs.PanicValidate("仓库排名称必填")
 	}
-	if cls.PositionDepotRowTypeUUID == "" {
+	if cls.PositionDepotRowTypeUuid == "" {
 		wrongs.PanicValidate("所属排类型必选")
 	}
 	models.BootByModel(models.PositionDepotRowTypeModel{}).
-		SetWheres(tools.Map{"uuid": cls.PositionDepotRowTypeUUID}).
+		SetWheres(tools.Map{"uuid": cls.PositionDepotRowTypeUuid}).
 		PrepareByDefault().
 		First(&cls.PositionDepotRowType)
 	wrongs.PanicWhenIsEmpty(ret, "所属仓库排类型")
-	if cls.PositionDepotSectionUUID == "" {
+	if cls.PositionDepotSectionUuid == "" {
 		wrongs.PanicValidate("所属仓库区域必选")
 	}
 	ret = models.BootByModel(models.PositionDepotSectionModel{}).
-		SetWheres(tools.Map{"uuid": cls.PositionDepotSectionUUID}).
+		SetWheres(tools.Map{"uuid": cls.PositionDepotSectionUuid}).
 		PrepareByDefault().
 		First(&cls.PositionDepotSection)
 	wrongs.PanicWhenIsEmpty(ret, "所属仓库区域")
@@ -145,11 +145,10 @@ func (PositionDepotRowController) U(ctx *gin.Context) {
 
 	// 编辑
 	positionDepotRow.BaseModel.Sort = form.Sort
-	positionDepotRow.UniqueCode = form.UniqueCode
 	positionDepotRow.Name = form.Name
 	positionDepotRow.PositionDepotRowType = form.PositionDepotRowType
 	positionDepotRow.PositionDepotSection = form.PositionDepotSection
-	if ret = models.BootByModel(models.PositionDepotRowModel{}).PrepareByDefault().Save(&positionDepotRow); ret.Error != nil {
+	if ret = models.BootByModel(models.PositionDepotRowModel{}).SetWheres(tools.Map{"uuid":ctx.Param("uuid")}).PrepareByDefault().Save(&positionDepotRow); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 

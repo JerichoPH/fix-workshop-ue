@@ -16,7 +16,7 @@ type PositionIndoorTierStoreForm struct {
 	Sort                      int64  `form:"sort" json:"sort"`
 	UniqueCode                string `form:"unique_code" json:"unique_code"`
 	Name                      string `form:"name" json:"name"`
-	PositionIndoorCabinetUUID string `form:"position_indoor_cabinet_uuid" json:"position_indoor_cabinet_uuid"`
+	PositionIndoorCabinetUuid string `form:"position_indoor_cabinet_uuid" json:"position_indoor_cabinet_uuid"`
 	PositionIndoorCabinet     models.PositionIndoorCabinetModel
 }
 
@@ -36,11 +36,11 @@ func (cls PositionIndoorTierStoreForm) ShouldBind(ctx *gin.Context) PositionIndo
 	if cls.Name == "" {
 		wrongs.PanicValidate("柜架层名称必填")
 	}
-	if cls.PositionIndoorCabinetUUID == "" {
+	if cls.PositionIndoorCabinetUuid == "" {
 		wrongs.PanicValidate("所属柜架必选")
 	}
 	ret = models.BootByModel(models.PositionIndoorCabinetModel{}).
-		SetWheres(tools.Map{"uuid": cls.PositionIndoorCabinetUUID}).
+		SetWheres(tools.Map{"uuid": cls.PositionIndoorCabinetUuid}).
 		PrepareByDefault().
 		First(&cls.PositionIndoorCabinet)
 	wrongs.PanicWhenIsEmpty(ret, "所属柜架")
@@ -48,7 +48,7 @@ func (cls PositionIndoorTierStoreForm) ShouldBind(ctx *gin.Context) PositionIndo
 	return cls
 }
 
-func(PositionIndoorTierController) C(ctx *gin.Context){
+func (PositionIndoorTierController) C(ctx *gin.Context) {
 	var (
 		ret    *gorm.DB
 		repeat models.PositionIndoorTierModel
@@ -82,7 +82,7 @@ func(PositionIndoorTierController) C(ctx *gin.Context){
 
 	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"position_indoor_tier": locationIndoorTier}))
 }
-func(PositionIndoorTierController) D(ctx *gin.Context){
+func (PositionIndoorTierController) D(ctx *gin.Context) {
 	var (
 		ret                *gorm.DB
 		positionIndoorTier models.PositionIndoorTierModel
@@ -102,7 +102,7 @@ func(PositionIndoorTierController) D(ctx *gin.Context){
 
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
-func(PositionIndoorTierController) U(ctx *gin.Context){
+func (PositionIndoorTierController) U(ctx *gin.Context) {
 	var (
 		ret                        *gorm.DB
 		positionIndoorTier, repeat models.PositionIndoorTierModel
@@ -134,16 +134,15 @@ func(PositionIndoorTierController) U(ctx *gin.Context){
 
 	// 编辑
 	positionIndoorTier.BaseModel.Sort = form.Sort
-	positionIndoorTier.UniqueCode = form.UniqueCode
 	positionIndoorTier.Name = form.Name
 	positionIndoorTier.PositionIndoorCabinet = form.PositionIndoorCabinet
-	if ret = models.BootByModel(models.PositionIndoorTierModel{}).PrepareByDefault().Save(&positionIndoorTier); ret.Error != nil {
+	if ret = models.BootByModel(models.PositionIndoorTierModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&positionIndoorTier); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"position_indoor_tier": positionIndoorTier}))
 }
-func(PositionIndoorTierController) S(ctx *gin.Context){
+func (PositionIndoorTierController) S(ctx *gin.Context) {
 	var (
 		ret                *gorm.DB
 		positionIndoorTier models.PositionIndoorTierModel
@@ -156,11 +155,11 @@ func(PositionIndoorTierController) S(ctx *gin.Context){
 
 	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_indoor_tier": positionIndoorTier}))
 }
-func(PositionIndoorTierController) I(ctx *gin.Context){
+func (PositionIndoorTierController) I(ctx *gin.Context) {
 	var positionIndoorTier []models.PositionIndoorTierModel
 	models.BootByModel(models.PositionIndoorTierModel{}).
 		SetWhereFields().
-		PrepareQuery(ctx,"").
+		PrepareQuery(ctx, "").
 		Find(&positionIndoorTier)
 
 	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_indoor_tier": positionIndoorTier}))

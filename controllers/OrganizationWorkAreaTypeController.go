@@ -106,7 +106,7 @@ func (OrganizationWorkAreaTypeController) U(ctx *gin.Context) {
 	organizationWorkAreaType.BaseModel.Sort = form.Sort
 	organizationWorkAreaType.UniqueCode = form.UniqueCode
 	organizationWorkAreaType.Name = form.Name
-	if ret = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).PrepareByDefault().Save(&organizationWorkAreaType); ret.Error != nil {
+	if ret = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).SetWheres(tools.Map{"uuid":ctx.Param("uuid")}).PrepareByDefault().Save(&organizationWorkAreaType); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 

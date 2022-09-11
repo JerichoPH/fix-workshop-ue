@@ -71,13 +71,13 @@ func (cls AccountStoreForm) ShouldBind(ctx *gin.Context) AccountStoreForm {
 type AccountUpdateForm struct {
 	Username                  string `form:"username" json:"username" uri:"username"`
 	Nickname                  string `form:"nickname" json:"nickname" uri:"nickname"`
-	OrganizationRailwayUUID   string `form:"organization_railway_uuid" json:"organization_railway_uuid"`
+	OrganizationRailwayUuid   string `form:"organization_railway_uuid" json:"organization_railway_uuid"`
 	OrganizationRailway       models.OrganizationRailwayModel
-	OrganizationParagraphUUID string `form:"organization_paragraph_uuid" json:"organization_paragraph_uuid"`
+	OrganizationParagraphUuid string `form:"organization_paragraph_uuid" json:"organization_paragraph_uuid"`
 	OrganizationParagraph     models.OrganizationParagraphModel
-	OrganizationWorkshopUUID  string `form:"organization_workshop_uuid" json:"organization_workshop_uuid"`
+	OrganizationWorkshopUuid  string `form:"organization_workshop_uuid" json:"organization_workshop_uuid"`
 	OrganizationWorkshop      models.OrganizationWorkshopModel
-	OrganizationWorkAreaUUID  string `form:"organization_work_area_uuid" json:"organization_work_area_uuid"`
+	OrganizationWorkAreaUuid  string `form:"organization_work_area_uuid" json:"organization_work_area_uuid"`
 	OrganizationWorkArea      models.OrganizationWorkAreaModel
 }
 
@@ -97,20 +97,20 @@ func (cls AccountUpdateForm) ShouldBind(ctx *gin.Context) AccountUpdateForm {
 	if cls.Nickname == "" {
 		wrongs.PanicValidate("昵称必填")
 	}
-	if cls.OrganizationRailwayUUID != "" {
-		ret = models.BootByModel(models.OrganizationRailwayModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationRailwayUUID}).PrepareByDefault().First(&cls.OrganizationRailway)
+	if cls.OrganizationRailwayUuid != "" {
+		ret = models.BootByModel(models.OrganizationRailwayModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationRailwayUuid}).PrepareByDefault().First(&cls.OrganizationRailway)
 		wrongs.PanicWhenIsEmpty(ret, "路局")
 	}
-	if cls.OrganizationParagraphUUID != "" {
-		ret = models.BootByModel(models.OrganizationParagraphModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationParagraphUUID}).PrepareByDefault().First(&cls.OrganizationParagraph)
+	if cls.OrganizationParagraphUuid != "" {
+		ret = models.BootByModel(models.OrganizationParagraphModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationParagraphUuid}).PrepareByDefault().First(&cls.OrganizationParagraph)
 		wrongs.PanicWhenIsEmpty(ret, "站段")
 	}
-	if cls.OrganizationWorkshopUUID != "" {
-		ret = models.BootByModel(models.OrganizationWorkshopModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).PrepareByDefault().First(&cls.OrganizationWorkshop)
+	if cls.OrganizationWorkshopUuid != "" {
+		ret = models.BootByModel(models.OrganizationWorkshopModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUuid}).PrepareByDefault().First(&cls.OrganizationWorkshop)
 		wrongs.PanicWhenIsEmpty(ret, "车间")
 	}
-	if cls.OrganizationWorkAreaUUID != "" {
-		ret = models.BootByModel(models.OrganizationWorkAreaModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUUID}).PrepareByDefault().First(&cls.OrganizationWorkArea)
+	if cls.OrganizationWorkAreaUuid != "" {
+		ret = models.BootByModel(models.OrganizationWorkAreaModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUuid}).PrepareByDefault().First(&cls.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "工区")
 	}
 
@@ -190,6 +190,27 @@ func (cls AccountController) C(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBoot("新建成功").Created(tools.Map{}))
 }
 
+// D 删除用户
+func (AccountController) D(ctx *gin.Context) {
+	var (
+		ret     *gorm.DB
+		account models.AccountModel
+	)
+
+	ret = models.BootByModel(models.AccountModel{}).
+		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+		PrepareByDefault().
+		First(&account)
+	wrongs.PanicWhenIsEmpty(ret, "用户")
+
+	models.BootByModel(models.AccountModel{}).
+		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+		PrepareByDefault().
+		Delete(&account)
+
+	ctx.JSON(tools.CorrectBootByDefault().Deleted())
+}
+
 // U 编辑用户
 func (AccountController) U(ctx *gin.Context) {
 	var (
@@ -216,7 +237,7 @@ func (AccountController) U(ctx *gin.Context) {
 	wrongs.PanicWhenIsRepeat(ret, "用户昵称")
 
 	// 查询
-	ret = models.BootByModel(models.AccountModel{}).SetWheres(map[string]interface{}{"uuid": ctx.Param("uuid")}).PrepareByDefault().First(&account)
+	ret = models.BootByModel(models.AccountModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().First(&account)
 	wrongs.PanicWhenIsEmpty(ret, "用户")
 
 	// 编辑
@@ -226,12 +247,7 @@ func (AccountController) U(ctx *gin.Context) {
 	account.OrganizationParagraphUuid = form.OrganizationParagraph.Uuid
 	account.OrganizationWorkshopUuid = form.OrganizationWorkshop.Uuid
 	account.OrganizationWorkAreaUuid = form.OrganizationWorkArea.Uuid
-	if ret = models.BootByModel(models.AccountModel{}).
-		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		//SetPreloads("OrganizationRailway", "OrganizationParagraph", "OrganizationWorkshop", "OrganizationWorkArea").
-		PrepareByDefault().
-		Debug().
-		Save(&account); ret.Error != nil {
+	if ret = models.BootByModel(models.AccountModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Debug().Save(&account); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
@@ -268,27 +284,6 @@ func (AccountController) PutPassword(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBoot("密码修改成功").Updated(tools.Map{}))
 }
 
-// D 删除用户
-func (AccountController) D(ctx *gin.Context) {
-	var (
-		ret     *gorm.DB
-		account models.AccountModel
-	)
-
-	ret = models.BootByModel(models.AccountModel{}).
-		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
-		First(&account)
-	wrongs.PanicWhenIsEmpty(ret, "用户")
-
-	models.BootByModel(models.AccountModel{}).
-		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
-		Delete(&account)
-
-	ctx.JSON(tools.CorrectBootByDefault().Deleted())
-}
-
 // S 详情
 func (AccountController) S(ctx *gin.Context) {
 	var (
@@ -306,7 +301,7 @@ func (AccountController) S(ctx *gin.Context) {
 }
 
 // I 列表
-func(AccountController) I(ctx *gin.Context){
+func (AccountController) I(ctx *gin.Context) {
 	var accounts []models.AccountModel
 	models.BootByModel(models.AccountModel{}).
 		PrepareUseQueryByDefault(ctx).

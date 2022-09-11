@@ -104,9 +104,8 @@ func (PositionIndoorRoomTypeController) U(ctx *gin.Context) {
 
 	// 编辑
 	positionIndoorRoomType.BaseModel.Sort = form.Sort
-	positionIndoorRoomType.UniqueCode = form.UniqueCode
 	positionIndoorRoomType.Name = form.Name
-	if ret = models.BootByModel(models.PositionIndoorRoomTypeModel{}).PrepareByDefault().Save(&positionIndoorRoomType); ret.Error != nil {
+	if ret = models.BootByModel(models.PositionIndoorRoomTypeModel{}).SetWheres(tools.Map{"uuid":ctx.Param("uuid")}).PrepareByDefault().Save(&positionIndoorRoomType); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 

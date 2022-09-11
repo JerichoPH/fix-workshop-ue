@@ -212,7 +212,7 @@ func (RbacRoleController) PutBindRbacPermissions(ctx *gin.Context) {
 
 	// 绑定
 	rbacRole.RbacPermissions = form.RbacPermissions
-	if ret = models.BootByModel(models.RbacRoleModel{}).PrepareByDefault().Save(&rbacRole); ret.Error != nil {
+	if ret = models.BootByModel(models.RbacRoleModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&rbacRole); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 

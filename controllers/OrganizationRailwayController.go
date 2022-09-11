@@ -18,7 +18,7 @@ type OrganizationRailwayStoreForm struct {
 	Name              string   `form:"name" json:"name"`
 	ShortName         string   `form:"short_name" json:"short_name"`
 	BeEnable          bool     `form:"be_enable" json:"be_enable"`
-	LocationLineUUIDs []string `form:"location_line_uuids" json:"location_line_uuids"`
+	LocationLineUuids []string `form:"location_line_uuids" json:"location_line_uuids"`
 	LocationLines     []*models.LocationLineModel
 }
 
@@ -36,10 +36,10 @@ func (cls OrganizationRailwayStoreForm) ShouldBind(ctx *gin.Context) Organizatio
 	if cls.Name == "" {
 		wrongs.PanicValidate("路局名称必填")
 	}
-	if len(cls.LocationLineUUIDs) > 0 {
+	if len(cls.LocationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
 			PrepareByDefault().
-			Where("uuid in ?", cls.LocationLineUUIDs).
+			Where("uuid in ?", cls.LocationLineUuids).
 			Find(&cls.LocationLines)
 	}
 
@@ -163,11 +163,10 @@ func (OrganizationRailwayController) U(ctx *gin.Context) {
 
 	// 修改
 	organizationRailway.Sort = form.Sort
-	organizationRailway.UniqueCode = form.UniqueCode
 	organizationRailway.Name = form.Name
 	organizationRailway.ShortName = form.ShortName
 	organizationRailway.BeEnable = form.BeEnable
-	if ret = models.BootByModel(models.OrganizationRailwayModel{}).PrepareByDefault().Save(&organizationRailway); ret.Error != nil {
+	if ret = models.BootByModel(models.OrganizationRailwayModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&organizationRailway); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 

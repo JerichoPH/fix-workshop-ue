@@ -18,9 +18,9 @@ type OrganizationParagraphStoreForm struct {
 	Name                    string `form:"name" json:"name"`
 	ShortName               string `form:"short_name" json:"short_name"`
 	BeEnable                bool   `form:"be_enable" json:"be_enable"`
-	OrganizationRailwayUUID string `form:"organization_railway_uuid" json:"organization_railway_uuid"`
+	OrganizationRailwayUuid string `form:"organization_railway_uuid" json:"organization_railway_uuid"`
 	OrganizationRailway     models.OrganizationRailwayModel
-	OrganizationLineUUIDs   []string `form:"organization_line_uuids" json:"organization_line_uuids"`
+	OrganizationLineUuids   []string `form:"organization_line_uuids" json:"organization_line_uuids"`
 	OrganizationLines       []*models.LocationLineModel
 }
 
@@ -39,18 +39,18 @@ func (cls OrganizationParagraphStoreForm) ShouldBind(ctx *gin.Context) Organizat
 	if cls.Name == "" {
 		wrongs.PanicValidate("站段名称必填")
 	}
-	if cls.OrganizationRailwayUUID == "" {
+	if cls.OrganizationRailwayUuid == "" {
 		wrongs.PanicValidate("所属路局必选")
 	}
 	ret = models.BootByModel(models.OrganizationRailwayModel{}).
-		SetWheres(tools.Map{"uuid": cls.OrganizationRailwayUUID}).
+		SetWheres(tools.Map{"uuid": cls.OrganizationRailwayUuid}).
 		PrepareByDefault().
 		First(&cls.OrganizationRailway)
 	wrongs.PanicWhenIsEmpty(ret, "路局")
-	if len(cls.OrganizationLineUUIDs) > 0 {
+	if len(cls.OrganizationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
 			PrepareByDefault().
-			Where("uuid in ?", cls.OrganizationLineUUIDs).
+			Where("uuid in ?", cls.OrganizationLineUuids).
 			Find(&cls.OrganizationLines)
 	}
 
@@ -151,12 +151,11 @@ func (OrganizationParagraphController) U(ctx *gin.Context) {
 
 	// 编辑
 	organizationParagraph.BaseModel.Sort = form.Sort
-	organizationParagraph.UniqueCode = form.UniqueCode
 	organizationParagraph.Name = form.Name
 	organizationParagraph.ShortName = form.ShortName
 	organizationParagraph.BeEnable = form.BeEnable
 	organizationParagraph.OrganizationRailway = form.OrganizationRailway
-	if ret = models.BootByModel(models.OrganizationParagraphModel{}).PrepareByDefault().Save(&organizationParagraph); ret.Error != nil {
+	if ret = models.BootByModel(models.OrganizationParagraphModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&organizationParagraph); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 

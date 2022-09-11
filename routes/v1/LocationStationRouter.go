@@ -20,21 +20,21 @@ func (LocationStationRouter) Load(engine *gin.Engine) {
 	)
 	{
 		// 新建
-		r.POST("", func(ctx *gin.Context) {new(controllers.LocationStationController).Store(ctx)})
+		r.POST("", func(ctx *gin.Context) {new(controllers.LocationStationController).C(ctx)})
 
 		// 删除
-		r.DELETE(":uuid", func(ctx *gin.Context) {new(controllers.LocationStationController).Destroy(ctx)})
+		r.DELETE(":uuid", func(ctx *gin.Context) {new(controllers.LocationStationController).D(ctx)})
 
 		// 编辑
-		r.PUT(":uuid", func(ctx *gin.Context) {new(controllers.LocationStationController).Update(ctx)})
+		r.PUT(":uuid", func(ctx *gin.Context) {new(controllers.LocationStationController).U(ctx)})
 
 		// 站场绑定线别
 		r.PUT(":uuid/bindLocationLines", func(ctx *gin.Context) {new(controllers.LocationStationController).PutBindLocationLines(ctx)})
 
 		// 详情
-		r.GET(":uuid", func(ctx *gin.Context) {new(controllers.LocationStationController).Show(ctx)})
+		r.GET(":uuid", func(ctx *gin.Context) {new(controllers.LocationStationController).S(ctx)})
 
 		// 列表
-		r.GET("", func(ctx *gin.Context) {new(controllers.LocationStationController).Index(ctx)})
+		r.GET("", func(ctx *gin.Context) {new(controllers.LocationStationController).I(ctx)})
 	}
 }

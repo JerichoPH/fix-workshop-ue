@@ -17,9 +17,9 @@ type LocationCenterStoreForm struct {
 	UniqueCode               string `form:"" json:""`
 	Name                     string `form:"name" json:"name"`
 	BeEnable                 bool   `form:"be_enable" json:"be_enable"`
-	OrganizationWorkshopUUID string `form:"organization_workshop_uuid" json:"organization_workshop_uuid"`
+	OrganizationWorkshopUuid string `form:"organization_workshop_uuid" json:"organization_workshop_uuid"`
 	OrganizationWorkshop     models.OrganizationWorkshopModel
-	OrganizationWorkAreaUUID string `form:"organization_work_area_uuid" json:"organization_work_area_uuid"`
+	OrganizationWorkAreaUuid string `form:"organization_work_area_uuid" json:"organization_work_area_uuid"`
 	OrganizationWorkArea     models.OrganizationWorkAreaModel
 }
 
@@ -39,17 +39,17 @@ func (cls LocationCenterStoreForm) ShouldBind(ctx *gin.Context) LocationCenterSt
 	if cls.Name == "" {
 		wrongs.PanicValidate("中心名称必填")
 	}
-	if cls.OrganizationWorkshopUUID == "" {
+	if cls.OrganizationWorkshopUuid == "" {
 		wrongs.PanicValidate("所属车间必选")
 	}
 	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
-		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).
+		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUuid}).
 		PrepareByDefault().
 		First(&cls.OrganizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "所属车间")
-	if cls.OrganizationWorkAreaUUID != "" {
+	if cls.OrganizationWorkAreaUuid != "" {
 		models.BootByModel(models.OrganizationWorkAreaModel{}).
-			SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUUID}).
+			SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUuid}).
 			PrepareByDefault().
 			First(&cls.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "工区")
@@ -60,7 +60,7 @@ func (cls LocationCenterStoreForm) ShouldBind(ctx *gin.Context) LocationCenterSt
 
 // LocationCenterBindLocationLinesForm 中心绑定线别表单
 type LocationCenterBindLocationLinesForm struct {
-	LocationLineUUIDs []string
+	LocationLineUuids []string
 	LocationLines     []*models.LocationLineModel
 }
 
@@ -73,10 +73,10 @@ func (cls LocationCenterBindLocationLinesForm) ShouldBind(ctx *gin.Context) Loca
 		wrongs.PanicValidate(err.Error())
 	}
 
-	if len(cls.LocationLineUUIDs) > 0 {
+	if len(cls.LocationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
 			PrepareByDefault().
-			Where("uuid in ?", cls.LocationLineUUIDs).
+			Where("uuid in ?", cls.LocationLineUuids).
 			Find(&cls.LocationLines)
 	}
 
@@ -174,10 +174,9 @@ func (LocationCenterController) U(ctx *gin.Context) {
 
 	// 编辑
 	locationCenter.BaseModel.Sort = form.Sort
-	locationCenter.UniqueCode = form.UniqueCode
 	locationCenter.Name = form.Name
 	locationCenter.BeEnable = form.BeEnable
-	if ret = models.BootByModel(models.LocationCenterModel{}).PrepareByDefault().Save(&locationCenter); ret.Error != nil {
+	if ret = models.BootByModel(models.LocationCenterModel{}).SetWheres(tools.Map{"uuid":ctx.Param("uuid")}).PrepareByDefault().Save(&locationCenter); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 

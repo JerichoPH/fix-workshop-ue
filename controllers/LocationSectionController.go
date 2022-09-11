@@ -17,9 +17,9 @@ type LocationSectionStoreForm struct {
 	UniqueCode               string `form:"unique_code" json:"unique_code"`
 	Name                     string `form:"name" json:"name"`
 	BeEnable                 bool   `form:"be_enable" json:"be_enable"`
-	OrganizationWorkshopUUID string `form:"organization_workshop_uuid" json:"organization_workshop_uuid"`
+	OrganizationWorkshopUuid string `form:"organization_workshop_uuid" json:"organization_workshop_uuid"`
 	OrganizationWorkshop     models.OrganizationWorkshopModel
-	OrganizationWorkAreaUUID string `form:"organization_work_area_uuid" json:"organization_work_area_uuid"`
+	OrganizationWorkAreaUuid string `form:"organization_work_area_uuid" json:"organization_work_area_uuid"`
 	OrganizationWorkArea     models.OrganizationWorkAreaModel
 }
 
@@ -39,17 +39,17 @@ func (cls LocationSectionStoreForm) ShouldBind(ctx *gin.Context) LocationSection
 	if cls.Name == "" {
 		wrongs.PanicValidate("区间名称不能为空")
 	}
-	if cls.OrganizationWorkshopUUID == "" {
+	if cls.OrganizationWorkshopUuid == "" {
 		wrongs.PanicValidate("所属车间不能为空")
 	}
 	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
-		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).
+		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUuid}).
 		PrepareByDefault().
 		First(&cls.OrganizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "车间")
-	if cls.OrganizationWorkAreaUUID != "" {
+	if cls.OrganizationWorkAreaUuid != "" {
 		ret = models.BootByModel(models.OrganizationWorkAreaModel{}).
-			SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUUID}).
+			SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUuid}).
 			PrepareByDefault().
 			First(&cls.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "工区")
@@ -60,7 +60,7 @@ func (cls LocationSectionStoreForm) ShouldBind(ctx *gin.Context) LocationSection
 
 // LocationSectionBindLocationLinesForm 区间绑定线别表单
 type LocationSectionBindLocationLinesForm struct {
-	LocationLineUUIDs []string
+	LocationLineUuids []string
 	LocationLines     []*models.LocationLineModel
 }
 
@@ -165,12 +165,11 @@ func (LocationSectionController) U(ctx *gin.Context) {
 
 	// 编辑
 	locationSection.BaseModel.Sort = form.Sort
-	locationSection.UniqueCode = form.UniqueCode
 	locationSection.Name = form.Name
 	locationSection.BeEnable = form.BeEnable
 	locationSection.OrganizationWorkshop = form.OrganizationWorkshop
 	locationSection.OrganizationWorkArea = form.OrganizationWorkArea
-	if ret = models.BootByModel(models.LocationSectionModel{}).PrepareByDefault().Save(&locationSection); ret.Error != nil {
+	if ret = models.BootByModel(models.LocationSectionModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&locationSection); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 

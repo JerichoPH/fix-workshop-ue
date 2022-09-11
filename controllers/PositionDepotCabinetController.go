@@ -16,7 +16,7 @@ type PositionDepotCabinetStoreForm struct {
 	Sort                 int64  `form:"sort" json:"sort"`
 	UniqueCode           string `form:"unique_code" json:"unique_code"`
 	Name                 string `form:"name" json:"name"`
-	PositionDepotRowUUID string `form:"position_depot_row_uuid" json:"position_depot_row_uuid"`
+	PositionDepotRowUuid string `form:"position_depot_row_uuid" json:"position_depot_row_uuid"`
 	PositionDepotRow     models.PositionDepotRowModel
 }
 
@@ -36,11 +36,11 @@ func (cls PositionDepotCabinetStoreForm) ShouldBind(ctx *gin.Context) PositionDe
 	if cls.Name == "" {
 		wrongs.PanicValidate("仓库柜架名称必填")
 	}
-	if cls.PositionDepotRowUUID == "" {
+	if cls.PositionDepotRowUuid == "" {
 		wrongs.PanicValidate("所属仓库排必选")
 	}
 	ret = models.BootByModel(models.PositionDepotRowModel{}).
-		SetWheres(tools.Map{"uuid": cls.PositionDepotRowUUID}).
+		SetWheres(tools.Map{"uuid": cls.PositionDepotRowUuid}).
 		PrepareByDefault().
 		First(&cls.PositionDepotRow)
 	wrongs.PanicWhenIsEmpty(ret, "所属仓库排")
@@ -134,10 +134,9 @@ func (PositionDepotCabinetController) U(ctx *gin.Context) {
 
 	// 编辑
 	positionDepotCabinet.BaseModel.Sort = form.Sort
-	positionDepotCabinet.UniqueCode = form.UniqueCode
 	positionDepotCabinet.Name = form.Name
 	positionDepotCabinet.PositionDepotRow = form.PositionDepotRow
-	if ret = models.BootByModel(models.PositionDepotCabinetModel{}).PrepareByDefault().Save(&positionDepotCabinet); ret.Error != nil {
+	if ret = models.BootByModel(models.PositionDepotCabinetModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&positionDepotCabinet); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
@@ -160,7 +159,7 @@ func (PositionDepotCabinetController) I(ctx *gin.Context) {
 	var positionDepotCabinets []models.PositionDepotCabinetModel
 	models.BootByModel(models.PositionDepotCabinetModel{}).
 		SetWhereFields().
-		PrepareQuery(ctx,"").
+		PrepareQuery(ctx, "").
 		Find(&positionDepotCabinets)
 
 	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_depot_cabinets": positionDepotCabinets}))

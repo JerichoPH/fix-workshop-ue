@@ -124,9 +124,7 @@ func (OrganizationWorkAreaProfessionController) U(ctx *gin.Context) {
 	organizationWorkAreaProfession.UniqueCode = form.UniqueCode
 	organizationWorkAreaProfession.Name = form.Name
 	if ret = models.
-		BootByModel(models.OrganizationWorkAreaProfessionModel{}).
-		PrepareByDefault().
-		Where("uuid = ?", ctx.Param("uuid")).
+		BootByModel(models.OrganizationWorkAreaProfessionModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().
 		Updates(map[string]interface{}{
 			"unique_code": form.UniqueCode,
 			"name":        form.Name,

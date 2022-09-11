@@ -132,12 +132,11 @@ func (KindCategoryController) U(ctx *gin.Context) {
 
 	// 编辑
 	kindCategory.BaseModel.Sort = form.Sort
-	kindCategory.UniqueCode = form.UniqueCode
 	kindCategory.Name = form.Name
 	kindCategory.Nickname = form.Nickname
 	kindCategory.BeEnable = form.BeEnable
 	kindCategory.Race = form.Race
-	if ret = models.BootByModel(models.KindCategoryModel{}).PrepareByDefault().Save(&kindCategory); ret.Error != nil {
+	if ret = models.BootByModel(models.KindCategoryModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&kindCategory); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 

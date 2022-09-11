@@ -108,7 +108,7 @@ func (RbacPermissionGroupController) U(ctx *gin.Context) {
 
 	// 修改
 	rbacPermissionGroup.Name = form.Name
-	models.BootByModel(models.RbacPermissionGroupModel{}).PrepareByDefault().Save(&rbacPermissionGroup)
+	models.BootByModel(models.RbacPermissionGroupModel{}).SetWheres(tools.Map{"uuid":ctx.Param("uuid")}).PrepareByDefault().Save(&rbacPermissionGroup)
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"rbac_permission_group": rbacPermissionGroup}))
 }

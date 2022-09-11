@@ -16,7 +16,7 @@ type PositionIndoorCellStoreForm struct {
 	Sort                   int64  `form:"sort" json:"sort"`
 	UniqueCode             string `form:"unique_code" json:"unique_code"`
 	Name                   string `form:"name" json:"name"`
-	PositionIndoorTierUUID string `form:"position_indoor_tier_uuid" json:"position_indoor_tier_uuid"`
+	PositionIndoorTierUuid string `form:"position_indoor_tier_uuid" json:"position_indoor_tier_uuid"`
 	PositionIndoorTier     models.PositionIndoorTierModel
 }
 
@@ -36,11 +36,11 @@ func (cls PositionIndoorCellStoreForm) ShouldBind(ctx *gin.Context) PositionIndo
 	if cls.Name == "" {
 		wrongs.PanicValidate("机柜格位名称必填")
 	}
-	if cls.PositionIndoorTierUUID == "" {
+	if cls.PositionIndoorTierUuid == "" {
 		wrongs.PanicValidate("所属机柜层必选")
 	}
 	ret = models.BootByModel(models.PositionIndoorTierModel{}).
-		SetWheres(tools.Map{"uuid": cls.PositionIndoorTierUUID}).
+		SetWheres(tools.Map{"uuid": cls.PositionIndoorTierUuid}).
 		PrepareByDefault().
 		First(&cls.PositionIndoorTier)
 	wrongs.PanicWhenIsEmpty(ret, "所属机柜层")
@@ -134,10 +134,9 @@ func (PositionIndoorCellController) U(ctx *gin.Context) {
 
 	// 编辑
 	positionIndoorCell.BaseModel.Sort = form.Sort
-	positionIndoorCell.UniqueCode = form.UniqueCode
 	positionIndoorCell.Name = form.Name
 	positionIndoorCell.PositionIndoorTier = form.PositionIndoorTier
-	if ret = models.BootByModel(models.PositionIndoorCellModel{}).PrepareByDefault().Save(&positionIndoorCell); ret.Error != nil {
+	if ret = models.BootByModel(models.PositionIndoorCellModel{}).SetWheres(tools.Map{"uuid":ctx.Param("uuid")}).PrepareByDefault().Save(&positionIndoorCell); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 

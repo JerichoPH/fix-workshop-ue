@@ -16,7 +16,7 @@ type PositionDepotCellStoreForm struct {
 	Sort                  int64  `form:"sort" json:"sort"`
 	UniqueCode            string `form:"unique_code" json:"unique_code"`
 	Name                  string `form:"name" json:"name"`
-	PositionDepotTierUUID string `form:"position_depot_tier_uuid" json:"position_depot_tier_uuid"`
+	PositionDepotTierUuid string `form:"position_depot_tier_uuid" json:"position_depot_tier_uuid"`
 	PositionDepotTier     models.PositionDepotTierModel
 }
 
@@ -36,11 +36,11 @@ func (cls PositionDepotCellStoreForm) ShouldBind(ctx *gin.Context) PositionDepot
 	if cls.Name == "" {
 		wrongs.PanicValidate("仓库名称不能必填")
 	}
-	if cls.PositionDepotTierUUID == "" {
+	if cls.PositionDepotTierUuid == "" {
 		wrongs.PanicValidate("所属仓库柜架层必选")
 	}
 	ret = models.BootByModel(models.PositionDepotTierModel{}).
-		SetWheres(tools.Map{"uuid": cls.PositionDepotTierUUID}).
+		SetWheres(tools.Map{"uuid": cls.PositionDepotTierUuid}).
 		PrepareByDefault().
 		First(&cls.PositionDepotTier)
 	wrongs.PanicWhenIsEmpty(ret, "所属仓库柜架层")
@@ -134,10 +134,9 @@ func (PositionDepotCellController) U(ctx *gin.Context) {
 
 	// 编辑
 	positionDepotCell.BaseModel.Sort = form.Sort
-	positionDepotCell.UniqueCode = form.UniqueCode
 	positionDepotCell.Name = form.Name
 	positionDepotCell.PositionDepotTier = form.PositionDepotTier
-	if ret = models.BootByModel(models.PositionDepotCellModel{}).PrepareByDefault().Save(&positionDepotCell); ret.Error != nil {
+	if ret = models.BootByModel(models.PositionDepotCellModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&positionDepotCell); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 

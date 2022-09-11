@@ -17,21 +17,21 @@ type LocationLineStoreForm struct {
 	UniqueCode                      string   `form:"unique_code" json:"unique_code"`
 	Name                            string   `form:"name" json:"name"`
 	BeEnable                        bool     `form:"be_enable" json:"be_enable"`
-	OrganizationRailwayUUIDs        []string `form:"organization_railway_uuids" json:"organization_railway_uuids"`
+	OrganizationRailwayUuids        []string `form:"organization_railway_uuids" json:"organization_railway_uuids"`
 	OrganizationRailways            []*models.OrganizationRailwayModel
-	OrganizationParagraphUUIDs      []string `form:"organization_paragraph_uuids" json:"organization_paragraph_uuids"`
+	OrganizationParagraphUuids      []string `form:"organization_paragraph_uuids" json:"organization_paragraph_uuids"`
 	OrganizationParagraphs          []*models.OrganizationParagraphModel
-	OrganizationWorkshopUUIDs       []string `form:"organization_workshop_uuids" json:"organization_workshop_uuids"`
+	OrganizationWorkshopUuids       []string `form:"organization_workshop_uuids" json:"organization_workshop_uuids"`
 	OrganizationWorkshops           []*models.OrganizationWorkshopModel
-	OrganizationWorkAreaUUIDs       []string `form:"organization_work_area_uuids" json:"organization_work_area_uuids"`
+	OrganizationWorkAreaUuids       []string `form:"organization_work_area_uuids" json:"organization_work_area_uuids"`
 	OrganizationWorkAreas           []*models.OrganizationWorkAreaModel
-	LocationSectionUUIDs            []string `form:"location_section_uuids" json:"location_section_uuids"`
+	LocationSectionUuids            []string `form:"location_section_uuids" json:"location_section_uuids"`
 	LocationSections                []*models.LocationSectionModel
-	LocationStationUUIDs            []string `form:"location_station_uuids" json:"location_station_uuids"`
+	LocationStationUuids            []string `form:"location_station_uuids" json:"location_station_uuids"`
 	LocationStations                []*models.LocationStationModel
-	LocationRailroadGradeCrossUUIDs []string `form:"location_railroad_grade_cross_uuids" json:"location_railroad_grade_cross_uuids"`
+	LocationRailroadGradeCrossUuids []string `form:"location_railroad_grade_cross_uuids" json:"location_railroad_grade_cross_uuids"`
 	LocationRailroadGradeCrosses    []*models.LocationRailroadGradeCrossModel
-	LocationCenterUUIDs             []string `form:"location_center_uuids" json:"location_center_uuids"`
+	LocationCenterUuids             []string `form:"location_center_uuids" json:"location_center_uuids"`
 	LocationCenters                 []*models.LocationCenterModel
 }
 
@@ -50,59 +50,59 @@ func (cls LocationLineStoreForm) ShouldBind(ctx *gin.Context) LocationLineStoreF
 		wrongs.PanicValidate("线别名称必填")
 	}
 	// 查询路局
-	if len(cls.OrganizationRailwayUUIDs) > 0 {
+	if len(cls.OrganizationRailwayUuids) > 0 {
 		models.BootByModel(models.OrganizationRailwayModel{}).
 			PrepareByDefault().
-			Where("uuid in ?", cls.OrganizationRailwayUUIDs).
+			Where("uuid in ?", cls.OrganizationRailwayUuids).
 			Find(&cls.OrganizationRailways)
 	}
 	// 查询站段
-	if len(cls.OrganizationParagraphUUIDs) > 0 {
+	if len(cls.OrganizationParagraphUuids) > 0 {
 		models.BootByModel(models.OrganizationParagraphModel{}).
 			PrepareByDefault().
-			Where("uuid in ?", cls.OrganizationParagraphUUIDs).
+			Where("uuid in ?", cls.OrganizationParagraphUuids).
 			Find(&cls.OrganizationParagraphs)
 	}
 	// 查询车间
-	if len(cls.OrganizationWorkshopUUIDs) > 0 {
+	if len(cls.OrganizationWorkshopUuids) > 0 {
 		models.BootByModel(models.OrganizationWorkshopModel{}).
 			PrepareByDefault().
-			Where("uuid in ?", cls.OrganizationWorkshopUUIDs).
+			Where("uuid in ?", cls.OrganizationWorkshopUuids).
 			Find(&cls.OrganizationWorkshops)
 	}
 	// 查询工区
-	if len(cls.OrganizationWorkAreaUUIDs) > 0 {
+	if len(cls.OrganizationWorkAreaUuids) > 0 {
 		models.BootByModel(models.OrganizationWorkAreaModel{}).
 			PrepareByDefault().
-			Where("uuid in ?", cls.OrganizationWorkAreaUUIDs).
+			Where("uuid in ?", cls.OrganizationWorkAreaUuids).
 			Find(&cls.OrganizationWorkAreas)
 	}
 	// 查询区间
-	if len(cls.LocationSectionUUIDs) > 0 {
+	if len(cls.LocationSectionUuids) > 0 {
 		models.BootByModel(models.LocationSectionModel{}).
 			PrepareByDefault().
-			Where("uuid in ?", cls.LocationSectionUUIDs).
+			Where("uuid in ?", cls.LocationSectionUuids).
 			Find(&cls.LocationSections)
 	}
 	// 查询站场
-	if len(cls.LocationStationUUIDs) > 0 {
+	if len(cls.LocationStationUuids) > 0 {
 		models.BootByModel(models.LocationStationModel{}).
 			PrepareByDefault().
-			Where("uuid in ?", cls.LocationStationUUIDs).
+			Where("uuid in ?", cls.LocationStationUuids).
 			Find(&cls.LocationStations)
 	}
 	// 查询道口
-	if len(cls.LocationRailroadGradeCrossUUIDs) > 0 {
+	if len(cls.LocationRailroadGradeCrossUuids) > 0 {
 		models.BootByModel(models.LocationRailroadGradeCrossModel{}).
 			PrepareByDefault().
-			Where("uuid in ?", cls.LocationRailroadGradeCrossUUIDs).
+			Where("uuid in ?", cls.LocationRailroadGradeCrossUuids).
 			Find(&cls.LocationRailroadGradeCrosses)
 	}
 	// 查询道口
-	if len(cls.LocationRailroadGradeCrossUUIDs) > 0 {
+	if len(cls.LocationRailroadGradeCrossUuids) > 0 {
 		models.BootByModel(models.LocationRailroadGradeCrossModel{}).
 			PrepareByDefault().
-			Where("uuid in ?", cls.LocationRailroadGradeCrossUUIDs).
+			Where("uuid in ?", cls.LocationRailroadGradeCrossUuids).
 			Find(&cls.LocationRailroadGradeCrosses)
 	}
 
@@ -111,21 +111,21 @@ func (cls LocationLineStoreForm) ShouldBind(ctx *gin.Context) LocationLineStoreF
 
 // LocationLineBindForm 线别多对多绑定
 type LocationLineBindForm struct {
-	OrganizationRailwayUUIDs        []string `form:"organization_railway_uuids" json:"organization_railway_uuids"`
+	OrganizationRailwayUuids        []string `form:"organization_railway_uuids" json:"organization_railway_uuids"`
 	OrganizationRailways            []*models.OrganizationRailwayModel
-	OrganizationParagraphUUIDs      []string `form:"organization_paragraph_uuids" json:"organization_paragraph_uuids"`
+	OrganizationParagraphUuids      []string `form:"organization_paragraph_uuids" json:"organization_paragraph_uuids"`
 	OrganizationParagraphs          []*models.OrganizationParagraphModel
-	OrganizationWorkshopUUIDs       []string `form:"organization_workshop_uuids" json:"organization_workshop_uuids"`
+	OrganizationWorkshopUuids       []string `form:"organization_workshop_uuids" json:"organization_workshop_uuids"`
 	OrganizationWorkshops           []*models.OrganizationWorkshopModel
-	OrganizationWorkAreaUUIDs       []string `form:"organization_work_area_uuids" json:"organization_work_area_uuids"`
+	OrganizationWorkAreaUuids       []string `form:"organization_work_area_uuids" json:"organization_work_area_uuids"`
 	OrganizationWorkAreas           []*models.OrganizationWorkAreaModel
-	LocationSectionUUIDs            []string `form:"location_section_uuids" json:"location_section_uuids"`
+	LocationSectionUuids            []string `form:"location_section_uuids" json:"location_section_uuids"`
 	LocationSections                []*models.LocationSectionModel
-	LocationStationUUIDs            []string `form:"location_station_uuids" json:"location_station_uuids"`
+	LocationStationUuids            []string `form:"location_station_uuids" json:"location_station_uuids"`
 	LocationStations                []*models.LocationStationModel
-	LocationRailroadGradeCrossUUIDs []string `form:"location_railroad_grade_cross_uuids" json:"location_railroad_grade_cross_uuids"`
+	LocationRailroadGradeCrossUuids []string `form:"location_railroad_grade_cross_uuids" json:"location_railroad_grade_cross_uuids"`
 	LocationRailroadGradeCrosses    []*models.LocationRailroadGradeCrossModel
-	LocationCenterUUIDs             []string `form:"location_center_uuids" json:"location_center_uuids"`
+	LocationCenterUuids             []string `form:"location_center_uuids" json:"location_center_uuids"`
 	LocationCenters                 []*models.LocationCenterModel
 }
 
@@ -222,7 +222,6 @@ func (LocationLineController) U(ctx *gin.Context) {
 	wrongs.PanicWhenIsEmpty(ret, "线别")
 
 	// 修改
-	locationLine.UniqueCode = form.UniqueCode
 	locationLine.Name = form.Name
 	locationLine.Sort = form.Sort
 	locationLine.BeEnable = form.BeEnable

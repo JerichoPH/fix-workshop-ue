@@ -17,9 +17,9 @@ type LocationStationStoreForm struct {
 	UniqueCode               string `form:"unique_code" json:"unique_code"`
 	Name                     string `form:"name" json:"name"`
 	BeEnable                 bool   `form:"be_enable" json:"be_enable"`
-	OrganizationWorkshopUUID string `form:"organization_workshop_uuid" json:"organization_workshop_uuid"`
+	OrganizationWorkshopUuid string `form:"organization_workshop_uuid" json:"organization_workshop_uuid"`
 	OrganizationWorkshop     models.OrganizationWorkshopModel
-	OrganizationWorkAreaUUID string `form:"organization_work_area_uuid" json:"organization_work_area_uuid"`
+	OrganizationWorkAreaUuid string `form:"organization_work_area_uuid" json:"organization_work_area_uuid"`
 	OrganizationWorkArea     models.OrganizationWorkAreaModel
 	LocationLineUUIDs        []string `form:"location_line_uuids" json:"location_line_uuids"`
 	LocationLines            []*models.LocationLineModel
@@ -41,17 +41,17 @@ func (cls LocationStationStoreForm) ShouldBind(ctx *gin.Context) LocationStation
 	if cls.Name == "" {
 		wrongs.PanicValidate("站场名称必填")
 	}
-	if cls.OrganizationWorkshopUUID == "" {
+	if cls.OrganizationWorkshopUuid == "" {
 		wrongs.PanicValidate("所属车间必选")
 	}
 	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
-		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).
+		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUuid}).
 		PrepareByDefault().
 		First(&cls.OrganizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "车间")
-	if cls.OrganizationWorkAreaUUID != "" {
+	if cls.OrganizationWorkAreaUuid != "" {
 		ret = models.BootByModel(models.OrganizationWorkAreaModel{}).
-			SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUUID}).
+			SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUuid}).
 			PrepareByDefault().
 			First(&cls.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "工区")
@@ -70,7 +70,7 @@ func (cls LocationStationStoreForm) ShouldBind(ctx *gin.Context) LocationStation
 
 // LocationStationBindLocationLinesForm 站场绑定线别表单
 type LocationStationBindLocationLinesForm struct {
-	LocationLineUUIDs []string `json:"location_line_uuids"`
+	LocationLineUuids []string `json:"location_line_uuids"`
 	LocationLines     []*models.LocationLineModel
 }
 
@@ -83,18 +83,18 @@ func (cls LocationStationBindLocationLinesForm) ShouldBind(ctx *gin.Context) Loc
 		wrongs.PanicValidate(err.Error())
 	}
 
-	if len(cls.LocationLineUUIDs) > 0 {
+	if len(cls.LocationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
 			PrepareByDefault().
-			Where("uuid in ?", cls.LocationLineUUIDs).
+			Where("uuid in ?", cls.LocationLineUuids).
 			Find(&cls.LocationLines)
 	}
 
 	return cls
 }
 
-// Store 新建
-func (LocationStationController) Store(ctx *gin.Context) {
+// C 新建
+func (LocationStationController) C(ctx *gin.Context) {
 	var (
 		ret    *gorm.DB
 		repeat models.LocationStationModel
@@ -132,8 +132,8 @@ func (LocationStationController) Store(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"organization_station": locationStation}))
 }
 
-// Destroy 删除
-func (LocationStationController) Destroy(ctx *gin.Context) {
+// D 删除
+func (LocationStationController) D(ctx *gin.Context) {
 	var (
 		ret             *gorm.DB
 		locationStation models.LocationStationModel
@@ -153,8 +153,8 @@ func (LocationStationController) Destroy(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
 
-// Update 编辑
-func (LocationStationController) Update(ctx *gin.Context) {
+// U 编辑
+func (LocationStationController) U(ctx *gin.Context) {
 	var (
 		ret                     *gorm.DB
 		locationStation, repeat models.LocationStationModel
@@ -191,11 +191,10 @@ func (LocationStationController) Update(ctx *gin.Context) {
 		Where("uuid = ?", ctx.Param("uuid")).
 		Updates(map[string]interface{}{
 			"sort":                        form.Sort,
-			"unique_code":                 form.UniqueCode,
 			"name":                        form.Name,
 			"be_enable":                   form.BeEnable,
-			"organization_workshop_uuid":  form.OrganizationWorkshopUUID,
-			"organization_work_area_uuid": form.OrganizationWorkAreaUUID,
+			"organization_workshop_uuid":  form.OrganizationWorkshopUuid,
+			"organization_work_area_uuid": form.OrganizationWorkAreaUuid,
 		}); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
@@ -240,8 +239,8 @@ func (LocationStationController) PutBindLocationLines(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{}))
 }
 
-// Show 详情
-func (LocationStationController) Show(ctx *gin.Context) {
+// S 详情
+func (LocationStationController) S(ctx *gin.Context) {
 	var (
 		ret             *gorm.DB
 		locationStation models.LocationStationModel
@@ -258,8 +257,8 @@ func (LocationStationController) Show(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"location_station": locationStation}))
 }
 
-// Index 列表
-func (LocationStationController) Index(ctx *gin.Context) {
+// I 列表
+func (LocationStationController) I(ctx *gin.Context) {
 	var locationStations []models.LocationStationModel
 	models.BootByModel(models.LocationStationModel{}).
 		SetWhereFields().

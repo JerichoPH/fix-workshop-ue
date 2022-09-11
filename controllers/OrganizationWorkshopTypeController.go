@@ -109,7 +109,7 @@ func (OrganizationWorkshopTypeController) U(ctx *gin.Context) {
 	organizationWorkshopType.UniqueCode = form.UniqueCode
 	organizationWorkshopType.Name = form.Name
 	organizationWorkshopType.Number = form.Number
-	models.BootByModel(models.OrganizationWorkshopTypeModel{}).PrepareByDefault().Save(&organizationWorkshopType)
+	models.BootByModel(models.OrganizationWorkshopTypeModel{}).SetWheres(tools.Map{"uuid":ctx.Param("uuid")}).PrepareByDefault().Save(&organizationWorkshopType)
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"organization_workshop_type": organizationWorkshopType}))
 }

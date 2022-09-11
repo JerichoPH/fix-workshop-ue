@@ -111,7 +111,7 @@ func (MenuController) U(ctx *gin.Context) {
 	menu.Icon = form.Icon
 	menu.ParentUuid = form.ParentUUID
 	menu.RbacRoles = form.RbacRoles
-	if ret = models.BootByModel(models.MenuModel{}).PrepareByDefault().Save(&menu); ret.Error != nil {
+	if ret = models.BootByModel(models.MenuModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&menu); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 

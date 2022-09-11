@@ -20,18 +20,18 @@ func (OrganizationWorkAreaRouter) Load(engine *gin.Engine) {
 	)
 	{
 		// 新建
-		r.POST("", func(ctx *gin.Context) { new(controllers.OrganizationWorkAreaController).Store(ctx) })
+		r.POST("", func(ctx *gin.Context) { new(controllers.OrganizationWorkAreaController).C(ctx) })
 
 		// 删除
-		r.DELETE(":uuid", func(ctx *gin.Context) { new(controllers.OrganizationWorkAreaController).Destroy(ctx) })
+		r.DELETE(":uuid", func(ctx *gin.Context) { new(controllers.OrganizationWorkAreaController).D(ctx) })
 
 		// 编辑
-		r.PUT(":uuid", func(ctx *gin.Context) { new(controllers.OrganizationWorkAreaController).Update(ctx) })
+		r.PUT(":uuid", func(ctx *gin.Context) { new(controllers.OrganizationWorkAreaController).U(ctx) })
 
 		// 详情
-		r.GET(":uuid", func(ctx *gin.Context) { new(controllers.OrganizationWorkAreaController).Show(ctx) })
+		r.GET(":uuid", func(ctx *gin.Context) { new(controllers.OrganizationWorkAreaController).S(ctx) })
 
 		// 列表
-		r.GET("", func(ctx *gin.Context) { new(controllers.OrganizationWorkAreaController).Index(ctx) })
+		r.GET("", func(ctx *gin.Context) { new(controllers.OrganizationWorkAreaController).I(ctx) })
 	}
 }
