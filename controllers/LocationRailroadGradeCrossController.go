@@ -21,6 +21,8 @@ type LocationRailroadGradeCrossStoreForm struct {
 	OrganizationWorkshop     models.OrganizationWorkshopModel
 	OrganizationWorkAreaUuid string `form:"organization_work_area_uuid" json:"organization_work_area_uuid"`
 	OrganizationWorkArea     models.OrganizationWorkAreaModel
+	LocationLineUuids        []string
+	LocationLines            []*models.LocationLineModel
 }
 
 // ShouldBind 表单绑定
@@ -54,6 +56,12 @@ func (cls LocationRailroadGradeCrossStoreForm) ShouldBind(ctx *gin.Context) Loca
 			First(&cls.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "工区")
 	}
+	if len(cls.LocationLineUuids) > 0 {
+		models.BootByModel(models.LocationLineModel{}).
+			PrepareByDefault().
+			Where("uuid in ?", cls.LocationLineUuids).
+			Find(&cls.LocationLines)
+	}
 
 	return cls
 }
@@ -83,6 +91,7 @@ func (cls LocationRailroadGradeCrossBindLocationLinesForm) ShouldBind(ctx *gin.C
 	return cls
 }
 
+// C 新建
 func (LocationRailroadGradeCrossController) C(ctx *gin.Context) {
 	var (
 		ret    *gorm.DB
@@ -118,6 +127,8 @@ func (LocationRailroadGradeCrossController) C(ctx *gin.Context) {
 
 	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"location_railroad_grade_cross": locationRailroadGradeCross}))
 }
+
+// D 删除
 func (LocationRailroadGradeCrossController) D(ctx *gin.Context) {
 	var (
 		ret                        *gorm.DB
@@ -138,6 +149,8 @@ func (LocationRailroadGradeCrossController) D(ctx *gin.Context) {
 
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
+
+// U 编辑
 func (LocationRailroadGradeCrossController) U(ctx *gin.Context) {
 	var (
 		ret                                *gorm.DB
@@ -172,12 +185,17 @@ func (LocationRailroadGradeCrossController) U(ctx *gin.Context) {
 	locationRailroadGradeCross.BaseModel.Sort = form.Sort
 	locationRailroadGradeCross.Name = form.Name
 	locationRailroadGradeCross.BeEnable = form.BeEnable
+	locationRailroadGradeCross.OrganizationWorkshopUuid = form.OrganizationWorkshop.Uuid
+	locationRailroadGradeCross.OrganizationWorkAreaUuid = form.OrganizationWorkAreaUuid
+	locationRailroadGradeCross.LocationLines = form.LocationLines
 	if ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&locationRailroadGradeCross); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"location_railroad_grade_cross": locationRailroadGradeCross}))
 }
+
+// PutBindLines 道口绑定线别
 func (LocationRailroadGradeCrossController) PutBindLines(ctx *gin.Context) {
 	var (
 		ret                                              *gorm.DB
@@ -196,7 +214,7 @@ func (LocationRailroadGradeCrossController) PutBindLines(ctx *gin.Context) {
 	}
 
 	// 删除原有绑定关系
-	ret = models.BootByModel(models.BaseModel{}).PrepareByDefault().Exec("delete from pivot_location_line_and_location_railroad_grade_crosses where location_railroad_grade_crosses_id = ?", locationRailroadGradeCross.Id)
+	ret = models.BootByModel(models.BaseModel{}).PrepareByDefault().Exec("delete from pivot_location_line_and_location_railroad_grade_crosses where location_railroad_grade_cross_id = ?", locationRailroadGradeCross.Id)
 
 	// 创建绑定关系
 	if len(form.LocationLines) > 0 {
@@ -213,6 +231,7 @@ func (LocationRailroadGradeCrossController) PutBindLines(ctx *gin.Context) {
 
 	ctx.JSON(tools.CorrectBoot("绑定成功").Updated(tools.Map{}))
 }
+
 func (LocationRailroadGradeCrossController) S(ctx *gin.Context) {
 	var (
 		ret                        *gorm.DB
@@ -229,6 +248,7 @@ func (LocationRailroadGradeCrossController) S(ctx *gin.Context) {
 
 	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"location_railroad_grade_cross": locationRailroadGradeCross}))
 }
+
 func (LocationRailroadGradeCrossController) I(ctx *gin.Context) {
 	var locationRailroadGradeCrosses []models.LocationRailroadGradeCrossModel
 	models.BootByModel(models.LocationRailroadGradeCrossModel{}).
