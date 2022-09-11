@@ -14,12 +14,12 @@ type LocationRailroadGradeCrossController struct{}
 // LocationRailroadGradeCrossStoreForm 新建道口表单
 type LocationRailroadGradeCrossStoreForm struct {
 	Sort                     int64  `form:"sort" json:"sort"`
-	UniqueCode               string `form:"" json:""`
+	UniqueCode               string `form:"unique_code" json:"unique_code"`
 	Name                     string `form:"name" json:"name"`
 	BeEnable                 bool   `form:"be_enable" json:"be_enable"`
-	OrganizationWorkshopUUID string `form:"organization_workshop_uuid" json:"organization_workshop_uuid"`
+	OrganizationWorkshopUuid string `form:"organization_workshop_uuid" json:"organization_workshop_uuid"`
 	OrganizationWorkshop     models.OrganizationWorkshopModel
-	OrganizationWorkAreaUUID string `form:"organization_work_area_uuid" json:"organization_work_area_uuid"`
+	OrganizationWorkAreaUuid string `form:"organization_work_area_uuid" json:"organization_work_area_uuid"`
 	OrganizationWorkArea     models.OrganizationWorkAreaModel
 }
 
@@ -30,7 +30,7 @@ type LocationRailroadGradeCrossStoreForm struct {
 func (cls LocationRailroadGradeCrossStoreForm) ShouldBind(ctx *gin.Context) LocationRailroadGradeCrossStoreForm {
 	var ret *gorm.DB
 
-	if err := ctx.ShouldBind(ctx); err != nil {
+	if err := ctx.ShouldBind(&cls); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
 	if cls.UniqueCode == "" {
@@ -39,17 +39,17 @@ func (cls LocationRailroadGradeCrossStoreForm) ShouldBind(ctx *gin.Context) Loca
 	if cls.Name == "" {
 		wrongs.PanicValidate("道口名称必填")
 	}
-	if cls.OrganizationWorkshopUUID == "" {
+	if cls.OrganizationWorkshopUuid == "" {
 		wrongs.PanicValidate("所属车间必选")
 	}
 	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
-		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).
+		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUuid}).
 		PrepareByDefault().
 		First(&cls.OrganizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "车间")
-	if cls.OrganizationWorkAreaUUID != "" {
+	if cls.OrganizationWorkAreaUuid != "" {
 		ret = models.BootByModel(models.OrganizationWorkAreaModel{}).
-			SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUUID}).
+			SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUuid}).
 			PrepareByDefault().
 			First(&cls.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "工区")
@@ -106,10 +106,11 @@ func (LocationRailroadGradeCrossController) C(ctx *gin.Context) {
 
 	// 新建
 	locationRailroadGradeCross := &models.LocationRailroadGradeCrossModel{
-		BaseModel:  models.BaseModel{Sort: form.Sort, Uuid: uuid.NewV4().String()},
-		UniqueCode: form.UniqueCode,
-		Name:       form.Name,
-		BeEnable:   form.BeEnable,
+		BaseModel:                models.BaseModel{Sort: form.Sort, Uuid: uuid.NewV4().String()},
+		UniqueCode:               form.UniqueCode,
+		Name:                     form.Name,
+		BeEnable:                 form.BeEnable,
+		OrganizationWorkshopUuid: form.OrganizationWorkshop.Uuid,
 	}
 	if ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).PrepareByDefault().Create(&locationRailroadGradeCross); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
@@ -172,13 +173,12 @@ func (LocationRailroadGradeCrossController) U(ctx *gin.Context) {
 	locationRailroadGradeCross.UniqueCode = form.UniqueCode
 	locationRailroadGradeCross.Name = form.Name
 	locationRailroadGradeCross.BeEnable = form.BeEnable
-	if ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).PrepareByDefault().Save(&locationRailroadGradeCross); ret.Error != nil {
+	if ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&locationRailroadGradeCross); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"location_railroad_grade_cross": locationRailroadGradeCross}))
 }
-
 func (LocationRailroadGradeCrossController) PutBindLines(ctx *gin.Context) {
 	var (
 		ret                                              *gorm.DB
@@ -214,7 +214,6 @@ func (LocationRailroadGradeCrossController) PutBindLines(ctx *gin.Context) {
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{}))
 }
-
 func (LocationRailroadGradeCrossController) S(ctx *gin.Context) {
 	var (
 		ret                        *gorm.DB
@@ -223,7 +222,9 @@ func (LocationRailroadGradeCrossController) S(ctx *gin.Context) {
 	ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 		SetWhereFields("be_enable").
-		PrepareQuery(ctx, "").
+		SetPreloads("OrganizationWorkshop", "OrganizationWorkArea").
+		SetPreloadsByDefault().
+		PrepareUseQueryByDefault(ctx).
 		First(&locationRailroadGradeCross)
 	wrongs.PanicWhenIsEmpty(ret, "道口")
 
@@ -233,7 +234,9 @@ func (LocationRailroadGradeCrossController) I(ctx *gin.Context) {
 	var locationRailroadGradeCrosses []models.LocationRailroadGradeCrossModel
 	models.BootByModel(models.LocationRailroadGradeCrossModel{}).
 		SetWhereFields("unique_code", "name", "be_enable", "organization_workshop_uuid", "organization_work_area_uuid").
-		PrepareQuery(ctx, "").
+		SetPreloads("OrganizationWorkshop", "OrganizationWorkArea").
+		SetPreloadsByDefault().
+		PrepareUseQueryByDefault(ctx).
 		Find(&locationRailroadGradeCrosses)
 
 	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"location_railroad_grade_crosses": locationRailroadGradeCrosses}))
