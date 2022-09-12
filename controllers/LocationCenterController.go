@@ -46,7 +46,7 @@ func (cls LocationCenterStoreForm) ShouldBind(ctx *gin.Context) LocationCenterSt
 	}
 	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
 		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUuid}).
-		SetPreloads("OrganizationParagraph","OrganizationParagraph.OrganizationRailway").
+		SetPreloads("OrganizationParagraph", "OrganizationParagraph.OrganizationRailway").
 		PrepareByDefault().
 		First(&cls.OrganizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "所属车间")
@@ -161,7 +161,7 @@ func (LocationCenterController) U(ctx *gin.Context) {
 	)
 
 	// 表单
-	form := new(LocationCenterStoreForm).ShouldBind(ctx)
+	form := (&LocationCenterStoreForm{}).ShouldBind(ctx)
 
 	// 查重
 	ret = models.BootByModel(models.LocationCenterModel{}).
@@ -240,7 +240,8 @@ func (LocationCenterController) S(ctx *gin.Context) {
 	ret := models.BootByModel(models.LocationCenterModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 		SetWhereFields("be_enable").
-		PrepareQuery(ctx, "").
+		SetPreloadsByDefault().
+		PrepareUseQueryByDefault(ctx).
 		First(&locationCenter)
 	wrongs.PanicWhenIsEmpty(ret, "中心")
 
@@ -252,7 +253,8 @@ func (LocationCenterController) I(ctx *gin.Context) {
 	var locationCenters []models.LocationCenterModel
 	models.BootByModel(models.LocationCenterModel{}).
 		SetWhereFields().
-		PrepareQuery(ctx, "").
+		SetPreloadsByDefault().
+		PrepareUseQueryByDefault(ctx).
 		Find(&locationCenters)
 
 	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"location_centers": locationCenters}))

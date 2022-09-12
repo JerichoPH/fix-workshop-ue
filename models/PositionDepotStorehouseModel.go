@@ -7,6 +7,8 @@ type PositionDepotStorehouseModel struct {
 	Name                     string                      `gorm:"type:VARCHAR(36);COMMENT:仓储库房名称;" json:"name"`
 	OrganizationWorkshopUuid string                      `gorm:"type:VARCHAR(36);COMMENT:所属车间UUID;" json:"organization_workshop_uuid"`
 	OrganizationWorkshop     OrganizationWorkshopModel   `gorm:"foreignKey:OrganizationWorkshopUuid;references:Uuid;COMMENT:所属车间;" json:"organization_workshop"`
+	OrganizationWorkAreaUuid string                      `gorm:"type:VARCHAR(36);COMMENT:所属工区UUID;" json:"organization_work_area_uuid"`
+	OrganizationWorkArea     OrganizationWorkAreaModel   `gorm:"foreignKey:OrganizationWorkAreaUuid;references:Uuid;COMMENT:所属工区;" json:"organization_work_area"`
 	PositionDepotSections    []PositionDepotSectionModel `gorm:"foreignKey:PositionDepotStorehouseUuid;references:Uuid;COMMENT:相关仓储仓库区域;" json:"position_depot_sections"`
 }
 

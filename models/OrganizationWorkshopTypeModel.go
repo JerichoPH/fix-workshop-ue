@@ -10,7 +10,7 @@ type OrganizationWorkshopTypeModel struct {
 	BaseModel
 	UniqueCode            string                      `gorm:"type:VARCHAR(64);COMMENT:车间类型代码;" json:"unique_code"`
 	Name                  string                      `gorm:"type:VARCHAR(64);COMMENT:车间类型名称;" json:"name"`
-	Number                string                      `gorm:"type:VARCHAR(64);COMMENT:车间类型数字代码;" json:"number"`
+	NumberCode            string                      `gorm:"type:VARCHAR(64);COMMENT:车间类型数字代码;" json:"number_code"`
 	OrganizationWorkshops []OrganizationWorkshopModel `gorm:"foreignKey:OrganizationWorkshopTypeUuid;references:Uuid;" json:"organization_workshops"`
 }
 

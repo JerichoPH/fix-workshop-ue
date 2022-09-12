@@ -60,7 +60,7 @@ func (OrganizationWorkshopTypeController) C(ctx *gin.Context) {
 		BaseModel:  models.BaseModel{Sort: form.Sort, Uuid: uuid.NewV4().String()},
 		UniqueCode: form.UniqueCode,
 		Name:       form.Name,
-		Number:     form.Number,
+		NumberCode: form.Number,
 	}
 	if ret = models.BootByModel(models.OrganizationWorkshopTypeModel{}).PrepareByDefault().Create(&organizationWorkshopType); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
@@ -108,7 +108,7 @@ func (OrganizationWorkshopTypeController) U(ctx *gin.Context) {
 	organizationWorkshopType.BaseModel.Sort = form.Sort
 	organizationWorkshopType.UniqueCode = form.UniqueCode
 	organizationWorkshopType.Name = form.Name
-	organizationWorkshopType.Number = form.Number
+	organizationWorkshopType.NumberCode = form.Number
 	models.BootByModel(models.OrganizationWorkshopTypeModel{}).SetWheres(tools.Map{"uuid":ctx.Param("uuid")}).PrepareByDefault().Save(&organizationWorkshopType)
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"organization_workshop_type": organizationWorkshopType}))

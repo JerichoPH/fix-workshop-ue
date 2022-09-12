@@ -101,7 +101,7 @@ func (LocationStationController) C(ctx *gin.Context) {
 	)
 
 	// 表单
-	form := (&LocationStationStoreForm{}).ShouldBind(ctx)
+	form := new(LocationStationStoreForm).ShouldBind(ctx)
 
 	// 查重
 	ret = models.BootByModel(models.LocationStationModel{}).
@@ -161,7 +161,7 @@ func (LocationStationController) U(ctx *gin.Context) {
 	)
 
 	// 表单
-	form := (&LocationStationStoreForm{}).ShouldBind(ctx)
+	form := new(LocationStationStoreForm).ShouldBind(ctx)
 
 	// 查重
 	ret = models.BootByModel(models.LocationStationModel{}).
@@ -211,7 +211,7 @@ func (LocationStationController) PutBindLocationLines(ctx *gin.Context) {
 	)
 
 	// 表单
-	form := (&LocationStationBindLocationLinesForm{}).ShouldBind(ctx)
+	form := new(LocationStationBindLocationLinesForm).ShouldBind(ctx)
 
 	if ret = models.BootByModel(models.LocationStationModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).

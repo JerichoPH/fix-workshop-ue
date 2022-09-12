@@ -30,11 +30,16 @@ type BaseModel struct {
 	model          interface{}
 }
 
-// BootByModel 获取数据库查询对象
+// BootByModel 通过model启动
 //  @param model
 //  @return *BaseModel
 func BootByModel(model interface{}) *BaseModel {
-	return (&BaseModel{}).SetModel(model)
+	return new(BaseModel).SetModel(model)
+}
+
+// Boot 启动
+func Boot() *BaseModel {
+	return new(BaseModel)
 }
 
 // demoFindOne 获取单条数据演示
