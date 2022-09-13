@@ -35,6 +35,6 @@ func (cls PositionDepotStorehouseRouter) Load(engine *gin.Engine) {
 		r.GET("", func(ctx *gin.Context) { new(controllers.PositionDepotStorehouseController).I(ctx) })
 
 		// 同步仓库位置
-		r.POST("",func(ctx *gin.Context){})
+		//r.POST("",func(ctx *gin.Context){})
 	}
 }
