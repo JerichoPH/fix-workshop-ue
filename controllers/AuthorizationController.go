@@ -156,12 +156,12 @@ func (AuthorizationController) GetMenus(ctx *gin.Context) {
 			First(&account)
 		wrongs.PanicWhenIsEmpty(ret, "当前令牌指向用户")
 
-		menuUUIDs := make([]string, 50)
+		menuUuids := make([]string, 0)
 		if len(account.RbacRoles) > 0 {
 			for _, rbacRole := range account.RbacRoles {
 				if len(rbacRole.Menus) > 0 {
 					for _, menu := range rbacRole.Menus {
-						menuUUIDs = append(menuUUIDs, menu.Uuid)
+						menuUuids = append(menuUuids, menu.BaseModel.Uuid)
 					}
 				}
 			}
@@ -170,9 +170,10 @@ func (AuthorizationController) GetMenus(ctx *gin.Context) {
 		var menus []models.MenuModel
 		models.BootByModel(models.MenuModel{}).
 			PrepareByDefault().
-			Where("uuid in ?", menuUUIDs).
+			Where("uuid in ?", menuUuids).
 			Where("parent_uuid is null").
 			Preload("Subs").
+			Debug().
 			Find(&menus)
 
 		ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"menus": menus}))

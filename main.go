@@ -113,7 +113,7 @@ func runAutoMigrate() {
 func main() {
 	setting := settings.Boot()         // 获取配置
 	settingApp := setting.App          // 加载参数（程序）
-	runAutoMigrate()                   // 数据库迁移
+	//runAutoMigrate()                   // 数据库迁移
 	engine := gin.Default()            // 启动服务引擎
 	engine.Use(wrongs.RecoverHandler)  // 异常处理
 	(&web.Router{}).Load(engine)       // 加载web路由
