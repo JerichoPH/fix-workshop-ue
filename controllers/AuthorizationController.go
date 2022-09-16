@@ -154,26 +154,23 @@ func (AuthorizationController) GetMenus(ctx *gin.Context) {
 			SetPreloads("RbacRoles", "RbacRoles.Menus").
 			PrepareByDefault().
 			First(&account)
-		wrongs.PanicWhenIsEmpty(ret, "当前令牌指向用户")
-
-		menuUuids := make([]string, 0)
-		if len(account.RbacRoles) > 0 {
-			for _, rbacRole := range account.RbacRoles {
-				if len(rbacRole.Menus) > 0 {
-					for _, menu := range rbacRole.Menus {
-						menuUuids = append(menuUuids, menu.BaseModel.Uuid)
-					}
-				}
-			}
+		if !wrongs.PanicWhenIsEmpty(ret, "") {
+			wrongs.PanicUnLogin("当前令牌指向用户不存在")
 		}
 
 		var menus []models.MenuModel
 		models.BootByModel(models.MenuModel{}).
 			PrepareByDefault().
-			Where("uuid in ?", menuUuids).
-			Where("parent_uuid is null").
+			Joins("join pivot_rbac_role_and_menus prram on menus.id = prram.menu_id").
+			Joins("join rbac_roles r on prram.rbac_role_id = r.id").
+			Joins("join pivot_rbac_role_and_accounts prraa on r.id = prraa.rbac_role_id").
+			Joins("join accounts a on prraa.account_id = a.id").
+			Where("a.uuid = ?", account.BaseModel.Uuid).
+			Where("menus.deleted_at is null").
+			Where("menus.parent_uuid is null").
+			Order("menus.sort asc").
+			Order("menus.id asc").
 			Preload("Subs").
-			Debug().
 			Find(&menus)
 
 		ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"menus": menus}))

@@ -1,10 +1,10 @@
 package middlewares
 
 import (
-	"fix-workshop-ue/wrongs"
 	"fix-workshop-ue/models"
 	"fix-workshop-ue/settings"
 	"fix-workshop-ue/tools"
+	"fix-workshop-ue/wrongs"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"reflect"
@@ -49,11 +49,11 @@ func CheckJwt() gin.HandlerFunc {
 					var ret *gorm.DB
 					ret = (&models.BaseModel{}).
 						SetModel(models.AccountModel{}).
-						SetWheres(tools.Map{"uuid": claims.UUID}).
-						Prepare("").
+						SetWheres(tools.Map{"uuid": claims.Uuid}).
+						PrepareByDefault().
 						First(&account)
 
-					wrongs.PanicWhenIsEmpty(ret, "用户")
+					wrongs.PanicWhenIsEmpty(ret,"令牌指向用户不存在")
 				default:
 					wrongs.PanicForbidden("权鉴认证方式不支持")
 				}

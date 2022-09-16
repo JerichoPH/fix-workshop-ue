@@ -11,7 +11,7 @@ var jwtSecret = []byte("fix-workshop-ue-jwt-secret") // 加密密钥
 
 // Claims Jwt 表单
 type Claims struct {
-	UUID string `json:"uuid"`
+	Uuid string `json:"uuid"`
 	jwt.StandardClaims
 }
 
@@ -22,7 +22,7 @@ func GenerateJwt(uuid, password string) (string, error) {
 	expireTime := nowTime.Add(168 * time.Hour)
 
 	claims := Claims{
-		UUID:     uuid,
+		Uuid: uuid,
 		StandardClaims: jwt.StandardClaims{
 			// 过期时间
 			ExpiresAt: expireTime.Unix(),
