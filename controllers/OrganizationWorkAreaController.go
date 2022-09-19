@@ -79,7 +79,7 @@ func (OrganizationWorkAreaController) C(ctx *gin.Context) {
 
 	// 查重
 	ret = models.BootByModel(models.OrganizationWorkAreaModel{}).
-		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
+		SetWheres(tools.Map{"unique_code": form.OrganizationWorkshop.OrganizationParagraph.UniqueCode + form.UniqueCode}).
 		PrepareByDefault().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "工区代码")

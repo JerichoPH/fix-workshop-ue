@@ -70,7 +70,7 @@ func (OrganizationWorkshopController) C(ctx *gin.Context) {
 
 	// 查重
 	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
-		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
+		SetWheres(tools.Map{"unique_code": form.OrganizationParagraph.UniqueCode + form.UniqueCode}).
 		PrepareByDefault().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "车间代码")

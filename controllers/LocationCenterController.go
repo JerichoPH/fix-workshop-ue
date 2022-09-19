@@ -63,7 +63,7 @@ func (cls LocationCenterStoreForm) ShouldBind(ctx *gin.Context) LocationCenterSt
 			First(&cls.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "所属工区")
 	}
-	if len(cls.LocationLines) > 0 {
+	if len(cls.LocationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
 			PrepareByDefault().
 			Where("uuid in ?", cls.LocationLineUuids).
@@ -110,7 +110,7 @@ func (LocationCenterController) C(ctx *gin.Context) {
 
 	// 查重
 	ret = models.BootByModel(models.LocationCenterModel{}).
-		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
+		SetWheres(tools.Map{"unique_code": form.OrganizationWorkshop.OrganizationParagraph.OrganizationRailway.UniqueCode + form.UniqueCode}).
 		PrepareByDefault().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "中心代码")
