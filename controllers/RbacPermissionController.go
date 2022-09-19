@@ -33,7 +33,10 @@ func (cls RbacPermissionStoreForm) ShouldBind(ctx *gin.Context) RbacPermissionSt
 		wrongs.PanicValidate(err.Error())
 	}
 	if cls.Name == "" {
-		wrongs.PanicValidate("名称必填")
+		wrongs.PanicValidate("权限名称必填")
+	}
+	if len(cls.Name) > 64 {
+		wrongs.PanicValidate("权限名称不能超过64位")
 	}
 	if cls.Uri == "" {
 		wrongs.PanicValidate("URI必填")

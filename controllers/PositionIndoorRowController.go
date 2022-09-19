@@ -36,6 +36,9 @@ func (cls PositionIndoorRowStoreForm) ShouldBind(ctx *gin.Context) PositionIndoo
 	if cls.Name == "" {
 		wrongs.PanicValidate("排名称必填")
 	}
+	if len(cls.Name) > 64 {
+		wrongs.PanicValidate("排名称不能超过64位")
+	}
 	if cls.PositionIndoorRoomUuid == "" {
 		wrongs.PanicValidate("所属机房必选")
 	}

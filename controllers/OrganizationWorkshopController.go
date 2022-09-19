@@ -35,25 +35,30 @@ func (cls OrganizationWorkshopStoreForm) ShouldBind(ctx *gin.Context) Organizati
 	if cls.UniqueCode == "" {
 		wrongs.PanicValidate("车间代码必填")
 	}
+	if len(cls.UniqueCode) != 3 {
+		wrongs.PanicValidate("车间代码必须是3位")
+	}
 	if cls.Name == "" {
 		wrongs.PanicValidate("车间名称必填")
 	}
-	if cls.OrganizationWorkshopTypeUuid == "" {
-		wrongs.PanicValidate("车间类型必选")
+	if len(cls.Name) > 64 {
+		wrongs.PanicValidate("车间名称不能超过64位")
 	}
-	cls.OrganizationWorkshopType = (&models.OrganizationWorkshopTypeModel{}).FindOneByUUID(cls.OrganizationWorkshopTypeUuid)
+	if cls.OrganizationWorkshopTypeUuid == "" {
+		wrongs.PanicValidate("所属车间类型必选")
+	}
+	ret = models.BootByModel(models.OrganizationWorkshopTypeModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopTypeUuid}).PrepareByDefault().First(&cls.OrganizationWorkshopType)
+	wrongs.PanicWhenIsEmpty(ret, "所属车间类型")
 	if cls.OrganizationParagraphUuid == "" {
 		wrongs.PanicValidate("所属站段必选")
 	}
-	ret = models.BootByModel(models.OrganizationParagraphModel{}).
-		SetWheres(tools.Map{"uuid": cls.OrganizationParagraphUuid}).
-		PrepareByDefault().
-		First(&cls.OrganizationParagraph)
+	ret = models.BootByModel(models.OrganizationParagraphModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationParagraphUuid}).SetPreloads("OrganizationRailway").PrepareByDefault().First(&cls.OrganizationParagraph)
 	wrongs.PanicWhenIsEmpty(ret, "站段")
 
 	return cls
 }
 
+// C 新建
 func (OrganizationWorkshopController) C(ctx *gin.Context) {
 	var (
 		ret    *gorm.DB
@@ -78,7 +83,7 @@ func (OrganizationWorkshopController) C(ctx *gin.Context) {
 	// 新建
 	organizationWorkshop := &models.OrganizationWorkshopModel{
 		BaseModel:                models.BaseModel{Sort: form.Sort, Uuid: uuid.NewV4().String()},
-		UniqueCode:               form.UniqueCode,
+		UniqueCode:               form.OrganizationParagraph.UniqueCode + form.UniqueCode,
 		Name:                     form.Name,
 		OrganizationWorkshopType: form.OrganizationWorkshopType,
 		OrganizationParagraph:    form.OrganizationParagraph,
@@ -89,6 +94,8 @@ func (OrganizationWorkshopController) C(ctx *gin.Context) {
 
 	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"organization_workshop": organizationWorkshop}))
 }
+
+// D 删除
 func (OrganizationWorkshopController) D(ctx *gin.Context) {
 	var (
 		ret                  *gorm.DB
@@ -109,6 +116,8 @@ func (OrganizationWorkshopController) D(ctx *gin.Context) {
 
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
+
+// U 编辑
 func (OrganizationWorkshopController) U(ctx *gin.Context) {
 	var (
 		ret                  *gorm.DB
@@ -145,7 +154,7 @@ func (OrganizationWorkshopController) U(ctx *gin.Context) {
 	organizationWorkshop.BeEnable = form.BeEnable
 	organizationWorkshop.OrganizationWorkshopType = form.OrganizationWorkshopType
 	organizationWorkshop.OrganizationParagraph = form.OrganizationParagraph
-	if ret = models.BootByModel(models.OrganizationWorkshopModel{}).SetWheres(tools.Map{"uuid":ctx.Param("uuid")}).PrepareByDefault().Save(&organizationWorkshop); ret.Error != nil {
+	if ret = models.BootByModel(models.OrganizationWorkshopModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&organizationWorkshop); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 

@@ -41,8 +41,17 @@ func (cls AccountStoreForm) ShouldBind(ctx *gin.Context) AccountStoreForm {
 	if cls.Username == "" {
 		wrongs.PanicValidate("账号必填")
 	}
+	if len(cls.Username) > 64 {
+		wrongs.PanicValidate("账号不能超过64位")
+	}
 	if cls.Nickname == "" {
 		wrongs.PanicValidate("昵称必填")
+	}
+	if len(cls.Nickname) > 64 {
+		wrongs.PanicValidate("昵称不能超过64位")
+	}
+	if len(cls.Password) > 32 || len(cls.Password) < 6{
+		wrongs.PanicValidate("密码不能小于6位或大于32位")
 	}
 	if cls.Password != cls.PasswordConfirmation {
 		wrongs.PanicValidate("两次密码输入不一致")

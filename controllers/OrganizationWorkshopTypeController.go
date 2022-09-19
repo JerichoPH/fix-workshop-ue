@@ -30,8 +30,14 @@ func (cls OrganizationWorkshopTypeStoreForm) ShouldBind(ctx *gin.Context) Organi
 	if cls.UniqueCode == "" {
 		wrongs.PanicValidate("车间类型代码必填")
 	}
+	if len(cls.UniqueCode) > 64 {
+		wrongs.PanicValidate("车间类型代码不能超过64位")
+	}
 	if cls.Name == "" {
 		wrongs.PanicValidate("车间类型名称必填")
+	}
+	if len(cls.Name) > 64 {
+		wrongs.PanicValidate("车间类型名称不能超过64位")
 	}
 
 	return cls
@@ -109,7 +115,7 @@ func (OrganizationWorkshopTypeController) U(ctx *gin.Context) {
 	organizationWorkshopType.UniqueCode = form.UniqueCode
 	organizationWorkshopType.Name = form.Name
 	organizationWorkshopType.NumberCode = form.Number
-	models.BootByModel(models.OrganizationWorkshopTypeModel{}).SetWheres(tools.Map{"uuid":ctx.Param("uuid")}).PrepareByDefault().Save(&organizationWorkshopType)
+	models.BootByModel(models.OrganizationWorkshopTypeModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&organizationWorkshopType)
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"organization_workshop_type": organizationWorkshopType}))
 }

@@ -32,8 +32,14 @@ func (cls KindCategoryStoreForm) ShouldBind(ctx *gin.Context) KindCategoryStoreF
 	if cls.UniqueCode == "" {
 		wrongs.PanicValidate("种类代码必填")
 	}
+	if len(cls.UniqueCode) != 3 {
+		wrongs.PanicValidate("种类代码必须是3位")
+	}
 	if cls.Name == "" {
 		wrongs.PanicValidate("种类名称必填")
+	}
+	if len(cls.Name) > 64 {
+		wrongs.PanicValidate("种类名称不能超过64位")
 	}
 
 	return cls

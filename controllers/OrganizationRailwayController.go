@@ -33,8 +33,14 @@ func (cls OrganizationRailwayStoreForm) ShouldBind(ctx *gin.Context) Organizatio
 	if cls.UniqueCode == "" {
 		wrongs.PanicValidate("路局代码必填")
 	}
+	if len(cls.UniqueCode) != 3 {
+		wrongs.PanicValidate("路局代码必须是3位")
+	}
 	if cls.Name == "" {
 		wrongs.PanicValidate("路局名称必填")
+	}
+	if len(cls.Name) > 64 {
+		wrongs.PanicValidate("路局名称不能超过64位")
 	}
 	if len(cls.LocationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).

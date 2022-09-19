@@ -27,10 +27,16 @@ func (cls OrganizationWorkAreaTypeStoreForm) ShouldBind(ctx *gin.Context) Organi
 		wrongs.PanicValidate(err.Error())
 	}
 	if cls.UniqueCode == "" {
-		wrongs.PanicValidate("工区代码必填")
+		wrongs.PanicValidate("工区类型代码必填")
+	}
+	if len(cls.UniqueCode) > 64{
+		wrongs.PanicValidate("工区类型代码不能超过64位")
 	}
 	if cls.Name == "" {
-		wrongs.PanicValidate("工区名称必填")
+		wrongs.PanicValidate("工区类型名称必填")
+	}
+	if len(cls.Name) > 64 {
+		wrongs.PanicValidate("工区类型名称不能超过64位")
 	}
 
 	return cls
@@ -106,7 +112,7 @@ func (OrganizationWorkAreaTypeController) U(ctx *gin.Context) {
 	organizationWorkAreaType.BaseModel.Sort = form.Sort
 	organizationWorkAreaType.UniqueCode = form.UniqueCode
 	organizationWorkAreaType.Name = form.Name
-	if ret = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).SetWheres(tools.Map{"uuid":ctx.Param("uuid")}).PrepareByDefault().Save(&organizationWorkAreaType); ret.Error != nil {
+	if ret = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&organizationWorkAreaType); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 

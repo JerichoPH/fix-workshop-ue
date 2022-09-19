@@ -21,7 +21,7 @@ type LocationRailroadGradeCrossStoreForm struct {
 	OrganizationWorkshop     models.OrganizationWorkshopModel
 	OrganizationWorkAreaUuid string `form:"organization_work_area_uuid" json:"organization_work_area_uuid"`
 	OrganizationWorkArea     models.OrganizationWorkAreaModel
-	LocationLineUuids        []string
+	LocationLineUuids        []string `form:"location_line_uuids" json:"location_line_uuids"`
 	LocationLines            []*models.LocationLineModel
 }
 
@@ -38,8 +38,14 @@ func (cls LocationRailroadGradeCrossStoreForm) ShouldBind(ctx *gin.Context) Loca
 	if cls.UniqueCode == "" {
 		wrongs.PanicValidate("道口代码必填")
 	}
+	if len(cls.UniqueCode) != 5 {
+		wrongs.PanicValidate("道口代码必须是5位")
+	}
 	if cls.Name == "" {
 		wrongs.PanicValidate("道口名称必填")
+	}
+	if len(cls.Name) > 64 {
+		wrongs.PanicValidate("道口名称不能超过64位")
 	}
 	if cls.OrganizationWorkshopUuid == "" {
 		wrongs.PanicValidate("所属车间必选")
@@ -80,7 +86,6 @@ func (cls LocationRailroadGradeCrossBindLocationLinesForm) ShouldBind(ctx *gin.C
 	if err := ctx.ShouldBind(&cls); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-
 	if len(cls.LocationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
 			PrepareByDefault().
@@ -120,6 +125,8 @@ func (LocationRailroadGradeCrossController) C(ctx *gin.Context) {
 		Name:                     form.Name,
 		BeEnable:                 form.BeEnable,
 		OrganizationWorkshopUuid: form.OrganizationWorkshop.Uuid,
+		OrganizationWorkAreaUuid: form.OrganizationWorkAreaUuid,
+		LocationLines:            form.LocationLines,
 	}
 	if ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).PrepareByDefault().Create(&locationRailroadGradeCross); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())

@@ -35,8 +35,14 @@ func (cls KindEntireTypeStoreForm) ShouldBind(ctx *gin.Context) KindEntireTypeSt
 	if cls.UniqueCode == "" {
 		wrongs.PanicValidate("类型代码必填")
 	}
+	if len(cls.UniqueCode) != 2 {
+		wrongs.PanicValidate("类型代码必须是2位")
+	}
 	if cls.Name == "" {
 		wrongs.PanicValidate("类型名称必填")
+	}
+	if len(cls.Name) > 64 {
+		wrongs.PanicValidate("类型名称不能超过64位")
 	}
 	if cls.KindCategoryUuid == "" {
 		wrongs.PanicValidate("所属种类必选")
@@ -75,7 +81,7 @@ func (KindEntireTypeController) C(ctx *gin.Context) {
 	// 新建
 	kindEntireType := &models.KindEntireTypeModel{
 		BaseModel:    models.BaseModel{Sort: form.Sort, Uuid: uuid.NewV4().String()},
-		UniqueCode:   form.UniqueCode,
+		UniqueCode:   form.KindCategory.UniqueCode + form.UniqueCode,
 		Name:         form.Name,
 		BeEnable:     form.BeEnable,
 		KindCategory: form.KindCategory,
@@ -145,7 +151,7 @@ func (KindEntireTypeController) U(ctx *gin.Context) {
 	kindEntireType.Name = form.Name
 	kindEntireType.BeEnable = form.BeEnable
 	kindEntireType.KindCategory = form.KindCategory
-	if ret = models.BootByModel(models.KindEntireTypeModel{}).SetWheres(tools.Map{"uuid":ctx.Param("uuid")}).PrepareByDefault().Save(&kindEntireType); ret.Error != nil {
+	if ret = models.BootByModel(models.KindEntireTypeModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&kindEntireType); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 

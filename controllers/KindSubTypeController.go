@@ -35,8 +35,14 @@ func (cls KindSubTypeStoreForm) ShouldBind(ctx *gin.Context) KindSubTypeStoreFor
 	if cls.UniqueCode == "" {
 		wrongs.PanicValidate("型号代码必填")
 	}
+	if len(cls.UniqueCode) != 2 {
+		wrongs.PanicValidate("型号代码必须是2位")
+	}
 	if cls.Name == "" {
 		wrongs.PanicValidate("型号名称必填")
+	}
+	if len(cls.Name) > 64 {
+		wrongs.PanicValidate("型号名称不能超过64位")
 	}
 	if cls.KindEntireTypeUuid == "" {
 		wrongs.PanicValidate("所属类型必选")
@@ -75,7 +81,7 @@ func (KindSubTypeController) C(ctx *gin.Context) {
 	// 新建
 	kindSubType := &models.KindSubTypeModel{
 		BaseModel:      models.BaseModel{Sort: form.Sort, Uuid: uuid.NewV4().String()},
-		UniqueCode:     form.UniqueCode,
+		UniqueCode:     form.KindEntireType.UniqueCode + form.UniqueCode,
 		Name:           form.Name,
 		BeEnable:       form.BeEnable,
 		Nickname:       form.Nickname,

@@ -29,8 +29,14 @@ func (cls OrganizationWorkAreaProfessionStoreForm) ShouldBind(ctx *gin.Context) 
 	if cls.UniqueCode == "" {
 		wrongs.PanicValidate("工区专业代码必填")
 	}
+	if len(cls.UniqueCode) > 64 {
+		wrongs.PanicValidate("工区专业代码不能超过64位")
+	}
 	if cls.Name == "" {
 		wrongs.PanicValidate("工区专业名称必填")
+	}
+	if len(cls.Name) > 64 {
+		wrongs.PanicValidate("工区专业名称不能超过64位")
 	}
 
 	return cls

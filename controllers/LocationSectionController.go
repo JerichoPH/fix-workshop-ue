@@ -38,8 +38,14 @@ func (cls LocationSectionStoreForm) ShouldBind(ctx *gin.Context) LocationSection
 	if cls.UniqueCode == "" {
 		wrongs.PanicValidate("区间代码不能为空")
 	}
+	if len(cls.UniqueCode) != 6 {
+		wrongs.PanicValidate("区间代码必须是6位")
+	}
 	if cls.Name == "" {
 		wrongs.PanicValidate("区间名称不能为空")
+	}
+	if len(cls.Name) > 64 {
+		wrongs.PanicValidate("区间名称不能64位")
 	}
 	if cls.OrganizationWorkshopUuid == "" {
 		wrongs.PanicValidate("所属车间不能为空")
@@ -56,11 +62,11 @@ func (cls LocationSectionStoreForm) ShouldBind(ctx *gin.Context) LocationSection
 			First(&cls.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "工区")
 	}
-	if len(cls.LocationLines) > 0 {
+	if len(cls.LocationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
 			PrepareByDefault().
-			Where("uuid = ?", cls.LocationLineUuids).
-			Find(&cls.LocationLineUuids)
+			Where("uuid in ?", cls.LocationLineUuids).
+			Find(&cls.LocationLines)
 	}
 
 	return cls

@@ -21,7 +21,7 @@ type LocationStationStoreForm struct {
 	OrganizationWorkshop     models.OrganizationWorkshopModel
 	OrganizationWorkAreaUuid string `form:"organization_work_area_uuid" json:"organization_work_area_uuid"`
 	OrganizationWorkArea     models.OrganizationWorkAreaModel
-	LocationLineUUIDs        []string `form:"location_line_uuids" json:"location_line_uuids"`
+	LocationLineUuids        []string `form:"location_line_uuids" json:"location_line_uuids"`
 	LocationLines            []*models.LocationLineModel
 }
 
@@ -38,8 +38,14 @@ func (cls LocationStationStoreForm) ShouldBind(ctx *gin.Context) LocationStation
 	if cls.UniqueCode == "" {
 		wrongs.PanicValidate("站场代码必填")
 	}
+	if len(cls.UniqueCode) != 6 {
+		wrongs.PanicValidate("站场代码必须是6位")
+	}
 	if cls.Name == "" {
 		wrongs.PanicValidate("站场名称必填")
+	}
+	if len(cls.Name) > 64 {
+		wrongs.PanicValidate("站场名称不能超过64位")
 	}
 	if cls.OrganizationWorkshopUuid == "" {
 		wrongs.PanicValidate("所属车间必选")
@@ -55,13 +61,11 @@ func (cls LocationStationStoreForm) ShouldBind(ctx *gin.Context) LocationStation
 			PrepareByDefault().
 			First(&cls.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "工区")
-	} else {
-
 	}
-	if len(cls.LocationLineUUIDs) > 0 {
+	if len(cls.LocationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
 			PrepareByDefault().
-			Where("uuid in ?", cls.LocationLineUUIDs).
+			Where("uuid in ?", cls.LocationLineUuids).
 			Find(&cls.LocationLines)
 	}
 
@@ -82,7 +86,6 @@ func (cls LocationStationBindLocationLinesForm) ShouldBind(ctx *gin.Context) Loc
 	if err := ctx.ShouldBind(&cls); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-
 	if len(cls.LocationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
 			PrepareByDefault().

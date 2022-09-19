@@ -38,8 +38,14 @@ func (cls LocationCenterStoreForm) ShouldBind(ctx *gin.Context) LocationCenterSt
 	if cls.UniqueCode == "" {
 		wrongs.PanicValidate("中心代码必填")
 	}
+	if len(cls.UniqueCode) != 3 {
+		wrongs.PanicValidate("中心代码必须是3位")
+	}
 	if cls.Name == "" {
 		wrongs.PanicValidate("中心名称必填")
+	}
+	if len(cls.Name) > 64 {
+		wrongs.PanicValidate("中心名称不能大于64位")
 	}
 	if cls.OrganizationWorkshopUuid == "" {
 		wrongs.PanicValidate("所属车间必选")

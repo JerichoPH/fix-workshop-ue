@@ -27,7 +27,10 @@ func (cls RbacRoleStoreForm) ShouldBind(ctx *gin.Context) RbacRoleStoreForm {
 		wrongs.PanicValidate(err.Error())
 	}
 	if cls.Name == "" {
-		wrongs.PanicValidate("名称必填")
+		wrongs.PanicValidate("角色名称必填")
+	}
+	if len(cls.Name) > 64 {
+		wrongs.PanicValidate("角色名称不能超过64位")
 	}
 
 	return cls

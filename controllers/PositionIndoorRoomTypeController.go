@@ -27,10 +27,16 @@ func (cls PositionIndoorRoomTypeStoreForm) ShouldBind(ctx *gin.Context) Position
 		wrongs.PanicValidate(err.Error())
 	}
 	if cls.UniqueCode == "" {
-		wrongs.PanicValidate("机房代码必填")
+		wrongs.PanicValidate("机房类型代码必填")
+	}
+	if len(cls.UniqueCode) > 64 {
+		wrongs.PanicValidate("机柜代码不能超过64位")
 	}
 	if cls.Name == "" {
-		wrongs.PanicValidate("机房名称必填")
+		wrongs.PanicValidate("机房类型名称必填")
+	}
+	if len(cls.Name) > 64 {
+		wrongs.PanicValidate("机房类型名称不能超过64位")
 	}
 
 	return cls
@@ -105,7 +111,7 @@ func (PositionIndoorRoomTypeController) U(ctx *gin.Context) {
 	// 编辑
 	positionIndoorRoomType.BaseModel.Sort = form.Sort
 	positionIndoorRoomType.Name = form.Name
-	if ret = models.BootByModel(models.PositionIndoorRoomTypeModel{}).SetWheres(tools.Map{"uuid":ctx.Param("uuid")}).PrepareByDefault().Save(&positionIndoorRoomType); ret.Error != nil {
+	if ret = models.BootByModel(models.PositionIndoorRoomTypeModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&positionIndoorRoomType); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 

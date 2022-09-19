@@ -19,7 +19,7 @@ type MenuStoreForm struct {
 	URIName       string   `form:"uri_name" json:"uri_name"`
 	ParentUUID    string   `form:"parent_uuid" json:"parent_uuid"`
 	Icon          string   `form:"icon" json:"icon"`
-	RbacRoleUUIDs []string `form:"rbac_role_uuids" json:"rbac_role_uuids"`
+	RbacRoleUuids []string `form:"rbac_role_uuids" json:"rbac_role_uuids"`
 	RbacRoles     []*models.RbacRoleModel
 }
 
@@ -34,13 +34,17 @@ func (cls MenuStoreForm) ShouldBind(ctx *gin.Context) MenuStoreForm {
 	if cls.Name == "" {
 		wrongs.PanicValidate("菜单名称必填")
 	}
-	if len(cls.RbacRoleUUIDs) > 0 {
-		models.BootByModel(models.RbacRoleModel{}).PrepareByDefault().Where("uuid in ?", cls.RbacRoleUUIDs).Find(&cls.RbacRoles)
+	if len(cls.Name) > 64 {
+		wrongs.PanicValidate("菜单名称不能超过64位")
+	}
+	if len(cls.RbacRoleUuids) > 0 {
+		models.BootByModel(models.RbacRoleModel{}).PrepareByDefault().Where("uuid in ?", cls.RbacRoleUuids).Find(&cls.RbacRoles)
 	}
 
 	return cls
 }
 
+// C 新建
 func (MenuController) C(ctx *gin.Context) {
 	var ret *gorm.DB
 
@@ -72,6 +76,8 @@ func (MenuController) C(ctx *gin.Context) {
 
 	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"menu": menu}))
 }
+
+// D 删除
 func (MenuController) D(ctx *gin.Context) {
 	var ret *gorm.DB
 
@@ -85,6 +91,8 @@ func (MenuController) D(ctx *gin.Context) {
 
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
+
+// U 更新
 func (MenuController) U(ctx *gin.Context) {
 	var ret *gorm.DB
 
@@ -117,10 +125,14 @@ func (MenuController) U(ctx *gin.Context) {
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"menu": menu}))
 }
+
+// S 详情
 func (MenuController) S(ctx *gin.Context) {
 	menu := (&models.MenuModel{}).FindOneByUUID(ctx.Param("uuid"))
 	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"menu": menu}))
 }
+
+// I 列表
 func (MenuController) I(ctx *gin.Context) {
 	var menus []models.MenuModel
 	models.BootByModel(models.MenuModel{}).

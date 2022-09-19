@@ -46,8 +46,14 @@ func (cls LocationLineStoreForm) ShouldBind(ctx *gin.Context) LocationLineStoreF
 	if cls.UniqueCode == "" {
 		wrongs.PanicValidate("线别代码必填")
 	}
+	if len(cls.UniqueCode) != 5 {
+		wrongs.PanicValidate("线别代码必须是5位")
+	}
 	if cls.Name == "" {
 		wrongs.PanicValidate("线别名称必填")
+	}
+	if len(cls.Name) > 64 {
+		wrongs.PanicValidate("线别名称不能超过64位")
 	}
 	// 查询路局
 	if len(cls.OrganizationRailwayUuids) > 0 {

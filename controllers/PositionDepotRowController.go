@@ -38,6 +38,9 @@ func (cls PositionDepotRowStoreForm) ShouldBind(ctx *gin.Context) PositionDepotR
 	if cls.Name == "" {
 		wrongs.PanicValidate("仓库排名称必填")
 	}
+	if len(cls.Name) > 64 {
+		wrongs.PanicValidate("仓库排名称不能超过64位")
+	}
 	if cls.PositionDepotRowTypeUuid == "" {
 		wrongs.PanicValidate("所属排类型必选")
 	}

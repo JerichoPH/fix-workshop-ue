@@ -38,8 +38,14 @@ func (cls OrganizationWorkAreaStoreForm) ShouldBind(ctx *gin.Context) Organizati
 	if cls.UniqueCode == "" {
 		wrongs.PanicValidate("工区代码必填")
 	}
+	if len(cls.UniqueCode) != 4 {
+		wrongs.PanicValidate("工区代码必须是4位")
+	}
 	if cls.Name == "" {
 		wrongs.PanicValidate("工区名称必填")
+	}
+	if len(cls.Name) > 64 {
+		wrongs.PanicValidate("工区名称不能超过64位")
 	}
 
 	if cls.OrganizationWorkAreaTypeUuid == "" {
@@ -51,7 +57,7 @@ func (cls OrganizationWorkAreaStoreForm) ShouldBind(ctx *gin.Context) Organizati
 	if cls.OrganizationWorkshopUuid == "" {
 		wrongs.PanicValidate("所属车间必选")
 	}
-	ret = models.BootByModel(models.OrganizationWorkshopModel{}).SetWheres(map[string]interface{}{"uuid": cls.OrganizationWorkshopUuid}).PrepareByDefault().First(&cls.OrganizationWorkshop)
+	ret = models.BootByModel(models.OrganizationWorkshopModel{}).SetWheres(map[string]interface{}{"uuid": cls.OrganizationWorkshopUuid}).SetPreloads("OrganizationParagraph", "OrganizationParagraph.OrganizationRailway").PrepareByDefault().First(&cls.OrganizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "所属车间")
 
 	if cls.OrganizationWorkAreaProfessionUuid != "" {
@@ -87,7 +93,7 @@ func (OrganizationWorkAreaController) C(ctx *gin.Context) {
 	if ret = models.BootByModel(models.OrganizationWorkAreaModel{}).PrepareByDefault().Create(
 		&models.OrganizationWorkAreaModel{
 			BaseModel:                          models.BaseModel{Sort: form.Sort, Uuid: uuid.NewV4().String()},
-			UniqueCode:                         form.UniqueCode,
+			UniqueCode:                         form.OrganizationWorkshop.OrganizationParagraph.UniqueCode + form.UniqueCode,
 			Name:                               form.Name,
 			OrganizationWorkAreaProfessionUuid: form.OrganizationWorkAreaProfessionUuid,
 			OrganizationWorkAreaTypeUuid:       form.OrganizationWorkAreaTypeUuid,

@@ -31,10 +31,13 @@ func (cls PositionDepotCellStoreForm) ShouldBind(ctx *gin.Context) PositionDepot
 		wrongs.PanicValidate(err.Error())
 	}
 	if cls.UniqueCode == "" {
-		wrongs.PanicValidate("仓库代码不能必填")
+		wrongs.PanicValidate("仓库格位代码不能必填")
 	}
 	if cls.Name == "" {
-		wrongs.PanicValidate("仓库名称不能必填")
+		wrongs.PanicValidate("仓库格位名称不能必填")
+	}
+	if len(cls.Name) > 64 {
+		wrongs.PanicValidate("仓库格位名称不能超过64位")
 	}
 	if cls.PositionDepotTierUuid == "" {
 		wrongs.PanicValidate("所属仓库柜架层必选")

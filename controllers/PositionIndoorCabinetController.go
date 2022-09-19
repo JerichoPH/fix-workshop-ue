@@ -36,6 +36,9 @@ func (cls PositionIndoorCabinetStoreForm) ShouldBind(ctx *gin.Context) PositionI
 	if cls.Name == "" {
 		wrongs.PanicValidate("柜架名称必填")
 	}
+	if len(cls.Name) > 64 {
+		wrongs.PanicValidate("柜架名称不能超过64位")
+	}
 	if cls.PositionIndoorRowUuid == "" {
 		ret = models.BootByModel(models.PositionIndoorRowModel{}).
 			SetWheres(tools.Map{"uuid": cls.PositionIndoorRowUuid}).

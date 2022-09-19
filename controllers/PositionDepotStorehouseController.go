@@ -36,6 +36,9 @@ func (cls PositionDepotStorehouseStoreForm) ShouldBind(ctx *gin.Context) Positio
 	if cls.Name == "" {
 		wrongs.PanicValidate("仓库名称必填")
 	}
+	if len(cls.Name) > 64 {
+		wrongs.PanicValidate("仓库名称不能超过64位")
+	}
 	if cls.OrganizationWorkshopUuid == "" {
 		wrongs.PanicValidate("所属车间必选")
 	}
