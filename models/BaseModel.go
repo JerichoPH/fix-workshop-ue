@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+	"strconv"
 	"time"
 )
 
@@ -285,17 +286,13 @@ func (cls *BaseModel) PrepareQuery(ctx *gin.Context, dbDriver string) *gorm.DB {
 		dbSession.Order("id asc, sort asc")
 	}
 
-	// offset
-	if offset, ok := ctx.GetQuery("__offset__"); ok {
-		offset := wrongs.PanicWhenIsNotInt(offset, "偏移参数只能填写整数")
-		dbSession.Offset(offset)
-	}
-
-	// limit
-	if limit, ok := ctx.GetQuery("__limit__"); ok {
-		limit := wrongs.PanicWhenIsNotInt(limit, "分页参数只能填写整数")
-		dbSession.Limit(limit)
-	}
+	// 分页
+	limitStr := ctx.DefaultQuery("__limit__", "50")
+	limit,_ := strconv.Atoi(limitStr)
+	pageStr := ctx.DefaultQuery("__page__", "1")
+	page,_ := strconv.Atoi(pageStr)
+	dbSession.Offset((page - 1) * limit)
+	dbSession.Limit(limit)
 
 	return dbSession
 }
