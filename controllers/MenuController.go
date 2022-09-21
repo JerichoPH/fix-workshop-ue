@@ -129,7 +129,7 @@ func (MenuController) U(ctx *gin.Context) {
 // S 详情
 func (MenuController) S(ctx *gin.Context) {
 	menu := (&models.MenuModel{}).FindOneByUUID(ctx.Param("uuid"))
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"menu": menu}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"menu": menu}))
 }
 
 // I 列表
@@ -138,8 +138,8 @@ func (MenuController) I(ctx *gin.Context) {
 	models.BootByModel(models.MenuModel{}).
 		SetWhereFields("uuid", "name", "url", "parent_uuid").
 		SetPreloads("Parent", "Subs", "RbacRoles").
-		PrepareQuery(ctx, "").
+		PrepareUseQueryByDefault(ctx).
 		Find(&menus)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"menus": menus}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"menus": menus}))
 }

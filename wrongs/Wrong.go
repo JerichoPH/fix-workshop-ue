@@ -59,8 +59,7 @@ type UnLoginWrong struct{ Wrong }
 
 // PanicUnLogin 未登录错误
 //  @param text
-//  @return error
-func PanicUnLogin(text string) error {
+func PanicUnLogin(text string) {
 	panic(&UnLoginWrong{Wrong{errorMessage: text}})
 }
 

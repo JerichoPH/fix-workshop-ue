@@ -120,14 +120,14 @@ func (PositionIndoorRoomTypeController) U(ctx *gin.Context) {
 func (PositionIndoorRoomTypeController) S(ctx *gin.Context) {
 	positionIndoorRoomType := (&models.PositionIndoorRoomTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_indoor_room_type": positionIndoorRoomType}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_indoor_room_type": positionIndoorRoomType}))
 }
 func (PositionIndoorRoomTypeController) I(ctx *gin.Context) {
 	var positionIndoorRoomTypes []models.PositionIndoorRoomTypeModel
 	models.BootByModel(models.PositionIndoorRoomTypeModel{}).
 		SetWhereFields().
-		PrepareQuery(ctx, "").
+		PrepareUseQuery(ctx, "").
 		Find(&positionIndoorRoomTypes)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_indoor_room_types": positionIndoorRoomTypes}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_indoor_room_types": positionIndoorRoomTypes}))
 }

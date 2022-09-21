@@ -253,7 +253,7 @@ func (LocationRailroadGradeCrossController) S(ctx *gin.Context) {
 		First(&locationRailroadGradeCross)
 	wrongs.PanicWhenIsEmpty(ret, "道口")
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"location_railroad_grade_cross": locationRailroadGradeCross}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_railroad_grade_cross": locationRailroadGradeCross}))
 }
 
 func (LocationRailroadGradeCrossController) I(ctx *gin.Context) {
@@ -265,5 +265,5 @@ func (LocationRailroadGradeCrossController) I(ctx *gin.Context) {
 		PrepareUseQueryByDefault(ctx).
 		Find(&locationRailroadGradeCrosses)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"location_railroad_grade_crosses": locationRailroadGradeCrosses}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_railroad_grade_crosses": locationRailroadGradeCrosses}))
 }

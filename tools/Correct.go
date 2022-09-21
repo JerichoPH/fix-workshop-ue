@@ -1,12 +1,16 @@
 package tools
 
-import "sync"
+import (
+	"strconv"
+	"sync"
+)
 
 type correct struct {
-	m  string
-	c  interface{}
-	s  uint
-	ec uint
+	msg        string
+	content    interface{}
+	pagination interface{}
+	status     uint
+	errorCode  uint
 }
 
 var responseIns *correct
@@ -16,65 +20,82 @@ var correctOnce sync.Once
 //  @param msg
 //  @return *correct
 func CorrectBoot(msg string) *correct {
-	correctOnce.Do(func() { responseIns = &correct{m: ""} })
-	responseIns.m = msg
+	correctOnce.Do(func() { responseIns = &correct{msg: ""} })
+	responseIns.msg = msg
 	return responseIns
 }
 
 // CorrectBootByDefault
 //  @return *correct
-func CorrectBootByDefault() *correct{
-	correctOnce.Do(func() { responseIns = &correct{m: ""} })
-	responseIns.m = ""
+func CorrectBootByDefault() *correct {
+	correctOnce.Do(func() { responseIns = &correct{msg: ""} })
+	responseIns.msg = ""
 	return responseIns
 }
 
 func (cls *correct) get() map[string]interface{} {
 	ret := map[string]interface{}{
-		"msg":    cls.m,
-		"content":    cls.c,
-		"status":     cls.s,
-		"error_code": cls.ec,
+		"msg":        cls.msg,
+		"content":    cls.content,
+		"pagination": cls.pagination,
+		"status":     cls.status,
+		"error_code": cls.errorCode,
 	}
 	return ret
 }
 
-func (cls *correct) set(content interface{}, status uint, errorCode uint) *correct {
-	cls.c = content
+func (cls *correct) set(content, pagination interface{}, status uint, errorCode uint) *correct {
+	cls.content = content
+	cls.pagination = pagination
 	if status == 0 {
-		cls.s = 200
+		cls.status = 200
 	} else {
-		cls.s = status
+		cls.status = status
 	}
-	cls.ec = errorCode
+	cls.errorCode = errorCode
 	return cls
 }
 
-func (cls *correct) OK(content interface{}) (int, map[string]interface{}) {
-	if cls.m == "" {
-		cls.m = "OK"
+// Ok 读取成功
+func (cls *correct) Ok(content interface{}) (int, map[string]interface{}) {
+	if cls.msg == "" {
+		cls.msg = "OK"
 	}
-	return 200, cls.set(content, 200, 0).get()
+	return 200, cls.set(content, nil, 200, 0).get()
 }
 
+// OkForPagination 返回分页数据
+func (cls *correct) OkForPagination(content interface{}, pageStr string, count int64) (int, map[string]interface{}) {
+	if cls.msg == "" {
+		cls.msg = "OK"
+	}
+
+	page, _ := strconv.Atoi(pageStr)
+
+	return 200, cls.set(content, map[string]interface{}{"page": page, "previous": page - 1, "next": page + 1, "count": count}, 200, 0).get()
+}
+
+// Created 新建成功
 func (cls *correct) Created(content interface{}) (int, map[string]interface{}) {
-	if cls.m == "" {
-		cls.m = "新建成功"
+	if cls.msg == "" {
+		cls.msg = "新建成功"
 	}
-	return 201, cls.set(content, 201, 0).get()
+	return 201, cls.set(content, nil, 201, 0).get()
 }
 
+// Updated 更新成功
 func (cls *correct) Updated(content interface{}) (int, map[string]interface{}) {
-	if cls.m == "" {
-		cls.m = "编辑成功"
+	if cls.msg == "" {
+		cls.msg = "编辑成功"
 	}
 
-	return 202, cls.set(content, 202, 0).get()
+	return 202, cls.set(content, nil, 202, 0).get()
 }
 
+// Deleted 删除成功
 func (cls *correct) Deleted() (int, interface{}) {
-	if cls.m == "" {
-		cls.m = "删除成功"
+	if cls.msg == "" {
+		cls.msg = "删除成功"
 	}
-	return 204, cls.set(nil, 204, 0).get()
+	return 204, cls.set(nil, nil, 204, 0).get()
 }

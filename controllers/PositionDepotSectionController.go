@@ -156,14 +156,14 @@ func (PositionDepotSectionController) S(ctx *gin.Context) {
 		First(&positionDepotSection)
 	wrongs.PanicWhenIsEmpty(ret, "仓库区域")
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_depot_section": positionDepotSection}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_depot_section": positionDepotSection}))
 }
 func (PositionDepotSectionController) I(ctx *gin.Context) {
 	var positionDepotSections []models.PositionDepotSectionModel
 	models.BootByModel(models.PositionDepotSectionModel{}).
 		SetWhereFields().
-		PrepareQuery(ctx,"").
+		PrepareUseQuery(ctx,"").
 		Find(&positionDepotSections)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_depot_sections": positionDepotSections}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_depot_sections": positionDepotSections}))
 }

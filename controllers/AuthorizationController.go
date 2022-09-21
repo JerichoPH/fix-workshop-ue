@@ -132,7 +132,7 @@ func (AuthorizationController) PostLogin(ctx *gin.Context) {
 		// 生成jwt错误
 		wrongs.PanicForbidden(err.Error())
 	} else {
-		ctx.JSON(tools.CorrectBoot("登陆成功").OK(tools.Map{
+		ctx.JSON(tools.CorrectBoot("登陆成功").Ok(tools.Map{
 			"token":    token,
 			"username": account.Username,
 			"nickname": account.Nickname,
@@ -145,7 +145,7 @@ func (AuthorizationController) PostLogin(ctx *gin.Context) {
 func (AuthorizationController) GetMenus(ctx *gin.Context) {
 	var ret *gorm.DB
 	if accountUUID, exists := ctx.Get("__ACCOUNT__"); !exists {
-		panic(wrongs.PanicUnLogin("用户未登录"))
+		wrongs.PanicUnLogin("用户未登录")
 	} else {
 		// 获取当前用户信息
 		var account models.AccountModel
@@ -167,12 +167,12 @@ func (AuthorizationController) GetMenus(ctx *gin.Context) {
 			Joins("join accounts a on prraa.account_id = a.id").
 			Where("a.uuid = ?", account.BaseModel.Uuid).
 			Where("menus.deleted_at is null").
-			Where("menus.parent_uuid is null").
+			Where("menus.parent_uuid = ''").
 			Order("menus.sort asc").
 			Order("menus.id asc").
 			Preload("Subs").
 			Find(&menus)
 
-		ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"menus": menus}))
+		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"menus": menus}))
 	}
 }

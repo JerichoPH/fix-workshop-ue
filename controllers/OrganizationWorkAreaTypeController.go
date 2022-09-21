@@ -121,14 +121,14 @@ func (OrganizationWorkAreaTypeController) U(ctx *gin.Context) {
 func (OrganizationWorkAreaTypeController) S(ctx *gin.Context) {
 	organizationWorkAreaType := (&models.OrganizationWorkAreaTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"organization_work_area_type": organizationWorkAreaType}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_work_area_type": organizationWorkAreaType}))
 }
 func (OrganizationWorkAreaTypeController) I(ctx *gin.Context) {
 	var organizationWorkAreaType []models.OrganizationWorkAreaTypeModel
 	models.BootByModel(models.OrganizationWorkAreaTypeModel{}).
 		SetWhereFields().
-		PrepareQuery(ctx, "").
+		PrepareUseQuery(ctx, "").
 		Find(&organizationWorkAreaType)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"organization_work_area_types": organizationWorkAreaType}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_work_area_types": organizationWorkAreaType}))
 }

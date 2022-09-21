@@ -191,7 +191,7 @@ func (OrganizationRailwayController) S(ctx *gin.Context) {
 		First(&organizationRailway)
 	wrongs.PanicWhenIsEmpty(ret, "路局")
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"organization_railway": organizationRailway}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_railway": organizationRailway}))
 }
 func (OrganizationRailwayController) I(ctx *gin.Context) {
 	var (
@@ -203,5 +203,5 @@ func (OrganizationRailwayController) I(ctx *gin.Context) {
 		PrepareUseQueryByDefault(ctx).
 		Find(&organizationRailways)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"organization_railways": organizationRailways}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_railways": organizationRailways}))
 }

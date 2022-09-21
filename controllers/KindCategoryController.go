@@ -162,7 +162,7 @@ func (KindCategoryController) S(ctx *gin.Context) {
 		First(&kindCategory)
 	wrongs.PanicWhenIsEmpty(ret, "种类")
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"kind_category": kindCategory}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"kind_category": kindCategory}))
 }
 
 // I 列表
@@ -171,8 +171,8 @@ func (KindCategoryController) I(ctx *gin.Context) {
 	models.BootByModel(models.KindCategoryModel{}).
 		SetScopes((&models.BaseModel{}).ScopeBeEnableTrue).
 		SetWhereFields().
-		PrepareQuery(ctx, "").
+		PrepareUseQuery(ctx, "").
 		Find(&kindCategories)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"kind_categories": kindCategories}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"kind_categories": kindCategories}))
 }

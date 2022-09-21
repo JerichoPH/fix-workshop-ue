@@ -122,14 +122,14 @@ func (OrganizationWorkshopTypeController) U(ctx *gin.Context) {
 func (OrganizationWorkshopTypeController) S(ctx *gin.Context) {
 	organizationWorkshopType := (&models.OrganizationWorkshopTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"organization_workshop_type": organizationWorkshopType}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_workshop_type": organizationWorkshopType}))
 }
 func (OrganizationWorkshopTypeController) I(ctx *gin.Context) {
 	var organizationWorkshopTypes []models.OrganizationWorkshopTypeModel
 	models.BootByModel(models.OrganizationWorkshopTypeModel{}).
 		SetWhereFields("sort", "unique_code", "name", "number").
-		PrepareQuery(ctx, "").
+		PrepareUseQuery(ctx, "").
 		Find(&organizationWorkshopTypes)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"organization_workshop_types": organizationWorkshopTypes}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_workshop_types": organizationWorkshopTypes}))
 }

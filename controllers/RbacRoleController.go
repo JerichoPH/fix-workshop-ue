@@ -239,7 +239,7 @@ func (RbacRoleController) S(ctx *gin.Context) {
 		First(&rbacRole)
 	wrongs.PanicWhenIsEmpty(ret, "角色")
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"rbac_role": rbacRole}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"rbac_role": rbacRole}))
 }
 func (RbacRoleController) I(ctx *gin.Context) {
 	var rbacRoles []models.RbacRoleModel
@@ -247,5 +247,5 @@ func (RbacRoleController) I(ctx *gin.Context) {
 		PrepareUseQueryByDefault(ctx).
 		Find(&rbacRoles)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"rbac_roles": rbacRoles}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"rbac_roles": rbacRoles}))
 }

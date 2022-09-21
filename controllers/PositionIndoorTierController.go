@@ -156,14 +156,14 @@ func (PositionIndoorTierController) S(ctx *gin.Context) {
 		First(&positionIndoorTier)
 	wrongs.PanicWhenIsEmpty(ret, "柜架层")
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_indoor_tier": positionIndoorTier}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_indoor_tier": positionIndoorTier}))
 }
 func (PositionIndoorTierController) I(ctx *gin.Context) {
 	var positionIndoorTier []models.PositionIndoorTierModel
 	models.BootByModel(models.PositionIndoorTierModel{}).
 		SetWhereFields().
-		PrepareQuery(ctx, "").
+		PrepareUseQuery(ctx, "").
 		Find(&positionIndoorTier)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_indoor_tier": positionIndoorTier}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_indoor_tier": positionIndoorTier}))
 }

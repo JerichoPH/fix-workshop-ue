@@ -188,7 +188,7 @@ func (OrganizationWorkAreaController) S(ctx *gin.Context) {
 		First(&organizationWorkArea)
 	wrongs.PanicWhenIsEmpty(ret, "工区")
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"organization_work_area": organizationWorkArea}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_work_area": organizationWorkArea}))
 }
 
 // I 列表
@@ -200,5 +200,5 @@ func (OrganizationWorkAreaController) I(ctx *gin.Context) {
 		PrepareUseQueryByDefault(ctx).
 		Find(&organizationWorkAreas)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"organization_work_areas": organizationWorkAreas}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_work_areas": organizationWorkAreas}))
 }

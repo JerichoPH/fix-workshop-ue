@@ -170,7 +170,7 @@ func (KindEntireTypeController) S(ctx *gin.Context) {
 		First(&kindEntireType)
 	wrongs.PanicWhenIsEmpty(ret, "类型")
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"kind_entire_type": kindEntireType}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"kind_entire_type": kindEntireType}))
 }
 
 // I 列表
@@ -178,8 +178,8 @@ func (KindEntireTypeController) I(ctx *gin.Context) {
 	var kindEntireTypes []models.KindEntireTypeModel
 	models.BootByModel(models.KindEntireTypeModel{}).
 		SetWhereFields().
-		PrepareQuery(ctx, "").
+		PrepareUseQuery(ctx, "").
 		Find(&kindEntireTypes)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"kind_entire_types": kindEntireTypes}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"kind_entire_types": kindEntireTypes}))
 }

@@ -257,7 +257,7 @@ func (LocationStationController) S(ctx *gin.Context) {
 		First(&locationStation)
 	wrongs.PanicWhenIsEmpty(ret, "站场")
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"location_station": locationStation}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_station": locationStation}))
 }
 
 // I 列表
@@ -269,5 +269,5 @@ func (LocationStationController) I(ctx *gin.Context) {
 		PrepareUseQueryByDefault(ctx).
 		Find(&locationStations)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"location_stations": locationStations}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_stations": locationStations}))
 }

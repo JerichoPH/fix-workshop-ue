@@ -168,14 +168,14 @@ func (PositionDepotRowController) S(ctx *gin.Context) {
 		First(&locationDepotRow)
 	wrongs.PanicWhenIsEmpty(ret, "仓库排")
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_depot_row": locationDepotRow}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_depot_row": locationDepotRow}))
 }
 func (PositionDepotRowController) I(ctx *gin.Context) {
 	var locationDepotRows []models.PositionDepotRowModel
 	models.BootByModel(models.PositionDepotRowModel{}).
 		SetWhereFields().
-		PrepareQuery(ctx, "").
+		PrepareUseQuery(ctx, "").
 		Find(&locationDepotRows)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_depot_rows": locationDepotRows}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_depot_rows": locationDepotRows}))
 }

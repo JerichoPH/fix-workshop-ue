@@ -172,7 +172,7 @@ func (KindSubTypeController) S(ctx *gin.Context) {
 		First(&kindSubType)
 	wrongs.PanicWhenIsEmpty(ret, "型号")
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"kind_sub_type": kindSubType}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"kind_sub_type": kindSubType}))
 }
 
 // I 列表
@@ -180,8 +180,8 @@ func (KindSubTypeController) I(ctx *gin.Context) {
 	var kindSubTypes []models.KindSubTypeModel
 	models.BootByModel(models.KindSubTypeModel{}).
 		SetWhereFields().
-		PrepareQuery(ctx, "").
+		PrepareUseQuery(ctx, "").
 		Find(&kindSubTypes)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"kind_sub_types": kindSubTypes}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"kind_sub_types": kindSubTypes}))
 }

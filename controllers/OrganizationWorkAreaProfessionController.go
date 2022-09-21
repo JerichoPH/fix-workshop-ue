@@ -151,7 +151,7 @@ func (OrganizationWorkAreaProfessionController) S(ctx *gin.Context) {
 		First(&organizationWorkAreaProfession)
 	wrongs.PanicWhenIsEmpty(ret, "工区专业")
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"organization_work_area_profession": organizationWorkAreaProfession}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_work_area_profession": organizationWorkAreaProfession}))
 }
 func (OrganizationWorkAreaProfessionController) I(ctx *gin.Context) {
 	var organizationWorkAreaProfessions []models.OrganizationWorkAreaProfessionModel
@@ -160,5 +160,5 @@ func (OrganizationWorkAreaProfessionController) I(ctx *gin.Context) {
 		PrepareUseQueryByDefault(ctx).
 		Find(&organizationWorkAreaProfessions)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"organization_work_area_professions": organizationWorkAreaProfessions}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_work_area_professions": organizationWorkAreaProfessions}))
 }

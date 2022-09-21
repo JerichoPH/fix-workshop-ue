@@ -156,7 +156,7 @@ func (PositionIndoorRowController) S(ctx *gin.Context) {
 		First(&positionIndoorRow)
 	wrongs.PanicWhenIsEmpty(ret, "排")
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_indoor_row": positionIndoorRow}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_indoor_row": positionIndoorRow}))
 }
 func (PositionIndoorRowController) I(ctx *gin.Context) {
 	var positionIndoorRows []models.PositionIndoorRowModel
@@ -165,5 +165,5 @@ func (PositionIndoorRowController) I(ctx *gin.Context) {
 		PrepareUseQueryByDefault(ctx).
 		Find(&positionIndoorRows)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_indoor_rows": positionIndoorRows}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_indoor_rows": positionIndoorRows}))
 }

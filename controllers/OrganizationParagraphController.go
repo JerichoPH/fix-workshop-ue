@@ -180,7 +180,7 @@ func (OrganizationParagraphController) S(ctx *gin.Context) {
 		First(&organizationParagraph)
 	wrongs.PanicWhenIsEmpty(ret, "站段")
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"organization_paragraph": organizationParagraph}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_paragraph": organizationParagraph}))
 }
 
 // I 列表
@@ -192,5 +192,5 @@ func (OrganizationParagraphController) I(ctx *gin.Context) {
 		PrepareUseQueryByDefault(ctx).
 		Find(&organizationParagraphs)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"organization_paragraphs": organizationParagraphs}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_paragraphs": organizationParagraphs}))
 }

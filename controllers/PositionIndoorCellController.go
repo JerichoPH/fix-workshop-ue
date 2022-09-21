@@ -156,14 +156,14 @@ func (PositionIndoorCellController) S(ctx *gin.Context) {
 		First(&positionIndoorCell)
 	wrongs.PanicWhenIsEmpty(ret, "机柜格位")
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_indoor_cell": positionIndoorCell}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_indoor_cell": positionIndoorCell}))
 }
 func (PositionIndoorCellController) I(ctx *gin.Context) {
 	var positionIndoorCells []models.PositionIndoorCellModel
 	models.BootByModel(models.PositionIndoorCellModel{}).
 		SetWhereFields().
-		PrepareQuery(ctx,"").
+		PrepareUseQuery(ctx,"").
 		Find(&positionIndoorCells)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_indoor_cells": positionIndoorCells}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_indoor_cells": positionIndoorCells}))
 }

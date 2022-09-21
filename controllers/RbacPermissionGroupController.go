@@ -128,14 +128,14 @@ func (RbacPermissionGroupController) S(ctx *gin.Context) {
 		First(&rbacPermissionGroup)
 	wrongs.PanicWhenIsEmpty(ret, "权限分组")
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"rbac_permission_group": rbacPermissionGroup}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"rbac_permission_group": rbacPermissionGroup}))
 }
 func (RbacPermissionGroupController) I(ctx *gin.Context) {
 	var rbacPermissionGroups []models.RbacPermissionGroupModel
 	models.BootByModel(models.RbacPermissionGroupModel{}).
 		SetPreloads("RbacPermissions").
-		PrepareQuery(ctx, "").
+		PrepareUseQuery(ctx, "").
 		Find(&rbacPermissionGroups)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"rbac_permission_groups": rbacPermissionGroups}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"rbac_permission_groups": rbacPermissionGroups}))
 }

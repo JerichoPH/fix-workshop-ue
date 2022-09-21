@@ -173,7 +173,7 @@ func (OrganizationWorkshopController) S(ctx *gin.Context) {
 		First(&organizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "车间")
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"organization_workshop": organizationWorkshop}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_workshop": organizationWorkshop}))
 }
 func (OrganizationWorkshopController) I(ctx *gin.Context) {
 	var (
@@ -183,7 +183,7 @@ func (OrganizationWorkshopController) I(ctx *gin.Context) {
 
 	dbSession = models.BootByModel(models.OrganizationWorkshopModel{}).
 		SetWhereFields("unique_code", "name", "be_enable", "organization_workshop_type_uuid", "organization_paragraph_uuid").
-		PrepareQuery(ctx, "")
+		PrepareUseQuery(ctx, "")
 
 	organizationWorkshopTypeUniqueCodes, exists := ctx.GetQueryArray("organization_workshop_type_unique_codes")
 	if exists {
@@ -193,5 +193,5 @@ func (OrganizationWorkshopController) I(ctx *gin.Context) {
 
 	dbSession.Find(&organizationWorkshops)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"organization_workshops": organizationWorkshops}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_workshops": organizationWorkshops}))
 }

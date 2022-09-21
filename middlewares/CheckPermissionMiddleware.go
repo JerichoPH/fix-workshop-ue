@@ -16,7 +16,7 @@ func CheckPermission() gin.HandlerFunc {
 		// 获取上下文中的用户
 		currentAccountUUID, exists := ctx.Get("__ACCOUNT__")
 		if !exists {
-			panic(wrongs.PanicUnLogin("未登录"))
+			wrongs.PanicUnLogin("未登录")
 		}
 
 		cfg := (&settings.Setting{}).Init()

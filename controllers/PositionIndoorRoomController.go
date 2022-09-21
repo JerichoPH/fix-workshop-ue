@@ -188,14 +188,14 @@ func (PositionIndoorRoomController) S(ctx *gin.Context) {
 		First(&positionIndoorRoom)
 	wrongs.PanicWhenIsEmpty(ret, "机房")
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_indoor_room": positionIndoorRoom}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_indoor_room": positionIndoorRoom}))
 }
 func (PositionIndoorRoomController) I(ctx *gin.Context) {
 	var positionIndoorRooms []models.PositionIndoorRoomModel
 	models.BootByModel(models.PositionIndoorRoomModel{}).
 		SetWhereFields().
-		PrepareQuery(ctx, "").
+		PrepareUseQuery(ctx, "").
 		Find(&positionIndoorRooms)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_indoor_rooms": positionIndoorRooms}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_indoor_rooms": positionIndoorRooms}))
 }

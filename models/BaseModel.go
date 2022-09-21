@@ -43,6 +43,18 @@ func Boot() *BaseModel {
 	return new(BaseModel)
 }
 
+// Pagination 分页器
+func Pagination(dbSession *gorm.DB, ctx *gin.Context) *gorm.DB {
+	if pageStr, ok := ctx.GetQuery("__page__"); ok {
+		limitStr := ctx.DefaultQuery("__limit__", "50")
+		limit, _ := strconv.Atoi(limitStr)
+		page, _ := strconv.Atoi(pageStr)
+		dbSession.Offset((page - 1) * limit).Limit(limit)
+	}
+
+	return dbSession
+}
+
 // demoFindOne 获取单条数据演示
 //  @receiver cls
 func (cls *BaseModel) demoFindOne() {
@@ -64,7 +76,7 @@ func (cls *BaseModel) demoFind() {
 	cls.
 		SetModel(BaseModel{}).
 		SetWhereFields("a", "b", "c").
-		PrepareQuery(ctx, "").
+		PrepareUseQuery(ctx, "").
 		Find(&b)
 }
 
@@ -224,8 +236,6 @@ func (cls *BaseModel) Prepare(dbDriver string) (dbSession *gorm.DB) {
 		for _, v := range cls.preloads {
 			dbSession = dbSession.Preload(v)
 		}
-		//} else {
-		//	dbSession = dbSession.Preload(clause.Associations)
 	}
 
 	// 拼接selects字段
@@ -241,12 +251,12 @@ func (cls *BaseModel) Prepare(dbDriver string) (dbSession *gorm.DB) {
 	return dbSession
 }
 
-// PrepareQuery 根据Query参数初始化
+// PrepareUseQuery 根据Query参数初始化
 //  @receiver cls
 //  @param ctx
 //  @param dbDriver
 //  @return *gorm.DB
-func (cls *BaseModel) PrepareQuery(ctx *gin.Context, dbDriver string) *gorm.DB {
+func (cls *BaseModel) PrepareUseQuery(ctx *gin.Context, dbDriver string) *gorm.DB {
 	dbSession := cls.Prepare(dbDriver)
 
 	wheres := make(map[string]interface{})
@@ -286,14 +296,6 @@ func (cls *BaseModel) PrepareQuery(ctx *gin.Context, dbDriver string) *gorm.DB {
 		dbSession.Order("id asc, sort asc")
 	}
 
-	// 分页
-	limitStr := ctx.DefaultQuery("__limit__", "50")
-	limit,_ := strconv.Atoi(limitStr)
-	pageStr := ctx.DefaultQuery("__page__", "1")
-	page,_ := strconv.Atoi(pageStr)
-	dbSession.Offset((page - 1) * limit)
-	dbSession.Limit(limit)
-
 	return dbSession
 }
 
@@ -309,7 +311,7 @@ func (cls *BaseModel) PrepareByDefault() (dbSession *gorm.DB) {
 //  @param ctx
 //  @return dbSession
 func (cls *BaseModel) PrepareUseQueryByDefault(ctx *gin.Context) (dbSession *gorm.DB) {
-	return cls.PrepareQuery(ctx, "")
+	return cls.PrepareUseQuery(ctx, "")
 }
 
 // BaseOption 基础查询条件

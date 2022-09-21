@@ -156,14 +156,14 @@ func (PositionDepotTierController) S(ctx *gin.Context) {
 		First(&positionDepotTier)
 	wrongs.PanicWhenIsEmpty(ret, "仓库柜架层")
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_depot_tier": positionDepotTier}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_depot_tier": positionDepotTier}))
 }
 func (PositionDepotTierController) I(ctx *gin.Context) {
 	var positionDepotTiers []models.PositionDepotTierModel
 	models.BootByModel(models.PositionDepotTierModel{}).
 		SetWhereFields().
-		PrepareQuery(ctx,"").
+		PrepareUseQuery(ctx,"").
 		Find(&positionDepotTiers)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_depot_tiers": positionDepotTiers}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_depot_tiers": positionDepotTiers}))
 }

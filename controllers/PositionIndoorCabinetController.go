@@ -155,14 +155,14 @@ func (PositionIndoorCabinetController) S(ctx *gin.Context) {
 		First(&positionIndoorCabinet)
 	wrongs.PanicWhenIsEmpty(ret, "柜架")
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_indoor_cabinet": positionIndoorCabinet}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_indoor_cabinet": positionIndoorCabinet}))
 }
 func (PositionIndoorCabinetController) I(ctx *gin.Context) {
 	var positionIndoorCabinet []models.PositionIndoorCabinetModel
 	models.BootByModel(models.PositionIndoorCabinetModel{}).
 		SetWhereFields().
-		PrepareQuery(ctx, "").
+		PrepareUseQuery(ctx, "").
 		Find(&positionIndoorCabinet)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"position_indoor_cabinet": positionIndoorCabinet}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_indoor_cabinet": positionIndoorCabinet}))
 }

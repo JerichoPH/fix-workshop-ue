@@ -251,7 +251,7 @@ func (LocationCenterController) S(ctx *gin.Context) {
 		First(&locationCenter)
 	wrongs.PanicWhenIsEmpty(ret, "中心")
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"location_center": locationCenter}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_center": locationCenter}))
 }
 
 // I 列表
@@ -263,5 +263,5 @@ func (LocationCenterController) I(ctx *gin.Context) {
 		PrepareUseQueryByDefault(ctx).
 		Find(&locationCenters)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"location_centers": locationCenters}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_centers": locationCenters}))
 }

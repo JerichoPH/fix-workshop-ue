@@ -306,7 +306,7 @@ func (AccountController) S(ctx *gin.Context) {
 		First(&account)
 	wrongs.PanicWhenIsEmpty(ret, "用户")
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"account": account}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"account": account}))
 }
 
 // I 列表
@@ -316,5 +316,5 @@ func (AccountController) I(ctx *gin.Context) {
 		PrepareUseQueryByDefault(ctx).
 		Find(&accounts)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"accounts": accounts}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"accounts": accounts}))
 }

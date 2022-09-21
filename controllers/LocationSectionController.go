@@ -247,7 +247,7 @@ func (LocationSectionController) S(ctx *gin.Context) {
 		First(&organizationSection)
 	wrongs.PanicWhenIsEmpty(ret, "区间")
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"location_section": organizationSection}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_section": organizationSection}))
 }
 
 func (LocationSectionController) I(ctx *gin.Context) {
@@ -258,5 +258,5 @@ func (LocationSectionController) I(ctx *gin.Context) {
 		PrepareUseQueryByDefault(ctx).
 		Find(&locationSections)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"location_sections": locationSections}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_sections": locationSections}))
 }

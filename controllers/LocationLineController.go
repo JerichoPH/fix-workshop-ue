@@ -251,11 +251,11 @@ func (LocationLineController) S(ctx *gin.Context) {
 	ret = models.BootByModel(models.LocationLineModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 		SetWhereFields("be_enable").
-		PrepareQuery(ctx, "").
+		PrepareUseQuery(ctx, "").
 		First(&organizationLine)
 	wrongs.PanicWhenIsEmpty(ret, "线别")
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"location_line": organizationLine}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_line": organizationLine}))
 }
 
 // I 列表
@@ -263,8 +263,8 @@ func (LocationLineController) I(ctx *gin.Context) {
 	var organizationLines []models.LocationLineModel
 	models.BootByModel(models.LocationLineModel{}).
 		SetWhereFields("unique_code", "name", "be_enable", "sort").
-		PrepareQuery(ctx, "").
+		PrepareUseQuery(ctx, "").
 		Find(&organizationLines)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"location_lines": organizationLines}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_lines": organizationLines}))
 }

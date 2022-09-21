@@ -188,6 +188,8 @@ func (RbacPermissionController) U(ctx *gin.Context) {
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"rbac_permission": rbacPermission}))
 }
+
+// S 详情
 func (RbacPermissionController) S(ctx *gin.Context) {
 	var (
 		ret            *gorm.DB
@@ -201,15 +203,27 @@ func (RbacPermissionController) S(ctx *gin.Context) {
 		First(&rbacPermission)
 	wrongs.PanicWhenIsEmpty(ret, "权限")
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"rbac_permission": rbacPermission}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"rbac_permission": rbacPermission}))
 }
+
+// I 列表
 func (RbacPermissionController) I(ctx *gin.Context) {
-	var rbacPermissions []models.RbacPermissionModel
-	models.BootByModel(models.RbacPermissionModel{}).
+	var (
+		rbacPermissions []models.RbacPermissionModel
+		count           int64
+		db              *gorm.DB
+	)
+	db = models.BootByModel(models.RbacPermissionModel{}).
 		SetPreloads("RbacPermissionGroup").
 		SetWhereFields("name", "uri", "method", "rbac_permission_group_uuid").
-		PrepareQuery(ctx, "").
-		Find(&rbacPermissions)
+		PrepareUseQueryByDefault(ctx)
 
-	ctx.JSON(tools.CorrectBootByDefault().OK(tools.Map{"rbac_permissions": rbacPermissions}))
+	if ctx.Query("__page__") == "" {
+		db.Find(&rbacPermissions)
+		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"rbac_permissions": rbacPermissions}))
+	} else {
+		db.Count(&count)
+		models.Pagination(db, ctx).Find(&rbacPermissions)
+		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"rbac_permissions": rbacPermissions}, ctx.Query("__page__"), count))
+	}
 }
