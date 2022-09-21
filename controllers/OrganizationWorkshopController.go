@@ -47,12 +47,12 @@ func (cls OrganizationWorkshopStoreForm) ShouldBind(ctx *gin.Context) Organizati
 	if cls.OrganizationWorkshopTypeUuid == "" {
 		wrongs.PanicValidate("所属车间类型必选")
 	}
-	ret = models.BootByModel(models.OrganizationWorkshopTypeModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopTypeUuid}).PrepareByDefault().First(&cls.OrganizationWorkshopType)
+	ret = models.BootByModel(models.OrganizationWorkshopTypeModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopTypeUuid}).PrepareByDefaultDbDriver().First(&cls.OrganizationWorkshopType)
 	wrongs.PanicWhenIsEmpty(ret, "所属车间类型")
 	if cls.OrganizationParagraphUuid == "" {
 		wrongs.PanicValidate("所属站段必选")
 	}
-	ret = models.BootByModel(models.OrganizationParagraphModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationParagraphUuid}).SetPreloads("OrganizationRailway").PrepareByDefault().First(&cls.OrganizationParagraph)
+	ret = models.BootByModel(models.OrganizationParagraphModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationParagraphUuid}).SetPreloads("OrganizationRailway").PrepareByDefaultDbDriver().First(&cls.OrganizationParagraph)
 	wrongs.PanicWhenIsEmpty(ret, "站段")
 
 	return cls
@@ -71,12 +71,12 @@ func (OrganizationWorkshopController) C(ctx *gin.Context) {
 	// 查重
 	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
 		SetWheres(tools.Map{"unique_code": form.OrganizationParagraph.UniqueCode + form.UniqueCode}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "车间代码")
 	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "车间名称")
 
@@ -88,7 +88,7 @@ func (OrganizationWorkshopController) C(ctx *gin.Context) {
 		OrganizationWorkshopType: form.OrganizationWorkshopType,
 		OrganizationParagraph:    form.OrganizationParagraph,
 	}
-	if ret = models.BootByModel(models.OrganizationWorkshopModel{}).PrepareByDefault().Create(&organizationWorkshop); ret.Error != nil {
+	if ret = models.BootByModel(models.OrganizationWorkshopModel{}).PrepareByDefaultDbDriver().Create(&organizationWorkshop); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
@@ -105,12 +105,12 @@ func (OrganizationWorkshopController) D(ctx *gin.Context) {
 	// 查询
 	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&organizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "车间")
 
 	// 删除
-	if ret = models.BootByModel(models.OrganizationWorkshopModel{}).PrepareByDefault().Delete(&organizationWorkshop); ret.Error != nil {
+	if ret = models.BootByModel(models.OrganizationWorkshopModel{}).PrepareByDefaultDbDriver().Delete(&organizationWorkshop); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
@@ -132,20 +132,20 @@ func (OrganizationWorkshopController) U(ctx *gin.Context) {
 	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "车间代码")
 	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "车间名称")
 
 	// 查询
 	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&organizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "车间")
 
@@ -154,12 +154,14 @@ func (OrganizationWorkshopController) U(ctx *gin.Context) {
 	organizationWorkshop.BeEnable = form.BeEnable
 	organizationWorkshop.OrganizationWorkshopType = form.OrganizationWorkshopType
 	organizationWorkshop.OrganizationParagraph = form.OrganizationParagraph
-	if ret = models.BootByModel(models.OrganizationWorkshopModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&organizationWorkshop); ret.Error != nil {
+	if ret = models.BootByModel(models.OrganizationWorkshopModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefaultDbDriver().Save(&organizationWorkshop); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"organization_workshop": organizationWorkshop}))
 }
+
+// S 详情
 func (OrganizationWorkshopController) S(ctx *gin.Context) {
 	var (
 		ret                  *gorm.DB
@@ -169,29 +171,46 @@ func (OrganizationWorkshopController) S(ctx *gin.Context) {
 	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 		SetWhereFields("be_enable").
-		PrepareUseQueryByDefault(ctx).
+		PrepareUseQueryByDefaultDbDriver(ctx).
 		First(&organizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "车间")
 
 	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_workshop": organizationWorkshop}))
 }
+
+// I 列表
 func (OrganizationWorkshopController) I(ctx *gin.Context) {
 	var (
 		organizationWorkshops []models.OrganizationWorkshopModel
-		dbSession             *gorm.DB
+		count                 int64
+		db                    *gorm.DB
 	)
-
-	dbSession = models.BootByModel(models.OrganizationWorkshopModel{}).
+	db = models.BootByModel(models.OrganizationWorkshopModel{}).
 		SetWhereFields("unique_code", "name", "be_enable", "organization_workshop_type_uuid", "organization_paragraph_uuid").
-		PrepareUseQuery(ctx, "")
+		SetExtraWheres(map[string]func(string, *gorm.DB) *gorm.DB{
+			"organization_workshop_type_unique_codes": func(fieldName string, dbSession *gorm.DB) *gorm.DB {
+				organizationWorkshopTypeUniqueCodes, exists := ctx.GetQueryArray(fieldName)
+				if exists {
+					dbSession.Joins("join organization_workshop_types owt on organization_workshops.organization_workshop_type_uuid = owt.uuid").
+						Where("owt.unique_code in ?", organizationWorkshopTypeUniqueCodes)
 
-	organizationWorkshopTypeUniqueCodes, exists := ctx.GetQueryArray("organization_workshop_type_unique_codes")
-	if exists {
-		dbSession = dbSession.Joins("join organization_workshop_types owt on organization_workshops.organization_workshop_type_uuid = owt.uuid").
-			Where("owt.unique_code in ?", organizationWorkshopTypeUniqueCodes)
+				}
+				return dbSession
+			},
+		}).
+		PrepareUseQueryByDefaultDbDriver(ctx)
+	//organizationWorkshopTypeUniqueCodes, exists := ctx.GetQueryArray("organization_workshop_type_unique_codes")
+	//if exists {
+	//	db = db.Joins("join organization_workshop_types owt on organization_workshops.organization_workshop_type_uuid = owt.uuid").
+	//		Where("owt.unique_code in ?", organizationWorkshopTypeUniqueCodes)
+	//}
+
+	if ctx.Query("__page__") == "" {
+		db.Find(&organizationWorkshops)
+		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_workshops": organizationWorkshops}))
+	} else {
+		db.Count(&count)
+		models.Pagination(db, ctx).Find(&organizationWorkshops)
+		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"organization_workshops": organizationWorkshops}, ctx.Query("__page__"), count))
 	}
-
-	dbSession.Find(&organizationWorkshops)
-
-	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_workshops": organizationWorkshops}))
 }

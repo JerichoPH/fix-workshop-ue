@@ -38,7 +38,7 @@ func (cls MenuStoreForm) ShouldBind(ctx *gin.Context) MenuStoreForm {
 		wrongs.PanicValidate("菜单名称不能超过64位")
 	}
 	if len(cls.RbacRoleUuids) > 0 {
-		models.BootByModel(models.RbacRoleModel{}).PrepareByDefault().Where("uuid in ?", cls.RbacRoleUuids).Find(&cls.RbacRoles)
+		models.BootByModel(models.RbacRoleModel{}).PrepareByDefaultDbDriver().Where("uuid in ?", cls.RbacRoleUuids).Find(&cls.RbacRoles)
 	}
 
 	return cls
@@ -56,7 +56,7 @@ func (MenuController) C(ctx *gin.Context) {
 	ret = (&models.BaseModel{}).
 		SetModel(models.MenuModel{}).
 		SetWheres(tools.Map{"name": form.Name, "url": form.URL}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "菜单名称和URL")
 
@@ -70,7 +70,7 @@ func (MenuController) C(ctx *gin.Context) {
 		ParentUuid: form.ParentUUID,
 		RbacRoles:  form.RbacRoles,
 	}
-	if ret = (&models.BaseModel{}).SetModel(models.MenuModel{}).PrepareByDefault().Create(&menu); ret.Error != nil {
+	if ret = (&models.BaseModel{}).SetModel(models.MenuModel{}).PrepareByDefaultDbDriver().Create(&menu); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
@@ -85,7 +85,7 @@ func (MenuController) D(ctx *gin.Context) {
 	menu := (&models.MenuModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 	// 删除
-	if ret = models.BootByModel(models.MenuModel{}).PrepareByDefault().Delete(&menu); ret.Error != nil {
+	if ret = models.BootByModel(models.MenuModel{}).PrepareByDefaultDbDriver().Delete(&menu); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
@@ -105,7 +105,7 @@ func (MenuController) U(ctx *gin.Context) {
 		SetModel(models.MenuModel{}).
 		SetWheres(tools.Map{"name": form.Name, "url": form.URL}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "菜单名称和URL")
 
@@ -119,7 +119,7 @@ func (MenuController) U(ctx *gin.Context) {
 	menu.Icon = form.Icon
 	menu.ParentUuid = form.ParentUUID
 	menu.RbacRoles = form.RbacRoles
-	if ret = models.BootByModel(models.MenuModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&menu); ret.Error != nil {
+	if ret = models.BootByModel(models.MenuModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefaultDbDriver().Save(&menu); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
@@ -134,12 +134,22 @@ func (MenuController) S(ctx *gin.Context) {
 
 // I 列表
 func (MenuController) I(ctx *gin.Context) {
-	var menus []models.MenuModel
-	models.BootByModel(models.MenuModel{}).
+	var (
+		menus []models.MenuModel
+		count           int64
+		db              *gorm.DB
+	)
+	db = models.BootByModel(models.MenuModel{}).
 		SetWhereFields("uuid", "name", "url", "parent_uuid").
 		SetPreloads("Parent", "Subs", "RbacRoles").
-		PrepareUseQueryByDefault(ctx).
-		Find(&menus)
+		PrepareUseQueryByDefaultDbDriver(ctx)
 
-	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"menus": menus}))
+	if ctx.Query("__page__") == "" {
+		db.Find(&menus)
+		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"menus": menus}))
+	} else {
+		db.Count(&count)
+		models.Pagination(db, ctx).Find(&menus)
+		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"menus": menus}, ctx.Query("__page__"), count))
+	}
 }

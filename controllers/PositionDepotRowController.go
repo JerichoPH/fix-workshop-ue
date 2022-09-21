@@ -46,7 +46,7 @@ func (cls PositionDepotRowStoreForm) ShouldBind(ctx *gin.Context) PositionDepotR
 	}
 	models.BootByModel(models.PositionDepotRowTypeModel{}).
 		SetWheres(tools.Map{"uuid": cls.PositionDepotRowTypeUuid}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&cls.PositionDepotRowType)
 	wrongs.PanicWhenIsEmpty(ret, "所属仓库排类型")
 	if cls.PositionDepotSectionUuid == "" {
@@ -54,13 +54,14 @@ func (cls PositionDepotRowStoreForm) ShouldBind(ctx *gin.Context) PositionDepotR
 	}
 	ret = models.BootByModel(models.PositionDepotSectionModel{}).
 		SetWheres(tools.Map{"uuid": cls.PositionDepotSectionUuid}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&cls.PositionDepotSection)
 	wrongs.PanicWhenIsEmpty(ret, "所属仓库区域")
 
 	return cls
 }
 
+// C 新建
 func (PositionDepotRowController) C(ctx *gin.Context) {
 	var (
 		ret    *gorm.DB
@@ -73,12 +74,12 @@ func (PositionDepotRowController) C(ctx *gin.Context) {
 	// 查重
 	ret = models.BootByModel(models.PositionDepotRowModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "仓库排代码")
 	ret = models.BootByModel(models.PositionDepotRowModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "仓库排名称")
 
@@ -90,12 +91,14 @@ func (PositionDepotRowController) C(ctx *gin.Context) {
 		PositionDepotRowType: form.PositionDepotRowType,
 		PositionDepotSection: form.PositionDepotSection,
 	}
-	if ret = models.BootByModel(models.PositionDepotRowModel{}).PrepareByDefault().Create(&positionDepotRow); ret.Error != nil {
+	if ret = models.BootByModel(models.PositionDepotRowModel{}).PrepareByDefaultDbDriver().Create(&positionDepotRow); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"position_depot_row": positionDepotRow}))
 }
+
+// D 删除
 func (PositionDepotRowController) D(ctx *gin.Context) {
 	var (
 		ret              *gorm.DB
@@ -105,17 +108,19 @@ func (PositionDepotRowController) D(ctx *gin.Context) {
 	// 查询
 	ret = models.BootByModel(models.PositionDepotRowModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&positionDepotRow)
 	wrongs.PanicWhenIsEmpty(ret, "仓库排")
 
 	// 删除
-	if ret := models.BootByModel(models.PositionDepotRowModel{}).PrepareByDefault().Delete(&positionDepotRow); ret.Error != nil {
+	if ret := models.BootByModel(models.PositionDepotRowModel{}).PrepareByDefaultDbDriver().Delete(&positionDepotRow); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
+
+// U 编辑
 func (PositionDepotRowController) U(ctx *gin.Context) {
 	var (
 		ret                      *gorm.DB
@@ -129,20 +134,20 @@ func (PositionDepotRowController) U(ctx *gin.Context) {
 	ret = models.BootByModel(models.PositionDepotRowModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "仓库排代码")
 	ret = models.BootByModel(models.PositionDepotRowModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "仓库排名称")
 
 	// 查询
 	ret = models.BootByModel(models.PositionDepotRowModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&positionDepotRow)
 	wrongs.PanicWhenIsEmpty(ret, "仓库排")
 
@@ -151,12 +156,14 @@ func (PositionDepotRowController) U(ctx *gin.Context) {
 	positionDepotRow.Name = form.Name
 	positionDepotRow.PositionDepotRowType = form.PositionDepotRowType
 	positionDepotRow.PositionDepotSection = form.PositionDepotSection
-	if ret = models.BootByModel(models.PositionDepotRowModel{}).SetWheres(tools.Map{"uuid":ctx.Param("uuid")}).PrepareByDefault().Save(&positionDepotRow); ret.Error != nil {
+	if ret = models.BootByModel(models.PositionDepotRowModel{}).SetWheres(tools.Map{"uuid":ctx.Param("uuid")}).PrepareByDefaultDbDriver().Save(&positionDepotRow); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"position_depot_row": positionDepotRow}))
 }
+
+// S 详情
 func (PositionDepotRowController) S(ctx *gin.Context) {
 	var (
 		ret              *gorm.DB
@@ -164,18 +171,31 @@ func (PositionDepotRowController) S(ctx *gin.Context) {
 	)
 	ret = models.BootByModel(models.PositionDepotRowModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&locationDepotRow)
 	wrongs.PanicWhenIsEmpty(ret, "仓库排")
 
 	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_depot_row": locationDepotRow}))
 }
-func (PositionDepotRowController) I(ctx *gin.Context) {
-	var locationDepotRows []models.PositionDepotRowModel
-	models.BootByModel(models.PositionDepotRowModel{}).
-		SetWhereFields().
-		PrepareUseQuery(ctx, "").
-		Find(&locationDepotRows)
 
-	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_depot_rows": locationDepotRows}))
+// I 列表
+func (PositionDepotRowController) I(ctx *gin.Context) {
+	var (
+		locationDepotRows []models.PositionDepotRowModel
+		count           int64
+		db              *gorm.DB
+	)
+	db = models.BootByModel(models.PositionDepotRowModel{}).
+		SetPreloads("RbacPermissionGroup").
+		SetWhereFields("name", "uri", "method", "rbac_permission_group_uuid").
+		PrepareUseQueryByDefaultDbDriver(ctx)
+
+	if ctx.Query("__page__") == "" {
+		db.Find(&locationDepotRows)
+		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_depot_rows": locationDepotRows}))
+	} else {
+		db.Count(&count)
+		models.Pagination(db, ctx).Find(&locationDepotRows)
+		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"location_depot_rows": locationDepotRows}, ctx.Query("__page__"), count))
+	}
 }

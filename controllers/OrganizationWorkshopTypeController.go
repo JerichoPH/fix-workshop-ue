@@ -43,6 +43,7 @@ func (cls OrganizationWorkshopTypeStoreForm) ShouldBind(ctx *gin.Context) Organi
 	return cls
 }
 
+// C 新建
 func (OrganizationWorkshopTypeController) C(ctx *gin.Context) {
 	var ret *gorm.DB
 
@@ -52,12 +53,12 @@ func (OrganizationWorkshopTypeController) C(ctx *gin.Context) {
 	// 查重
 	ret = models.BootByModel(models.OrganizationWorkshopTypeModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&models.OrganizationWorkAreaTypeModel{})
 	wrongs.PanicWhenIsRepeat(ret, "车间类型代码")
 	ret = models.BootByModel(models.OrganizationWorkshopTypeModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&models.OrganizationWorkshopTypeModel{})
 	wrongs.PanicWhenIsRepeat(ret, "车间类型名称")
 
@@ -68,12 +69,14 @@ func (OrganizationWorkshopTypeController) C(ctx *gin.Context) {
 		Name:       form.Name,
 		NumberCode: form.Number,
 	}
-	if ret = models.BootByModel(models.OrganizationWorkshopTypeModel{}).PrepareByDefault().Create(&organizationWorkshopType); ret.Error != nil {
+	if ret = models.BootByModel(models.OrganizationWorkshopTypeModel{}).PrepareByDefaultDbDriver().Create(&organizationWorkshopType); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"organization_workshop_type": organizationWorkshopType}))
 }
+
+// D 删除
 func (OrganizationWorkshopTypeController) D(ctx *gin.Context) {
 	var ret *gorm.DB
 
@@ -81,12 +84,14 @@ func (OrganizationWorkshopTypeController) D(ctx *gin.Context) {
 	organizationWorkshopType := (&models.OrganizationWorkshopTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 	// 删除
-	if ret = models.BootByModel(models.OrganizationWorkshopTypeModel{}).PrepareByDefault().Delete(&organizationWorkshopType); ret.Error != nil {
+	if ret = models.BootByModel(models.OrganizationWorkshopTypeModel{}).PrepareByDefaultDbDriver().Delete(&organizationWorkshopType); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
+
+// U 编辑
 func (OrganizationWorkshopTypeController) U(ctx *gin.Context) {
 	var ret *gorm.DB
 
@@ -97,13 +102,13 @@ func (OrganizationWorkshopTypeController) U(ctx *gin.Context) {
 	ret = models.BootByModel(models.OrganizationWorkshopTypeModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&models.OrganizationWorkAreaTypeModel{})
 	wrongs.PanicWhenIsRepeat(ret, "车间类型代码")
 	ret = models.BootByModel(models.OrganizationWorkshopTypeModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&models.OrganizationWorkshopTypeModel{})
 	wrongs.PanicWhenIsRepeat(ret, "车间类型名称")
 
@@ -115,21 +120,35 @@ func (OrganizationWorkshopTypeController) U(ctx *gin.Context) {
 	organizationWorkshopType.UniqueCode = form.UniqueCode
 	organizationWorkshopType.Name = form.Name
 	organizationWorkshopType.NumberCode = form.Number
-	models.BootByModel(models.OrganizationWorkshopTypeModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&organizationWorkshopType)
+	models.BootByModel(models.OrganizationWorkshopTypeModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefaultDbDriver().Save(&organizationWorkshopType)
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"organization_workshop_type": organizationWorkshopType}))
 }
+
+// S 详情
 func (OrganizationWorkshopTypeController) S(ctx *gin.Context) {
 	organizationWorkshopType := (&models.OrganizationWorkshopTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_workshop_type": organizationWorkshopType}))
 }
-func (OrganizationWorkshopTypeController) I(ctx *gin.Context) {
-	var organizationWorkshopTypes []models.OrganizationWorkshopTypeModel
-	models.BootByModel(models.OrganizationWorkshopTypeModel{}).
-		SetWhereFields("sort", "unique_code", "name", "number").
-		PrepareUseQuery(ctx, "").
-		Find(&organizationWorkshopTypes)
 
-	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_workshop_types": organizationWorkshopTypes}))
+// I 列表
+func (OrganizationWorkshopTypeController) I(ctx *gin.Context) {
+	var (
+		organizationWorkshopTypes []models.OrganizationWorkshopTypeModel
+		count           int64
+		db              *gorm.DB
+	)
+	db = models.BootByModel(models.OrganizationWorkshopTypeModel{}).
+		SetWhereFields("sort", "unique_code", "name", "number").
+		PrepareUseQueryByDefaultDbDriver(ctx)
+
+	if ctx.Query("__page__") == "" {
+		db.Find(&organizationWorkshopTypes)
+		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_workshop_types": organizationWorkshopTypes}))
+	} else {
+		db.Count(&count)
+		models.Pagination(db, ctx).Find(&organizationWorkshopTypes)
+		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"organization_workshop_types": organizationWorkshopTypes}, ctx.Query("__page__"), count))
+	}
 }

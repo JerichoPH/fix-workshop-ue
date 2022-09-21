@@ -58,7 +58,7 @@ func (cls RbacRoleBindAccountsForm) ShouldBind(ctx *gin.Context) RbacRoleBindAcc
 
 	if len(cls.AccountUUIDs) > 0 {
 		models.BootByModel(models.AccountModel{}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			Where("uuid in ?", cls.AccountUUIDs).
 			Find(&cls.Accounts)
 	}
@@ -83,7 +83,7 @@ func (cls RbacRoleBindPermissionsForm) ShouldBind(ctx *gin.Context) RbacRoleBind
 
 	if len(cls.RbacPermissionUUIDs) > 0 {
 		models.BootByModel(models.RbacPermissionModel{}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			Where("uuid in ?", cls.RbacPermissionUUIDs).
 			Find(&cls.RbacPermissions)
 	}
@@ -91,6 +91,7 @@ func (cls RbacRoleBindPermissionsForm) ShouldBind(ctx *gin.Context) RbacRoleBind
 	return cls
 }
 
+// C 新建
 func (RbacRoleController) C(ctx *gin.Context) {
 	var (
 		ret    *gorm.DB
@@ -103,7 +104,7 @@ func (RbacRoleController) C(ctx *gin.Context) {
 	// 查重
 	ret = models.BootByModel(models.RbacRoleModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "角色名称")
 
@@ -112,12 +113,14 @@ func (RbacRoleController) C(ctx *gin.Context) {
 		BaseModel: models.BaseModel{Sort: form.Sort, Uuid: uuid.NewV4().String()},
 		Name:      form.Name,
 	}
-	if ret = models.BootByModel(models.RbacRoleModel{}).PrepareByDefault().Create(rbacRole); ret.Error != nil {
+	if ret = models.BootByModel(models.RbacRoleModel{}).PrepareByDefaultDbDriver().Create(rbacRole); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"rbac_role": rbacRole}))
 }
+
+// D 删除
 func (RbacRoleController) D(ctx *gin.Context) {
 	var (
 		ret      *gorm.DB
@@ -126,17 +129,19 @@ func (RbacRoleController) D(ctx *gin.Context) {
 	// 查询
 	ret = models.BootByModel(models.RbacRoleModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&rbacRole)
 	wrongs.PanicWhenIsEmpty(ret, "角色")
 
 	// 删除
-	if ret = models.BootByModel(models.RbacRoleModel{}).PrepareByDefault().Delete(&rbacRole); ret.Error != nil {
+	if ret = models.BootByModel(models.RbacRoleModel{}).PrepareByDefaultDbDriver().Delete(&rbacRole); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
+
+// U 编辑
 func (RbacRoleController) U(ctx *gin.Context) {
 	var (
 		ret              *gorm.DB
@@ -150,23 +155,25 @@ func (RbacRoleController) U(ctx *gin.Context) {
 	ret = models.BootByModel(models.RbacRoleModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "角色名称")
 
 	// 查询
 	ret = models.BootByModel(models.RbacRoleModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&rbacRole)
 	wrongs.PanicWhenIsEmpty(ret, "角色")
 
 	// 修改
 	rbacRole.Name = form.Name
-	models.BootByModel(models.RbacRoleModel{}).PrepareByDefault().Save(&rbacRole)
+	models.BootByModel(models.RbacRoleModel{}).PrepareByDefaultDbDriver().Save(&rbacRole)
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"rbac_role": rbacRole}))
 }
+
+// PutBindAccounts 角色绑定用户
 func (RbacRoleController) PutBindAccounts(ctx *gin.Context) {
 	var (
 		ret      *gorm.DB
@@ -179,7 +186,7 @@ func (RbacRoleController) PutBindAccounts(ctx *gin.Context) {
 	// 查询
 	ret = models.BootByModel(models.RbacRoleModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&rbacRole)
 	wrongs.PanicWhenIsEmpty(ret, "角色")
 
@@ -188,12 +195,14 @@ func (RbacRoleController) PutBindAccounts(ctx *gin.Context) {
 
 	// 绑定
 	rbacRole.Accounts = form.Accounts
-	if ret = models.BootByModel(models.RbacRoleModel{}).PrepareByDefault().Save(&rbacRole); ret.Error != nil {
+	if ret = models.BootByModel(models.RbacRoleModel{}).PrepareByDefaultDbDriver().Save(&rbacRole); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBoot("绑定成功").Updated(tools.Map{}))
 }
+
+// PutBindRbacPermissions 角色绑定权限
 func (RbacRoleController) PutBindRbacPermissions(ctx *gin.Context) {
 	var (
 		ret      *gorm.DB
@@ -206,7 +215,7 @@ func (RbacRoleController) PutBindRbacPermissions(ctx *gin.Context) {
 	// 查询
 	ret = models.BootByModel(models.RbacRoleModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&rbacRole)
 	wrongs.PanicWhenIsEmpty(ret, "角色")
 
@@ -215,12 +224,14 @@ func (RbacRoleController) PutBindRbacPermissions(ctx *gin.Context) {
 
 	// 绑定
 	rbacRole.RbacPermissions = form.RbacPermissions
-	if ret = models.BootByModel(models.RbacRoleModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&rbacRole); ret.Error != nil {
+	if ret = models.BootByModel(models.RbacRoleModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefaultDbDriver().Save(&rbacRole); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBoot("绑定成功").Updated(tools.Map{}))
 }
+
+// S 详情
 func (RbacRoleController) S(ctx *gin.Context) {
 	var (
 		ret      *gorm.DB
@@ -235,17 +246,29 @@ func (RbacRoleController) S(ctx *gin.Context) {
 			"Accounts",
 			"Menus",
 		).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&rbacRole)
 	wrongs.PanicWhenIsEmpty(ret, "角色")
 
 	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"rbac_role": rbacRole}))
 }
-func (RbacRoleController) I(ctx *gin.Context) {
-	var rbacRoles []models.RbacRoleModel
-	models.BootByModel(models.RbacRoleModel{}).
-		PrepareUseQueryByDefault(ctx).
-		Find(&rbacRoles)
 
-	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"rbac_roles": rbacRoles}))
+// I 列表
+func (RbacRoleController) I(ctx *gin.Context) {
+	var (
+		rbacRoles []models.RbacRoleModel
+		count     int64
+		db        *gorm.DB
+	)
+	db = models.BootByModel(models.RbacRoleModel{}).
+		PrepareUseQueryByDefaultDbDriver(ctx)
+
+	if ctx.Query("__page__") == "" {
+		db.Find(&rbacRoles)
+		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"rbac_roles": rbacRoles}))
+	} else {
+		db.Count(&count)
+		models.Pagination(db, ctx).Find(&rbacRoles)
+		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"rbac_roles": rbacRoles}, ctx.Query("__page__"), count))
+	}
 }

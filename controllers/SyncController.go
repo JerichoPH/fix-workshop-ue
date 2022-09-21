@@ -49,16 +49,16 @@ func (cls PositionDepotStorehouseForm) CheckBind() PositionDepotStorehouseForm {
 	if cls.OrganizationWorkshopUniqueCode == "" {
 		wrongs.PanicValidate("仓库表单验证错误：所属车间代码不能为空")
 	}
-	ret = models.BootByModel(models.OrganizationWorkshopModel{}).SetWheres(tools.Map{"unique_code": cls.OrganizationWorkshopUniqueCode}).PrepareByDefault().First(&cls.OrganizationWorkshop)
+	ret = models.BootByModel(models.OrganizationWorkshopModel{}).SetWheres(tools.Map{"unique_code": cls.OrganizationWorkshopUniqueCode}).PrepareByDefaultDbDriver().First(&cls.OrganizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "仓库表单验证错误：所属车间")
 	if cls.OrganizationWorkAreaUniqueCode != "" {
-		ret = models.BootByModel(models.OrganizationWorkAreaModel{}).SetWheres(tools.Map{"unique_code": cls.OrganizationWorkAreaUniqueCode}).PrepareByDefault().First(&cls.OrganizationWorkArea)
+		ret = models.BootByModel(models.OrganizationWorkAreaModel{}).SetWheres(tools.Map{"unique_code": cls.OrganizationWorkAreaUniqueCode}).PrepareByDefaultDbDriver().First(&cls.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "仓库表单验证错误：所属工区")
 	}
 	if cls.OrganizationParagraphUniqueCode == "" {
 		wrongs.PanicValidate("仓库表单验证错误：段代码不能为空")
 	}
-	ret = models.BootByModel(models.OrganizationParagraphModel{}).SetWheres(tools.Map{"unique_code": cls.OrganizationParagraphUniqueCode}).PrepareByDefault().First(&cls.OrganizationParagraph)
+	ret = models.BootByModel(models.OrganizationParagraphModel{}).SetWheres(tools.Map{"unique_code": cls.OrganizationParagraphUniqueCode}).PrepareByDefaultDbDriver().First(&cls.OrganizationParagraph)
 	wrongs.PanicWhenIsEmpty(ret, "仓库表单验证错误：所属段")
 
 	return cls
@@ -89,12 +89,12 @@ func (cls PositionDepotSectionForm) CheckBind() PositionDepotSectionForm {
 	if cls.PositionDepotStorehouseUniqueCode == "" {
 		wrongs.PanicValidate("仓库区域表单验证错误：所属仓库代码不能为空")
 	}
-	ret = models.BootByModel(models.PositionDepotSectionModel{}).SetWheres(tools.Map{"unique_code": cls.PositionDepotStorehouseUniqueCode}).PrepareByDefault().First(&cls.PositionDepotStorehouse)
+	ret = models.BootByModel(models.PositionDepotSectionModel{}).SetWheres(tools.Map{"unique_code": cls.PositionDepotStorehouseUniqueCode}).PrepareByDefaultDbDriver().First(&cls.PositionDepotStorehouse)
 	wrongs.PanicWhenIsEmpty(ret, "仓库区域表单验证错误：所属仓库")
 	if cls.OrganizationParagraphUniqueCode != "" {
 		wrongs.PanicValidate("仓库区域表单验证错误：所属段代码不能为空")
 	}
-	ret = models.BootByModel(models.OrganizationParagraphModel{}).SetWheres(tools.Map{"unique_code": cls.OrganizationParagraphUniqueCode}).PrepareByDefault().First(&cls.OrganizationParagraph)
+	ret = models.BootByModel(models.OrganizationParagraphModel{}).SetWheres(tools.Map{"unique_code": cls.OrganizationParagraphUniqueCode}).PrepareByDefaultDbDriver().First(&cls.OrganizationParagraph)
 	wrongs.PanicWhenIsEmpty(ret, "仓库区域表单验证错误：所属段")
 
 	return cls
@@ -157,11 +157,11 @@ func (SyncController) PostLocation(ctx *gin.Context) {
 			// 检查仓库是否存在
 			ret = models.BootByModel(models.PositionDepotStorehouseModel{}).
 				SetWheres(tools.Map{"unique_code": positionDepotStorehouse.UniqueCode}).
-				PrepareByDefault().
+				PrepareByDefaultDbDriver().
 				First(&positionDepotStorehouse)
 			if !wrongs.PanicWhenIsEmpty(ret, "") {
 				// 新建仓库
-				models.BootByModel(models.PositionDepotStorehouseModel{}).PrepareByDefault().Create(&models.PositionDepotStorehouseModel{
+				models.BootByModel(models.PositionDepotStorehouseModel{}).PrepareByDefaultDbDriver().Create(&models.PositionDepotStorehouseModel{
 					BaseModel:                models.BaseModel{Uuid: uuid.NewV4().String(), Sort: 0},
 					UniqueCode:               positionDepotStorehouseForm.UniqueCode,
 					Name:                     positionDepotStorehouseForm.Name,
@@ -173,7 +173,7 @@ func (SyncController) PostLocation(ctx *gin.Context) {
 				positionDepotStorehouse.Name = positionDepotStorehouseForm.Name
 				positionDepotStorehouse.OrganizationWorkshopUuid = positionDepotStorehouseForm.OrganizationWorkshop.Uuid
 				positionDepotStorehouse.OrganizationWorkAreaUuid = positionDepotStorehouseForm.organizationWorkAreaUuid
-				models.BootByModel(models.PositionDepotStorehouseModel{}).SetWheres(tools.Map{"uuid": positionDepotStorehouse.Uuid}).PrepareByDefault().Save(&positionDepotStorehouse)
+				models.BootByModel(models.PositionDepotStorehouseModel{}).SetWheres(tools.Map{"uuid": positionDepotStorehouse.Uuid}).PrepareByDefaultDbDriver().Save(&positionDepotStorehouse)
 			}
 		}
 	}
@@ -189,10 +189,10 @@ func (SyncController) PostLocation(ctx *gin.Context) {
 				positionDepotSection models.PositionDepotSectionModel
 			)
 
-			ret = models.BootByModel(models.PositionDepotSectionModel{}).SetWheres(tools.Map{"unique_code": positionDepotSectionForm.UniqueCode}).PrepareByDefault().First(&positionDepotSection)
+			ret = models.BootByModel(models.PositionDepotSectionModel{}).SetWheres(tools.Map{"unique_code": positionDepotSectionForm.UniqueCode}).PrepareByDefaultDbDriver().First(&positionDepotSection)
 			if wrongs.PanicWhenIsEmpty(ret, "") {
 				// 新建仓库区域
-				models.BootByModel(models.PositionDepotSectionModel{}).PrepareByDefault().Create(&models.PositionDepotSectionModel{
+				models.BootByModel(models.PositionDepotSectionModel{}).PrepareByDefaultDbDriver().Create(&models.PositionDepotSectionModel{
 					BaseModel:                   models.BaseModel{Uuid: uuid.NewV4().String(), Sort: 0},
 					UniqueCode:                  positionDepotSectionForm.UniqueCode,
 					Name:                        positionDepotSectionForm.Name,
@@ -202,7 +202,7 @@ func (SyncController) PostLocation(ctx *gin.Context) {
 				// 编辑仓库区域
 				positionDepotSection.Name = positionDepotSectionForm.Name
 				positionDepotSection.PositionDepotStorehouseUuid = positionDepotSectionForm.PositionDepotStorehouse.Uuid
-				models.BootByModel(models.PositionDepotSectionModel{}).SetWheres(tools.Map{"uuid": positionDepotSection.Uuid}).PrepareByDefault().Save(&positionDepotSection)
+				models.BootByModel(models.PositionDepotSectionModel{}).SetWheres(tools.Map{"uuid": positionDepotSection.Uuid}).PrepareByDefaultDbDriver().Save(&positionDepotSection)
 			}
 		}
 	}

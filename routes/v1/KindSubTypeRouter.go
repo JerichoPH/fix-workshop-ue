@@ -20,18 +20,18 @@ func (KindSubTypeRouter) Load(engine *gin.Engine) {
 	)
 	{
 		// 新建
-		r.POST("", func(ctx *gin.Context) { new(controllers.KindSubTypeController).C(ctx) })
+		r.POST("", func(ctx *gin.Context) { new(controllers.KindSubTypeController).N(ctx) })
 
 		// 删除
-		r.DELETE(":uuid", func(ctx *gin.Context) { new(controllers.KindSubTypeController).D(ctx) })
+		r.DELETE(":uuid", func(ctx *gin.Context) { new(controllers.KindSubTypeController).R(ctx) })
 
 		// 编辑
-		r.PUT(":uuid", func(ctx *gin.Context) { new(controllers.KindSubTypeController).U(ctx) })
+		r.PUT(":uuid", func(ctx *gin.Context) { new(controllers.KindSubTypeController).E(ctx) })
 
 		// 详情
-		r.GET(":uuid", func(ctx *gin.Context) { new(controllers.KindSubTypeController).S(ctx) })
+		r.GET(":uuid", func(ctx *gin.Context) { new(controllers.KindSubTypeController).D(ctx) })
 
 		// 列表
-		r.GET("", func(ctx *gin.Context) { new(controllers.KindSubTypeController).I(ctx) })
+		r.GET("", func(ctx *gin.Context) { new(controllers.KindSubTypeController).L(ctx) })
 	}
 }

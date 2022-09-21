@@ -52,19 +52,19 @@ func (cls LocationStationStoreForm) ShouldBind(ctx *gin.Context) LocationStation
 	}
 	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
 		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUuid}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&cls.OrganizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "车间")
 	if cls.OrganizationWorkAreaUuid != "" {
 		ret = models.BootByModel(models.OrganizationWorkAreaModel{}).
 			SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUuid}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			First(&cls.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "工区")
 	}
 	if len(cls.LocationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			Where("uuid in ?", cls.LocationLineUuids).
 			Find(&cls.LocationLines)
 	}
@@ -88,7 +88,7 @@ func (cls LocationStationBindLocationLinesForm) ShouldBind(ctx *gin.Context) Loc
 	}
 	if len(cls.LocationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			Where("uuid in ?", cls.LocationLineUuids).
 			Find(&cls.LocationLines)
 	}
@@ -109,12 +109,12 @@ func (LocationStationController) C(ctx *gin.Context) {
 	// 查重
 	ret = models.BootByModel(models.LocationStationModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "站场代码")
 	ret = models.BootByModel(models.LocationStationModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "站场名称")
 
@@ -128,7 +128,7 @@ func (LocationStationController) C(ctx *gin.Context) {
 		OrganizationWorkArea: form.OrganizationWorkArea,
 		LocationLines:        form.LocationLines,
 	}
-	if ret = models.BootByModel(models.LocationStationModel{}).PrepareByDefault().Create(&locationStation); ret.Error != nil {
+	if ret = models.BootByModel(models.LocationStationModel{}).PrepareByDefaultDbDriver().Create(&locationStation); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
@@ -144,12 +144,12 @@ func (LocationStationController) D(ctx *gin.Context) {
 	// 查询
 	ret = models.BootByModel(models.LocationStationModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&locationStation)
 	wrongs.PanicWhenIsEmpty(ret, "站场")
 
 	// 删除
-	if ret := models.BootByModel(models.LocationStationModel{}).PrepareByDefault().Delete(&locationStation); ret.Error != nil {
+	if ret := models.BootByModel(models.LocationStationModel{}).PrepareByDefaultDbDriver().Delete(&locationStation); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
@@ -170,27 +170,27 @@ func (LocationStationController) U(ctx *gin.Context) {
 	ret = models.BootByModel(models.LocationStationModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "站场代码")
 	ret = models.BootByModel(models.LocationStationModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "站场名称")
 
 	// 查询
 	ret = models.BootByModel(models.LocationStationModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&locationStation)
 	wrongs.PanicWhenIsEmpty(ret, "站场")
 
 	// 编辑
 	if ret = models.
 		BootByModel(models.LocationStationModel{}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		Where("uuid = ?", ctx.Param("uuid")).
 		Updates(map[string]interface{}{
 			"sort":                        form.Sort,
@@ -218,13 +218,13 @@ func (LocationStationController) PutBindLocationLines(ctx *gin.Context) {
 
 	if ret = models.BootByModel(models.LocationStationModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&locationStation); ret.Error != nil {
 		wrongs.PanicWhenIsEmpty(ret, "站场")
 	}
 
 	// 删除原有绑定关系
-	ret = models.BootByModel(models.BaseModel{}).PrepareByDefault().Exec("delete from pivot_location_line_and_location_stations where location_station_id = ?", locationStation.Id)
+	ret = models.BootByModel(models.BaseModel{}).PrepareByDefaultDbDriver().Exec("delete from pivot_location_line_and_location_stations where location_station_id = ?", locationStation.Id)
 
 	// 创建绑定关系
 	if len(form.LocationLines) > 0 {
@@ -235,7 +235,7 @@ func (LocationStationController) PutBindLocationLines(ctx *gin.Context) {
 			})
 		}
 		models.BootByModel(models.PivotLocationLineAndLocationStation{}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			CreateInBatches(&pivotLocationLineAndLocationStations, 100)
 	}
 
@@ -253,7 +253,7 @@ func (LocationStationController) S(ctx *gin.Context) {
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 		SetWhereFields("be_enable").
 		SetPreloadsByDefault().
-		PrepareUseQueryByDefault(ctx).
+		PrepareUseQueryByDefaultDbDriver(ctx).
 		First(&locationStation)
 	wrongs.PanicWhenIsEmpty(ret, "站场")
 
@@ -262,12 +262,22 @@ func (LocationStationController) S(ctx *gin.Context) {
 
 // I 列表
 func (LocationStationController) I(ctx *gin.Context) {
-	var locationStations []models.LocationStationModel
-	models.BootByModel(models.LocationStationModel{}).
+	var (
+		locationStations []models.LocationStationModel
+		count            int64
+		db               *gorm.DB
+	)
+	db = models.BootByModel(models.LocationStationModel{}).
 		SetWhereFields().
 		SetPreloadsByDefault().
-		PrepareUseQueryByDefault(ctx).
-		Find(&locationStations)
+		PrepareUseQueryByDefaultDbDriver(ctx)
 
-	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_stations": locationStations}))
+	if ctx.Query("__page__") == "" {
+		db.Find(&locationStations)
+		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_stations": locationStations}))
+	} else {
+		db.Count(&count)
+		models.Pagination(db, ctx).Find(&locationStations)
+		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"location_stations": locationStations}, ctx.Query("__page__"), count))
+	}
 }

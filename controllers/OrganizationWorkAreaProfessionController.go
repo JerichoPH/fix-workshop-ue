@@ -42,6 +42,7 @@ func (cls OrganizationWorkAreaProfessionStoreForm) ShouldBind(ctx *gin.Context) 
 	return cls
 }
 
+// C 新建
 func (OrganizationWorkAreaProfessionController) C(ctx *gin.Context) {
 	var (
 		ret    *gorm.DB
@@ -54,12 +55,12 @@ func (OrganizationWorkAreaProfessionController) C(ctx *gin.Context) {
 	// 查重
 	ret = models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "工区专业代码")
 	ret = models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "工区专业名称")
 
@@ -69,13 +70,15 @@ func (OrganizationWorkAreaProfessionController) C(ctx *gin.Context) {
 		UniqueCode: form.UniqueCode,
 		Name:       form.Name,
 	}
-	ret = models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).PrepareByDefault().Create(&organizationWorkAreaProfession)
+	ret = models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).PrepareByDefaultDbDriver().Create(&organizationWorkAreaProfession)
 	if ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"organization_work_area_profession": organizationWorkAreaProfession}))
 }
+
+// D 删除
 func (OrganizationWorkAreaProfessionController) D(ctx *gin.Context) {
 	var (
 		ret                            *gorm.DB
@@ -85,17 +88,19 @@ func (OrganizationWorkAreaProfessionController) D(ctx *gin.Context) {
 	// 查询
 	ret = models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&organizationWorkAreaProfession)
 	wrongs.PanicWhenIsEmpty(ret, "工区专业")
 
 	// 删除
-	if ret := models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).PrepareByDefault().Delete(&organizationWorkAreaProfession); ret.Error != nil {
+	if ret := models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).PrepareByDefaultDbDriver().Delete(&organizationWorkAreaProfession); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
+
+// U 编辑
 func (OrganizationWorkAreaProfessionController) U(ctx *gin.Context) {
 	var (
 		ret                                    *gorm.DB
@@ -109,20 +114,20 @@ func (OrganizationWorkAreaProfessionController) U(ctx *gin.Context) {
 	ret = models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "工区专业代码")
 	ret = models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "工区专业名称")
 
 	// 查询
 	ret = models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&organizationWorkAreaProfession)
 	wrongs.PanicWhenIsEmpty(ret, "工区专业")
 
@@ -130,7 +135,7 @@ func (OrganizationWorkAreaProfessionController) U(ctx *gin.Context) {
 	organizationWorkAreaProfession.UniqueCode = form.UniqueCode
 	organizationWorkAreaProfession.Name = form.Name
 	if ret = models.
-		BootByModel(models.OrganizationWorkAreaProfessionModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().
+		BootByModel(models.OrganizationWorkAreaProfessionModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefaultDbDriver().
 		Updates(map[string]interface{}{
 			"unique_code": form.UniqueCode,
 			"name":        form.Name,
@@ -140,6 +145,8 @@ func (OrganizationWorkAreaProfessionController) U(ctx *gin.Context) {
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"organization_work_area_profession": organizationWorkAreaProfession}))
 }
+
+// S 详情
 func (OrganizationWorkAreaProfessionController) S(ctx *gin.Context) {
 	var (
 		ret                            *gorm.DB
@@ -147,18 +154,32 @@ func (OrganizationWorkAreaProfessionController) S(ctx *gin.Context) {
 	)
 	ret = models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&organizationWorkAreaProfession)
 	wrongs.PanicWhenIsEmpty(ret, "工区专业")
 
 	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_work_area_profession": organizationWorkAreaProfession}))
 }
-func (OrganizationWorkAreaProfessionController) I(ctx *gin.Context) {
-	var organizationWorkAreaProfessions []models.OrganizationWorkAreaProfessionModel
-	models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).
-		SetWhereFields().
-		PrepareUseQueryByDefault(ctx).
-		Find(&organizationWorkAreaProfessions)
 
-	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_work_area_professions": organizationWorkAreaProfessions}))
+// I 列表
+func (OrganizationWorkAreaProfessionController) I(ctx *gin.Context) {
+	var (
+		organizationWorkAreaProfessions []models.OrganizationWorkAreaProfessionModel
+		count           int64
+		db              *gorm.DB
+	)
+	db = models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).
+		SetWhereFields().
+		PrepareUseQueryByDefaultDbDriver(ctx)
+
+	if ctx.Query("__page__") == "" {
+		db.Find(&organizationWorkAreaProfessions)
+		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_work_area_professions": organizationWorkAreaProfessions}))
+	} else {
+		db.Count(&count)
+		models.Pagination(db, ctx).Find(&organizationWorkAreaProfessions)
+		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"organization_work_area_professions": organizationWorkAreaProfessions}, ctx.Query("__page__"), count))
+	}
 }
+
+

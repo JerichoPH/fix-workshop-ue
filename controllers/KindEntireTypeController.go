@@ -49,15 +49,15 @@ func (cls KindEntireTypeStoreForm) ShouldBind(ctx *gin.Context) KindEntireTypeSt
 	}
 	ret = models.BootByModel(models.KindCategoryModel{}).
 		SetWheres(tools.Map{"uuid": cls.KindCategoryUuid}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&cls.KindCategory)
 	wrongs.PanicWhenIsEmpty(ret, "所属种类")
 
 	return cls
 }
 
-// C 新建
-func (KindEntireTypeController) C(ctx *gin.Context) {
+// N 新建
+func (KindEntireTypeController) N(ctx *gin.Context) {
 	var (
 		ret    *gorm.DB
 		repeat models.KindEntireTypeModel
@@ -69,12 +69,12 @@ func (KindEntireTypeController) C(ctx *gin.Context) {
 	// 查重
 	ret = models.BootByModel(models.KindEntireTypeModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "类型代码")
 	ret = models.BootByModel(models.KindEntireTypeModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "类型名称")
 
@@ -86,15 +86,15 @@ func (KindEntireTypeController) C(ctx *gin.Context) {
 		BeEnable:     form.BeEnable,
 		KindCategory: form.KindCategory,
 	}
-	if ret = models.BootByModel(models.KindEntireTypeModel{}).PrepareByDefault().Create(&kindEntireType); ret.Error != nil {
+	if ret = models.BootByModel(models.KindEntireTypeModel{}).PrepareByDefaultDbDriver().Create(&kindEntireType); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"kind_entire_type": kindEntireType}))
 }
 
-// D 删除
-func (KindEntireTypeController) D(ctx *gin.Context) {
+// R 删除
+func (KindEntireTypeController) R(ctx *gin.Context) {
 	var (
 		ret            *gorm.DB
 		kindEntireType models.KindEntireTypeModel
@@ -103,20 +103,20 @@ func (KindEntireTypeController) D(ctx *gin.Context) {
 	// 查询
 	ret = models.BootByModel(models.KindEntireTypeModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&kindEntireType)
 	wrongs.PanicWhenIsEmpty(ret, "类型")
 
 	// 删除
-	if ret := models.BootByModel(models.KindEntireTypeModel{}).PrepareByDefault().Delete(&kindEntireType); ret.Error != nil {
+	if ret := models.BootByModel(models.KindEntireTypeModel{}).PrepareByDefaultDbDriver().Delete(&kindEntireType); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
 
-// U 更新
-func (KindEntireTypeController) U(ctx *gin.Context) {
+// E 更新
+func (KindEntireTypeController) E(ctx *gin.Context) {
 	var (
 		ret                    *gorm.DB
 		kindEntireType, repeat models.KindEntireTypeModel
@@ -129,20 +129,20 @@ func (KindEntireTypeController) U(ctx *gin.Context) {
 	ret = models.BootByModel(models.KindEntireTypeModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "类型代码")
 	ret = models.BootByModel(models.KindEntireTypeModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "类型名称")
 
 	// 查询
 	ret = models.BootByModel(models.KindEntireTypeModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&kindEntireType)
 	wrongs.PanicWhenIsEmpty(ret, "类型")
 
@@ -151,35 +151,45 @@ func (KindEntireTypeController) U(ctx *gin.Context) {
 	kindEntireType.Name = form.Name
 	kindEntireType.BeEnable = form.BeEnable
 	kindEntireType.KindCategory = form.KindCategory
-	if ret = models.BootByModel(models.KindEntireTypeModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&kindEntireType); ret.Error != nil {
+	if ret = models.BootByModel(models.KindEntireTypeModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefaultDbDriver().Save(&kindEntireType); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"kind_entire_type": kindEntireType}))
 }
 
-// S 详情
-func (KindEntireTypeController) S(ctx *gin.Context) {
+// D 详情
+func (KindEntireTypeController) D(ctx *gin.Context) {
 	var (
 		ret            *gorm.DB
 		kindEntireType models.KindEntireTypeModel
 	)
 	ret = models.BootByModel(models.KindEntireTypeModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&kindEntireType)
 	wrongs.PanicWhenIsEmpty(ret, "类型")
 
 	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"kind_entire_type": kindEntireType}))
 }
 
-// I 列表
-func (KindEntireTypeController) I(ctx *gin.Context) {
-	var kindEntireTypes []models.KindEntireTypeModel
-	models.BootByModel(models.KindEntireTypeModel{}).
-		SetWhereFields().
-		PrepareUseQuery(ctx, "").
-		Find(&kindEntireTypes)
+// L 列表
+func (KindEntireTypeController) L(ctx *gin.Context) {
+	var (
+		kindEntireTypes []models.KindEntireTypeModel
+		count           int64
+		db              *gorm.DB
+	)
+	db = models.BootByModel(models.KindEntireTypeModel{}).
+		SetWhereFields("kind_category_uuid").
+		PrepareUseQueryByDefaultDbDriver(ctx)
 
-	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"kind_entire_types": kindEntireTypes}))
+	if ctx.Query("__page__") == "" {
+		db.Find(&kindEntireTypes)
+		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"kind_entire_types": kindEntireTypes}))
+	} else {
+		db.Count(&count)
+		models.Pagination(db, ctx).Find(&kindEntireTypes)
+		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"kind_entire_types": kindEntireTypes}, ctx.Query("__page__"), count))
+	}
 }

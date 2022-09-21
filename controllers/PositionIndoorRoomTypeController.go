@@ -42,6 +42,7 @@ func (cls PositionIndoorRoomTypeStoreForm) ShouldBind(ctx *gin.Context) Position
 	return cls
 }
 
+// C 新建
 func (PositionIndoorRoomTypeController) C(ctx *gin.Context) {
 	var ret *gorm.DB
 
@@ -52,12 +53,12 @@ func (PositionIndoorRoomTypeController) C(ctx *gin.Context) {
 	var repeat models.PositionIndoorRoomTypeModel
 	ret = models.BootByModel(models.PositionIndoorRoomTypeModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "机房代码")
 	ret = models.BootByModel(models.PositionIndoorRoomTypeModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "机房名称")
 
@@ -67,23 +68,27 @@ func (PositionIndoorRoomTypeController) C(ctx *gin.Context) {
 		UniqueCode: form.UniqueCode,
 		Name:       form.Name,
 	}
-	if ret = models.BootByModel(models.PositionIndoorRoomTypeModel{}).PrepareByDefault().Create(&positionIndoorRoomType); ret.Error != nil {
+	if ret = models.BootByModel(models.PositionIndoorRoomTypeModel{}).PrepareByDefaultDbDriver().Create(&positionIndoorRoomType); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"position_indoor_room_type": positionIndoorRoomType}))
 }
+
+// D 删除
 func (PositionIndoorRoomTypeController) D(ctx *gin.Context) {
 	// 查询
 	locationIndoorRoomType := (&models.PositionIndoorRoomTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 	// 删除
-	if ret := models.BootByModel(models.PositionIndoorRoomTypeModel{}).PrepareByDefault().Delete(&locationIndoorRoomType); ret.Error != nil {
+	if ret := models.BootByModel(models.PositionIndoorRoomTypeModel{}).PrepareByDefaultDbDriver().Delete(&locationIndoorRoomType); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
+
+// U 编辑
 func (PositionIndoorRoomTypeController) U(ctx *gin.Context) {
 	var ret *gorm.DB
 
@@ -95,13 +100,13 @@ func (PositionIndoorRoomTypeController) U(ctx *gin.Context) {
 	ret = models.BootByModel(models.PositionIndoorRoomTypeModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "机房代码")
 	ret = models.BootByModel(models.PositionIndoorRoomTypeModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "机房名称")
 
@@ -111,23 +116,37 @@ func (PositionIndoorRoomTypeController) U(ctx *gin.Context) {
 	// 编辑
 	positionIndoorRoomType.BaseModel.Sort = form.Sort
 	positionIndoorRoomType.Name = form.Name
-	if ret = models.BootByModel(models.PositionIndoorRoomTypeModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&positionIndoorRoomType); ret.Error != nil {
+	if ret = models.BootByModel(models.PositionIndoorRoomTypeModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefaultDbDriver().Save(&positionIndoorRoomType); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"position_indoor_room_type": positionIndoorRoomType}))
 }
+
+// S 详情
 func (PositionIndoorRoomTypeController) S(ctx *gin.Context) {
 	positionIndoorRoomType := (&models.PositionIndoorRoomTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_indoor_room_type": positionIndoorRoomType}))
 }
-func (PositionIndoorRoomTypeController) I(ctx *gin.Context) {
-	var positionIndoorRoomTypes []models.PositionIndoorRoomTypeModel
-	models.BootByModel(models.PositionIndoorRoomTypeModel{}).
-		SetWhereFields().
-		PrepareUseQuery(ctx, "").
-		Find(&positionIndoorRoomTypes)
 
-	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_indoor_room_types": positionIndoorRoomTypes}))
+// I 列表
+func (PositionIndoorRoomTypeController) I(ctx *gin.Context) {
+	var (
+		positionIndoorRoomTypes []models.PositionIndoorRoomTypeModel
+		count           int64
+		db              *gorm.DB
+	)
+	db = models.BootByModel(models.PositionIndoorRoomTypeModel{}).
+		SetWhereFields().
+		PrepareUseQueryByDefaultDbDriver(ctx)
+
+	if ctx.Query("__page__") == "" {
+		db.Find(&positionIndoorRoomTypes)
+		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_indoor_room_types": positionIndoorRoomTypes}))
+	} else {
+		db.Count(&count)
+		models.Pagination(db, ctx).Find(&positionIndoorRoomTypes)
+		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"position_indoor_room_types": positionIndoorRoomTypes}, ctx.Query("__page__"), count))
+	}
 }

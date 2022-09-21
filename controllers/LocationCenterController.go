@@ -53,19 +53,19 @@ func (cls LocationCenterStoreForm) ShouldBind(ctx *gin.Context) LocationCenterSt
 	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
 		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUuid}).
 		SetPreloads("OrganizationParagraph", "OrganizationParagraph.OrganizationRailway").
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&cls.OrganizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "所属车间")
 	if cls.OrganizationWorkAreaUuid != "" {
 		models.BootByModel(models.OrganizationWorkAreaModel{}).
 			SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUuid}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			First(&cls.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "所属工区")
 	}
 	if len(cls.LocationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			Where("uuid in ?", cls.LocationLineUuids).
 			Find(&cls.LocationLines)
 	}
@@ -90,7 +90,7 @@ func (cls LocationCenterBindLocationLinesForm) ShouldBind(ctx *gin.Context) Loca
 
 	if len(cls.LocationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			Where("uuid in ?", cls.LocationLineUuids).
 			Find(&cls.LocationLines)
 	}
@@ -98,8 +98,8 @@ func (cls LocationCenterBindLocationLinesForm) ShouldBind(ctx *gin.Context) Loca
 	return cls
 }
 
-// C 新建
-func (LocationCenterController) C(ctx *gin.Context) {
+// N 新建
+func (LocationCenterController) N(ctx *gin.Context) {
 	var (
 		ret    *gorm.DB
 		repeat models.LocationCenterModel
@@ -111,12 +111,12 @@ func (LocationCenterController) C(ctx *gin.Context) {
 	// 查重
 	ret = models.BootByModel(models.LocationCenterModel{}).
 		SetWheres(tools.Map{"unique_code": form.OrganizationWorkshop.OrganizationParagraph.OrganizationRailway.UniqueCode + form.UniqueCode}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "中心代码")
 	ret = models.BootByModel(models.LocationCenterModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "中心名称")
 
@@ -130,15 +130,15 @@ func (LocationCenterController) C(ctx *gin.Context) {
 		OrganizationWorkAreaUuid: form.OrganizationWorkAreaUuid,
 		LocationLines:            form.LocationLines,
 	}
-	if ret = models.BootByModel(models.LocationCenterModel{}).PrepareByDefault().Create(&locationCenter); ret.Error != nil {
+	if ret = models.BootByModel(models.LocationCenterModel{}).PrepareByDefaultDbDriver().Create(&locationCenter); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"location_center": locationCenter}))
 }
 
-// D 删除
-func (LocationCenterController) D(ctx *gin.Context) {
+// R 删除
+func (LocationCenterController) R(ctx *gin.Context) {
 	var (
 		ret            *gorm.DB
 		locationCenter models.LocationCenterModel
@@ -147,20 +147,20 @@ func (LocationCenterController) D(ctx *gin.Context) {
 	// 查询
 	ret = models.BootByModel(models.LocationCenterModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&locationCenter)
 	wrongs.PanicWhenIsEmpty(ret, "中心")
 
 	// 删除
-	if ret := models.BootByModel(models.LocationCenterModel{}).PrepareByDefault().Delete(&locationCenter); ret.Error != nil {
+	if ret := models.BootByModel(models.LocationCenterModel{}).PrepareByDefaultDbDriver().Delete(&locationCenter); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
 
-// U 编辑
-func (LocationCenterController) U(ctx *gin.Context) {
+// E 编辑
+func (LocationCenterController) E(ctx *gin.Context) {
 	var (
 		ret                    *gorm.DB
 		locationCenter, repeat models.LocationCenterModel
@@ -173,20 +173,20 @@ func (LocationCenterController) U(ctx *gin.Context) {
 	ret = models.BootByModel(models.LocationCenterModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "中心代码")
 	ret = models.BootByModel(models.LocationCenterModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "中心名称")
 
 	// 查询
 	ret = models.BootByModel(models.LocationCenterModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&locationCenter)
 	wrongs.PanicWhenIsEmpty(ret, "中心")
 
@@ -196,7 +196,7 @@ func (LocationCenterController) U(ctx *gin.Context) {
 	locationCenter.BeEnable = form.BeEnable
 	locationCenter.OrganizationWorkshopUuid = form.OrganizationWorkshop.Uuid
 	locationCenter.OrganizationWorkAreaUuid = form.OrganizationWorkAreaUuid
-	if ret = models.BootByModel(models.LocationCenterModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&locationCenter); ret.Error != nil {
+	if ret = models.BootByModel(models.LocationCenterModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefaultDbDriver().Save(&locationCenter); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
@@ -216,13 +216,13 @@ func (LocationCenterController) PutBindLines(ctx *gin.Context) {
 
 	if ret = models.BootByModel(models.LocationCenterModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&locationCenter); ret.Error != nil {
 		wrongs.PanicWhenIsEmpty(ret, "中心")
 	}
 
 	// 删除原有绑定关系
-	ret = models.BootByModel(models.BaseModel{}).PrepareByDefault().Exec("delete from pivot_location_line_and_location_centers where location_center_id = ?", locationCenter.Id)
+	ret = models.BootByModel(models.BaseModel{}).PrepareByDefaultDbDriver().Exec("delete from pivot_location_line_and_location_centers where location_center_id = ?", locationCenter.Id)
 
 	// 创建绑定关系
 	if len(form.LocationLines) > 0 {
@@ -233,35 +233,45 @@ func (LocationCenterController) PutBindLines(ctx *gin.Context) {
 			})
 		}
 		models.BootByModel(models.PivotLocationLineAndLocationCenter{}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			CreateInBatches(&pivotLocationLineAndLocationCenters, 100)
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{}))
 }
 
-// S 详情
-func (LocationCenterController) S(ctx *gin.Context) {
+// D 详情
+func (LocationCenterController) D(ctx *gin.Context) {
 	var locationCenter models.LocationCenterModel
 	ret := models.BootByModel(models.LocationCenterModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 		SetWhereFields("be_enable").
 		SetPreloadsByDefault().
-		PrepareUseQueryByDefault(ctx).
+		PrepareUseQueryByDefaultDbDriver(ctx).
 		First(&locationCenter)
 	wrongs.PanicWhenIsEmpty(ret, "中心")
 
 	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_center": locationCenter}))
 }
 
-// I 列表
-func (LocationCenterController) I(ctx *gin.Context) {
-	var locationCenters []models.LocationCenterModel
-	models.BootByModel(models.LocationCenterModel{}).
-		SetWhereFields().
+// L 列表
+func (LocationCenterController) L(ctx *gin.Context) {
+	var (
+		locationCenters []models.LocationCenterModel
+		count           int64
+		db              *gorm.DB
+	)
+	db = models.BootByModel(models.LocationCenterModel{}).
+		SetWhereFields("be_enable", "organization_workshop_uuid", "organization_work_area_uuid").
 		SetPreloadsByDefault().
-		PrepareUseQueryByDefault(ctx).
-		Find(&locationCenters)
+		PrepareUseQueryByDefaultDbDriver(ctx)
 
-	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_centers": locationCenters}))
+	if ctx.Query("__page__") == "" {
+		db.Find(&locationCenters)
+		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_centers": locationCenters}))
+	} else {
+		db.Count(&count)
+		models.Pagination(db, ctx).Find(&locationCenters)
+		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"location_centers": locationCenters}, ctx.Query("__page__"), count))
+	}
 }

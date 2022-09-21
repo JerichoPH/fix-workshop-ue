@@ -57,19 +57,19 @@ func (cls AccountStoreForm) ShouldBind(ctx *gin.Context) AccountStoreForm {
 		wrongs.PanicValidate("两次密码输入不一致")
 	}
 	if cls.OrganizationRailwayUUID != "" {
-		ret = models.BootByModel(models.OrganizationRailwayModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationRailwayUUID}).PrepareByDefault().First(&cls.OrganizationRailway)
+		ret = models.BootByModel(models.OrganizationRailwayModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationRailwayUUID}).PrepareByDefaultDbDriver().First(&cls.OrganizationRailway)
 		wrongs.PanicWhenIsEmpty(ret, "路局")
 	}
 	if cls.OrganizationParagraphUUID != "" {
-		ret = models.BootByModel(models.OrganizationParagraphModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationParagraphUUID}).PrepareByDefault().First(&cls.OrganizationParagraph)
+		ret = models.BootByModel(models.OrganizationParagraphModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationParagraphUUID}).PrepareByDefaultDbDriver().First(&cls.OrganizationParagraph)
 		wrongs.PanicWhenIsEmpty(ret, "站段")
 	}
 	if cls.OrganizationWorkshopUUID != "" {
-		ret = models.BootByModel(models.OrganizationWorkshopModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).PrepareByDefault().First(&cls.OrganizationWorkshop)
+		ret = models.BootByModel(models.OrganizationWorkshopModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).PrepareByDefaultDbDriver().First(&cls.OrganizationWorkshop)
 		wrongs.PanicWhenIsEmpty(ret, "车间")
 	}
 	if cls.OrganizationWorkAreaUUID != "" {
-		ret = models.BootByModel(models.OrganizationWorkAreaModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUUID}).PrepareByDefault().First(&cls.OrganizationWorkArea)
+		ret = models.BootByModel(models.OrganizationWorkAreaModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUUID}).PrepareByDefaultDbDriver().First(&cls.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "工区")
 	}
 
@@ -107,19 +107,19 @@ func (cls AccountUpdateForm) ShouldBind(ctx *gin.Context) AccountUpdateForm {
 		wrongs.PanicValidate("昵称必填")
 	}
 	if cls.OrganizationRailwayUuid != "" {
-		ret = models.BootByModel(models.OrganizationRailwayModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationRailwayUuid}).PrepareByDefault().First(&cls.OrganizationRailway)
+		ret = models.BootByModel(models.OrganizationRailwayModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationRailwayUuid}).PrepareByDefaultDbDriver().First(&cls.OrganizationRailway)
 		wrongs.PanicWhenIsEmpty(ret, "路局")
 	}
 	if cls.OrganizationParagraphUuid != "" {
-		ret = models.BootByModel(models.OrganizationParagraphModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationParagraphUuid}).PrepareByDefault().First(&cls.OrganizationParagraph)
+		ret = models.BootByModel(models.OrganizationParagraphModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationParagraphUuid}).PrepareByDefaultDbDriver().First(&cls.OrganizationParagraph)
 		wrongs.PanicWhenIsEmpty(ret, "站段")
 	}
 	if cls.OrganizationWorkshopUuid != "" {
-		ret = models.BootByModel(models.OrganizationWorkshopModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUuid}).PrepareByDefault().First(&cls.OrganizationWorkshop)
+		ret = models.BootByModel(models.OrganizationWorkshopModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUuid}).PrepareByDefaultDbDriver().First(&cls.OrganizationWorkshop)
 		wrongs.PanicWhenIsEmpty(ret, "车间")
 	}
 	if cls.OrganizationWorkAreaUuid != "" {
-		ret = models.BootByModel(models.OrganizationWorkAreaModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUuid}).PrepareByDefault().First(&cls.OrganizationWorkArea)
+		ret = models.BootByModel(models.OrganizationWorkAreaModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUuid}).PrepareByDefaultDbDriver().First(&cls.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "工区")
 	}
 
@@ -157,8 +157,8 @@ func (cls AccountUpdatePasswordForm) ShouldBind(ctx *gin.Context) AccountUpdateP
 	return cls
 }
 
-// C 新建用户
-func (cls AccountController) C(ctx *gin.Context) {
+// N 新建用户
+func (cls AccountController) N(ctx *gin.Context) {
 	// 表单
 	form := (&AccountStoreForm{}).ShouldBind(ctx)
 
@@ -167,12 +167,12 @@ func (cls AccountController) C(ctx *gin.Context) {
 	var ret *gorm.DB
 	ret = (&models.BaseModel{}).
 		SetWheres(tools.Map{"username": form.Username}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "用户名")
 	ret = (&models.BaseModel{}).
 		SetWheres(tools.Map{"nickname": form.Nickname}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "昵称")
 
@@ -191,7 +191,7 @@ func (cls AccountController) C(ctx *gin.Context) {
 	}
 
 	if ret = models.BootByModel(models.AccountModel{}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		Create(&account); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
@@ -199,8 +199,8 @@ func (cls AccountController) C(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBoot("新建成功").Created(tools.Map{}))
 }
 
-// D 删除用户
-func (AccountController) D(ctx *gin.Context) {
+// R 删除用户
+func (AccountController) R(ctx *gin.Context) {
 	var (
 		ret     *gorm.DB
 		account models.AccountModel
@@ -208,20 +208,20 @@ func (AccountController) D(ctx *gin.Context) {
 
 	ret = models.BootByModel(models.AccountModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&account)
 	wrongs.PanicWhenIsEmpty(ret, "用户")
 
 	models.BootByModel(models.AccountModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		Delete(&account)
 
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
 
-// U 编辑用户
-func (AccountController) U(ctx *gin.Context) {
+// E 编辑用户
+func (AccountController) E(ctx *gin.Context) {
 	var (
 		ret     *gorm.DB
 		account models.AccountModel
@@ -235,18 +235,18 @@ func (AccountController) U(ctx *gin.Context) {
 	ret = models.BootByModel(models.AccountModel{}).
 		SetWheres(tools.Map{"username": form.Username}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "用户账号")
 	ret = models.BootByModel(models.AccountModel{}).
 		SetWheres(tools.Map{"nickname": form.Nickname}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "用户昵称")
 
 	// 查询
-	ret = models.BootByModel(models.AccountModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().First(&account)
+	ret = models.BootByModel(models.AccountModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefaultDbDriver().First(&account)
 	wrongs.PanicWhenIsEmpty(ret, "用户")
 
 	// 编辑
@@ -256,7 +256,7 @@ func (AccountController) U(ctx *gin.Context) {
 	account.OrganizationParagraphUuid = form.OrganizationParagraph.Uuid
 	account.OrganizationWorkshopUuid = form.OrganizationWorkshop.Uuid
 	account.OrganizationWorkAreaUuid = form.OrganizationWorkArea.Uuid
-	if ret = models.BootByModel(models.AccountModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Debug().Save(&account); ret.Error != nil {
+	if ret = models.BootByModel(models.AccountModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefaultDbDriver().Debug().Save(&account); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
@@ -283,7 +283,7 @@ func (AccountController) PutPassword(ctx *gin.Context) {
 	account.Password = string(bytes)
 
 	if ret = models.BootByModel(models.AccountModel{}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		Updates(map[string]interface{}{
 			"password": string(bytes),
 		}); ret.Error != nil {
@@ -293,8 +293,8 @@ func (AccountController) PutPassword(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBoot("密码修改成功").Updated(tools.Map{}))
 }
 
-// S 详情
-func (AccountController) S(ctx *gin.Context) {
+// D 详情
+func (AccountController) D(ctx *gin.Context) {
 	var (
 		ret     *gorm.DB
 		account models.AccountModel
@@ -302,22 +302,22 @@ func (AccountController) S(ctx *gin.Context) {
 	ret = models.BootByModel(models.AccountModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 		SetPreloads("RbacRoles", "RbacRoles.RbacPermissions").
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&account)
 	wrongs.PanicWhenIsEmpty(ret, "用户")
 
 	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"account": account}))
 }
 
-// I 列表
-func (AccountController) I(ctx *gin.Context) {
+// L 列表
+func (AccountController) L(ctx *gin.Context) {
 	var (
 		accounts []models.AccountModel
 		count    int64
 		db       *gorm.DB
 	)
 	db = models.BootByModel(models.AccountModel{}).
-		PrepareUseQueryByDefault(ctx)
+		PrepareUseQueryByDefaultDbDriver(ctx)
 
 	if ctx.Query("__page__") == "" {
 		db.Find(&accounts)

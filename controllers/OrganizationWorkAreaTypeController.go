@@ -42,6 +42,7 @@ func (cls OrganizationWorkAreaTypeStoreForm) ShouldBind(ctx *gin.Context) Organi
 	return cls
 }
 
+// C 新建
 func (OrganizationWorkAreaTypeController) C(ctx *gin.Context) {
 	var ret *gorm.DB
 
@@ -52,12 +53,12 @@ func (OrganizationWorkAreaTypeController) C(ctx *gin.Context) {
 	var repeat models.OrganizationWorkAreaTypeModel
 	ret = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "工区类型代码")
 	ret = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "工区类型名称")
 
@@ -67,23 +68,27 @@ func (OrganizationWorkAreaTypeController) C(ctx *gin.Context) {
 		UniqueCode: form.UniqueCode,
 		Name:       form.Name,
 	}
-	if ret = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).PrepareByDefault().Create(&organizationWorkAreaType); ret.Error != nil {
+	if ret = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).PrepareByDefaultDbDriver().Create(&organizationWorkAreaType); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"organization_work_area_type": organizationWorkAreaType}))
 }
+
+// D 删除
 func (OrganizationWorkAreaTypeController) D(ctx *gin.Context) {
 	// 查询
 	organizationWorkAreaType := (&models.OrganizationWorkAreaTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 	// 删除
-	if ret := models.BootByModel(models.OrganizationWorkAreaTypeModel{}).PrepareByDefault().Delete(&organizationWorkAreaType); ret.Error != nil {
+	if ret := models.BootByModel(models.OrganizationWorkAreaTypeModel{}).PrepareByDefaultDbDriver().Delete(&organizationWorkAreaType); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
+
+// U 编辑
 func (OrganizationWorkAreaTypeController) U(ctx *gin.Context) {
 	var ret *gorm.DB
 
@@ -95,13 +100,13 @@ func (OrganizationWorkAreaTypeController) U(ctx *gin.Context) {
 	ret = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "工区类型代码")
 	ret = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "工区类型名称")
 
@@ -112,23 +117,37 @@ func (OrganizationWorkAreaTypeController) U(ctx *gin.Context) {
 	organizationWorkAreaType.BaseModel.Sort = form.Sort
 	organizationWorkAreaType.UniqueCode = form.UniqueCode
 	organizationWorkAreaType.Name = form.Name
-	if ret = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&organizationWorkAreaType); ret.Error != nil {
+	if ret = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefaultDbDriver().Save(&organizationWorkAreaType); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"organization_work_area_type": organizationWorkAreaType}))
 }
+
+// S 详情
 func (OrganizationWorkAreaTypeController) S(ctx *gin.Context) {
 	organizationWorkAreaType := (&models.OrganizationWorkAreaTypeModel{}).FindOneByUUID(ctx.Param("uuid"))
 
 	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_work_area_type": organizationWorkAreaType}))
 }
-func (OrganizationWorkAreaTypeController) I(ctx *gin.Context) {
-	var organizationWorkAreaType []models.OrganizationWorkAreaTypeModel
-	models.BootByModel(models.OrganizationWorkAreaTypeModel{}).
-		SetWhereFields().
-		PrepareUseQuery(ctx, "").
-		Find(&organizationWorkAreaType)
 
-	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_work_area_types": organizationWorkAreaType}))
+// I 列表
+func (OrganizationWorkAreaTypeController) I(ctx *gin.Context) {
+	var (
+		organizationWorkAreaType []models.OrganizationWorkAreaTypeModel
+		count           int64
+		db              *gorm.DB
+	)
+	db = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).
+		SetWhereFields().
+		PrepareUseQueryByDefaultDbDriver(ctx)
+
+	if ctx.Query("__page__") == "" {
+		db.Find(&organizationWorkAreaType)
+		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_work_area_type": organizationWorkAreaType}))
+	} else {
+		db.Count(&count)
+		models.Pagination(db, ctx).Find(&organizationWorkAreaType)
+		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"organization_work_area_type": organizationWorkAreaType}, ctx.Query("__page__"), count))
+	}
 }

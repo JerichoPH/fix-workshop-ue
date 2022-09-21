@@ -58,56 +58,56 @@ func (cls LocationLineStoreForm) ShouldBind(ctx *gin.Context) LocationLineStoreF
 	// 查询路局
 	if len(cls.OrganizationRailwayUuids) > 0 {
 		models.BootByModel(models.OrganizationRailwayModel{}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			Where("uuid in ?", cls.OrganizationRailwayUuids).
 			Find(&cls.OrganizationRailways)
 	}
 	// 查询站段
 	if len(cls.OrganizationParagraphUuids) > 0 {
 		models.BootByModel(models.OrganizationParagraphModel{}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			Where("uuid in ?", cls.OrganizationParagraphUuids).
 			Find(&cls.OrganizationParagraphs)
 	}
 	// 查询车间
 	if len(cls.OrganizationWorkshopUuids) > 0 {
 		models.BootByModel(models.OrganizationWorkshopModel{}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			Where("uuid in ?", cls.OrganizationWorkshopUuids).
 			Find(&cls.OrganizationWorkshops)
 	}
 	// 查询工区
 	if len(cls.OrganizationWorkAreaUuids) > 0 {
 		models.BootByModel(models.OrganizationWorkAreaModel{}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			Where("uuid in ?", cls.OrganizationWorkAreaUuids).
 			Find(&cls.OrganizationWorkAreas)
 	}
 	// 查询区间
 	if len(cls.LocationSectionUuids) > 0 {
 		models.BootByModel(models.LocationSectionModel{}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			Where("uuid in ?", cls.LocationSectionUuids).
 			Find(&cls.LocationSections)
 	}
 	// 查询站场
 	if len(cls.LocationStationUuids) > 0 {
 		models.BootByModel(models.LocationStationModel{}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			Where("uuid in ?", cls.LocationStationUuids).
 			Find(&cls.LocationStations)
 	}
 	// 查询道口
 	if len(cls.LocationRailroadGradeCrossUuids) > 0 {
 		models.BootByModel(models.LocationRailroadGradeCrossModel{}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			Where("uuid in ?", cls.LocationRailroadGradeCrossUuids).
 			Find(&cls.LocationRailroadGradeCrosses)
 	}
 	// 查询道口
 	if len(cls.LocationRailroadGradeCrossUuids) > 0 {
 		models.BootByModel(models.LocationRailroadGradeCrossModel{}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			Where("uuid in ?", cls.LocationRailroadGradeCrossUuids).
 			Find(&cls.LocationRailroadGradeCrosses)
 	}
@@ -135,8 +135,8 @@ type LocationLineBindForm struct {
 	LocationCenters                 []*models.LocationCenterModel
 }
 
-// C 新建
-func (LocationLineController) C(ctx *gin.Context) {
+// N 新建
+func (LocationLineController) N(ctx *gin.Context) {
 	var (
 		ret    *gorm.DB
 		repeat models.LocationLineModel
@@ -148,12 +148,12 @@ func (LocationLineController) C(ctx *gin.Context) {
 	// 查重
 	ret = models.BootByModel(models.LocationLineModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "线别代码")
 	ret = models.BootByModel(models.LocationLineModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "线别名称")
 
@@ -168,15 +168,15 @@ func (LocationLineController) C(ctx *gin.Context) {
 		LocationRailroadGradeCrosses: form.LocationRailroadGradeCrosses,
 		LocationCenters:              form.LocationCenters,
 	}
-	if ret = models.BootByModel(models.LocationLineModel{}).PrepareByDefault().Create(organizationLine); ret.Error != nil {
+	if ret = models.BootByModel(models.LocationLineModel{}).PrepareByDefaultDbDriver().Create(organizationLine); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"organization_line": organizationLine}))
 }
 
-// D 删除
-func (LocationLineController) D(ctx *gin.Context) {
+// R 删除
+func (LocationLineController) R(ctx *gin.Context) {
 	var (
 		ret              *gorm.DB
 		organizationLine models.LocationLineModel
@@ -184,20 +184,20 @@ func (LocationLineController) D(ctx *gin.Context) {
 	// 查询
 	ret = models.BootByModel(models.LocationLineModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&organizationLine)
 	wrongs.PanicWhenIsEmpty(ret, "线别")
 
 	// 删除
-	if ret = models.BootByModel(models.LocationLineModel{}).PrepareByDefault().Delete(&organizationLine); ret.Error != nil {
+	if ret = models.BootByModel(models.LocationLineModel{}).PrepareByDefaultDbDriver().Delete(&organizationLine); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
 
-// U 编辑
-func (LocationLineController) U(ctx *gin.Context) {
+// E 编辑
+func (LocationLineController) E(ctx *gin.Context) {
 	var (
 		ret                  *gorm.DB
 		locationLine, repeat models.LocationLineModel
@@ -210,20 +210,20 @@ func (LocationLineController) U(ctx *gin.Context) {
 	ret = models.BootByModel(models.LocationLineModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "线别代码")
 	ret = models.BootByModel(models.LocationLineModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "线别名称")
 
 	// 查询
 	ret = models.BootByModel(models.LocationLineModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&locationLine)
 	wrongs.PanicWhenIsEmpty(ret, "线别")
 
@@ -233,7 +233,7 @@ func (LocationLineController) U(ctx *gin.Context) {
 	locationLine.BeEnable = form.BeEnable
 	if ret = models.BootByModel(&models.LocationLineModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		Save(&locationLine); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
@@ -241,8 +241,8 @@ func (LocationLineController) U(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"location_line": locationLine}))
 }
 
-// S 详情
-func (LocationLineController) S(ctx *gin.Context) {
+// D 详情
+func (LocationLineController) D(ctx *gin.Context) {
 	var (
 		ret              *gorm.DB
 		organizationLine models.LocationLineModel
@@ -258,13 +258,23 @@ func (LocationLineController) S(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_line": organizationLine}))
 }
 
-// I 列表
-func (LocationLineController) I(ctx *gin.Context) {
-	var organizationLines []models.LocationLineModel
-	models.BootByModel(models.LocationLineModel{}).
+// L 列表
+func (LocationLineController) L(ctx *gin.Context) {
+	var (
+		organizationLines []models.LocationLineModel
+		count             int64
+		db                *gorm.DB
+	)
+	db = models.BootByModel(models.LocationLineModel{}).
 		SetWhereFields("unique_code", "name", "be_enable", "sort").
-		PrepareUseQuery(ctx, "").
-		Find(&organizationLines)
+		PrepareUseQueryByDefaultDbDriver(ctx)
 
-	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_lines": organizationLines}))
+	if ctx.Query("__page__") == "" {
+		db.Find(&organizationLines)
+		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_lines": organizationLines}))
+	} else {
+		db.Count(&count)
+		models.Pagination(db, ctx).Find(&organizationLines)
+		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"organization_lines": organizationLines}, ctx.Query("__page__"), count))
+	}
 }

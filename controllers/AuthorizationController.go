@@ -79,12 +79,12 @@ func (AuthorizationController) PostRegister(ctx *gin.Context) {
 	var ret *gorm.DB
 	ret = (&models.BaseModel{}).
 		SetWheres(tools.Map{"username": form.Username}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "用户名")
 	ret = (&models.BaseModel{}).
 		SetWheres(tools.Map{"nickname": form.Nickname}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "昵称")
 
@@ -100,7 +100,7 @@ func (AuthorizationController) PostRegister(ctx *gin.Context) {
 	}
 	if ret = models.BootByModel(models.AccountModel{}).
 		SetOmits(clause.Associations).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		Create(&account); ret.Error != nil {
 		wrongs.PanicForbidden("创建失败：" + ret.Error.Error())
 	}
@@ -118,7 +118,7 @@ func (AuthorizationController) PostLogin(ctx *gin.Context) {
 	var ret *gorm.DB
 	ret = models.BootByModel(models.AccountModel{}).
 		SetWheres(tools.Map{"username": form.Username}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&account)
 	wrongs.PanicWhenIsEmpty(ret, "用户")
 
@@ -152,7 +152,7 @@ func (AuthorizationController) GetMenus(ctx *gin.Context) {
 		ret = models.BootByModel(models.AccountModel{}).
 			SetWheres(tools.Map{"uuid": accountUUID}).
 			SetPreloads("RbacRoles", "RbacRoles.Menus").
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			First(&account)
 		if !wrongs.PanicWhenIsEmpty(ret, "") {
 			wrongs.PanicUnLogin("当前令牌指向用户不存在")
@@ -160,7 +160,7 @@ func (AuthorizationController) GetMenus(ctx *gin.Context) {
 
 		var menus []models.MenuModel
 		models.BootByModel(models.MenuModel{}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			Joins("join pivot_rbac_role_and_menus prram on menus.id = prram.menu_id").
 			Joins("join rbac_roles r on prram.rbac_role_id = r.id").
 			Joins("join pivot_rbac_role_and_accounts prraa on r.id = prraa.rbac_role_id").

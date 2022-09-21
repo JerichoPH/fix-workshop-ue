@@ -33,6 +33,7 @@ func (cls RbacPermissionGroupStoreForm) ShouldBind(ctx *gin.Context) RbacPermiss
 	return cls
 }
 
+// C 新建
 func (RbacPermissionGroupController) C(ctx *gin.Context) {
 	var (
 		ret    *gorm.DB
@@ -45,20 +46,22 @@ func (RbacPermissionGroupController) C(ctx *gin.Context) {
 	// 查重
 	ret = models.BootByModel(models.RbacPermissionGroupModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "权限分组名称")
 
 	// 保存
 	rbacPermissionGroup := &models.RbacPermissionGroupModel{Name: form.Name}
 	if ret = models.BootByModel(models.RbacPermissionGroupModel{}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		Create(&rbacPermissionGroup); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"rbac_permission_group": rbacPermissionGroup}))
 }
+
+// D 删除
 func (RbacPermissionGroupController) D(ctx *gin.Context) {
 	var (
 		ret                 *gorm.DB
@@ -67,22 +70,24 @@ func (RbacPermissionGroupController) D(ctx *gin.Context) {
 	// 查询
 	ret = models.BootByModel(models.RbacPermissionGroupModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&rbacPermissionGroup)
 	wrongs.PanicWhenIsEmpty(ret, "权限分组")
 
 	// 删除权限分组
 	if len(rbacPermissionGroup.RbacPermissions) > 0 {
-		models.BootByModel(models.RbacPermissionGroupModel{}).PrepareByDefault().Delete(&rbacPermissionGroup.RbacPermissions)
+		models.BootByModel(models.RbacPermissionGroupModel{}).PrepareByDefaultDbDriver().Delete(&rbacPermissionGroup.RbacPermissions)
 	}
 
 	// 删除
-	if ret = models.BootByModel(models.RbacPermissionGroupModel{}).PrepareByDefault().Delete(&rbacPermissionGroup); ret.Error != nil {
+	if ret = models.BootByModel(models.RbacPermissionGroupModel{}).PrepareByDefaultDbDriver().Delete(&rbacPermissionGroup); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
+
+// U 编辑
 func (RbacPermissionGroupController) U(ctx *gin.Context) {
 	var (
 		ret                         *gorm.DB
@@ -98,23 +103,25 @@ func (RbacPermissionGroupController) U(ctx *gin.Context) {
 	ret = models.BootByModel(models.RbacPermissionGroupModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
 		SetNotWheres(tools.Map{"uuid": uuid}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "权限分组名称")
 
 	// 查询
 	ret = models.BootByModel(models.RbacPermissionGroupModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&rbacPermissionGroup)
 	wrongs.PanicWhenIsEmpty(ret, "权限分组")
 
 	// 修改
 	rbacPermissionGroup.Name = form.Name
-	models.BootByModel(models.RbacPermissionGroupModel{}).SetWheres(tools.Map{"uuid":ctx.Param("uuid")}).PrepareByDefault().Save(&rbacPermissionGroup)
+	models.BootByModel(models.RbacPermissionGroupModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefaultDbDriver().Save(&rbacPermissionGroup)
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"rbac_permission_group": rbacPermissionGroup}))
 }
+
+// S 详情
 func (RbacPermissionGroupController) S(ctx *gin.Context) {
 	var ret *gorm.DB
 	uuid := ctx.Param("uuid")
@@ -124,18 +131,31 @@ func (RbacPermissionGroupController) S(ctx *gin.Context) {
 	ret = models.BootByModel(models.RbacPermissionGroupModel{}).
 		SetWheres(tools.Map{"uuid": uuid}).
 		SetPreloads("RbacPermissions").
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&rbacPermissionGroup)
 	wrongs.PanicWhenIsEmpty(ret, "权限分组")
 
 	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"rbac_permission_group": rbacPermissionGroup}))
 }
-func (RbacPermissionGroupController) I(ctx *gin.Context) {
-	var rbacPermissionGroups []models.RbacPermissionGroupModel
-	models.BootByModel(models.RbacPermissionGroupModel{}).
-		SetPreloads("RbacPermissions").
-		PrepareUseQuery(ctx, "").
-		Find(&rbacPermissionGroups)
 
-	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"rbac_permission_groups": rbacPermissionGroups}))
+// I 列表
+func (RbacPermissionGroupController) I(ctx *gin.Context) {
+	var (
+		rbacPermissionGroups []models.RbacPermissionGroupModel
+		count                int64
+		db                   *gorm.DB
+	)
+	db = models.BootByModel(models.RbacPermissionGroupModel{}).
+		SetPreloads("RbacPermissionGroup").
+		SetWhereFields("name", "uri", "method", "rbac_permission_group_uuid").
+		PrepareUseQueryByDefaultDbDriver(ctx)
+
+	if ctx.Query("__page__") == "" {
+		db.Find(&rbacPermissionGroups)
+		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"rbac_permission_groups": rbacPermissionGroups}))
+	} else {
+		db.Count(&count)
+		models.Pagination(db, ctx).Find(&rbacPermissionGroups)
+		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"rbac_permission_groups": rbacPermissionGroups}, ctx.Query("__page__"), count))
+	}
 }

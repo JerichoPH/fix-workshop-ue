@@ -20,18 +20,18 @@ func (LocationLineRouter) Load(engine *gin.Engine) {
 	)
 	{
 		// 新建
-		r.POST("", func(ctx *gin.Context) { new(controllers.LocationLineController).C(ctx) })
+		r.POST("", func(ctx *gin.Context) { new(controllers.LocationLineController).N(ctx) })
 
 		// 删除
-		r.DELETE(":uuid", func(ctx *gin.Context) { new(controllers.LocationLineController).D(ctx) })
+		r.DELETE(":uuid", func(ctx *gin.Context) { new(controllers.LocationLineController).R(ctx) })
 
 		// 编辑
-		r.PUT(":uuid", func(ctx *gin.Context) { new(controllers.LocationLineController).U(ctx) })
+		r.PUT(":uuid", func(ctx *gin.Context) { new(controllers.LocationLineController).E(ctx) })
 
 		// 详情
-		r.GET(":uuid", func(ctx *gin.Context) { new(controllers.LocationLineController).S(ctx) })
+		r.GET(":uuid", func(ctx *gin.Context) { new(controllers.LocationLineController).D(ctx) })
 
 		// 列表
-		r.GET("", func(ctx *gin.Context) { new(controllers.LocationLineController).I(ctx) })
+		r.GET("", func(ctx *gin.Context) { new(controllers.LocationLineController).L(ctx) })
 	}
 }

@@ -52,19 +52,19 @@ func (cls LocationSectionStoreForm) ShouldBind(ctx *gin.Context) LocationSection
 	}
 	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
 		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUuid}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&cls.OrganizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "车间")
 	if cls.OrganizationWorkAreaUuid != "" {
 		ret = models.BootByModel(models.OrganizationWorkAreaModel{}).
 			SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUuid}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			First(&cls.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "工区")
 	}
 	if len(cls.LocationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			Where("uuid in ?", cls.LocationLineUuids).
 			Find(&cls.LocationLines)
 	}
@@ -89,7 +89,7 @@ func (cls LocationSectionBindLocationLinesForm) ShouldBind(ctx *gin.Context) Loc
 
 	if len(cls.LocationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			Where("uuid in ?", cls.LocationLineUuids).
 			Find(&cls.LocationLines)
 	}
@@ -97,6 +97,7 @@ func (cls LocationSectionBindLocationLinesForm) ShouldBind(ctx *gin.Context) Loc
 	return cls
 }
 
+// C 新建
 func (LocationSectionController) C(ctx *gin.Context) {
 	var (
 		ret    *gorm.DB
@@ -109,12 +110,12 @@ func (LocationSectionController) C(ctx *gin.Context) {
 	// 查重
 	ret = models.BootByModel(models.LocationSectionModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "区间代码")
 	ret = models.BootByModel(models.LocationSectionModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "区间名称")
 
@@ -128,7 +129,7 @@ func (LocationSectionController) C(ctx *gin.Context) {
 		OrganizationWorkArea: form.OrganizationWorkArea,
 		LocationLines:        form.LocationLines,
 	}
-	if ret = models.BootByModel(models.LocationSectionModel{}).PrepareByDefault().Create(&organizationSection); ret.Error != nil {
+	if ret = models.BootByModel(models.LocationSectionModel{}).PrepareByDefaultDbDriver().Create(&organizationSection); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
@@ -143,18 +144,19 @@ func (LocationSectionController) D(ctx *gin.Context) {
 	// 查询
 	ret = models.BootByModel(models.LocationSectionModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&locationSection)
 	wrongs.PanicWhenIsEmpty(ret, "区间")
 
 	// 删除
-	if ret := models.BootByModel(models.LocationSectionModel{}).PrepareByDefault().Delete(&locationSection); ret.Error != nil {
+	if ret := models.BootByModel(models.LocationSectionModel{}).PrepareByDefaultDbDriver().Delete(&locationSection); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
 
+// U 编辑
 func (LocationSectionController) U(ctx *gin.Context) {
 	var (
 		ret                     *gorm.DB
@@ -168,20 +170,20 @@ func (LocationSectionController) U(ctx *gin.Context) {
 	ret = models.BootByModel(models.LocationSectionModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "区间代码")
 	ret = models.BootByModel(models.LocationSectionModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "区间名称")
 
 	// 查询
 	ret = models.BootByModel(models.LocationSectionModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&locationSection)
 	wrongs.PanicWhenIsEmpty(ret, "区间")
 
@@ -191,13 +193,14 @@ func (LocationSectionController) U(ctx *gin.Context) {
 	locationSection.BeEnable = form.BeEnable
 	locationSection.OrganizationWorkshopUuid = form.OrganizationWorkshop.Uuid
 	locationSection.OrganizationWorkAreaUuid = form.OrganizationWorkAreaUuid
-	if ret = models.BootByModel(models.LocationSectionModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&locationSection); ret.Error != nil {
+	if ret = models.BootByModel(models.LocationSectionModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefaultDbDriver().Save(&locationSection); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"location_section": locationSection}))
 }
 
+// PutBindLines 绑定线别
 func (LocationSectionController) PutBindLines(ctx *gin.Context) {
 	var (
 		ret                                  *gorm.DB
@@ -210,13 +213,13 @@ func (LocationSectionController) PutBindLines(ctx *gin.Context) {
 
 	if ret = models.BootByModel(models.LocationSectionModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&locationSection); ret.Error != nil {
 		wrongs.PanicWhenIsEmpty(ret, "区间")
 	}
 
 	// 删除原有绑定关系
-	ret = models.BootByModel(models.BaseModel{}).PrepareByDefault().Exec("delete from pivot_location_line_and_location_sections where location_section_id = ?", locationSection.Id)
+	ret = models.BootByModel(models.BaseModel{}).PrepareByDefaultDbDriver().Exec("delete from pivot_location_line_and_location_sections where location_section_id = ?", locationSection.Id)
 
 	// 创建绑定关系
 	if len(form.LocationLines) > 0 {
@@ -227,13 +230,14 @@ func (LocationSectionController) PutBindLines(ctx *gin.Context) {
 			})
 		}
 		models.BootByModel(models.PivotLocationLineAndLocationSection{}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			CreateInBatches(&pivotLocationLineAndLocationSections, 100)
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{}))
 }
 
+// S 详情
 func (LocationSectionController) S(ctx *gin.Context) {
 	var (
 		ret                 *gorm.DB
@@ -243,20 +247,31 @@ func (LocationSectionController) S(ctx *gin.Context) {
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 		SetWhereFields("be_enable").
 		SetPreloadsByDefault().
-		PrepareUseQueryByDefault(ctx).
+		PrepareUseQueryByDefaultDbDriver(ctx).
 		First(&organizationSection)
 	wrongs.PanicWhenIsEmpty(ret, "区间")
 
 	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_section": organizationSection}))
 }
 
+// I 列表
 func (LocationSectionController) I(ctx *gin.Context) {
-	var locationSections []models.LocationSectionModel
-	models.BootByModel(models.LocationSectionModel{}).
+	var (
+		locationSections []models.LocationSectionModel
+		count            int64
+		db               *gorm.DB
+	)
+	db = models.BootByModel(models.LocationSectionModel{}).
 		SetWhereFields("unique_code", "Name", "be_enable", "organization_workshop_uuid", "organization_work_area_uuid").
 		SetPreloadsByDefault().
-		PrepareUseQueryByDefault(ctx).
-		Find(&locationSections)
+		PrepareUseQueryByDefaultDbDriver(ctx)
 
-	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_sections": locationSections}))
+	if ctx.Query("__page__") == "" {
+		db.Find(&locationSections)
+		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_sections": locationSections}))
+	} else {
+		db.Count(&count)
+		models.Pagination(db, ctx).Find(&locationSections)
+		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"location_sections": locationSections}, ctx.Query("__page__"), count))
+	}
 }

@@ -50,7 +50,7 @@ func CheckJwt() gin.HandlerFunc {
 					ret = (&models.BaseModel{}).
 						SetModel(models.AccountModel{}).
 						SetWheres(tools.Map{"uuid": claims.Uuid}).
-						PrepareByDefault().
+						PrepareByDefaultDbDriver().
 						First(&account)
 
 					wrongs.PanicWhenIsEmpty(ret,"令牌指向用户不存在")

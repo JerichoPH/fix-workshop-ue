@@ -20,21 +20,21 @@ func (LocationCenterRouter) Load(engine *gin.Engine) {
 	)
 	{
 		// 新建
-		r.POST("", func(ctx *gin.Context) { new(controllers.LocationCenterController).C(ctx) })
+		r.POST("", func(ctx *gin.Context) { new(controllers.LocationCenterController).N(ctx) })
 
 		// 删除
-		r.DELETE(":uuid", func(ctx *gin.Context) { new(controllers.LocationCenterController).D(ctx) })
+		r.DELETE(":uuid", func(ctx *gin.Context) { new(controllers.LocationCenterController).R(ctx) })
 
 		// 编辑
-		r.PUT(":uuid", func(ctx *gin.Context) { new(controllers.LocationCenterController).U(ctx) })
+		r.PUT(":uuid", func(ctx *gin.Context) { new(controllers.LocationCenterController).E(ctx) })
 
 		// 中心绑定线别
 		r.PUT(":uuid/bindLocationLines", func(ctx *gin.Context) { new(controllers.LocationCenterController).PutBindLines(ctx) })
 
 		// 详情
-		r.GET(":uuid", func(ctx *gin.Context) { new(controllers.LocationCenterController).S(ctx) })
+		r.GET(":uuid", func(ctx *gin.Context) { new(controllers.LocationCenterController).D(ctx) })
 
 		// 列表
-		r.GET("", func(ctx *gin.Context) { new(controllers.LocationCenterController).I(ctx) })
+		r.GET("", func(ctx *gin.Context) { new(controllers.LocationCenterController).L(ctx) })
 	}
 }

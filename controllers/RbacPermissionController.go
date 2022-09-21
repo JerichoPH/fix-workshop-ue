@@ -49,7 +49,7 @@ func (cls RbacPermissionStoreForm) ShouldBind(ctx *gin.Context) RbacPermissionSt
 	}
 	ret = models.BootByModel(models.RbacPermissionGroupModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&cls.RbacPermissionGroup)
 	wrongs.PanicWhenIsEmpty(ret, "权限分组")
 
@@ -95,7 +95,7 @@ func (RbacPermissionController) C(ctx *gin.Context) {
 		RbacPermissionGroupUuid: form.RbacPermissionGroup.Uuid,
 	}
 	if ret = models.BootByModel(&models.RbacPermissionModel{}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		Create(&rbacPermission); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
@@ -116,11 +116,11 @@ func (RbacPermissionController) PostResource(ctx *gin.Context) {
 		var repeat models.RbacPermissionModel
 		ret = models.BootByModel(models.RbacPermissionModel{}).
 			SetWheres(tools.Map{"name": name, "method": method, "uri": form.Uri}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			First(&repeat)
 		if !wrongs.PanicWhenIsEmpty(ret, "") {
 			if ret = models.BootByModel(models.RbacPermissionModel{}).
-				PrepareByDefault().
+				PrepareByDefaultDbDriver().
 				Create(&models.RbacPermissionModel{
 					BaseModel:               models.BaseModel{Uuid: uuid.NewV4().String()},
 					Name:                    name,
@@ -145,13 +145,13 @@ func (RbacPermissionController) D(ctx *gin.Context) {
 	// 查询
 	ret = models.BootByModel(models.RbacPermissionModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&rbacPermission)
 	wrongs.PanicWhenIsEmpty(ret, "权限")
 
 	// 删除
 	if ret = models.BootByModel(&models.RbacPermissionModel{}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		Delete(&rbacPermission); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
@@ -170,7 +170,7 @@ func (RbacPermissionController) U(ctx *gin.Context) {
 	// 查询
 	ret = models.BootByModel(models.RbacPermissionModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&rbacPermission)
 	wrongs.PanicWhenIsEmpty(ret, "权限")
 
@@ -181,7 +181,7 @@ func (RbacPermissionController) U(ctx *gin.Context) {
 	rbacPermission.RbacPermissionGroupUuid = form.RbacPermissionGroupUuid
 	if ret = models.BootByModel(models.RbacPermissionModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		Save(&rbacPermission); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
@@ -199,7 +199,7 @@ func (RbacPermissionController) S(ctx *gin.Context) {
 	ret = models.BootByModel(&models.RbacPermissionModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 		SetPreloads("RbacPermissionGroup").
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&rbacPermission)
 	wrongs.PanicWhenIsEmpty(ret, "权限")
 
@@ -216,7 +216,7 @@ func (RbacPermissionController) I(ctx *gin.Context) {
 	db = models.BootByModel(models.RbacPermissionModel{}).
 		SetPreloads("RbacPermissionGroup").
 		SetWhereFields("name", "uri", "method", "rbac_permission_group_uuid").
-		PrepareUseQueryByDefault(ctx)
+		PrepareUseQueryByDefaultDbDriver(ctx)
 
 	if ctx.Query("__page__") == "" {
 		db.Find(&rbacPermissions)

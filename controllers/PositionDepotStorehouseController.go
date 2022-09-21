@@ -13,8 +13,8 @@ type PositionDepotStorehouseController struct{}
 
 // PositionDepotStorehouseStoreForm 仓储仓库新建表单
 type PositionDepotStorehouseStoreForm struct {
-	Sort                      int64  `form:"sort" json:"sort"`
-	UniqueCode                string `form:"unique_code" json:"unique_code"`
+	Sort                     int64  `form:"sort" json:"sort"`
+	UniqueCode               string `form:"unique_code" json:"unique_code"`
 	Name                     string `form:"name" json:"name"`
 	OrganizationWorkshopUuid string `form:"organization_workshop_uuid" json:"organization_workshop_uuid"`
 	OrganizationWorkshop     models.OrganizationWorkshopModel
@@ -44,13 +44,14 @@ func (cls PositionDepotStorehouseStoreForm) ShouldBind(ctx *gin.Context) Positio
 	}
 	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
 		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUuid}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&cls.OrganizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "所属车间")
 
 	return cls
 }
 
+// C 新建
 func (PositionDepotStorehouseController) C(ctx *gin.Context) {
 	var (
 		ret    *gorm.DB
@@ -63,23 +64,25 @@ func (PositionDepotStorehouseController) C(ctx *gin.Context) {
 	// 查重
 	ret = models.BootByModel(models.PositionDepotStorehouseModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "仓库代码")
 
 	// 新建
 	positionDepotStorehouse := &models.PositionDepotStorehouseModel{
-		BaseModel:             models.BaseModel{Sort: form.Sort, Uuid: uuid.NewV4().String()},
-		UniqueCode:            form.UniqueCode,
-		Name:                  form.Name,
-		OrganizationWorkshop:  form.OrganizationWorkshop,
+		BaseModel:            models.BaseModel{Sort: form.Sort, Uuid: uuid.NewV4().String()},
+		UniqueCode:           form.UniqueCode,
+		Name:                 form.Name,
+		OrganizationWorkshop: form.OrganizationWorkshop,
 	}
-	if ret = models.BootByModel(models.PositionDepotStorehouseModel{}).PrepareByDefault().Create(&positionDepotStorehouse); ret.Error != nil {
+	if ret = models.BootByModel(models.PositionDepotStorehouseModel{}).PrepareByDefaultDbDriver().Create(&positionDepotStorehouse); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"position_depot_storehouse": positionDepotStorehouse}))
 }
+
+// D 删除
 func (PositionDepotStorehouseController) D(ctx *gin.Context) {
 	var (
 		ret                     *gorm.DB
@@ -89,17 +92,19 @@ func (PositionDepotStorehouseController) D(ctx *gin.Context) {
 	// 查询
 	ret = models.BootByModel(models.PositionDepotStorehouseModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&positionDepotStorehouse)
 	wrongs.PanicWhenIsEmpty(ret, "仓库")
 
 	// 删除
-	if ret := models.BootByModel(models.PositionDepotStorehouseModel{}).PrepareByDefault().Delete(&positionDepotStorehouse); ret.Error != nil {
+	if ret := models.BootByModel(models.PositionDepotStorehouseModel{}).PrepareByDefaultDbDriver().Delete(&positionDepotStorehouse); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
+
+// U 编辑
 func (PositionDepotStorehouseController) U(ctx *gin.Context) {
 	var (
 		ret                             *gorm.DB
@@ -113,14 +118,14 @@ func (PositionDepotStorehouseController) U(ctx *gin.Context) {
 	ret = models.BootByModel(models.PositionDepotStorehouseModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "仓库代码")
 
 	// 查询
 	ret = models.BootByModel(models.PositionDepotStorehouseModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&positionDepotStorehouse)
 	wrongs.PanicWhenIsEmpty(ret, "仓库")
 
@@ -128,12 +133,14 @@ func (PositionDepotStorehouseController) U(ctx *gin.Context) {
 	positionDepotStorehouse.BaseModel.Sort = form.Sort
 	positionDepotStorehouse.Name = form.Name
 	positionDepotStorehouse.OrganizationWorkshop = form.OrganizationWorkshop
-	if ret = models.BootByModel(models.PositionDepotStorehouseModel{}).SetWheres(tools.Map{"uuid":ctx.Param("uuid")}).PrepareByDefault().Save(&positionDepotStorehouse); ret.Error != nil {
+	if ret = models.BootByModel(models.PositionDepotStorehouseModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefaultDbDriver().Save(&positionDepotStorehouse); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"position_depot_storehouse": positionDepotStorehouse}))
 }
+
+// S 详情
 func (PositionDepotStorehouseController) S(ctx *gin.Context) {
 	var (
 		ret                     *gorm.DB
@@ -141,18 +148,31 @@ func (PositionDepotStorehouseController) S(ctx *gin.Context) {
 	)
 	ret = models.BootByModel(models.PositionDepotStorehouseModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&positionDepotStorehouse)
 	wrongs.PanicWhenIsEmpty(ret, "仓库")
 
 	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_depot_storehouse": positionDepotStorehouse}))
 }
-func (PositionDepotStorehouseController) I(ctx *gin.Context) {
-	var positionDepotStorehouses []models.PositionDepotStorehouseModel
-	models.BootByModel(models.PositionDepotStorehouseModel{}).
-		SetWhereFields().
-		PrepareUseQuery(ctx,"").
-		Find(&positionDepotStorehouses)
 
-	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_depot_storehouses": positionDepotStorehouses}))
+// I 列表
+func (PositionDepotStorehouseController) I(ctx *gin.Context) {
+
+	var (
+		positionDepotStorehouses []models.PositionDepotStorehouseModel
+		count                    int64
+		db                       *gorm.DB
+	)
+	db = models.BootByModel(models.PositionDepotStorehouseModel{}).
+		SetWhereFields().
+		PrepareUseQueryByDefaultDbDriver(ctx)
+
+	if ctx.Query("__page__") == "" {
+		db.Find(&positionDepotStorehouses)
+		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_depot_storehouses": positionDepotStorehouses}))
+	} else {
+		db.Count(&count)
+		models.Pagination(db, ctx).Find(&positionDepotStorehouses)
+		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"position_depot_storehouses": positionDepotStorehouses}, ctx.Query("__page__"), count))
+	}
 }

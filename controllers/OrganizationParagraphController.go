@@ -35,7 +35,7 @@ func (cls OrganizationParagraphStoreForm) ShouldBind(ctx *gin.Context) Organizat
 	if cls.UniqueCode == "" {
 		wrongs.PanicValidate("站段代码必填")
 	}
-	if len(cls.UniqueCode) != 4{
+	if len(cls.UniqueCode) != 4 {
 		wrongs.PanicValidate("站段代码必须是4位")
 	}
 	if cls.Name == "" {
@@ -49,12 +49,12 @@ func (cls OrganizationParagraphStoreForm) ShouldBind(ctx *gin.Context) Organizat
 	}
 	ret = models.BootByModel(models.OrganizationRailwayModel{}).
 		SetWheres(tools.Map{"uuid": cls.OrganizationRailwayUuid}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&cls.OrganizationRailway)
 	wrongs.PanicWhenIsEmpty(ret, "路局")
 	if len(cls.OrganizationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			Where("uuid in ?", cls.OrganizationLineUuids).
 			Find(&cls.OrganizationLines)
 	}
@@ -75,12 +75,12 @@ func (OrganizationParagraphController) C(ctx *gin.Context) {
 	// 查重
 	ret = models.BootByModel(models.OrganizationParagraphModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "站段代码")
 	ret = models.BootByModel(models.OrganizationParagraphModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "站段名称")
 
@@ -92,7 +92,7 @@ func (OrganizationParagraphController) C(ctx *gin.Context) {
 		BeEnable:            form.BeEnable,
 		OrganizationRailway: form.OrganizationRailway,
 	}
-	if ret = models.BootByModel(models.OrganizationParagraphModel{}).PrepareByDefault().Create(&organizationParagraph); ret.Error != nil {
+	if ret = models.BootByModel(models.OrganizationParagraphModel{}).PrepareByDefaultDbDriver().Create(&organizationParagraph); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
@@ -109,12 +109,12 @@ func (OrganizationParagraphController) D(ctx *gin.Context) {
 	// 查询
 	ret = models.BootByModel(models.OrganizationRailwayModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&organizationParagraph)
 	wrongs.PanicWhenIsEmpty(ret, "站段")
 
 	// 删除
-	if ret = models.BootByModel(models.OrganizationParagraphModel{}).PrepareByDefault().Delete(&organizationParagraph); ret.Error != nil {
+	if ret = models.BootByModel(models.OrganizationParagraphModel{}).PrepareByDefaultDbDriver().Delete(&organizationParagraph); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
@@ -136,20 +136,20 @@ func (OrganizationParagraphController) U(ctx *gin.Context) {
 	ret = models.BootByModel(models.OrganizationParagraphModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "站段代码")
 	ret = models.BootByModel(models.OrganizationParagraphModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "站段名称")
 
 	// 查询
 	ret = models.BootByModel(models.OrganizationParagraphModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&organizationParagraph)
 	wrongs.PanicWhenIsEmpty(ret, "站段")
 
@@ -158,7 +158,7 @@ func (OrganizationParagraphController) U(ctx *gin.Context) {
 	organizationParagraph.Name = form.Name
 	organizationParagraph.BeEnable = form.BeEnable
 	organizationParagraph.OrganizationRailway = form.OrganizationRailway
-	if ret = models.BootByModel(models.OrganizationParagraphModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&organizationParagraph); ret.Error != nil {
+	if ret = models.BootByModel(models.OrganizationParagraphModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefaultDbDriver().Save(&organizationParagraph); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
@@ -176,7 +176,7 @@ func (OrganizationParagraphController) S(ctx *gin.Context) {
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 		SetWhereFields("be_enable").
 		SetPreloadsByDefault().
-		PrepareUseQueryByDefault(ctx).
+		PrepareUseQueryByDefaultDbDriver(ctx).
 		First(&organizationParagraph)
 	wrongs.PanicWhenIsEmpty(ret, "站段")
 
@@ -185,12 +185,22 @@ func (OrganizationParagraphController) S(ctx *gin.Context) {
 
 // I 列表
 func (OrganizationParagraphController) I(ctx *gin.Context) {
-	var organizationParagraphs []models.OrganizationParagraphModel
-	models.BootByModel(models.OrganizationParagraphModel{}).
+	var (
+		organizationParagraphs []models.OrganizationParagraphModel
+		count                  int64
+		db                     *gorm.DB
+	)
+	db = models.BootByModel(models.OrganizationParagraphModel{}).
 		SetWhereFields("uuid", "sort", "unique_code", "name", "shot_name", "be_enable", "organization_railway_uuid").
 		SetPreloadsByDefault().
-		PrepareUseQueryByDefault(ctx).
-		Find(&organizationParagraphs)
+		PrepareUseQueryByDefaultDbDriver(ctx)
 
-	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_paragraphs": organizationParagraphs}))
+	if ctx.Query("__page__") == "" {
+		db.Find(&organizationParagraphs)
+		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_paragraphs": organizationParagraphs}))
+	} else {
+		db.Count(&count)
+		models.Pagination(db, ctx).Find(&organizationParagraphs)
+		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"organization_paragraphs": organizationParagraphs}, ctx.Query("__page__"), count))
+	}
 }

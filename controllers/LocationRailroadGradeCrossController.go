@@ -52,19 +52,19 @@ func (cls LocationRailroadGradeCrossStoreForm) ShouldBind(ctx *gin.Context) Loca
 	}
 	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
 		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUuid}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&cls.OrganizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "车间")
 	if cls.OrganizationWorkAreaUuid != "" {
 		ret = models.BootByModel(models.OrganizationWorkAreaModel{}).
 			SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUuid}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			First(&cls.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "工区")
 	}
 	if len(cls.LocationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			Where("uuid in ?", cls.LocationLineUuids).
 			Find(&cls.LocationLines)
 	}
@@ -88,7 +88,7 @@ func (cls LocationRailroadGradeCrossBindLocationLinesForm) ShouldBind(ctx *gin.C
 	}
 	if len(cls.LocationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			Where("uuid in ?", cls.LocationLineUuids).
 			Find(&cls.LocationLines)
 	}
@@ -96,8 +96,8 @@ func (cls LocationRailroadGradeCrossBindLocationLinesForm) ShouldBind(ctx *gin.C
 	return cls
 }
 
-// C 新建
-func (LocationRailroadGradeCrossController) C(ctx *gin.Context) {
+// N 新建
+func (LocationRailroadGradeCrossController) N(ctx *gin.Context) {
 	var (
 		ret    *gorm.DB
 		repeat models.LocationRailroadGradeCrossModel
@@ -109,12 +109,12 @@ func (LocationRailroadGradeCrossController) C(ctx *gin.Context) {
 	// 查重
 	ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "道口代码")
 	ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "道口名称")
 
@@ -128,15 +128,15 @@ func (LocationRailroadGradeCrossController) C(ctx *gin.Context) {
 		OrganizationWorkAreaUuid: form.OrganizationWorkAreaUuid,
 		LocationLines:            form.LocationLines,
 	}
-	if ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).PrepareByDefault().Create(&locationRailroadGradeCross); ret.Error != nil {
+	if ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).PrepareByDefaultDbDriver().Create(&locationRailroadGradeCross); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"location_railroad_grade_cross": locationRailroadGradeCross}))
 }
 
-// D 删除
-func (LocationRailroadGradeCrossController) D(ctx *gin.Context) {
+// R 删除
+func (LocationRailroadGradeCrossController) R(ctx *gin.Context) {
 	var (
 		ret                        *gorm.DB
 		locationRailroadGradeCross models.LocationRailroadGradeCrossModel
@@ -145,20 +145,20 @@ func (LocationRailroadGradeCrossController) D(ctx *gin.Context) {
 	// 查询
 	ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&locationRailroadGradeCross)
 	wrongs.PanicWhenIsEmpty(ret, "道口")
 
 	// 删除
-	if ret := models.BootByModel(models.LocationRailroadGradeCrossModel{}).PrepareByDefault().Delete(&locationRailroadGradeCross); ret.Error != nil {
+	if ret := models.BootByModel(models.LocationRailroadGradeCrossModel{}).PrepareByDefaultDbDriver().Delete(&locationRailroadGradeCross); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
 
-// U 编辑
-func (LocationRailroadGradeCrossController) U(ctx *gin.Context) {
+// E 编辑
+func (LocationRailroadGradeCrossController) E(ctx *gin.Context) {
 	var (
 		ret                                *gorm.DB
 		locationRailroadGradeCross, repeat models.LocationRailroadGradeCrossModel
@@ -171,20 +171,20 @@ func (LocationRailroadGradeCrossController) U(ctx *gin.Context) {
 	ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "道口代码")
 	ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "道口名称")
 
 	// 查询
 	ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&locationRailroadGradeCross)
 	wrongs.PanicWhenIsEmpty(ret, "道口")
 
@@ -195,7 +195,7 @@ func (LocationRailroadGradeCrossController) U(ctx *gin.Context) {
 	locationRailroadGradeCross.OrganizationWorkshopUuid = form.OrganizationWorkshop.Uuid
 	locationRailroadGradeCross.OrganizationWorkAreaUuid = form.OrganizationWorkAreaUuid
 	locationRailroadGradeCross.LocationLines = form.LocationLines
-	if ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&locationRailroadGradeCross); ret.Error != nil {
+	if ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefaultDbDriver().Save(&locationRailroadGradeCross); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
@@ -215,13 +215,13 @@ func (LocationRailroadGradeCrossController) PutBindLines(ctx *gin.Context) {
 
 	if ret = models.BootByModel(models.LocationRailroadGradeCrossModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&locationRailroadGradeCross); ret.Error != nil {
 		wrongs.PanicWhenIsEmpty(ret, "道口")
 	}
 
 	// 删除原有绑定关系
-	ret = models.BootByModel(models.BaseModel{}).PrepareByDefault().Exec("delete from pivot_location_line_and_location_railroad_grade_crosses where location_railroad_grade_cross_id = ?", locationRailroadGradeCross.Id)
+	ret = models.BootByModel(models.BaseModel{}).PrepareByDefaultDbDriver().Exec("delete from pivot_location_line_and_location_railroad_grade_crosses where location_railroad_grade_cross_id = ?", locationRailroadGradeCross.Id)
 
 	// 创建绑定关系
 	if len(form.LocationLines) > 0 {
@@ -232,14 +232,15 @@ func (LocationRailroadGradeCrossController) PutBindLines(ctx *gin.Context) {
 			})
 		}
 		models.BootByModel(models.PivotLocationLineAndLocationRailroadGradeCross{}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			CreateInBatches(&pivotLocationLineAndLocationRailroadGradeCrosses, 100)
 	}
 
 	ctx.JSON(tools.CorrectBoot("绑定成功").Updated(tools.Map{}))
 }
 
-func (LocationRailroadGradeCrossController) S(ctx *gin.Context) {
+// D 详情
+func (LocationRailroadGradeCrossController) D(ctx *gin.Context) {
 	var (
 		ret                        *gorm.DB
 		locationRailroadGradeCross models.LocationRailroadGradeCrossModel
@@ -249,21 +250,32 @@ func (LocationRailroadGradeCrossController) S(ctx *gin.Context) {
 		SetWhereFields("be_enable").
 		SetPreloads("OrganizationWorkshop", "OrganizationWorkArea", "LocationLines").
 		SetPreloadsByDefault().
-		PrepareUseQueryByDefault(ctx).
+		PrepareUseQueryByDefaultDbDriver(ctx).
 		First(&locationRailroadGradeCross)
 	wrongs.PanicWhenIsEmpty(ret, "道口")
 
 	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_railroad_grade_cross": locationRailroadGradeCross}))
 }
 
-func (LocationRailroadGradeCrossController) I(ctx *gin.Context) {
-	var locationRailroadGradeCrosses []models.LocationRailroadGradeCrossModel
-	models.BootByModel(models.LocationRailroadGradeCrossModel{}).
+// L 列表
+func (LocationRailroadGradeCrossController) L(ctx *gin.Context) {
+	var (
+		locationRailroadGradeCrosses []models.LocationRailroadGradeCrossModel
+		count                        int64
+		db                           *gorm.DB
+	)
+	db = models.BootByModel(models.LocationRailroadGradeCrossModel{}).
 		SetWhereFields("unique_code", "name", "be_enable", "organization_workshop_uuid", "organization_work_area_uuid").
 		SetPreloads("OrganizationWorkshop", "OrganizationWorkArea", "LocationLines").
 		SetPreloadsByDefault().
-		PrepareUseQueryByDefault(ctx).
-		Find(&locationRailroadGradeCrosses)
+		PrepareUseQueryByDefaultDbDriver(ctx)
 
-	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_railroad_grade_crosses": locationRailroadGradeCrosses}))
+	if ctx.Query("__page__") == "" {
+		db.Find(&locationRailroadGradeCrosses)
+		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_railroad_grade_crosses": locationRailroadGradeCrosses}))
+	} else {
+		db.Count(&count)
+		models.Pagination(db, ctx).Find(&locationRailroadGradeCrosses)
+		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"location_railroad_grade_crosses": locationRailroadGradeCrosses}, ctx.Query("__page__"), count))
+	}
 }

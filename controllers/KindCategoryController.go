@@ -45,8 +45,8 @@ func (cls KindCategoryStoreForm) ShouldBind(ctx *gin.Context) KindCategoryStoreF
 	return cls
 }
 
-// C 保存
-func (KindCategoryController) C(ctx *gin.Context) {
+// N 保存
+func (KindCategoryController) N(ctx *gin.Context) {
 	var (
 		ret    *gorm.DB
 		repeat models.KindCategoryModel
@@ -58,12 +58,12 @@ func (KindCategoryController) C(ctx *gin.Context) {
 	// 查重
 	ret = models.BootByModel(models.KindCategoryModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "种类代码")
 	ret = models.BootByModel(models.KindCategoryModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "种类名称")
 
@@ -76,15 +76,15 @@ func (KindCategoryController) C(ctx *gin.Context) {
 		Nickname:   form.Nickname,
 		Race:       form.Race,
 	}
-	if ret = models.BootByModel(models.KindCategoryModel{}).PrepareByDefault().Create(&kindCategory); ret.Error != nil {
+	if ret = models.BootByModel(models.KindCategoryModel{}).PrepareByDefaultDbDriver().Create(&kindCategory); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"kind_category": kindCategory}))
 }
 
-// D 删除
-func (KindCategoryController) D(ctx *gin.Context) {
+// R 删除
+func (KindCategoryController) R(ctx *gin.Context) {
 	var (
 		ret          *gorm.DB
 		kindCategory models.KindCategoryModel
@@ -93,20 +93,20 @@ func (KindCategoryController) D(ctx *gin.Context) {
 	// 查询
 	ret = models.BootByModel(models.KindCategoryModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&kindCategory)
 	wrongs.PanicWhenIsEmpty(ret, "种类")
 
 	// 删除
-	if ret := models.BootByModel(models.KindCategoryModel{}).PrepareByDefault().Delete(&kindCategory); ret.Error != nil {
+	if ret := models.BootByModel(models.KindCategoryModel{}).PrepareByDefaultDbDriver().Delete(&kindCategory); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
 
-// U 更新
-func (KindCategoryController) U(ctx *gin.Context) {
+// E 更新
+func (KindCategoryController) E(ctx *gin.Context) {
 	var (
 		ret                  *gorm.DB
 		kindCategory, repeat models.KindCategoryModel
@@ -119,20 +119,20 @@ func (KindCategoryController) U(ctx *gin.Context) {
 	ret = models.BootByModel(models.KindCategoryModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "种类代码")
 	ret = models.BootByModel(models.KindCategoryModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "种类名称")
 
 	// 查询
 	ret = models.BootByModel(models.KindCategoryModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&kindCategory)
 	wrongs.PanicWhenIsEmpty(ret, "种类")
 
@@ -142,15 +142,15 @@ func (KindCategoryController) U(ctx *gin.Context) {
 	kindCategory.Nickname = form.Nickname
 	kindCategory.BeEnable = form.BeEnable
 	kindCategory.Race = form.Race
-	if ret = models.BootByModel(models.KindCategoryModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&kindCategory); ret.Error != nil {
+	if ret = models.BootByModel(models.KindCategoryModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefaultDbDriver().Save(&kindCategory); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"kind_category": kindCategory}))
 }
 
-// S 详情
-func (KindCategoryController) S(ctx *gin.Context) {
+// D 详情
+func (KindCategoryController) D(ctx *gin.Context) {
 	var (
 		ret          *gorm.DB
 		kindCategory models.KindCategoryModel
@@ -158,21 +158,30 @@ func (KindCategoryController) S(ctx *gin.Context) {
 	ret = models.BootByModel(models.KindCategoryModel{}).
 		SetScopes((&models.BaseModel{}).ScopeBeEnableTrue).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&kindCategory)
 	wrongs.PanicWhenIsEmpty(ret, "种类")
 
 	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"kind_category": kindCategory}))
 }
 
-// I 列表
-func (KindCategoryController) I(ctx *gin.Context) {
-	var kindCategories []models.KindCategoryModel
-	models.BootByModel(models.KindCategoryModel{}).
-		SetScopes((&models.BaseModel{}).ScopeBeEnableTrue).
+// L 列表
+func (KindCategoryController) L(ctx *gin.Context) {
+	var (
+		kindCategories []models.KindCategoryModel
+		count          int64
+		db             *gorm.DB
+	)
+	db = models.BootByModel(models.KindCategoryModel{}).
 		SetWhereFields().
-		PrepareUseQuery(ctx, "").
-		Find(&kindCategories)
+		PrepareUseQueryByDefaultDbDriver(ctx)
 
-	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"kind_categories": kindCategories}))
+	if ctx.Query("__page__") == "" {
+		db.Find(&kindCategories)
+		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"kind_categories": kindCategories}))
+	} else {
+		db.Count(&count)
+		models.Pagination(db, ctx).Find(&kindCategories)
+		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"kind_categories": kindCategories}, ctx.Query("__page__"), count))
+	}
 }

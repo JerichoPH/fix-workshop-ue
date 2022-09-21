@@ -44,13 +44,14 @@ func (cls PositionIndoorCellStoreForm) ShouldBind(ctx *gin.Context) PositionIndo
 	}
 	ret = models.BootByModel(models.PositionIndoorTierModel{}).
 		SetWheres(tools.Map{"uuid": cls.PositionIndoorTierUuid}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&cls.PositionIndoorTier)
 	wrongs.PanicWhenIsEmpty(ret, "所属机柜层")
 
 	return cls
 }
 
+// C 新建
 func (PositionIndoorCellController) C(ctx *gin.Context) {
 	var (
 		ret    *gorm.DB
@@ -63,12 +64,12 @@ func (PositionIndoorCellController) C(ctx *gin.Context) {
 	// 查重
 	ret = models.BootByModel(models.PositionIndoorCellModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "机柜格位代码")
 	ret = models.BootByModel(models.PositionIndoorCellModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "机柜格位名称")
 
@@ -79,12 +80,14 @@ func (PositionIndoorCellController) C(ctx *gin.Context) {
 		Name:               form.Name,
 		PositionIndoorTier: form.PositionIndoorTier,
 	}
-	if ret = models.BootByModel(models.PositionIndoorCellModel{}).PrepareByDefault().Create(&positionIndoorCell); ret.Error != nil {
+	if ret = models.BootByModel(models.PositionIndoorCellModel{}).PrepareByDefaultDbDriver().Create(&positionIndoorCell); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"position_indoor_cell": positionIndoorCell}))
 }
+
+// D 删除
 func (PositionIndoorCellController) D(ctx *gin.Context) {
 	var (
 		ret                *gorm.DB
@@ -94,17 +97,19 @@ func (PositionIndoorCellController) D(ctx *gin.Context) {
 	// 查询
 	ret = models.BootByModel(models.PositionIndoorCellModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&positionIndoorCell)
 	wrongs.PanicWhenIsEmpty(ret, "机柜格位")
 
 	// 删除
-	if ret := models.BootByModel(models.PositionIndoorCellModel{}).PrepareByDefault().Delete(&positionIndoorCell); ret.Error != nil {
+	if ret := models.BootByModel(models.PositionIndoorCellModel{}).PrepareByDefaultDbDriver().Delete(&positionIndoorCell); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
+
+// U 编辑
 func (PositionIndoorCellController) U(ctx *gin.Context) {
 	var (
 		ret                        *gorm.DB
@@ -118,20 +123,20 @@ func (PositionIndoorCellController) U(ctx *gin.Context) {
 	ret = models.BootByModel(models.PositionIndoorCellModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "机柜格位代码")
 	ret = models.BootByModel(models.PositionIndoorCellModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "机柜格位名称")
 
 	// 查询
 	ret = models.BootByModel(models.PositionIndoorCellModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&positionIndoorCell)
 	wrongs.PanicWhenIsEmpty(ret, "机柜格位")
 
@@ -139,12 +144,14 @@ func (PositionIndoorCellController) U(ctx *gin.Context) {
 	positionIndoorCell.BaseModel.Sort = form.Sort
 	positionIndoorCell.Name = form.Name
 	positionIndoorCell.PositionIndoorTier = form.PositionIndoorTier
-	if ret = models.BootByModel(models.PositionIndoorCellModel{}).SetWheres(tools.Map{"uuid":ctx.Param("uuid")}).PrepareByDefault().Save(&positionIndoorCell); ret.Error != nil {
+	if ret = models.BootByModel(models.PositionIndoorCellModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefaultDbDriver().Save(&positionIndoorCell); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"position_indoor_cell": positionIndoorCell}))
 }
+
+// S 详情
 func (PositionIndoorCellController) S(ctx *gin.Context) {
 	var (
 		ret                *gorm.DB
@@ -152,18 +159,30 @@ func (PositionIndoorCellController) S(ctx *gin.Context) {
 	)
 	ret = models.BootByModel(models.PositionIndoorCellModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&positionIndoorCell)
 	wrongs.PanicWhenIsEmpty(ret, "机柜格位")
 
 	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_indoor_cell": positionIndoorCell}))
 }
-func (PositionIndoorCellController) I(ctx *gin.Context) {
-	var positionIndoorCells []models.PositionIndoorCellModel
-	models.BootByModel(models.PositionIndoorCellModel{}).
-		SetWhereFields().
-		PrepareUseQuery(ctx,"").
-		Find(&positionIndoorCells)
 
-	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_indoor_cells": positionIndoorCells}))
+// I 列表
+func (PositionIndoorCellController) I(ctx *gin.Context) {
+	var (
+		positionIndoorCells []models.PositionIndoorCellModel
+		count               int64
+		db                  *gorm.DB
+	)
+	db = models.BootByModel(models.PositionIndoorCellModel{}).
+		SetWhereFields().
+		PrepareUseQueryByDefaultDbDriver(ctx)
+
+	if ctx.Query("__page__") == "" {
+		db.Find(&positionIndoorCells)
+		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"position_indoor_cells": positionIndoorCells}))
+	} else {
+		db.Count(&count)
+		models.Pagination(db, ctx).Find(&positionIndoorCells)
+		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"position_indoor_cells": positionIndoorCells}, ctx.Query("__page__"), count))
+	}
 }

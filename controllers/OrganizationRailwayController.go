@@ -44,7 +44,7 @@ func (cls OrganizationRailwayStoreForm) ShouldBind(ctx *gin.Context) Organizatio
 	}
 	if len(cls.LocationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
-			PrepareByDefault().
+			PrepareByDefaultDbDriver().
 			Where("uuid in ?", cls.LocationLineUuids).
 			Find(&cls.LocationLines)
 	}
@@ -67,13 +67,14 @@ func (cls OrganizationRailwayBindLinesFrom) ShouldBind(ctx *gin.Context) Organiz
 	}
 
 	models.BootByModel(models.LocationLineModel{}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		Where("uuid in ?", cls.LocationLineUUIDs).
 		Find(&cls.LocationLines)
 
 	return cls
 }
 
+// C 新建
 func (OrganizationRailwayController) C(ctx *gin.Context) {
 	var (
 		ret    *gorm.DB
@@ -86,17 +87,17 @@ func (OrganizationRailwayController) C(ctx *gin.Context) {
 	// 查重
 	ret = models.BootByModel(models.OrganizationRailwayModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "路局代码")
 	ret = models.BootByModel(models.OrganizationRailwayModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "路局名称")
 	ret = models.BootByModel(models.OrganizationRailwayModel{}).
 		SetWheres(tools.Map{"short_name": form.ShortName}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "路局简称")
 
@@ -108,12 +109,14 @@ func (OrganizationRailwayController) C(ctx *gin.Context) {
 		ShortName:  form.ShortName,
 		BeEnable:   form.BeEnable,
 	}
-	if ret = (&models.BaseModel{}).SetModel(models.OrganizationRailwayModel{}).PrepareByDefault().Create(&organizationRailway); ret.Error != nil {
+	if ret = (&models.BaseModel{}).SetModel(models.OrganizationRailwayModel{}).PrepareByDefaultDbDriver().Create(&organizationRailway); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"organization_railway": organizationRailway}))
 }
+
+// D 删除
 func (OrganizationRailwayController) D(ctx *gin.Context) {
 	var ret *gorm.DB
 
@@ -121,16 +124,18 @@ func (OrganizationRailwayController) D(ctx *gin.Context) {
 	var organizationRailway models.OrganizationRailwayModel
 	ret = models.BootByModel(models.OrganizationRailwayModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&organizationRailway)
 	wrongs.PanicWhenIsEmpty(ret, "路局")
 	// 删除
-	if ret = models.BootByModel(models.OrganizationRailwayModel{}).PrepareByDefault().Delete(&organizationRailway); ret.Error != nil {
+	if ret = models.BootByModel(models.OrganizationRailwayModel{}).PrepareByDefaultDbDriver().Delete(&organizationRailway); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
+
+// U 编辑
 func (OrganizationRailwayController) U(ctx *gin.Context) {
 	var (
 		ret                         *gorm.DB
@@ -144,26 +149,26 @@ func (OrganizationRailwayController) U(ctx *gin.Context) {
 	ret = models.BootByModel(models.OrganizationRailwayModel{}).
 		SetWheres(tools.Map{"unique_code": form.UniqueCode}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "路局代码")
 	ret = models.BootByModel(models.OrganizationRailwayModel{}).
 		SetWheres(tools.Map{"name": form.Name}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "路局名称")
 	ret = models.BootByModel(models.OrganizationRailwayModel{}).
 		SetWheres(tools.Map{"short_name": form.ShortName}).
 		SetNotWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&repeat)
 	wrongs.PanicWhenIsRepeat(ret, "路局简称")
 
 	// 查询
 	ret = models.BootByModel(models.OrganizationRailwayModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefault().
+		PrepareByDefaultDbDriver().
 		First(&organizationRailway)
 	wrongs.PanicWhenIsEmpty(ret, "路局")
 
@@ -172,12 +177,14 @@ func (OrganizationRailwayController) U(ctx *gin.Context) {
 	organizationRailway.Name = form.Name
 	organizationRailway.ShortName = form.ShortName
 	organizationRailway.BeEnable = form.BeEnable
-	if ret = models.BootByModel(models.OrganizationRailwayModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefault().Save(&organizationRailway); ret.Error != nil {
+	if ret = models.BootByModel(models.OrganizationRailwayModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefaultDbDriver().Save(&organizationRailway); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"organization_railway": organizationRailway}))
 }
+
+// S 详情
 func (OrganizationRailwayController) S(ctx *gin.Context) {
 	var (
 		ret                 *gorm.DB
@@ -187,21 +194,30 @@ func (OrganizationRailwayController) S(ctx *gin.Context) {
 	ret = models.BootByModel(models.OrganizationRailwayModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 		SetWhereFields("be_enable").
-		PrepareUseQueryByDefault(ctx).
+		PrepareUseQueryByDefaultDbDriver(ctx).
 		First(&organizationRailway)
 	wrongs.PanicWhenIsEmpty(ret, "路局")
 
 	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_railway": organizationRailway}))
 }
+
+// I 列表
 func (OrganizationRailwayController) I(ctx *gin.Context) {
 	var (
 		organizationRailways []models.OrganizationRailwayModel
+		count                int64
+		db                   *gorm.DB
 	)
-
-	models.BootByModel(models.OrganizationRailwayModel{}).
+	db = models.BootByModel(models.OrganizationRailwayModel{}).
 		SetWhereFields("uuid", "sort", "unique_code", "name", "short_name", "be_enable").
-		PrepareUseQueryByDefault(ctx).
-		Find(&organizationRailways)
+		PrepareUseQueryByDefaultDbDriver(ctx)
 
-	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_railways": organizationRailways}))
+	if ctx.Query("__page__") == "" {
+		db.Find(&organizationRailways)
+		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_railways": organizationRailways}))
+	} else {
+		db.Count(&count)
+		models.Pagination(db, ctx).Find(&organizationRailways)
+		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"organization_railways": organizationRailways}, ctx.Query("__page__"), count))
+	}
 }

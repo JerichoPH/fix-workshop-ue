@@ -27,6 +27,7 @@ type BaseModel struct {
 	ignoreFields   []string
 	wheres         map[string]interface{}
 	notWheres      map[string]interface{}
+	extraWheres    map[string]func(string, *gorm.DB) *gorm.DB
 	scopes         []func(*gorm.DB) *gorm.DB
 	model          interface{}
 }
@@ -194,6 +195,13 @@ func (cls *BaseModel) SetScopes(scopes ...func(*gorm.DB) *gorm.DB) *BaseModel {
 	return cls
 }
 
+// SetExtraWheres 设置额外搜索条件字段
+func (cls *BaseModel) SetExtraWheres(extraWheres map[string]func(string, *gorm.DB) *gorm.DB) *BaseModel {
+	cls.extraWheres = extraWheres
+
+	return cls
+}
+
 // BeforeCreate 插入数据前
 //  @receiver cls
 //  @param db
@@ -289,6 +297,13 @@ func (cls *BaseModel) PrepareUseQuery(ctx *gin.Context, dbDriver string) *gorm.D
 	}
 	dbSession = dbSession.Where(wheres).Not(notWheres)
 
+	// 拼接额外搜索条件
+	for fieldName, v := range cls.extraWheres {
+		if _, ok := ignoreFields[fieldName]; !ok {
+			dbSession = v(fieldName, dbSession)
+		}
+	}
+
 	// 排序
 	if order, ok := ctx.GetQuery("__order__"); ok {
 		dbSession.Order(order)
@@ -299,18 +314,18 @@ func (cls *BaseModel) PrepareUseQuery(ctx *gin.Context, dbDriver string) *gorm.D
 	return dbSession
 }
 
-// PrepareByDefault 通过默认数据库初始化
+// PrepareByDefaultDbDriver 通过默认数据库初始化
 //  @receiver cls
 //  @return dbSession
-func (cls *BaseModel) PrepareByDefault() (dbSession *gorm.DB) {
+func (cls *BaseModel) PrepareByDefaultDbDriver() (dbSession *gorm.DB) {
 	return cls.Prepare("")
 }
 
-// PrepareUseQueryByDefault 通过默认数据库初始化
+// PrepareUseQueryByDefaultDbDriver 通过默认数据库初始化
 //  @receiver cls
 //  @param ctx
 //  @return dbSession
-func (cls *BaseModel) PrepareUseQueryByDefault(ctx *gin.Context) (dbSession *gorm.DB) {
+func (cls *BaseModel) PrepareUseQueryByDefaultDbDriver(ctx *gin.Context) (dbSession *gorm.DB) {
 	return cls.PrepareUseQuery(ctx, "")
 }
 
