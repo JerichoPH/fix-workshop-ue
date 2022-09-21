@@ -50,7 +50,7 @@ func (cls AccountStoreForm) ShouldBind(ctx *gin.Context) AccountStoreForm {
 	if len(cls.Nickname) > 64 {
 		wrongs.PanicValidate("昵称不能超过64位")
 	}
-	if len(cls.Password) > 32 || len(cls.Password) < 6{
+	if len(cls.Password) > 32 || len(cls.Password) < 6 {
 		wrongs.PanicValidate("密码不能小于6位或大于32位")
 	}
 	if cls.Password != cls.PasswordConfirmation {
@@ -311,10 +311,20 @@ func (AccountController) S(ctx *gin.Context) {
 
 // I 列表
 func (AccountController) I(ctx *gin.Context) {
-	var accounts []models.AccountModel
-	models.BootByModel(models.AccountModel{}).
-		PrepareUseQueryByDefault(ctx).
-		Find(&accounts)
+	var (
+		accounts []models.AccountModel
+		count    int64
+		db       *gorm.DB
+	)
+	db = models.BootByModel(models.AccountModel{}).
+		PrepareUseQueryByDefault(ctx)
 
-	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"accounts": accounts}))
+	if ctx.Query("__page__") == "" {
+		db.Find(&accounts)
+		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"accounts": accounts}))
+	} else {
+		db.Count(&count)
+		models.Pagination(db, ctx).Find(&accounts)
+		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"accounts": accounts}, ctx.Query("__page__"), count))
+	}
 }
