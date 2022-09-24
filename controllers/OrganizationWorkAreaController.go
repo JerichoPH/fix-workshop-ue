@@ -211,6 +211,15 @@ func (OrganizationWorkAreaController) I(ctx *gin.Context) {
 
 				return dbSession
 			},
+			"organization_work_area_profession_unique_code": func(fieldName string, dbSession *gorm.DB) *gorm.DB {
+				organizationWorkAreaProfessionUniqueCode, exists := ctx.GetQuery("organization_work_area_profession_unique_code")
+				if exists {
+					dbSession.Joins("join organization_work_area_professions owap on organization_work_area_type_profession_uuid = owap.uuid").
+						Where("owap.unique_code = ?", organizationWorkAreaProfessionUniqueCode)
+				}
+
+				return dbSession
+			},
 		}).
 		PrepareUseQueryByDefaultDbDriver(ctx)
 
