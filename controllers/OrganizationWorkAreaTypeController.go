@@ -134,8 +134,8 @@ func (OrganizationWorkAreaTypeController) S(ctx *gin.Context) {
 // I 列表
 func (OrganizationWorkAreaTypeController) I(ctx *gin.Context) {
 	var (
-		organizationWorkAreaType []models.OrganizationWorkAreaTypeModel
-		count           int64
+		organizationWorkAreaTypes []models.OrganizationWorkAreaTypeModel
+		count                     int64
 		db              *gorm.DB
 	)
 	db = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).
@@ -143,11 +143,11 @@ func (OrganizationWorkAreaTypeController) I(ctx *gin.Context) {
 		PrepareUseQueryByDefaultDbDriver(ctx)
 
 	if ctx.Query("__page__") == "" {
-		db.Find(&organizationWorkAreaType)
-		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_work_area_type": organizationWorkAreaType}))
+		db.Find(&organizationWorkAreaTypes)
+		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_work_area_types": organizationWorkAreaTypes}))
 	} else {
 		db.Count(&count)
-		models.Pagination(db, ctx).Find(&organizationWorkAreaType)
-		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"organization_work_area_type": organizationWorkAreaType}, ctx.Query("__page__"), count))
+		models.Pagination(db, ctx).Find(&organizationWorkAreaTypes)
+		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"organization_work_area_types": organizationWorkAreaTypes}, ctx.Query("__page__"), count))
 	}
 }

@@ -188,7 +188,7 @@ func (OrganizationWorkshopController) I(ctx *gin.Context) {
 	db = models.BootByModel(models.OrganizationWorkshopModel{}).
 		SetWhereFields("unique_code", "name", "be_enable", "organization_workshop_type_uuid", "organization_paragraph_uuid").
 		SetExtraWheres(map[string]func(string, *gorm.DB) *gorm.DB{
-			"organization_workshop_type_unique_codes": func(fieldName string, dbSession *gorm.DB) *gorm.DB {
+			"organization_workshop_type_unique_code": func(fieldName string, dbSession *gorm.DB) *gorm.DB {
 				organizationWorkshopTypeUniqueCodes, exists := ctx.GetQueryArray(fieldName)
 				if exists {
 					dbSession.Joins("join organization_workshop_types owt on organization_workshops.organization_workshop_type_uuid = owt.uuid").

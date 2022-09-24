@@ -261,8 +261,8 @@ func (LocationLineController) D(ctx *gin.Context) {
 // L 列表
 func (LocationLineController) L(ctx *gin.Context) {
 	var (
-		organizationLines []models.LocationLineModel
-		count             int64
+		locationLines []models.LocationLineModel
+		count         int64
 		db                *gorm.DB
 	)
 	db = models.BootByModel(models.LocationLineModel{}).
@@ -270,11 +270,11 @@ func (LocationLineController) L(ctx *gin.Context) {
 		PrepareUseQueryByDefaultDbDriver(ctx)
 
 	if ctx.Query("__page__") == "" {
-		db.Find(&organizationLines)
-		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"organization_lines": organizationLines}))
+		db.Find(&locationLines)
+		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_lines": locationLines}))
 	} else {
 		db.Count(&count)
-		models.Pagination(db, ctx).Find(&organizationLines)
-		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"organization_lines": organizationLines}, ctx.Query("__page__"), count))
+		models.Pagination(db, ctx).Find(&locationLines)
+		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"location_lines": locationLines}, ctx.Query("__page__"), count))
 	}
 }

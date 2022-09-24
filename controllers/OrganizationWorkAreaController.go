@@ -195,12 +195,23 @@ func (OrganizationWorkAreaController) S(ctx *gin.Context) {
 func (OrganizationWorkAreaController) I(ctx *gin.Context) {
 	var (
 		organizationWorkAreas []models.OrganizationWorkAreaModel
-		count           int64
-		db              *gorm.DB
+		count                 int64
+		db                    *gorm.DB
 	)
 	db = models.BootByModel(models.OrganizationWorkAreaModel{}).
 		SetWhereFields("unique_code", "name", "be_enable", "organization_work_area_type_uuid", "organization_workshop_uuid").
 		SetPreloadsByDefault().
+		SetExtraWheres(map[string]func(string, *gorm.DB) *gorm.DB{
+			"organization_work_area_type_unique_code": func(fieldName string, dbSession *gorm.DB) *gorm.DB {
+				organizationWorkAreaTypeUniqueCode, exists := ctx.GetQuery("organization_work_area_type_unique_code")
+				if exists {
+					dbSession.Joins("join organization_work_area_types owat on organization_work_area_type_uuid = owat.uuid").
+						Where("owat.unique_code = ?", organizationWorkAreaTypeUniqueCode)
+				}
+
+				return dbSession
+			},
+		}).
 		PrepareUseQueryByDefaultDbDriver(ctx)
 
 	if ctx.Query("__page__") == "" {
