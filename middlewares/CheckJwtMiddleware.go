@@ -88,7 +88,7 @@ func CheckJwt() gin.HandlerFunc {
 				ctx.Set(tools.AccountOrganizationWorkAreaTypeUniqueCode, account.OrganizationWorkArea.OrganizationWorkAreaType.UniqueCode)
 				ctx.Set(tools.AccountOrganizationWorkAreaProfessionUniqueCode, account.OrganizationWorkArea.OrganizationWorkAreaProfession.UniqueCode)
 			}
-			if account.Username == "admin" {
+			if account.BeSuperAdmin {
 				ctx.Set(tools.AccountOrganizationLevel, tools.OrganizationLevelAll)
 				ctx.Set(tools.AccountOrganizationWorkshopTypeUniqueCode, tools.OrganizationLevelAll)
 				ctx.Set(tools.AccountOrganizationWorkAreaTypeUniqueCode, tools.OrganizationLevelAll)

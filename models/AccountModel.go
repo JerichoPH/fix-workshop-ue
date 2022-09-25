@@ -12,6 +12,7 @@ type AccountModel struct {
 	Password                  string                     `gorm:"type:VARCHAR(128);COMMENT:登录密码;" json:"password"`
 	Nickname                  string                     `gorm:"type:VARCHAR(64);COMMENT:昵称;" json:"nickname"`
 	DeleteEntireInstances     []*EntireInstanceModel     `gorm:"constraint:OnUpdate:CASCADE;foreignKey:DeleteOperatorUuid;references:Uuid;COMMENT:相关删除的器材;" json:"delete_entire_instances"`
+	BeSuperAdmin              bool                       `gorm:"BOOLEAN;NOT NULL;DEFAULT:0;COMMENT:超级管理员;" json:"be_super_admin"`
 	RbacRoles                 []*RbacRoleModel           `gorm:"many2many:pivot_rbac_role_and_accounts;foreignKey:id;joinForeignKey:account_id;References:id;joinReferences:rbac_role_id;COMMENT:角色与用户多对多;" json:"rbac_roles"`
 	OrganizationRailwayUuid   string                     `gorm:"type:VARCHAR(36);COMMENT:所属路局UUID;" json:"organization_railway_uuid"`
 	OrganizationRailway       OrganizationRailwayModel   `gorm:"foreignKey:OrganizationRailwayUuid;references:Uuid;COMMENT:所属路局;" json:"organization_railway"`

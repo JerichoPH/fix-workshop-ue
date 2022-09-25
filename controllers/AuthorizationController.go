@@ -144,7 +144,7 @@ func (AuthorizationController) PostLogin(ctx *gin.Context) {
 // GetMenus 获取当前用户菜单
 func (AuthorizationController) GetMenus(ctx *gin.Context) {
 	var ret *gorm.DB
-	if accountUUID, exists := ctx.Get("__Account.Uuid__"); !exists {
+	if accountUUID, exists := ctx.Get(tools.AccountUuid); !exists {
 		wrongs.PanicUnLogin("用户未登录")
 	} else {
 		// 获取当前用户信息

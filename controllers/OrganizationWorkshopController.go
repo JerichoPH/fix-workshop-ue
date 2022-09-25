@@ -198,6 +198,7 @@ func (OrganizationWorkshopController) I(ctx *gin.Context) {
 				return dbSession
 			},
 		}).
+		SetPreloadsByDefault().
 		PrepareUseQueryByDefaultDbDriver(ctx)
 	//organizationWorkshopTypeUniqueCodes, exists := ctx.GetQueryArray("organization_workshop_type_unique_codes")
 	//if exists {
