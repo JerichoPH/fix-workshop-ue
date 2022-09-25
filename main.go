@@ -55,54 +55,54 @@ func runServer(router *gin.Engine, addr string) {
 // runAutoMigrate 初始化数据库迁移
 func runAutoMigrate() {
 	if errAutoMigrate := (&databases.Launcher{}).GetDatabaseConn().AutoMigrate(
-		// 用户与权鉴
-		//&models.AccountModel{},             // 用户
-		//&models.RbacRoleModel{},            // 角色
-		//&models.RbacPermissionModel{},      // 权限
-		//&models.RbacPermissionGroupModel{}, //权限分组
+	// 用户与权鉴
+	//&models.AccountModel{},             // 用户
+	//&models.RbacRoleModel{},            // 角色
+	//&models.RbacPermissionModel{},      // 权限
+	//&models.RbacPermissionGroupModel{}, //权限分组
 
-		// 组织机构
-		//&models.OrganizationRailwayModel{},            //路局
-		//&models.OrganizationParagraphModel{},          // 站段
-		//&models.LocationLineModel{},                   // 线别
-		//&models.OrganizationWorkshopTypeModel{},       // 车间类型
-		//&models.OrganizationWorkshopModel{},           // 车间
-		//&models.OrganizationWorkAreaTypeModel{},       // 工区类型
-		//&models.OrganizationWorkAreaProfessionModel{}, // 工区专业
-		//&models.OrganizationWorkAreaModel{},           // 工区
-		//&models.LocationSectionModel{},                // 区间
-		//&models.LocationCenterModel{},                 // 中心
-		//&models.LocationRailroadGradeCrossModel{},     // 道口
-		//&models.LocationStationModel{},                // 站场
+	// 组织机构
+	//&models.OrganizationRailwayModel{},            //路局
+	//&models.OrganizationParagraphModel{},          // 站段
+	//&models.LocationLineModel{},                   // 线别
+	//&models.OrganizationWorkshopTypeModel{},       // 车间类型
+	//&models.OrganizationWorkshopModel{},           // 车间
+	//&models.OrganizationWorkAreaTypeModel{},       // 工区类型
+	//&models.OrganizationWorkAreaProfessionModel{}, // 工区专业
+	//&models.OrganizationWorkAreaModel{},           // 工区
+	//&models.LocationSectionModel{},                // 区间
+	//&models.LocationCenterModel{},                 // 中心
+	//&models.LocationRailroadGradeCrossModel{},     // 道口
+	//&models.LocationStationModel{},                // 站场
 
-		// 仓储
-		//&models.PositionDepotStorehouseModel{}, // 仓储仓库
-		//&models.PositionDepotSectionModel{},    // 仓储仓库区域
-		//&models.PositionDepotRowTypeModel{},    // 仓储仓库排类型
-		//&models.PositionDepotRowModel{},        // 仓储仓库排
-		//&models.PositionDepotCabinetModel{},    // 仓储柜架
-		//&models.PositionDepotTierModel{},       // 仓储柜架层
-		//&models.PositionDepotCellModel{},       // 仓储柜架格位
+	// 仓储
+	//&models.PositionDepotStorehouseModel{}, // 仓储仓库
+	//&models.PositionDepotSectionModel{},    // 仓储仓库区域
+	//&models.PositionDepotRowTypeModel{},    // 仓储仓库排类型
+	//&models.PositionDepotRowModel{},        // 仓储仓库排
+	//&models.PositionDepotCabinetModel{},    // 仓储柜架
+	//&models.PositionDepotTierModel{},       // 仓储柜架层
+	//&models.PositionDepotCellModel{},       // 仓储柜架格位
 
-		// 室内上道位置
-		//&models.PositionIndoorRoomTypeModel{}, // 机房类型
-		//&models.PositionIndoorRoomModel{},     // 机房
-		//&models.PositionIndoorRowModel{},      // 排
-		//&models.PositionIndoorCabinetModel{},  // 架
-		//&models.PositionIndoorTierModel{},     // 层
-		//&models.PositionIndoorCellModel{},     // 位
+	// 室内上道位置
+	//&models.PositionIndoorRoomTypeModel{}, // 机房类型
+	//&models.PositionIndoorRoomModel{},     // 机房
+	//&models.PositionIndoorRowModel{},      // 排
+	//&models.PositionIndoorCabinetModel{},  // 架
+	//&models.PositionIndoorTierModel{},     // 层
+	//&models.PositionIndoorCellModel{},     // 位
 
-		// 种类型
-		//&models.KindCategoryModel{},   // 种类
-		//&models.KindEntireTypeModel{}, // 类型
-		//&models.KindSubTypeModel{},    // 型号
+	// 种类型
+	//&models.KindCategoryModel{},   // 种类
+	//&models.KindEntireTypeModel{}, // 类型
+	//&models.KindSubTypeModel{},    // 型号
 
-		// 器材
-		//&models.EntireInstanceModel{},        // 器材
-		//&models.EntireInstanceStatusModel{},  // 器材状态
-		//&models.EntireInstanceLockModel{},    // 器材锁
-		//&models.EntireInstanceLogTypeModel{}, // 器材日志类型
-		//&models.EntireInstanceLogModel{},     // 器材日志
+	// 器材
+	//&models.EntireInstanceModel{},        // 器材
+	//&models.EntireInstanceStatusModel{},  // 器材状态
+	//&models.EntireInstanceLockModel{},    // 器材锁
+	//&models.EntireInstanceLogTypeModel{}, // 器材日志类型
+	//&models.EntireInstanceLogModel{},     // 器材日志
 	); errAutoMigrate != nil {
 		fmt.Println("数据库迁移错误")
 		os.Exit(1)
@@ -111,8 +111,8 @@ func runAutoMigrate() {
 
 // main 程序入口
 func main() {
-	setting := settings.Boot()         // 获取配置
-	settingApp := setting.App          // 加载参数（程序）
+	setting := settings.Boot() // 获取配置
+	settingApp := setting.App  // 加载参数（程序）
 	//runAutoMigrate()                   // 数据库迁移
 	engine := gin.Default()            // 启动服务引擎
 	engine.Use(wrongs.RecoverHandler)  // 异常处理

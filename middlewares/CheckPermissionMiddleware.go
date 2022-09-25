@@ -3,6 +3,7 @@ package middlewares
 import (
 	"errors"
 	"fix-workshop-ue/models"
+	"fix-workshop-ue/services"
 	"fix-workshop-ue/settings"
 	"fix-workshop-ue/tools"
 	"fix-workshop-ue/wrongs"
@@ -11,13 +12,16 @@ import (
 	"gorm.io/gorm"
 )
 
+// CheckPermission 检查用户权限
 func CheckPermission() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// 获取上下文中的用户
-		currentAccountUUID, exists := ctx.Get("__ACCOUNT__")
+		currentAccountUuid, exists := ctx.Get(tools.AccountUuid)
 		if !exists {
 			wrongs.PanicUnLogin("未登录")
 		}
+
+		new(services.EntireInstanceService).GetAccountOrganizationLevel(ctx)
 
 		cfg := (&settings.Setting{}).Init()
 
@@ -48,7 +52,7 @@ from pivot_rbac_role_and_rbac_permissions as prp
          join rbac_permissions p on prp.rbac_permission_id = p.id
          join pivot_rbac_role_and_accounts pra on prp.rbac_role_id = pra.rbac_role_id
          join accounts a on pra.account_id = a.id
-where p.uri = ? and p.method = ? and a.uuid = ?`, ctx.FullPath(), ctx.Request.Method, currentAccountUUID).
+where p.uri = ? and p.method = ? and a.uuid = ?`, ctx.FullPath(), ctx.Request.Method, currentAccountUuid).
 				Scan(&currentRbacRoleID)
 
 			if currentRbacRoleID == 0 {
