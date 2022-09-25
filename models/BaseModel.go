@@ -13,23 +13,25 @@ import (
 
 // BaseModel 出厂数据、财务数据、检修数据、仓储数据、流转数据、运用数据
 type BaseModel struct {
-	Id             uint64         `gorm:"primaryKey" json:"id"`
-	CreatedAt      time.Time      `gorm:"timestamptz" json:"created_at"`
-	UpdatedAt      time.Time      `gorm:"timestamptz" json:"updated_at"`
-	DeletedAt      gorm.DeletedAt `gorm:"index" json:"deleted_at"`
-	Uuid           string         `gorm:"type:VARCHAR(36);COMMENT:uuid;" json:"uuid"`
-	Sort           int64          `gorm:"type:BIGINT;DEFAULT:0;COMMENT:排序;" json:"sort"`
-	preloads       []string
-	selects        []string
-	omits          []string
-	whereFields    []string
-	notWhereFields []string
-	ignoreFields   []string
-	wheres         map[string]interface{}
-	notWheres      map[string]interface{}
-	extraWheres    map[string]func(string, *gorm.DB) *gorm.DB
-	scopes         []func(*gorm.DB) *gorm.DB
-	model          interface{}
+	Id                 uint64         `gorm:"primaryKey" json:"id"`
+	CreatedAt          time.Time      `gorm:"timestamptz" json:"created_at"`
+	UpdatedAt          time.Time      `gorm:"timestamptz" json:"updated_at"`
+	DeletedAt          gorm.DeletedAt `gorm:"index" json:"deleted_at"`
+	Uuid               string         `gorm:"type:VARCHAR(36);COMMENT:uuid;" json:"uuid"`
+	Sort               int64          `gorm:"type:BIGINT;DEFAULT:0;COMMENT:排序;" json:"sort"`
+	ctx                *gin.Context
+	preloads           []string
+	selects            []string
+	omits              []string
+	whereFields        []string
+	notWhereFields     []string
+	ignoreFields       []string
+	distinctFieldNames []string
+	wheres             map[string]interface{}
+	notWheres          map[string]interface{}
+	extraWheres        map[string]func(string, *gorm.DB) *gorm.DB
+	scopes             []func(*gorm.DB) *gorm.DB
+	model              interface{}
 }
 
 // BootByModel 通过model启动
@@ -97,12 +99,26 @@ func (BaseModel) ScopeBeEnableFalse(db *gorm.DB) *gorm.DB {
 	return db.Where("be_enable is false")
 }
 
+// SetCtx 设置Context
+func (cls *BaseModel) SetCtx(ctx *gin.Context) *BaseModel {
+	cls.ctx = ctx
+
+	return cls
+}
+
 // SetModel 设置使用的模型
 //  @receiver cls
 //  @param model
 //  @return *BaseModel
 func (cls *BaseModel) SetModel(model interface{}) *BaseModel {
 	cls.model = model
+	return cls
+}
+
+// SetDistinct 设置不重复字段
+func (cls *BaseModel) SetDistinct(distinctFieldNames ...string) *BaseModel {
+	cls.distinctFieldNames = distinctFieldNames
+
 	return cls
 }
 
@@ -224,39 +240,44 @@ func (cls *BaseModel) BeforeSave(db *gorm.DB) (err error) {
 // Prepare 初始化
 //  @receiver cls
 //  @param dbDriver
-//  @return dbSession
-func (cls *BaseModel) Prepare(dbDriver string) (dbSession *gorm.DB) {
-	dbSession = (&databases.Launcher{DbDriver: dbDriver}).GetDatabaseConn()
+//  @return query
+func (cls *BaseModel) Prepare(dbDriver string) (query *gorm.DB) {
+	query = (&databases.Launcher{DbDriver: dbDriver}).GetDatabaseConn()
 
-	dbSession = dbSession.Where(cls.wheres).Not(cls.notWheres)
+	query = query.Where(cls.wheres).Not(cls.notWheres)
 
 	if cls.model != nil {
-		dbSession = dbSession.Model(&cls.model)
+		query = query.Model(&cls.model)
 	}
 
 	// 设置scopes
 	if len(cls.scopes) > 0 {
-		dbSession = dbSession.Scopes(cls.scopes...)
+		query = query.Scopes(cls.scopes...)
 	}
 
 	// 拼接preloads关系
 	if len(cls.preloads) > 0 {
 		for _, v := range cls.preloads {
-			dbSession = dbSession.Preload(v)
+			query = query.Preload(v)
 		}
+	}
+
+	// 拼接distinct
+	if len(cls.distinctFieldNames) > 0 {
+		query = query.Distinct(cls.distinctFieldNames)
 	}
 
 	// 拼接selects字段
 	if len(cls.selects) > 0 {
-		dbSession = dbSession.Select(cls.selects)
+		query = query.Select(cls.selects)
 	}
 
 	// 拼接omits字段
 	if len(cls.omits) > 0 {
-		dbSession = dbSession.Omit(cls.omits...)
+		query = query.Omit(cls.omits...)
 	}
 
-	return dbSession
+	return query
 }
 
 // PrepareUseQuery 根据Query参数初始化
@@ -317,7 +338,7 @@ func (cls *BaseModel) PrepareUseQuery(ctx *gin.Context, dbDriver string) *gorm.D
 // PrepareByDefaultDbDriver 通过默认数据库初始化
 //  @receiver cls
 //  @return dbSession
-func (cls *BaseModel) PrepareByDefaultDbDriver() (dbSession *gorm.DB) {
+func (cls *BaseModel) PrepareByDefaultDbDriver() (query *gorm.DB) {
 	return cls.Prepare("")
 }
 
@@ -325,7 +346,7 @@ func (cls *BaseModel) PrepareByDefaultDbDriver() (dbSession *gorm.DB) {
 //  @receiver cls
 //  @param ctx
 //  @return dbSession
-func (cls *BaseModel) PrepareUseQueryByDefaultDbDriver(ctx *gin.Context) (dbSession *gorm.DB) {
+func (cls *BaseModel) PrepareUseQueryByDefaultDbDriver(ctx *gin.Context) (query *gorm.DB) {
 	return cls.PrepareUseQuery(ctx, "")
 }
 
