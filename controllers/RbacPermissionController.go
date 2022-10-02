@@ -48,7 +48,7 @@ func (cls RbacPermissionStoreForm) ShouldBind(ctx *gin.Context) RbacPermissionSt
 		wrongs.PanicValidate("所属权限分组必选")
 	}
 	ret = models.BootByModel(models.RbacPermissionGroupModel{}).
-		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+		SetWheres(tools.Map{"uuid": cls.RbacPermissionGroupUuid}).
 		PrepareByDefaultDbDriver().
 		First(&cls.RbacPermissionGroup)
 	wrongs.PanicWhenIsEmpty(ret, "权限分组")
@@ -80,7 +80,7 @@ func (cls RbacPermissionStoreResourceForm) ShouldBind(ctx *gin.Context) RbacPerm
 	return cls
 }
 
-func (RbacPermissionController) C(ctx *gin.Context) {
+func (RbacPermissionController) N(ctx *gin.Context) {
 	var ret *gorm.DB
 
 	// 表单
@@ -137,7 +137,7 @@ func (RbacPermissionController) PostResource(ctx *gin.Context) {
 
 	ctx.JSON(tools.CorrectBoot("成功添加权限：" + strconv.Itoa(successCount) + "个").Created(tools.Map{}))
 }
-func (RbacPermissionController) D(ctx *gin.Context) {
+func (RbacPermissionController) R(ctx *gin.Context) {
 	var (
 		ret            *gorm.DB
 		rbacPermission models.RbacPermissionModel
@@ -158,7 +158,7 @@ func (RbacPermissionController) D(ctx *gin.Context) {
 
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
-func (RbacPermissionController) U(ctx *gin.Context) {
+func (RbacPermissionController) E(ctx *gin.Context) {
 	var (
 		ret            *gorm.DB
 		rbacPermission models.RbacPermissionModel
@@ -189,8 +189,8 @@ func (RbacPermissionController) U(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"rbac_permission": rbacPermission}))
 }
 
-// S 详情
-func (RbacPermissionController) S(ctx *gin.Context) {
+// D 详情
+func (RbacPermissionController) D(ctx *gin.Context) {
 	var (
 		ret            *gorm.DB
 		rbacPermission models.RbacPermissionModel
@@ -206,8 +206,8 @@ func (RbacPermissionController) S(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"rbac_permission": rbacPermission}))
 }
 
-// I 列表
-func (RbacPermissionController) I(ctx *gin.Context) {
+// L 列表
+func (RbacPermissionController) L(ctx *gin.Context) {
 	var (
 		rbacPermissions []models.RbacPermissionModel
 		count           int64

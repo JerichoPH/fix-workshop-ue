@@ -20,18 +20,18 @@ func (RbacPermissionGroupRouter) Load(engine *gin.Engine) {
 	)
 	{
 		// 创建权限分组
-		r.POST("", func(ctx *gin.Context) { new(controllers.RbacPermissionGroupController).C(ctx) })
+		r.POST("", func(ctx *gin.Context) { new(controllers.RbacPermissionGroupController).N(ctx) })
 
 		// 删除用户分组
-		r.DELETE(":uuid", func(ctx *gin.Context) { new(controllers.RbacPermissionGroupController).D(ctx) })
+		r.DELETE(":uuid", func(ctx *gin.Context) { new(controllers.RbacPermissionGroupController).R(ctx) })
 
 		// 编辑权限分组
-		r.PUT(":uuid", func(ctx *gin.Context) { new(controllers.RbacPermissionGroupController).U(ctx) })
+		r.PUT(":uuid", func(ctx *gin.Context) { new(controllers.RbacPermissionGroupController).E(ctx) })
 
 		// 权限分组详情
-		r.GET(":uuid", func(ctx *gin.Context) { new(controllers.RbacPermissionGroupController).S(ctx) })
+		r.GET(":uuid", func(ctx *gin.Context) { new(controllers.RbacPermissionGroupController).D(ctx) })
 
 		// 权限分组列表
-		r.GET("", func(ctx *gin.Context) { new(controllers.RbacPermissionGroupController).I(ctx) })
+		r.GET("", func(ctx *gin.Context) { new(controllers.RbacPermissionGroupController).L(ctx) })
 	}
 }

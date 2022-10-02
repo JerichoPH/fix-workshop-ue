@@ -1,9 +1,7 @@
 package models
 
-import "gorm.io/gorm"
-
-// PivotLocationLineAndLocationSection 线别对区间多对多
-type PivotLocationLineAndLocationSection struct {
+// PivotLocationLineAndLocationSectionModel 线别对区间多对多
+type PivotLocationLineAndLocationSectionModel struct {
 	LocationLineId    uint64               `json:"location_line_id"`
 	LocationLine      LocationLineModel    `json:"location_line"`
 	LocationSectionId uint64               `json:"location_section_id"`
@@ -11,9 +9,9 @@ type PivotLocationLineAndLocationSection struct {
 }
 
 // TableName 表名称
-//  @receiver PivotLocationLineAndLocationSection
+//  @receiver PivotLocationLineAndLocationSectionModel
 //  @param db
 //  @return string
-func (PivotLocationLineAndLocationSection) TableName(db *gorm.DB) string {
+func (PivotLocationLineAndLocationSectionModel) TableName() string {
 	return "pivot_location_line_and_location_sections"
 }

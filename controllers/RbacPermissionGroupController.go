@@ -5,6 +5,7 @@ import (
 	"fix-workshop-ue/tools"
 	"fix-workshop-ue/wrongs"
 	"github.com/gin-gonic/gin"
+	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
 )
 
@@ -33,8 +34,8 @@ func (cls RbacPermissionGroupStoreForm) ShouldBind(ctx *gin.Context) RbacPermiss
 	return cls
 }
 
-// C 新建
-func (RbacPermissionGroupController) C(ctx *gin.Context) {
+// N 新建
+func (RbacPermissionGroupController) N(ctx *gin.Context) {
 	var (
 		ret    *gorm.DB
 		repeat models.RbacPermissionGroupModel
@@ -51,7 +52,10 @@ func (RbacPermissionGroupController) C(ctx *gin.Context) {
 	wrongs.PanicWhenIsRepeat(ret, "权限分组名称")
 
 	// 保存
-	rbacPermissionGroup := &models.RbacPermissionGroupModel{Name: form.Name}
+	rbacPermissionGroup := &models.RbacPermissionGroupModel{
+		BaseModel: models.BaseModel{Uuid: uuid.NewV4().String()},
+		Name:      form.Name,
+	}
 	if ret = models.BootByModel(models.RbacPermissionGroupModel{}).
 		PrepareByDefaultDbDriver().
 		Create(&rbacPermissionGroup); ret.Error != nil {
@@ -61,8 +65,8 @@ func (RbacPermissionGroupController) C(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"rbac_permission_group": rbacPermissionGroup}))
 }
 
-// D 删除
-func (RbacPermissionGroupController) D(ctx *gin.Context) {
+// R 删除
+func (RbacPermissionGroupController) R(ctx *gin.Context) {
 	var (
 		ret                 *gorm.DB
 		rbacPermissionGroup models.RbacPermissionGroupModel
@@ -87,8 +91,8 @@ func (RbacPermissionGroupController) D(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
 
-// U 编辑
-func (RbacPermissionGroupController) U(ctx *gin.Context) {
+// E 编辑
+func (RbacPermissionGroupController) E(ctx *gin.Context) {
 	var (
 		ret                         *gorm.DB
 		rbacPermissionGroup, repeat models.RbacPermissionGroupModel
@@ -121,8 +125,8 @@ func (RbacPermissionGroupController) U(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"rbac_permission_group": rbacPermissionGroup}))
 }
 
-// S 详情
-func (RbacPermissionGroupController) S(ctx *gin.Context) {
+// D 详情
+func (RbacPermissionGroupController) D(ctx *gin.Context) {
 	var ret *gorm.DB
 	uuid := ctx.Param("uuid")
 
@@ -138,8 +142,8 @@ func (RbacPermissionGroupController) S(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"rbac_permission_group": rbacPermissionGroup}))
 }
 
-// I 列表
-func (RbacPermissionGroupController) I(ctx *gin.Context) {
+// L 列表
+func (RbacPermissionGroupController) L(ctx *gin.Context) {
 	var (
 		rbacPermissionGroups []models.RbacPermissionGroupModel
 		count                int64

@@ -19,24 +19,29 @@ func (RbacRoleRouter) Load(engine *gin.Engine) {
 	)
 	{
 		// 新建角色
-		r.POST("", func(ctx *gin.Context) {new(controllers.RbacRoleController).C(ctx)})
+		r.POST("", func(ctx *gin.Context) { new(controllers.RbacRoleController).N(ctx) })
 
 		// 删除角色
-		r.DELETE(":uuid", func(ctx *gin.Context) {new(controllers.RbacRoleController).D(ctx)})
+		r.DELETE(":uuid", func(ctx *gin.Context) { new(controllers.RbacRoleController).R(ctx) })
 
 		// 编辑角色
-		r.PUT(":uuid", func(ctx *gin.Context) {new(controllers.RbacRoleController).U(ctx)})
+		r.PUT(":uuid", func(ctx *gin.Context) { new(controllers.RbacRoleController).E(ctx) })
 
 		// 绑定用户
-		r.PUT("role/:uuid/bindAccounts", func(ctx *gin.Context) {new(controllers.RbacRoleController).PutBindAccounts(ctx)})
+		r.PUT(":uuid/bindAccounts", func(ctx *gin.Context) { new(controllers.RbacRoleController).PutBindAccounts(ctx) })
 
 		// 绑定权限
-		r.PUT("role/:uuid/bindPermissions", func(ctx *gin.Context) {new(controllers.RbacRoleController).PutBindRbacPermissions(ctx)})
+		r.PUT(":uuid/bindRbacPermissions", func(ctx *gin.Context) { new(controllers.RbacRoleController).PutBindRbacPermissions(ctx) })
+
+		// 绑定权限（根据权限分组）
+		r.PUT(":uuid/bindRbacPermissionsByRbacPermissionGroup", func(ctx *gin.Context) {
+			new(controllers.RbacRoleController).PutBindRbacPermissionsByRbacPermissionGroup(ctx)
+		})
 
 		// 角色详情
-		r.GET(":uuid", func(ctx *gin.Context) {new(controllers.RbacRoleController).S(ctx)})
+		r.GET(":uuid", func(ctx *gin.Context) { new(controllers.RbacRoleController).D(ctx) })
 
 		// 角色列表
-		r.GET("", func(ctx *gin.Context) {new(controllers.RbacRoleController).I(ctx)})
+		r.GET("", func(ctx *gin.Context) { new(controllers.RbacRoleController).L(ctx) })
 	}
 }

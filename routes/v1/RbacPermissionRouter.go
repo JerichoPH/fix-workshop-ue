@@ -20,22 +20,22 @@ func (RbacPermissionRouter) Load(engine *gin.Engine) {
 	)
 	{
 		// 新建
-		r.POST("", func(ctx *gin.Context) {new(controllers.RbacPermissionController).C(ctx)})
+		r.POST("", func(ctx *gin.Context) { new(controllers.RbacPermissionController).N(ctx) })
 
 		// 批量添加资源权限
-		r.POST("resource", func(ctx *gin.Context) {new(controllers.RbacPermissionController).PostResource(ctx)})
+		r.POST("resource", func(ctx *gin.Context) { new(controllers.RbacPermissionController).PostResource(ctx) })
 
 		// 删除权限
-		r.DELETE(":uuid", func(ctx *gin.Context) {new(controllers.RbacPermissionController).D(ctx)})
+		r.DELETE(":uuid", func(ctx *gin.Context) { new(controllers.RbacPermissionController).R(ctx) })
 
 		// 编辑权限
-		r.PUT(":uuid", func(ctx *gin.Context) {new(controllers.RbacPermissionController).U(ctx)})
+		r.PUT(":uuid", func(ctx *gin.Context) { new(controllers.RbacPermissionController).E(ctx) })
 
 		// 权限详情
-		r.GET(":uuid", func(ctx *gin.Context) {new(controllers.RbacPermissionController).S(ctx)})
+		r.GET(":uuid", func(ctx *gin.Context) { new(controllers.RbacPermissionController).D(ctx) })
 
 		// 权限列表
-		r.GET("", func(ctx *gin.Context) {new(controllers.RbacPermissionController).I(ctx)})
+		r.GET("", func(ctx *gin.Context) { new(controllers.RbacPermissionController).L(ctx) })
 	}
 
 }

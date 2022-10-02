@@ -207,7 +207,7 @@ func (LocationRailroadGradeCrossController) PutBindLines(ctx *gin.Context) {
 	var (
 		ret                                              *gorm.DB
 		locationRailroadGradeCross                       models.LocationRailroadGradeCrossModel
-		pivotLocationLineAndLocationRailroadGradeCrosses []models.PivotLocationLineAndLocationRailroadGradeCross
+		pivotLocationLineAndLocationRailroadGradeCrosses []models.PivotLocationLineAndLocationRailroadGradeCrossModel
 	)
 
 	// 表单
@@ -226,12 +226,12 @@ func (LocationRailroadGradeCrossController) PutBindLines(ctx *gin.Context) {
 	// 创建绑定关系
 	if len(form.LocationLines) > 0 {
 		for _, locationLine := range form.LocationLines {
-			pivotLocationLineAndLocationRailroadGradeCrosses = append(pivotLocationLineAndLocationRailroadGradeCrosses, models.PivotLocationLineAndLocationRailroadGradeCross{
+			pivotLocationLineAndLocationRailroadGradeCrosses = append(pivotLocationLineAndLocationRailroadGradeCrosses, models.PivotLocationLineAndLocationRailroadGradeCrossModel{
 				LocationLineId:               locationLine.Id,
 				LocationRailroadGradeCrossId: locationRailroadGradeCross.Id,
 			})
 		}
-		models.BootByModel(models.PivotLocationLineAndLocationRailroadGradeCross{}).
+		models.BootByModel(models.PivotLocationLineAndLocationRailroadGradeCrossModel{}).
 			PrepareByDefaultDbDriver().
 			CreateInBatches(&pivotLocationLineAndLocationRailroadGradeCrosses, 100)
 	}

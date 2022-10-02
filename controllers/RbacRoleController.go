@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
+	"strconv"
 )
 
 type RbacRoleController struct{}
@@ -68,7 +69,7 @@ func (cls RbacRoleBindAccountsForm) ShouldBind(ctx *gin.Context) RbacRoleBindAcc
 
 // RbacRoleBindPermissionsForm 角色绑定权限表单
 type RbacRoleBindPermissionsForm struct {
-	RbacPermissionUUIDs []string `form:"rbac_permission_uuids" json:"rbac_permission_uuids"`
+	RbacPermissionUuids []string `form:"rbac_permission_uuids" json:"rbac_permission_uuids"`
 	RbacPermissions     []*models.RbacPermissionModel
 }
 
@@ -81,18 +82,47 @@ func (cls RbacRoleBindPermissionsForm) ShouldBind(ctx *gin.Context) RbacRoleBind
 		wrongs.PanicForbidden(err.Error())
 	}
 
-	if len(cls.RbacPermissionUUIDs) > 0 {
+	if len(cls.RbacPermissionUuids) > 0 {
 		models.BootByModel(models.RbacPermissionModel{}).
 			PrepareByDefaultDbDriver().
-			Where("uuid in ?", cls.RbacPermissionUUIDs).
+			Where("uuid in ?", cls.RbacPermissionUuids).
 			Find(&cls.RbacPermissions)
 	}
 
 	return cls
 }
 
-// C 新建
-func (RbacRoleController) C(ctx *gin.Context) {
+// RbacRoleBindPermissionsByRbacPermissionGroupForm 角色绑定权限表单（根据权限分组）
+type RbacRoleBindPermissionsByRbacPermissionGroupForm struct {
+	RbacPermissionUuids     []string `form:"rbac_permission_uuids" json:"rbac_permission_uuids"`
+	RbacPermissions         []*models.RbacPermissionModel
+	RbacPermissionGroupUuid string `form:"rbac_permission_group_uuid" json:"rbac_permission_group_uuid"`
+	RbacPermissionGroup     models.RbacPermissionGroupModel
+}
+
+// ShouldBind 绑定表单
+func (cls RbacRoleBindPermissionsByRbacPermissionGroupForm) ShouldBind(ctx *gin.Context) RbacRoleBindPermissionsByRbacPermissionGroupForm {
+	var ret *gorm.DB
+
+	if err := ctx.ShouldBind(&cls); err != nil {
+		wrongs.PanicValidate(err.Error())
+	}
+
+	if cls.RbacPermissionGroupUuid == "" {
+		wrongs.PanicValidate("所属权限分组必选")
+	}
+	ret = models.BootByModel(models.RbacPermissionGroupModel{}).SetWheres(tools.Map{"uuid": cls.RbacPermissionGroupUuid}).PrepareByDefaultDbDriver().First(&cls.RbacPermissionGroup)
+	wrongs.PanicWhenIsEmpty(ret, "权限分组")
+
+	if len(cls.RbacPermissionUuids) > 0 {
+		models.BootByModel(models.RbacPermissionModel{}).PrepareByDefaultDbDriver().Where("uuid in ?", cls.RbacPermissionUuids).Find(&cls.RbacPermissions)
+	}
+
+	return cls
+}
+
+// N 新建
+func (RbacRoleController) N(ctx *gin.Context) {
 	var (
 		ret    *gorm.DB
 		repeat RbacRoleStoreForm
@@ -120,8 +150,8 @@ func (RbacRoleController) C(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"rbac_role": rbacRole}))
 }
 
-// D 删除
-func (RbacRoleController) D(ctx *gin.Context) {
+// R 删除
+func (RbacRoleController) R(ctx *gin.Context) {
 	var (
 		ret      *gorm.DB
 		rbacRole models.RbacRoleModel
@@ -141,8 +171,8 @@ func (RbacRoleController) D(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBootByDefault().Deleted())
 }
 
-// U 编辑
-func (RbacRoleController) U(ctx *gin.Context) {
+// E 编辑
+func (RbacRoleController) E(ctx *gin.Context) {
 	var (
 		ret              *gorm.DB
 		rbacRole, repeat models.RbacRoleModel
@@ -176,8 +206,9 @@ func (RbacRoleController) U(ctx *gin.Context) {
 // PutBindAccounts 角色绑定用户
 func (RbacRoleController) PutBindAccounts(ctx *gin.Context) {
 	var (
-		ret      *gorm.DB
-		rbacRole models.RbacRoleModel
+		ret          *gorm.DB
+		rbacRole     models.RbacRoleModel
+		successCount uint64
 	)
 
 	// 表单
@@ -191,22 +222,88 @@ func (RbacRoleController) PutBindAccounts(ctx *gin.Context) {
 	wrongs.PanicWhenIsEmpty(ret, "角色")
 
 	// 删除原有绑定关系
-	new(databases.Launcher).GetDatabaseConn().Exec("delete from pivot_rbac_role_and_rbac_permissions where rbac_role_id = ?", rbacRole.Id)
+	new(databases.Launcher).GetDatabaseConn().Exec("delete from pivot_rbac_role_and_accounts where rbac_role_id = ?", rbacRole.Id)
 
-	// 绑定
-	rbacRole.Accounts = form.Accounts
-	if ret = models.BootByModel(models.RbacRoleModel{}).PrepareByDefaultDbDriver().Save(&rbacRole); ret.Error != nil {
-		wrongs.PanicForbidden(ret.Error.Error())
+	// 绑定角色与用户
+	if len(form.Accounts) > 0 {
+		for _, account := range form.Accounts {
+			pivotRbacRoleAndAccount := models.PivotRbacRoleAndAccountModel{
+				RbacRoleId: rbacRole.Id,
+				AccountId:  account.Id,
+			}
+
+			models.BootByModel(models.PivotRbacRoleAndAccountModel{}).
+				PrepareByDefaultDbDriver().
+				Create(&pivotRbacRoleAndAccount)
+			successCount++
+		}
 	}
 
-	ctx.JSON(tools.CorrectBoot("绑定成功").Updated(tools.Map{}))
+	ctx.JSON(tools.CorrectBoot("绑定成功" + strconv.Itoa(int(successCount)) + "项").Updated(tools.Map{}))
+}
+
+// PutBindRbacPermissionsByRbacPermissionGroup 角色绑定权限（根据权限分组）
+func (RbacRoleController) PutBindRbacPermissionsByRbacPermissionGroup(ctx *gin.Context) {
+	var (
+		ret               *gorm.DB
+		rbacRole          models.RbacRoleModel
+		successCount      uint64
+		rbacPermissions   []models.RbacPermissionModel
+		rbacPermissionIds []uint64
+	)
+
+	// 表单
+	form := (&RbacRoleBindPermissionsByRbacPermissionGroupForm{}).ShouldBind(ctx)
+
+	// 查询
+	ret = models.BootByModel(models.RbacRoleModel{}).
+		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
+		PrepareByDefaultDbDriver().
+		First(&rbacRole)
+	wrongs.PanicWhenIsEmpty(ret, "角色")
+
+	// 删除原有绑定关系
+	// 1、查找现有权限分组下所有权限id
+	models.BootByModel(models.RbacPermissionModel{}).
+		SetWheres(tools.Map{"rbac_permission_group_uuid": form.RbacPermissionGroup.Uuid}).
+		PrepareByDefaultDbDriver().
+		Find(&rbacPermissions)
+	if len(rbacPermissions) > 0 {
+		for _, rbacPermission := range rbacPermissions {
+			rbacPermissionIds = append(rbacPermissionIds, rbacPermission.Id)
+		}
+	}
+
+	new(databases.Launcher).GetDatabaseConn().Exec(`
+delete from pivot_rbac_role_and_rbac_permissions
+		where rbac_role_id = ?
+		and rbac_permission_id in ?
+`, rbacRole.Id, rbacPermissionIds)
+
+	// 绑定角色与权限关系
+	if len(form.RbacPermissions) > 0 {
+		for _, rbacPermission := range form.RbacPermissions {
+			pivotRbacRoleAndPermission := models.PivotRbacRoleAndPermissionModel{
+				RbacRoleId:       rbacRole.Id,
+				RbacPermissionId: rbacPermission.Id,
+			}
+
+			models.BootByModel(models.PivotRbacRoleAndPermissionModel{}).
+				PrepareByDefaultDbDriver().
+				Create(&pivotRbacRoleAndPermission)
+			successCount++
+		}
+	}
+
+	ctx.JSON(tools.CorrectBoot("绑定成功" + strconv.Itoa(int(successCount)) + "项").Updated(tools.Map{}))
 }
 
 // PutBindRbacPermissions 角色绑定权限
 func (RbacRoleController) PutBindRbacPermissions(ctx *gin.Context) {
 	var (
-		ret      *gorm.DB
-		rbacRole models.RbacRoleModel
+		ret          *gorm.DB
+		rbacRole     models.RbacRoleModel
+		successCount uint64
 	)
 
 	// 表单
@@ -222,17 +319,26 @@ func (RbacRoleController) PutBindRbacPermissions(ctx *gin.Context) {
 	// 删除原有绑定关系
 	new(databases.Launcher).GetDatabaseConn().Exec("delete from pivot_rbac_role_and_rbac_permissions where rbac_role_id = ?", rbacRole.Id)
 
-	// 绑定
-	rbacRole.RbacPermissions = form.RbacPermissions
-	if ret = models.BootByModel(models.RbacRoleModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefaultDbDriver().Save(&rbacRole); ret.Error != nil {
-		wrongs.PanicForbidden(ret.Error.Error())
+	// 绑定角色与权限关系
+	if len(form.RbacPermissions) > 0 {
+		for _, rbacPermission := range form.RbacPermissions {
+			pivotRbacRoleAndPermission := models.PivotRbacRoleAndPermissionModel{
+				RbacRoleId:       rbacRole.Id,
+				RbacPermissionId: rbacPermission.Id,
+			}
+
+			models.BootByModel(models.PivotRbacRoleAndPermissionModel{}).
+				PrepareByDefaultDbDriver().
+				Create(&pivotRbacRoleAndPermission)
+			successCount++
+		}
 	}
 
-	ctx.JSON(tools.CorrectBoot("绑定成功").Updated(tools.Map{}))
+	ctx.JSON(tools.CorrectBoot("绑定成功" + strconv.Itoa(int(successCount)) + "项").Updated(tools.Map{}))
 }
 
-// S 详情
-func (RbacRoleController) S(ctx *gin.Context) {
+// D 详情
+func (RbacRoleController) D(ctx *gin.Context) {
 	var (
 		ret      *gorm.DB
 		rbacRole models.RbacRoleModel
@@ -253,8 +359,8 @@ func (RbacRoleController) S(ctx *gin.Context) {
 	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"rbac_role": rbacRole}))
 }
 
-// I 列表
-func (RbacRoleController) I(ctx *gin.Context) {
+// L 列表
+func (RbacRoleController) L(ctx *gin.Context) {
 	var (
 		rbacRoles []models.RbacRoleModel
 		count     int64

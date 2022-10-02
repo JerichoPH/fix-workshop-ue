@@ -208,7 +208,7 @@ func (LocationCenterController) PutBindLines(ctx *gin.Context) {
 	var (
 		ret                                 *gorm.DB
 		locationCenter                      models.LocationCenterModel
-		pivotLocationLineAndLocationCenters []models.PivotLocationLineAndLocationCenter
+		pivotLocationLineAndLocationCenters []models.PivotLocationLineAndLocationCenterModel
 	)
 
 	// 表单
@@ -227,12 +227,12 @@ func (LocationCenterController) PutBindLines(ctx *gin.Context) {
 	// 创建绑定关系
 	if len(form.LocationLines) > 0 {
 		for _, locationLine := range form.LocationLines {
-			pivotLocationLineAndLocationCenters = append(pivotLocationLineAndLocationCenters, models.PivotLocationLineAndLocationCenter{
+			pivotLocationLineAndLocationCenters = append(pivotLocationLineAndLocationCenters, models.PivotLocationLineAndLocationCenterModel{
 				LocationLineId:   locationLine.Id,
 				LocationCenterId: locationCenter.Id,
 			})
 		}
-		models.BootByModel(models.PivotLocationLineAndLocationCenter{}).
+		models.BootByModel(models.PivotLocationLineAndLocationCenterModel{}).
 			PrepareByDefaultDbDriver().
 			CreateInBatches(&pivotLocationLineAndLocationCenters, 100)
 	}

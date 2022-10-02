@@ -1,9 +1,7 @@
 package models
 
-import "gorm.io/gorm"
-
-// PivotLocationLineAndLocationRailroadGradeCross 线别对道口多对多
-type PivotLocationLineAndLocationRailroadGradeCross struct {
+// PivotLocationLineAndLocationRailroadGradeCrossModel 线别对道口多对多
+type PivotLocationLineAndLocationRailroadGradeCrossModel struct {
 	LocationLineId               uint64                          `json:"location_line_id"`
 	LocationLine                 LocationLineModel               `json:"location_line"`
 	LocationRailroadGradeCrossId uint64                          `json:"location_railroad_grade_cross_id"`
@@ -11,9 +9,9 @@ type PivotLocationLineAndLocationRailroadGradeCross struct {
 }
 
 // TableName 表名称
-//  @receiver PivotLocationLineAndLocationRailroadGradeCross
+//  @receiver PivotLocationLineAndLocationRailroadGradeCrossModel
 //  @param db
 //  @return string
-func (PivotLocationLineAndLocationRailroadGradeCross) TableName(db *gorm.DB) string {
+func (PivotLocationLineAndLocationRailroadGradeCrossModel) TableName() string {
 	return "pivot_location_line_and_location_railroad_grade_crosses"
 }
