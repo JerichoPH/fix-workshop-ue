@@ -30,57 +30,56 @@ type PositionIndoorRoomStoreForm struct {
 //  @receiver PositionIndoorRoomStoreForm
 //  @param ctx
 //  @return PositionIndoorRoomStoreForm
-func (cls PositionIndoorRoomStoreForm) ShouldBind(ctx *gin.Context) PositionIndoorRoomStoreForm {
+func (ins PositionIndoorRoomStoreForm) ShouldBind(ctx *gin.Context) PositionIndoorRoomStoreForm {
 	var ret *gorm.DB
 
-	if err := ctx.ShouldBind(&cls); err != nil {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if cls.UniqueCode == "" {
+	if ins.UniqueCode == "" {
 		wrongs.PanicValidate("机房代码必填")
 	}
-	if cls.Name == "" {
+	if ins.Name == "" {
 		wrongs.PanicValidate("机房名称必填")
 	}
-	if len(cls.Name) > 64 {
+	if len(ins.Name) > 64 {
 		wrongs.PanicValidate("机房名称不能超过64位")
 	}
-	if cls.PositionIndoorRoomTypeUuid == "" {
+	if ins.PositionIndoorRoomTypeUuid == "" {
 		wrongs.PanicValidate("机房类型必选")
 	}
 	ret = models.BootByModel(models.PositionIndoorRoomTypeModel{}).
-		SetWheres(tools.Map{"uuid": cls.PositionIndoorRoomTypeUuid}).
+		SetWheres(tools.Map{"uuid": ins.PositionIndoorRoomTypeUuid}).
 		PrepareByDefaultDbDriver().
-		First(&cls.PositionIndoorRoomType)
+		First(&ins.PositionIndoorRoomType)
 	wrongs.PanicWhenIsEmpty(ret, "机房类型")
-	if cls.LocationStationUuid == "" && cls.LocationSectionUuid == "" && cls.LocationCenterUuid == "" {
+	if ins.LocationStationUuid == "" && ins.LocationSectionUuid == "" && ins.LocationCenterUuid == "" {
 		wrongs.PanicValidate("归属单位必选")
 	}
-	if cls.LocationStationUuid != "" {
+	if ins.LocationStationUuid != "" {
 		ret = models.BootByModel(models.LocationStationModel{}).
-			SetWheres(tools.Map{"uuid": cls.LocationStationUuid}).
+			SetWheres(tools.Map{"uuid": ins.LocationStationUuid}).
 			PrepareByDefaultDbDriver().
-			First(&cls.LocationStation)
+			First(&ins.LocationStation)
 		wrongs.PanicWhenIsEmpty(ret, "所属战场")
 	}
-	if cls.LocationSectionUuid != "" {
+	if ins.LocationSectionUuid != "" {
 		ret = models.BootByModel(models.LocationSectionModel{}).
-			SetWheres(tools.Map{"uuid": cls.LocationSection}).
+			SetWheres(tools.Map{"uuid": ins.LocationSection}).
 			PrepareByDefaultDbDriver().
-			First(&cls.LocationSection)
+			First(&ins.LocationSection)
 		wrongs.PanicWhenIsEmpty(ret, "所属区间")
 	}
-	if cls.LocationCenterUuid != "" {
+	if ins.LocationCenterUuid != "" {
 		ret = models.BootByModel(models.LocationSectionModel{}).
-			SetWheres(tools.Map{"uuid": cls.LocationSection}).
+			SetWheres(tools.Map{"uuid": ins.LocationSection}).
 			PrepareByDefaultDbDriver().
-			First(&cls.LocationSection)
+			First(&ins.LocationSection)
 		wrongs.PanicWhenIsEmpty(ret, "所属中心")
 	}
 
-	return cls
+	return ins
 }
-
 
 // C 新建
 func (PositionIndoorRoomController) C(ctx *gin.Context) {
@@ -203,8 +202,8 @@ func (PositionIndoorRoomController) S(ctx *gin.Context) {
 func (PositionIndoorRoomController) I(ctx *gin.Context) {
 	var (
 		positionIndoorRooms []models.PositionIndoorRoomModel
-		count           int64
-		db              *gorm.DB
+		count               int64
+		db                  *gorm.DB
 	)
 	db = models.BootByModel(models.PositionIndoorRoomModel{}).
 		SetWhereFields().

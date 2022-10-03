@@ -10,7 +10,7 @@ import (
 type PositionDepotRowRouter struct{}
 
 // Load 加载路由
-//  @receiver cls
+//  @receiver ins
 //  @param engine
 func (PositionDepotRowRouter) Load(engine *gin.Engine) {
 	r := engine.Group(

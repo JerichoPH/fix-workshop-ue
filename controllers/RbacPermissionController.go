@@ -23,37 +23,37 @@ type RbacPermissionStoreForm struct {
 }
 
 // ShouldBind 绑定表单
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return RbacPermissionStoreForm
-func (cls RbacPermissionStoreForm) ShouldBind(ctx *gin.Context) RbacPermissionStoreForm {
+func (ins RbacPermissionStoreForm) ShouldBind(ctx *gin.Context) RbacPermissionStoreForm {
 	var ret *gorm.DB
 
-	if err := ctx.ShouldBind(&cls); err != nil {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if cls.Name == "" {
+	if ins.Name == "" {
 		wrongs.PanicValidate("权限名称必填")
 	}
-	if len(cls.Name) > 64 {
+	if len(ins.Name) > 64 {
 		wrongs.PanicValidate("权限名称不能超过64位")
 	}
-	if cls.Uri == "" {
+	if ins.Uri == "" {
 		wrongs.PanicValidate("URI必填")
 	}
-	if cls.Method == "" {
+	if ins.Method == "" {
 		wrongs.PanicValidate("访问方法必选")
 	}
-	if cls.RbacPermissionGroupUuid == "" {
+	if ins.RbacPermissionGroupUuid == "" {
 		wrongs.PanicValidate("所属权限分组必选")
 	}
 	ret = models.BootByModel(models.RbacPermissionGroupModel{}).
-		SetWheres(tools.Map{"uuid": cls.RbacPermissionGroupUuid}).
+		SetWheres(tools.Map{"uuid": ins.RbacPermissionGroupUuid}).
 		PrepareByDefaultDbDriver().
-		First(&cls.RbacPermissionGroup)
+		First(&ins.RbacPermissionGroup)
 	wrongs.PanicWhenIsEmpty(ret, "权限分组")
 
-	return cls
+	return ins
 }
 
 // RbacPermissionStoreResourceForm 批量添加资源权限
@@ -63,21 +63,21 @@ type RbacPermissionStoreResourceForm struct {
 }
 
 // ShouldBind 绑定表单
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return RbacPermissionStoreResourceForm
-func (cls RbacPermissionStoreResourceForm) ShouldBind(ctx *gin.Context) RbacPermissionStoreResourceForm {
-	if err := ctx.ShouldBind(&cls); err != nil {
+func (ins RbacPermissionStoreResourceForm) ShouldBind(ctx *gin.Context) RbacPermissionStoreResourceForm {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicForbidden(err.Error())
 	}
-	if cls.Uri == "" {
+	if ins.Uri == "" {
 		wrongs.PanicForbidden("URI必填")
 	}
-	if cls.RbacPermissionGroupUuid == "" {
+	if ins.RbacPermissionGroupUuid == "" {
 		wrongs.PanicForbidden("权限分组必选")
 	}
 
-	return cls
+	return ins
 }
 
 func (RbacPermissionController) N(ctx *gin.Context) {

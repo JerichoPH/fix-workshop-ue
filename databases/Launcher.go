@@ -14,11 +14,11 @@ type Launcher struct {
 // GetDatabaseConn 获取当前数据库链接
 //  @receiver Launcher
 //  @return *gorm.DB
-func (cls Launcher) GetDatabaseConn() (dbSession *gorm.DB) {
+func (ins Launcher) GetDatabaseConn() (dbSession *gorm.DB) {
 	var dbDriver string
 
-	if cls.DbDriver != "" {
-		dbDriver = cls.DbDriver
+	if ins.DbDriver != "" {
+		dbDriver = ins.DbDriver
 	} else {
 		setting := (&settings.Setting{}).Init()
 		dbDriver = setting.DB.Section("db").Key("db_driver").MustString("")

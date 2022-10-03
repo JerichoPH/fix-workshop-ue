@@ -18,28 +18,28 @@ type OrganizationWorkAreaProfessionStoreForm struct {
 }
 
 // ShouldBind 表单绑定
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return OrganizationWorkAreaProfessionStoreForm
-func (cls OrganizationWorkAreaProfessionStoreForm) ShouldBind(ctx *gin.Context) OrganizationWorkAreaProfessionStoreForm {
+func (ins OrganizationWorkAreaProfessionStoreForm) ShouldBind(ctx *gin.Context) OrganizationWorkAreaProfessionStoreForm {
 
-	if err := ctx.ShouldBind(&cls); err != nil {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if cls.UniqueCode == "" {
+	if ins.UniqueCode == "" {
 		wrongs.PanicValidate("工区专业代码必填")
 	}
-	if len(cls.UniqueCode) > 64 {
+	if len(ins.UniqueCode) > 64 {
 		wrongs.PanicValidate("工区专业代码不能超过64位")
 	}
-	if cls.Name == "" {
+	if ins.Name == "" {
 		wrongs.PanicValidate("工区专业名称必填")
 	}
-	if len(cls.Name) > 64 {
+	if len(ins.Name) > 64 {
 		wrongs.PanicValidate("工区专业名称不能超过64位")
 	}
 
-	return cls
+	return ins
 }
 
 // C 新建
@@ -165,8 +165,8 @@ func (OrganizationWorkAreaProfessionController) S(ctx *gin.Context) {
 func (OrganizationWorkAreaProfessionController) I(ctx *gin.Context) {
 	var (
 		organizationWorkAreaProfessions []models.OrganizationWorkAreaProfessionModel
-		count           int64
-		db              *gorm.DB
+		count                           int64
+		db                              *gorm.DB
 	)
 	db = models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).
 		SetWhereFields().
@@ -181,5 +181,3 @@ func (OrganizationWorkAreaProfessionController) I(ctx *gin.Context) {
 		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"organization_work_area_professions": organizationWorkAreaProfessions}, ctx.Query("__page__"), count))
 	}
 }
-
-

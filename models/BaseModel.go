@@ -59,10 +59,10 @@ func Pagination(dbSession *gorm.DB, ctx *gin.Context) *gorm.DB {
 }
 
 // demoFindOne 获取单条数据演示
-//  @receiver cls
-func (cls *BaseModel) demoFindOne() {
+//  @receiver ins
+func (ins *BaseModel) demoFindOne() {
 	var b BaseModel
-	ret := cls.
+	ret := ins.
 		SetModel(BaseModel{}).
 		SetWheres(tools.Map{}).
 		SetNotWheres(tools.Map{}).
@@ -72,11 +72,11 @@ func (cls *BaseModel) demoFindOne() {
 }
 
 // demoFind 获取多条数据演示
-//  @receiver cls
-func (cls *BaseModel) demoFind() {
+//  @receiver ins
+func (ins *BaseModel) demoFind() {
 	var b BaseModel
 	var ctx *gin.Context
-	cls.
+	ins.
 		SetModel(BaseModel{}).
 		SetWhereFields("a", "b", "c").
 		PrepareUseQuery(ctx, "").
@@ -84,7 +84,7 @@ func (cls *BaseModel) demoFind() {
 }
 
 // ScopeBeEnableTrue 启用（查询域）
-//  @receiver cls
+//  @receiver ins
 //  @param db
 //  @return *gorm.DB
 func (BaseModel) ScopeBeEnableTrue(db *gorm.DB) *gorm.DB {
@@ -100,207 +100,207 @@ func (BaseModel) ScopeBeEnableFalse(db *gorm.DB) *gorm.DB {
 }
 
 // SetCtx 设置Context
-func (cls *BaseModel) SetCtx(ctx *gin.Context) *BaseModel {
-	cls.ctx = ctx
+func (ins *BaseModel) SetCtx(ctx *gin.Context) *BaseModel {
+	ins.ctx = ctx
 
-	return cls
+	return ins
 }
 
 // SetModel 设置使用的模型
-//  @receiver cls
+//  @receiver ins
 //  @param model
 //  @return *BaseModel
-func (cls *BaseModel) SetModel(model interface{}) *BaseModel {
-	cls.model = model
-	return cls
+func (ins *BaseModel) SetModel(model interface{}) *BaseModel {
+	ins.model = model
+	return ins
 }
 
 // SetDistinct 设置不重复字段
-func (cls *BaseModel) SetDistinct(distinctFieldNames ...string) *BaseModel {
-	cls.distinctFieldNames = distinctFieldNames
+func (ins *BaseModel) SetDistinct(distinctFieldNames ...string) *BaseModel {
+	ins.distinctFieldNames = distinctFieldNames
 
-	return cls
+	return ins
 }
 
 // SetPreloads 设置Preloads
-//  @receiver cls
+//  @receiver ins
 //  @param preloads
 //  @return *BaseModel
-func (cls *BaseModel) SetPreloads(preloads ...string) *BaseModel {
-	cls.preloads = preloads
-	return cls
+func (ins *BaseModel) SetPreloads(preloads ...string) *BaseModel {
+	ins.preloads = preloads
+	return ins
 }
 
 // SetPreloadsByDefault 设置Preloads为默认
-//  @receiver cls
+//  @receiver ins
 //  @return *BaseModel
-func (cls *BaseModel) SetPreloadsByDefault() *BaseModel {
-	cls.preloads = tools.Strings{clause.Associations}
-	return cls
+func (ins *BaseModel) SetPreloadsByDefault() *BaseModel {
+	ins.preloads = tools.Strings{clause.Associations}
+	return ins
 }
 
 // SetSelects 设置Selects
-//  @receiver cls
+//  @receiver ins
 //  @param selects
 //  @return *BaseModel
-func (cls *BaseModel) SetSelects(selects ...string) *BaseModel {
-	cls.selects = selects
-	return cls
+func (ins *BaseModel) SetSelects(selects ...string) *BaseModel {
+	ins.selects = selects
+	return ins
 }
 
 // SetOmits 设置Omits
-//  @receiver cls
+//  @receiver ins
 //  @param omits
 //  @return *BaseModel
-func (cls *BaseModel) SetOmits(omits ...string) *BaseModel {
-	cls.omits = omits
-	return cls
+func (ins *BaseModel) SetOmits(omits ...string) *BaseModel {
+	ins.omits = omits
+	return ins
 }
 
 // SetWhereFields 设置WhereFields
-//  @receiver cls
+//  @receiver ins
 //  @param whereFields
 //  @return *BaseModel
-func (cls *BaseModel) SetWhereFields(whereFields ...string) *BaseModel {
-	cls.whereFields = whereFields
-	return cls
+func (ins *BaseModel) SetWhereFields(whereFields ...string) *BaseModel {
+	ins.whereFields = whereFields
+	return ins
 }
 
 // SetNotWhereFields 设置NotWhereFields
-//  @receiver cls
+//  @receiver ins
 //  @param notWhereFields
 //  @return *BaseModel
-func (cls *BaseModel) SetNotWhereFields(notWhereFields ...string) *BaseModel {
-	cls.notWhereFields = notWhereFields
-	return cls
+func (ins *BaseModel) SetNotWhereFields(notWhereFields ...string) *BaseModel {
+	ins.notWhereFields = notWhereFields
+	return ins
 }
 
 // SetIgnoreFields 设置IgnoreFields
-//  @receiver cls
+//  @receiver ins
 //  @param ignoreFields
 //  @return *BaseModel
-func (cls *BaseModel) SetIgnoreFields(ignoreFields ...string) *BaseModel {
-	cls.ignoreFields = ignoreFields
-	return cls
+func (ins *BaseModel) SetIgnoreFields(ignoreFields ...string) *BaseModel {
+	ins.ignoreFields = ignoreFields
+	return ins
 }
 
 // SetWheres 通过Map设置Wheres
-//  @receiver cls
+//  @receiver ins
 //  @param wheres
 //  @return *BaseModel
-func (cls *BaseModel) SetWheres(wheres map[string]interface{}) *BaseModel {
-	cls.wheres = wheres
-	return cls
+func (ins *BaseModel) SetWheres(wheres map[string]interface{}) *BaseModel {
+	ins.wheres = wheres
+	return ins
 }
 
 // SetNotWheres 设置NotWheres
-//  @receiver cls
+//  @receiver ins
 //  @param notWheres
 //  @return *BaseModel
-func (cls *BaseModel) SetNotWheres(notWheres map[string]interface{}) *BaseModel {
-	cls.notWheres = notWheres
-	return cls
+func (ins *BaseModel) SetNotWheres(notWheres map[string]interface{}) *BaseModel {
+	ins.notWheres = notWheres
+	return ins
 }
 
 // SetScopes 设置Scopes
-//  @receiver cls
+//  @receiver ins
 //  @param scopes
 //  @return *BaseModel
-func (cls *BaseModel) SetScopes(scopes ...func(*gorm.DB) *gorm.DB) *BaseModel {
-	cls.scopes = scopes
-	return cls
+func (ins *BaseModel) SetScopes(scopes ...func(*gorm.DB) *gorm.DB) *BaseModel {
+	ins.scopes = scopes
+	return ins
 }
 
 // SetExtraWheres 设置额外搜索条件字段
-func (cls *BaseModel) SetExtraWheres(extraWheres map[string]func(string, *gorm.DB) *gorm.DB) *BaseModel {
-	cls.extraWheres = extraWheres
+func (ins *BaseModel) SetExtraWheres(extraWheres map[string]func(string, *gorm.DB) *gorm.DB) *BaseModel {
+	ins.extraWheres = extraWheres
 
-	return cls
+	return ins
 }
 
 // BeforeCreate 插入数据前
-//  @receiver cls
+//  @receiver ins
 //  @param db
 //  @return err
-func (cls *BaseModel) BeforeCreate(db *gorm.DB) (err error) {
-	cls.CreatedAt = time.Now()
-	cls.UpdatedAt = time.Now()
+func (ins *BaseModel) BeforeCreate(db *gorm.DB) (err error) {
+	ins.CreatedAt = time.Now()
+	ins.UpdatedAt = time.Now()
 	return
 }
 
 // BeforeSave 修改数据前
-//  @receiver cls
+//  @receiver ins
 //  @param db
 //  @return err
-func (cls *BaseModel) BeforeSave(db *gorm.DB) (err error) {
-	cls.UpdatedAt = time.Now()
+func (ins *BaseModel) BeforeSave(db *gorm.DB) (err error) {
+	ins.UpdatedAt = time.Now()
 	return
 }
 
 // Prepare 初始化
-//  @receiver cls
+//  @receiver ins
 //  @param dbDriver
 //  @return query
-func (cls *BaseModel) Prepare(dbDriver string) (query *gorm.DB) {
+func (ins *BaseModel) Prepare(dbDriver string) (query *gorm.DB) {
 	query = (&databases.Launcher{DbDriver: dbDriver}).GetDatabaseConn()
 
-	query = query.Where(cls.wheres).Not(cls.notWheres)
+	query = query.Where(ins.wheres).Not(ins.notWheres)
 
-	if cls.model != nil {
-		query = query.Model(&cls.model)
+	if ins.model != nil {
+		query = query.Model(&ins.model)
 	}
 
 	// 设置scopes
-	if len(cls.scopes) > 0 {
-		query = query.Scopes(cls.scopes...)
+	if len(ins.scopes) > 0 {
+		query = query.Scopes(ins.scopes...)
 	}
 
 	// 拼接preloads关系
-	if len(cls.preloads) > 0 {
-		for _, v := range cls.preloads {
+	if len(ins.preloads) > 0 {
+		for _, v := range ins.preloads {
 			query = query.Preload(v)
 		}
 	}
 
 	// 拼接distinct
-	if len(cls.distinctFieldNames) > 0 {
-		query = query.Distinct(cls.distinctFieldNames)
+	if len(ins.distinctFieldNames) > 0 {
+		query = query.Distinct(ins.distinctFieldNames)
 	}
 
 	// 拼接selects字段
-	if len(cls.selects) > 0 {
-		query = query.Select(cls.selects)
+	if len(ins.selects) > 0 {
+		query = query.Select(ins.selects)
 	}
 
 	// 拼接omits字段
-	if len(cls.omits) > 0 {
-		query = query.Omit(cls.omits...)
+	if len(ins.omits) > 0 {
+		query = query.Omit(ins.omits...)
 	}
 
 	return query
 }
 
 // PrepareUseQuery 根据Query参数初始化
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @param dbDriver
 //  @return *gorm.DB
-func (cls *BaseModel) PrepareUseQuery(ctx *gin.Context, dbDriver string) *gorm.DB {
-	dbSession := cls.Prepare(dbDriver)
+func (ins *BaseModel) PrepareUseQuery(ctx *gin.Context, dbDriver string) *gorm.DB {
+	dbSession := ins.Prepare(dbDriver)
 
 	wheres := make(map[string]interface{})
 	notWheres := make(map[string]interface{})
 
 	// 拼接需要跳过的字段
 	ignoreFields := make(map[string]int32)
-	if len(cls.ignoreFields) > 0 {
-		for _, v := range cls.ignoreFields {
+	if len(ins.ignoreFields) > 0 {
+		for _, v := range ins.ignoreFields {
 			ignoreFields[v] = 1
 		}
 	}
 
 	// 拼接Where条件
-	for _, v := range cls.whereFields {
+	for _, v := range ins.whereFields {
 		if _, ok := ignoreFields[v]; !ok {
 			if val, ok := ctx.GetQuery(v); ok {
 				wheres[v] = val
@@ -309,7 +309,7 @@ func (cls *BaseModel) PrepareUseQuery(ctx *gin.Context, dbDriver string) *gorm.D
 	}
 
 	// 拼接NotWhere条件
-	for _, v := range cls.notWhereFields {
+	for _, v := range ins.notWhereFields {
 		if _, ok := ignoreFields[v]; !ok {
 			if val, ok := ctx.GetQuery(v); ok == true {
 				notWheres[v] = val
@@ -319,7 +319,7 @@ func (cls *BaseModel) PrepareUseQuery(ctx *gin.Context, dbDriver string) *gorm.D
 	dbSession = dbSession.Where(wheres).Not(notWheres)
 
 	// 拼接额外搜索条件
-	for fieldName, v := range cls.extraWheres {
+	for fieldName, v := range ins.extraWheres {
 		if _, ok := ignoreFields[fieldName]; !ok {
 			dbSession = v(fieldName, dbSession)
 		}
@@ -336,18 +336,18 @@ func (cls *BaseModel) PrepareUseQuery(ctx *gin.Context, dbDriver string) *gorm.D
 }
 
 // PrepareByDefaultDbDriver 通过默认数据库初始化
-//  @receiver cls
+//  @receiver ins
 //  @return dbSession
-func (cls *BaseModel) PrepareByDefaultDbDriver() (query *gorm.DB) {
-	return cls.Prepare("")
+func (ins *BaseModel) PrepareByDefaultDbDriver() (query *gorm.DB) {
+	return ins.Prepare("")
 }
 
 // PrepareUseQueryByDefaultDbDriver 通过默认数据库初始化
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return dbSession
-func (cls *BaseModel) PrepareUseQueryByDefaultDbDriver(ctx *gin.Context) (query *gorm.DB) {
-	return cls.PrepareUseQuery(ctx, "")
+func (ins *BaseModel) PrepareUseQueryByDefaultDbDriver(ctx *gin.Context) (query *gorm.DB) {
+	return ins.PrepareUseQuery(ctx, "")
 }
 
 // BaseOption 基础查询条件

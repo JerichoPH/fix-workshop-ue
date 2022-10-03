@@ -21,34 +21,34 @@ type PositionDepotStorehouseStoreForm struct {
 }
 
 // ShouldBind 绑定表单
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return PositionDepotStorehouseStoreForm
-func (cls PositionDepotStorehouseStoreForm) ShouldBind(ctx *gin.Context) PositionDepotStorehouseStoreForm {
+func (ins PositionDepotStorehouseStoreForm) ShouldBind(ctx *gin.Context) PositionDepotStorehouseStoreForm {
 	var ret *gorm.DB
 
-	if err := ctx.ShouldBind(&cls); err != nil {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if cls.UniqueCode == "" {
+	if ins.UniqueCode == "" {
 		wrongs.PanicValidate("仓库代码必填")
 	}
-	if cls.Name == "" {
+	if ins.Name == "" {
 		wrongs.PanicValidate("仓库名称必填")
 	}
-	if len(cls.Name) > 64 {
+	if len(ins.Name) > 64 {
 		wrongs.PanicValidate("仓库名称不能超过64位")
 	}
-	if cls.OrganizationWorkshopUuid == "" {
+	if ins.OrganizationWorkshopUuid == "" {
 		wrongs.PanicValidate("所属车间必选")
 	}
 	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
-		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUuid}).
+		SetWheres(tools.Map{"uuid": ins.OrganizationWorkshopUuid}).
 		PrepareByDefaultDbDriver().
-		First(&cls.OrganizationWorkshop)
+		First(&ins.OrganizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "所属车间")
 
-	return cls
+	return ins
 }
 
 // C 新建

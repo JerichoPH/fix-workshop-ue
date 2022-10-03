@@ -19,27 +19,27 @@ type PostgreSql struct {
 var postgresqlConn *gorm.DB
 
 // getConn 获取链接
-//  @receiver cls
+//  @receiver ins
 //  @return db
-func (cls *PostgreSql) getConn() (db *gorm.DB) {
+func (ins *PostgreSql) getConn() (db *gorm.DB) {
 	ctf := settings.Setting{}
 	config := ctf.Init()
 
-	cls.Host = config.DB.Section("postgresql").Key("host").MustString("127.0.0.1")
-	cls.Port = config.DB.Section("postgresql").Key("port").MustString("5432")
-	cls.Username = config.DB.Section("postgresql").Key("username").MustString("postgres")
-	cls.Password = config.DB.Section("postgresql").Key("password").MustString("zces@1234")
-	cls.Database = config.DB.Section("postgresql").Key("database").MustString("postgres")
-	cls.SSLMode = config.DB.Section("postgresql").Key("ssl_mode").MustString("disable")
+	ins.Host = config.DB.Section("postgresql").Key("host").MustString("127.0.0.1")
+	ins.Port = config.DB.Section("postgresql").Key("port").MustString("5432")
+	ins.Username = config.DB.Section("postgresql").Key("username").MustString("postgres")
+	ins.Password = config.DB.Section("postgresql").Key("password").MustString("zces@1234")
+	ins.Database = config.DB.Section("postgresql").Key("database").MustString("postgres")
+	ins.SSLMode = config.DB.Section("postgresql").Key("ssl_mode").MustString("disable")
 
 	dsn := fmt.Sprintf(
 		"host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
-		cls.Host,
-		cls.Port,
-		cls.Username,
-		cls.Database,
-		cls.Password,
-		cls.SSLMode,
+		ins.Host,
+		ins.Port,
+		ins.Username,
+		ins.Database,
+		ins.Password,
+		ins.SSLMode,
 	)
 
 	mySqlConn, _ := gorm.Open(postgres.Open(dsn), &gorm.Config{
@@ -57,14 +57,14 @@ func (cls *PostgreSql) getConn() (db *gorm.DB) {
 }
 
 // GetConn 获取数据库链接
-func (cls *PostgreSql) GetConn() *gorm.DB {
+func (ins *PostgreSql) GetConn() *gorm.DB {
 	if postgresqlConn == nil {
-		postgresqlConn = cls.getConn()
+		postgresqlConn = ins.getConn()
 	}
 	return postgresqlConn
 }
 
 // NewConn 获取新数据库链接
-func (cls *PostgreSql) NewConn() *gorm.DB {
-	return cls.getConn()
+func (ins *PostgreSql) NewConn() *gorm.DB {
+	return ins.getConn()
 }

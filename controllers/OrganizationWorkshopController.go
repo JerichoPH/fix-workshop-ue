@@ -24,38 +24,38 @@ type OrganizationWorkshopStoreForm struct {
 }
 
 // ShouldBind 绑定表单
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return OrganizationWorkshopStoreForm
-func (cls OrganizationWorkshopStoreForm) ShouldBind(ctx *gin.Context) OrganizationWorkshopStoreForm {
+func (ins OrganizationWorkshopStoreForm) ShouldBind(ctx *gin.Context) OrganizationWorkshopStoreForm {
 	var ret *gorm.DB
-	if err := ctx.ShouldBind(&cls); err != nil {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if cls.UniqueCode == "" {
+	if ins.UniqueCode == "" {
 		wrongs.PanicValidate("车间代码必填")
 	}
-	if len(cls.UniqueCode) != 3 {
+	if len(ins.UniqueCode) != 3 {
 		wrongs.PanicValidate("车间代码必须是3位")
 	}
-	if cls.Name == "" {
+	if ins.Name == "" {
 		wrongs.PanicValidate("车间名称必填")
 	}
-	if len(cls.Name) > 64 {
+	if len(ins.Name) > 64 {
 		wrongs.PanicValidate("车间名称不能超过64位")
 	}
-	if cls.OrganizationWorkshopTypeUuid == "" {
+	if ins.OrganizationWorkshopTypeUuid == "" {
 		wrongs.PanicValidate("所属车间类型必选")
 	}
-	ret = models.BootByModel(models.OrganizationWorkshopTypeModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopTypeUuid}).PrepareByDefaultDbDriver().First(&cls.OrganizationWorkshopType)
+	ret = models.BootByModel(models.OrganizationWorkshopTypeModel{}).SetWheres(tools.Map{"uuid": ins.OrganizationWorkshopTypeUuid}).PrepareByDefaultDbDriver().First(&ins.OrganizationWorkshopType)
 	wrongs.PanicWhenIsEmpty(ret, "所属车间类型")
-	if cls.OrganizationParagraphUuid == "" {
+	if ins.OrganizationParagraphUuid == "" {
 		wrongs.PanicValidate("所属站段必选")
 	}
-	ret = models.BootByModel(models.OrganizationParagraphModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationParagraphUuid}).SetPreloads("OrganizationRailway").PrepareByDefaultDbDriver().First(&cls.OrganizationParagraph)
+	ret = models.BootByModel(models.OrganizationParagraphModel{}).SetWheres(tools.Map{"uuid": ins.OrganizationParagraphUuid}).SetPreloads("OrganizationRailway").PrepareByDefaultDbDriver().First(&ins.OrganizationParagraph)
 	wrongs.PanicWhenIsEmpty(ret, "站段")
 
-	return cls
+	return ins
 }
 
 // C 新建

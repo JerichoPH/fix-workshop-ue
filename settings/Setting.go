@@ -14,9 +14,9 @@ type Setting struct {
 }
 
 // Init 获取配置文件
-//  @receiver cls
+//  @receiver ins
 //  @return *Setting
-func (cls *Setting) Init() *Setting {
+func (ins *Setting) Init() *Setting {
 
 	appConfigFile, appConfigErr := ini.Load("./settings/app.ini")
 	if appConfigErr != nil {
@@ -28,12 +28,12 @@ func (cls *Setting) Init() *Setting {
 		panic(dbConfigErr)
 	}
 
-	cls.App = appConfigFile
-	cls.DB = dbConfigFile
-	cls.Timezone, _ = time.LoadLocation(cls.App.Section("app").Key("timezone").MustString("Asia/Shanghai"))
-	cls.Time = (&time.Time{}).In(cls.Timezone)
+	ins.App = appConfigFile
+	ins.DB = dbConfigFile
+	ins.Timezone, _ = time.LoadLocation(ins.App.Section("app").Key("timezone").MustString("Asia/Shanghai"))
+	ins.Time = (&time.Time{}).In(ins.Timezone)
 
-	return cls
+	return ins
 }
 
 // Boot 获取配置

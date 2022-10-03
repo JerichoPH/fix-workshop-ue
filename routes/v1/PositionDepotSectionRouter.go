@@ -10,9 +10,9 @@ import (
 type PositionDepotSectionRouter struct{}
 
 // Load 加载路由
-//  @receiver cls
+//  @receiver ins
 //  @param router
-func (cls PositionDepotSectionRouter) Load(engine *gin.Engine) {
+func (ins PositionDepotSectionRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
 		"api/v1/positionDepotSection",
 		middlewares.CheckJwt(),

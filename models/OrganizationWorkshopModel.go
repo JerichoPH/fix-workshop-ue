@@ -19,8 +19,8 @@ type OrganizationWorkshopModel struct {
 }
 
 // TableName 表名称
-//  @receiver cls
+//  @receiver ins
 //  @return string
-func (cls *OrganizationWorkshopModel) TableName() string {
+func (ins *OrganizationWorkshopModel) TableName() string {
 	return "organization_workshops"
 }

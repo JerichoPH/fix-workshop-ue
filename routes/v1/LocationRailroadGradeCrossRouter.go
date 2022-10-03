@@ -10,7 +10,7 @@ import (
 type LocationRailroadGradeCrossRouter struct{}
 
 // Load 加载路由
-//  @receiver cls
+//  @receiver ins
 //  @param router
 func (LocationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 	r := engine.Group(

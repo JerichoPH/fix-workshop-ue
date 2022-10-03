@@ -26,50 +26,50 @@ type LocationRailroadGradeCrossStoreForm struct {
 }
 
 // ShouldBind 表单绑定
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return LocationCenterStoreForm
-func (cls LocationRailroadGradeCrossStoreForm) ShouldBind(ctx *gin.Context) LocationRailroadGradeCrossStoreForm {
+func (ins LocationRailroadGradeCrossStoreForm) ShouldBind(ctx *gin.Context) LocationRailroadGradeCrossStoreForm {
 	var ret *gorm.DB
 
-	if err := ctx.ShouldBind(&cls); err != nil {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if cls.UniqueCode == "" {
+	if ins.UniqueCode == "" {
 		wrongs.PanicValidate("道口代码必填")
 	}
-	if len(cls.UniqueCode) != 5 {
+	if len(ins.UniqueCode) != 5 {
 		wrongs.PanicValidate("道口代码必须是5位")
 	}
-	if cls.Name == "" {
+	if ins.Name == "" {
 		wrongs.PanicValidate("道口名称必填")
 	}
-	if len(cls.Name) > 64 {
+	if len(ins.Name) > 64 {
 		wrongs.PanicValidate("道口名称不能超过64位")
 	}
-	if cls.OrganizationWorkshopUuid == "" {
+	if ins.OrganizationWorkshopUuid == "" {
 		wrongs.PanicValidate("所属车间必选")
 	}
 	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
-		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUuid}).
+		SetWheres(tools.Map{"uuid": ins.OrganizationWorkshopUuid}).
 		PrepareByDefaultDbDriver().
-		First(&cls.OrganizationWorkshop)
+		First(&ins.OrganizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "车间")
-	if cls.OrganizationWorkAreaUuid != "" {
+	if ins.OrganizationWorkAreaUuid != "" {
 		ret = models.BootByModel(models.OrganizationWorkAreaModel{}).
-			SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUuid}).
+			SetWheres(tools.Map{"uuid": ins.OrganizationWorkAreaUuid}).
 			PrepareByDefaultDbDriver().
-			First(&cls.OrganizationWorkArea)
+			First(&ins.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "工区")
 	}
-	if len(cls.LocationLineUuids) > 0 {
+	if len(ins.LocationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
 			PrepareByDefaultDbDriver().
-			Where("uuid in ?", cls.LocationLineUuids).
-			Find(&cls.LocationLines)
+			Where("uuid in ?", ins.LocationLineUuids).
+			Find(&ins.LocationLines)
 	}
 
-	return cls
+	return ins
 }
 
 // LocationRailroadGradeCrossBindLocationLinesForm 道口绑定线别表单
@@ -79,21 +79,21 @@ type LocationRailroadGradeCrossBindLocationLinesForm struct {
 }
 
 // ShouldBind 绑定表单
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return LocationRailroadGradeCrossBindLocationLinesForm
-func (cls LocationRailroadGradeCrossBindLocationLinesForm) ShouldBind(ctx *gin.Context) LocationRailroadGradeCrossBindLocationLinesForm {
-	if err := ctx.ShouldBind(&cls); err != nil {
+func (ins LocationRailroadGradeCrossBindLocationLinesForm) ShouldBind(ctx *gin.Context) LocationRailroadGradeCrossBindLocationLinesForm {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if len(cls.LocationLineUuids) > 0 {
+	if len(ins.LocationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
 			PrepareByDefaultDbDriver().
-			Where("uuid in ?", cls.LocationLineUuids).
-			Find(&cls.LocationLines)
+			Where("uuid in ?", ins.LocationLineUuids).
+			Find(&ins.LocationLines)
 	}
 
-	return cls
+	return ins
 }
 
 // N 新建

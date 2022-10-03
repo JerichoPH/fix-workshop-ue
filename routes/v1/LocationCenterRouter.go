@@ -10,7 +10,7 @@ import (
 type LocationCenterRouter struct{}
 
 // Load 加载路由
-//  @receiver cls
+//  @receiver ins
 //  @param router
 func (LocationCenterRouter) Load(engine *gin.Engine) {
 	r := engine.Group(

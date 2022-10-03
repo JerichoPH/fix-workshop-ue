@@ -18,13 +18,13 @@ func (OrganizationWorkAreaTypeModel) TableName() string {
 }
 
 // FindOneByUUID 根据UUID获取单条数据
-//  @receiver cls
+//  @receiver ins
 //  @param uuid
 //  @return OrganizationWorkAreaTypeModel
-func (cls OrganizationWorkAreaTypeModel) FindOneByUUID(uuid string) OrganizationWorkAreaTypeModel {
-	if ret := BootByModel(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare("").First(&cls); ret.Error != nil {
+func (ins OrganizationWorkAreaTypeModel) FindOneByUUID(uuid string) OrganizationWorkAreaTypeModel {
+	if ret := BootByModel(ins).SetWheres(tools.Map{"uuid": uuid}).Prepare("").First(&ins); ret.Error != nil {
 		panic(wrongs.PanicWhenIsEmpty(ret, "工区类型"))
 	}
 
-	return cls
+	return ins
 }

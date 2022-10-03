@@ -10,7 +10,7 @@ import (
 type OrganizationRailwayRouter struct{}
 
 // Load 加载路由
-//  @receiver cls
+//  @receiver ins
 //  @param router
 func (OrganizationRailwayRouter) Load(engine *gin.Engine) {
 	r := engine.Group(

@@ -29,51 +29,51 @@ type AccountStoreForm struct {
 }
 
 // ShouldBind 绑定表单
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return AccountStoreForm
-func (cls AccountStoreForm) ShouldBind(ctx *gin.Context) AccountStoreForm {
+func (ins AccountStoreForm) ShouldBind(ctx *gin.Context) AccountStoreForm {
 	var ret *gorm.DB
 
-	if err := ctx.ShouldBind(&cls); err != nil {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if cls.Username == "" {
+	if ins.Username == "" {
 		wrongs.PanicValidate("账号必填")
 	}
-	if len(cls.Username) > 64 {
+	if len(ins.Username) > 64 {
 		wrongs.PanicValidate("账号不能超过64位")
 	}
-	if cls.Nickname == "" {
+	if ins.Nickname == "" {
 		wrongs.PanicValidate("昵称必填")
 	}
-	if len(cls.Nickname) > 64 {
+	if len(ins.Nickname) > 64 {
 		wrongs.PanicValidate("昵称不能超过64位")
 	}
-	if len(cls.Password) > 32 || len(cls.Password) < 6 {
+	if len(ins.Password) > 32 || len(ins.Password) < 6 {
 		wrongs.PanicValidate("密码不能小于6位或大于32位")
 	}
-	if cls.Password != cls.PasswordConfirmation {
+	if ins.Password != ins.PasswordConfirmation {
 		wrongs.PanicValidate("两次密码输入不一致")
 	}
-	if cls.OrganizationRailwayUUID != "" {
-		ret = models.BootByModel(models.OrganizationRailwayModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationRailwayUUID}).PrepareByDefaultDbDriver().First(&cls.OrganizationRailway)
+	if ins.OrganizationRailwayUUID != "" {
+		ret = models.BootByModel(models.OrganizationRailwayModel{}).SetWheres(tools.Map{"uuid": ins.OrganizationRailwayUUID}).PrepareByDefaultDbDriver().First(&ins.OrganizationRailway)
 		wrongs.PanicWhenIsEmpty(ret, "路局")
 	}
-	if cls.OrganizationParagraphUUID != "" {
-		ret = models.BootByModel(models.OrganizationParagraphModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationParagraphUUID}).PrepareByDefaultDbDriver().First(&cls.OrganizationParagraph)
+	if ins.OrganizationParagraphUUID != "" {
+		ret = models.BootByModel(models.OrganizationParagraphModel{}).SetWheres(tools.Map{"uuid": ins.OrganizationParagraphUUID}).PrepareByDefaultDbDriver().First(&ins.OrganizationParagraph)
 		wrongs.PanicWhenIsEmpty(ret, "站段")
 	}
-	if cls.OrganizationWorkshopUUID != "" {
-		ret = models.BootByModel(models.OrganizationWorkshopModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUUID}).PrepareByDefaultDbDriver().First(&cls.OrganizationWorkshop)
+	if ins.OrganizationWorkshopUUID != "" {
+		ret = models.BootByModel(models.OrganizationWorkshopModel{}).SetWheres(tools.Map{"uuid": ins.OrganizationWorkshopUUID}).PrepareByDefaultDbDriver().First(&ins.OrganizationWorkshop)
 		wrongs.PanicWhenIsEmpty(ret, "车间")
 	}
-	if cls.OrganizationWorkAreaUUID != "" {
-		ret = models.BootByModel(models.OrganizationWorkAreaModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUUID}).PrepareByDefaultDbDriver().First(&cls.OrganizationWorkArea)
+	if ins.OrganizationWorkAreaUUID != "" {
+		ret = models.BootByModel(models.OrganizationWorkAreaModel{}).SetWheres(tools.Map{"uuid": ins.OrganizationWorkAreaUUID}).PrepareByDefaultDbDriver().First(&ins.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "工区")
 	}
 
-	return cls
+	return ins
 }
 
 // AccountUpdateForm 编辑用户表单
@@ -91,39 +91,39 @@ type AccountUpdateForm struct {
 }
 
 // ShouldBind 绑定表单
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return AccountUpdateForm
-func (cls AccountUpdateForm) ShouldBind(ctx *gin.Context) AccountUpdateForm {
+func (ins AccountUpdateForm) ShouldBind(ctx *gin.Context) AccountUpdateForm {
 	var ret *gorm.DB
 
-	if err := ctx.ShouldBind(&cls); err != nil {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if cls.Username == "" {
+	if ins.Username == "" {
 		wrongs.PanicValidate("账号必填")
 	}
-	if cls.Nickname == "" {
+	if ins.Nickname == "" {
 		wrongs.PanicValidate("昵称必填")
 	}
-	if cls.OrganizationRailwayUuid != "" {
-		ret = models.BootByModel(models.OrganizationRailwayModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationRailwayUuid}).PrepareByDefaultDbDriver().First(&cls.OrganizationRailway)
+	if ins.OrganizationRailwayUuid != "" {
+		ret = models.BootByModel(models.OrganizationRailwayModel{}).SetWheres(tools.Map{"uuid": ins.OrganizationRailwayUuid}).PrepareByDefaultDbDriver().First(&ins.OrganizationRailway)
 		wrongs.PanicWhenIsEmpty(ret, "路局")
 	}
-	if cls.OrganizationParagraphUuid != "" {
-		ret = models.BootByModel(models.OrganizationParagraphModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationParagraphUuid}).PrepareByDefaultDbDriver().First(&cls.OrganizationParagraph)
+	if ins.OrganizationParagraphUuid != "" {
+		ret = models.BootByModel(models.OrganizationParagraphModel{}).SetWheres(tools.Map{"uuid": ins.OrganizationParagraphUuid}).PrepareByDefaultDbDriver().First(&ins.OrganizationParagraph)
 		wrongs.PanicWhenIsEmpty(ret, "站段")
 	}
-	if cls.OrganizationWorkshopUuid != "" {
-		ret = models.BootByModel(models.OrganizationWorkshopModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUuid}).PrepareByDefaultDbDriver().First(&cls.OrganizationWorkshop)
+	if ins.OrganizationWorkshopUuid != "" {
+		ret = models.BootByModel(models.OrganizationWorkshopModel{}).SetWheres(tools.Map{"uuid": ins.OrganizationWorkshopUuid}).PrepareByDefaultDbDriver().First(&ins.OrganizationWorkshop)
 		wrongs.PanicWhenIsEmpty(ret, "车间")
 	}
-	if cls.OrganizationWorkAreaUuid != "" {
-		ret = models.BootByModel(models.OrganizationWorkAreaModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUuid}).PrepareByDefaultDbDriver().First(&cls.OrganizationWorkArea)
+	if ins.OrganizationWorkAreaUuid != "" {
+		ret = models.BootByModel(models.OrganizationWorkAreaModel{}).SetWheres(tools.Map{"uuid": ins.OrganizationWorkAreaUuid}).PrepareByDefaultDbDriver().First(&ins.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "工区")
 	}
 
-	return cls
+	return ins
 }
 
 // AccountUpdatePasswordForm 修改密码表单
@@ -134,31 +134,31 @@ type AccountUpdatePasswordForm struct {
 }
 
 // ShouldBind 绑定表单
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return AccountUpdatePasswordForm
-func (cls AccountUpdatePasswordForm) ShouldBind(ctx *gin.Context) AccountUpdatePasswordForm {
-	if err := ctx.ShouldBind(&cls); err != nil {
+func (ins AccountUpdatePasswordForm) ShouldBind(ctx *gin.Context) AccountUpdatePasswordForm {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if cls.OldPassword == "" {
+	if ins.OldPassword == "" {
 		wrongs.PanicValidate("原始密码必填")
 	}
-	if cls.NewPassword == "" {
+	if ins.NewPassword == "" {
 		wrongs.PanicValidate("新密码必填")
 	}
-	if cls.PasswordConfirmation == "" {
+	if ins.PasswordConfirmation == "" {
 		wrongs.PanicValidate("确认密码必填")
 	}
-	if cls.NewPassword != cls.PasswordConfirmation {
+	if ins.NewPassword != ins.PasswordConfirmation {
 		wrongs.PanicValidate("两次密码输入不一致")
 	}
 
-	return cls
+	return ins
 }
 
 // N 新建用户
-func (cls AccountController) N(ctx *gin.Context) {
+func (ins AccountController) N(ctx *gin.Context) {
 	// 表单
 	form := (&AccountStoreForm{}).ShouldBind(ctx)
 

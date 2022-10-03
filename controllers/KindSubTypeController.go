@@ -23,37 +23,37 @@ type KindSubTypeStoreForm struct {
 }
 
 // ShouldBind 绑定表单
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return KindSubTypeStoreForm
-func (cls KindSubTypeStoreForm) ShouldBind(ctx *gin.Context) KindSubTypeStoreForm {
+func (ins KindSubTypeStoreForm) ShouldBind(ctx *gin.Context) KindSubTypeStoreForm {
 	var ret *gorm.DB
 
-	if err := ctx.ShouldBind(&cls); err != nil {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if cls.UniqueCode == "" {
+	if ins.UniqueCode == "" {
 		wrongs.PanicValidate("型号代码必填")
 	}
-	if len(cls.UniqueCode) != 2 {
+	if len(ins.UniqueCode) != 2 {
 		wrongs.PanicValidate("型号代码必须是2位")
 	}
-	if cls.Name == "" {
+	if ins.Name == "" {
 		wrongs.PanicValidate("型号名称必填")
 	}
-	if len(cls.Name) > 64 {
+	if len(ins.Name) > 64 {
 		wrongs.PanicValidate("型号名称不能超过64位")
 	}
-	if cls.KindEntireTypeUuid == "" {
+	if ins.KindEntireTypeUuid == "" {
 		wrongs.PanicValidate("所属类型必选")
 	}
 	ret = models.BootByModel(models.KindEntireTypeModel{}).
-		SetWheres(tools.Map{"uuid": cls.KindEntireTypeUuid}).
+		SetWheres(tools.Map{"uuid": ins.KindEntireTypeUuid}).
 		PrepareByDefaultDbDriver().
-		First(&cls.KindEntireType)
+		First(&ins.KindEntireType)
 	wrongs.PanicWhenIsEmpty(ret, "所属类型")
 
-	return cls
+	return ins
 }
 
 // N 新建

@@ -21,34 +21,34 @@ type PositionDepotCabinetStoreForm struct {
 }
 
 // ShouldBind 绑定表单
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return PositionDepotCabinetStoreForm
-func (cls PositionDepotCabinetStoreForm) ShouldBind(ctx *gin.Context) PositionDepotCabinetStoreForm {
+func (ins PositionDepotCabinetStoreForm) ShouldBind(ctx *gin.Context) PositionDepotCabinetStoreForm {
 	var ret *gorm.DB
 
-	if err := ctx.ShouldBind(&cls); err != nil {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if cls.UniqueCode == "" {
+	if ins.UniqueCode == "" {
 		wrongs.PanicValidate("仓库柜架代码必填")
 	}
-	if cls.Name == "" {
+	if ins.Name == "" {
 		wrongs.PanicValidate("仓库柜架名称必填")
 	}
-	if len(cls.Name) > 64 {
+	if len(ins.Name) > 64 {
 		wrongs.PanicValidate("仓库柜架名称不能超过64位")
 	}
-	if cls.PositionDepotRowUuid == "" {
+	if ins.PositionDepotRowUuid == "" {
 		wrongs.PanicValidate("所属仓库排必选")
 	}
 	ret = models.BootByModel(models.PositionDepotRowModel{}).
-		SetWheres(tools.Map{"uuid": cls.PositionDepotRowUuid}).
+		SetWheres(tools.Map{"uuid": ins.PositionDepotRowUuid}).
 		PrepareByDefaultDbDriver().
-		First(&cls.PositionDepotRow)
+		First(&ins.PositionDepotRow)
 	wrongs.PanicWhenIsEmpty(ret, "所属仓库排")
 
-	return cls
+	return ins
 }
 
 // C 新建
@@ -170,8 +170,8 @@ func (PositionDepotCabinetController) S(ctx *gin.Context) {
 func (PositionDepotCabinetController) I(ctx *gin.Context) {
 	var (
 		positionDepotCabinets []models.PositionDepotCabinetModel
-		count           int64
-		db              *gorm.DB
+		count                 int64
+		db                    *gorm.DB
 	)
 	db = models.BootByModel(models.PositionDepotCabinetModel{}).
 		SetWhereFields().

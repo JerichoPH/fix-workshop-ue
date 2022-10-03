@@ -22,27 +22,27 @@ type AuthorizationRegisterForm struct {
 }
 
 // ShouldBind 绑定表单
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return AuthorizationRegisterForm
-func (cls AuthorizationRegisterForm) ShouldBind(ctx *gin.Context) AuthorizationRegisterForm {
-	if err := ctx.ShouldBind(&cls); err != nil {
+func (ins AuthorizationRegisterForm) ShouldBind(ctx *gin.Context) AuthorizationRegisterForm {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if cls.Username == "" {
+	if ins.Username == "" {
 		wrongs.PanicValidate("账号必填")
 	}
-	if cls.Password == "" {
+	if ins.Password == "" {
 		wrongs.PanicValidate("密码必填")
 	}
-	if len(cls.Password) < 6 || len(cls.Password) > 18 {
+	if len(ins.Password) < 6 || len(ins.Password) > 18 {
 		wrongs.PanicValidate("密码不可小于6位或大于18位")
 	}
-	if cls.Password != cls.PasswordConfirmation {
+	if ins.Password != ins.PasswordConfirmation {
 		wrongs.PanicValidate("两次密码输入不一致")
 	}
 
-	return cls
+	return ins
 }
 
 // AuthorizationLoginForm 登录表单
@@ -52,21 +52,21 @@ type AuthorizationLoginForm struct {
 }
 
 // ShouldBind 绑定表单
-func (cls AuthorizationLoginForm) ShouldBind(ctx *gin.Context) AuthorizationLoginForm {
-	if err := ctx.ShouldBind(&cls); err != nil {
+func (ins AuthorizationLoginForm) ShouldBind(ctx *gin.Context) AuthorizationLoginForm {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if cls.Username == "" {
+	if ins.Username == "" {
 		wrongs.PanicValidate("账号必填")
 	}
-	if cls.Password == "" {
+	if ins.Password == "" {
 		wrongs.PanicValidate("密码必填")
 	}
-	if len(cls.Password) < 6 || len(cls.Password) > 18 {
+	if len(ins.Password) < 6 || len(ins.Password) > 18 {
 		wrongs.PanicValidate("密码不可小于6位或大于18位")
 	}
 
-	return cls
+	return ins
 }
 
 // PostRegister 注册

@@ -20,13 +20,13 @@ func (OrganizationWorkshopTypeModel) TableName() string {
 }
 
 // FindOneByUUID 根据uuid获取单条数据
-//  @receiver cls
+//  @receiver ins
 //  @param uuid
 //  @return OrganizationWorkshopTypeModel
-func (cls OrganizationWorkshopTypeModel) FindOneByUUID(uuid string) OrganizationWorkshopTypeModel {
-	if ret := BootByModel(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare("").First(&cls); ret.Error != nil {
+func (ins OrganizationWorkshopTypeModel) FindOneByUUID(uuid string) OrganizationWorkshopTypeModel {
+	if ret := BootByModel(ins).SetWheres(tools.Map{"uuid": uuid}).Prepare("").First(&ins); ret.Error != nil {
 		panic(wrongs.PanicWhenIsEmpty(ret, "车间类型"))
 	}
 
-	return cls
+	return ins
 }

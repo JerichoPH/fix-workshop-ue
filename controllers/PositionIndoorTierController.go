@@ -21,34 +21,34 @@ type PositionIndoorTierStoreForm struct {
 }
 
 // ShouldBind
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return PositionIndoorTierStoreForm
-func (cls PositionIndoorTierStoreForm) ShouldBind(ctx *gin.Context) PositionIndoorTierStoreForm {
+func (ins PositionIndoorTierStoreForm) ShouldBind(ctx *gin.Context) PositionIndoorTierStoreForm {
 	var ret *gorm.DB
 
-	if err := ctx.ShouldBind(&cls); err != nil {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if cls.UniqueCode == "" {
+	if ins.UniqueCode == "" {
 		wrongs.PanicValidate("柜架层代码必填")
 	}
-	if cls.Name == "" {
+	if ins.Name == "" {
 		wrongs.PanicValidate("柜架层名称必填")
 	}
-	if len(cls.Name) > 64 {
+	if len(ins.Name) > 64 {
 		wrongs.PanicValidate("机柜层名称不能超过64位")
 	}
-	if cls.PositionIndoorCabinetUuid == "" {
+	if ins.PositionIndoorCabinetUuid == "" {
 		wrongs.PanicValidate("所属柜架必选")
 	}
 	ret = models.BootByModel(models.PositionIndoorCabinetModel{}).
-		SetWheres(tools.Map{"uuid": cls.PositionIndoorCabinetUuid}).
+		SetWheres(tools.Map{"uuid": ins.PositionIndoorCabinetUuid}).
 		PrepareByDefaultDbDriver().
-		First(&cls.PositionIndoorCabinet)
+		First(&ins.PositionIndoorCabinet)
 	wrongs.PanicWhenIsEmpty(ret, "所属柜架")
 
-	return cls
+	return ins
 }
 
 // C 新建

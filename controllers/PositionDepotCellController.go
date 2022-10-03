@@ -21,34 +21,34 @@ type PositionDepotCellStoreForm struct {
 }
 
 // ShouldBind 绑定表单
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return PositionDepotCellStoreForm
-func (cls PositionDepotCellStoreForm) ShouldBind(ctx *gin.Context) PositionDepotCellStoreForm {
+func (ins PositionDepotCellStoreForm) ShouldBind(ctx *gin.Context) PositionDepotCellStoreForm {
 	var ret *gorm.DB
 
-	if err := ctx.ShouldBind(&cls); err != nil {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if cls.UniqueCode == "" {
+	if ins.UniqueCode == "" {
 		wrongs.PanicValidate("仓库格位代码不能必填")
 	}
-	if cls.Name == "" {
+	if ins.Name == "" {
 		wrongs.PanicValidate("仓库格位名称不能必填")
 	}
-	if len(cls.Name) > 64 {
+	if len(ins.Name) > 64 {
 		wrongs.PanicValidate("仓库格位名称不能超过64位")
 	}
-	if cls.PositionDepotTierUuid == "" {
+	if ins.PositionDepotTierUuid == "" {
 		wrongs.PanicValidate("所属仓库柜架层必选")
 	}
 	ret = models.BootByModel(models.PositionDepotTierModel{}).
-		SetWheres(tools.Map{"uuid": cls.PositionDepotTierUuid}).
+		SetWheres(tools.Map{"uuid": ins.PositionDepotTierUuid}).
 		PrepareByDefaultDbDriver().
-		First(&cls.PositionDepotTier)
+		First(&ins.PositionDepotTier)
 	wrongs.PanicWhenIsEmpty(ret, "所属仓库柜架层")
 
-	return cls
+	return ins
 }
 
 // C 新建
@@ -170,8 +170,8 @@ func (PositionDepotCellController) S(ctx *gin.Context) {
 func (PositionDepotCellController) I(ctx *gin.Context) {
 	var (
 		positionDepotCells []models.PositionDepotCellModel
-		count           int64
-		db              *gorm.DB
+		count              int64
+		db                 *gorm.DB
 	)
 	db = models.BootByModel(models.PositionDepotCellModel{}).
 		SetWhereFields().

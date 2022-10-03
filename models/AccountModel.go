@@ -30,13 +30,13 @@ func (AccountModel) TableName() string {
 }
 
 // FindOneByUUID 根据UUID获取单个对象
-//  @receiver cls
+//  @receiver ins
 //  @param uuid
 //  @return AccountModel
-func (cls AccountModel) FindOneByUUID(uuid string) AccountModel {
-	if ret := BootByModel(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare("").First(&cls); ret.Error != nil {
+func (ins AccountModel) FindOneByUUID(uuid string) AccountModel {
+	if ret := BootByModel(ins).SetWheres(tools.Map{"uuid": uuid}).Prepare("").First(&ins); ret.Error != nil {
 		panic(wrongs.PanicWhenIsEmpty(ret, "用户"))
 	}
 
-	return cls
+	return ins
 }

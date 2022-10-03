@@ -24,24 +24,24 @@ type MenuStoreForm struct {
 }
 
 // ShouldBind 绑定表单
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return MenuStoreForm
-func (cls MenuStoreForm) ShouldBind(ctx *gin.Context) MenuStoreForm {
-	if err := ctx.ShouldBind(&cls); err != nil {
+func (ins MenuStoreForm) ShouldBind(ctx *gin.Context) MenuStoreForm {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if cls.Name == "" {
+	if ins.Name == "" {
 		wrongs.PanicValidate("菜单名称必填")
 	}
-	if len(cls.Name) > 64 {
+	if len(ins.Name) > 64 {
 		wrongs.PanicValidate("菜单名称不能超过64位")
 	}
-	if len(cls.RbacRoleUuids) > 0 {
-		models.BootByModel(models.RbacRoleModel{}).PrepareByDefaultDbDriver().Where("uuid in ?", cls.RbacRoleUuids).Find(&cls.RbacRoles)
+	if len(ins.RbacRoleUuids) > 0 {
+		models.BootByModel(models.RbacRoleModel{}).PrepareByDefaultDbDriver().Where("uuid in ?", ins.RbacRoleUuids).Find(&ins.RbacRoles)
 	}
 
-	return cls
+	return ins
 }
 
 // C 新建
@@ -136,8 +136,8 @@ func (MenuController) S(ctx *gin.Context) {
 func (MenuController) I(ctx *gin.Context) {
 	var (
 		menus []models.MenuModel
-		count           int64
-		db              *gorm.DB
+		count int64
+		db    *gorm.DB
 	)
 	db = models.BootByModel(models.MenuModel{}).
 		SetWhereFields("uuid", "name", "url", "parent_uuid").

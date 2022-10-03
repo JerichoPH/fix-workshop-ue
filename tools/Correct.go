@@ -33,69 +33,69 @@ func CorrectBootByDefault() *correct {
 	return responseIns
 }
 
-func (cls *correct) get() map[string]interface{} {
+func (ins *correct) get() map[string]interface{} {
 	ret := map[string]interface{}{
-		"msg":        cls.msg,
-		"content":    cls.content,
-		"pagination": cls.pagination,
-		"status":     cls.status,
-		"error_code": cls.errorCode,
+		"msg":        ins.msg,
+		"content":    ins.content,
+		"pagination": ins.pagination,
+		"status":     ins.status,
+		"error_code": ins.errorCode,
 	}
 	return ret
 }
 
-func (cls *correct) set(content, pagination interface{}, status uint, errorCode uint) *correct {
-	cls.content = content
-	cls.pagination = pagination
+func (ins *correct) set(content, pagination interface{}, status uint, errorCode uint) *correct {
+	ins.content = content
+	ins.pagination = pagination
 	if status == 0 {
-		cls.status = 200
+		ins.status = 200
 	} else {
-		cls.status = status
+		ins.status = status
 	}
-	cls.errorCode = errorCode
-	return cls
+	ins.errorCode = errorCode
+	return ins
 }
 
 // Ok 读取成功
-func (cls *correct) Ok(content interface{}) (int, map[string]interface{}) {
-	if cls.msg == "" {
-		cls.msg = "OK"
+func (ins *correct) Ok(content interface{}) (int, map[string]interface{}) {
+	if ins.msg == "" {
+		ins.msg = "OK"
 	}
-	return 200, cls.set(content, nil, 200, 0).get()
+	return 200, ins.set(content, nil, 200, 0).get()
 }
 
 // OkForPagination 返回分页数据
-func (cls *correct) OkForPagination(content interface{}, pageStr string, count int64) (int, map[string]interface{}) {
-	if cls.msg == "" {
-		cls.msg = "OK"
+func (ins *correct) OkForPagination(content interface{}, pageStr string, count int64) (int, map[string]interface{}) {
+	if ins.msg == "" {
+		ins.msg = "OK"
 	}
 
 	page, _ := strconv.Atoi(pageStr)
 
-	return 200, cls.set(content, map[string]interface{}{"page": page, "previous": page - 1, "next": page + 1, "count": count}, 200, 0).get()
+	return 200, ins.set(content, map[string]interface{}{"page": page, "previous": page - 1, "next": page + 1, "count": count}, 200, 0).get()
 }
 
 // Created 新建成功
-func (cls *correct) Created(content interface{}) (int, map[string]interface{}) {
-	if cls.msg == "" {
-		cls.msg = "新建成功"
+func (ins *correct) Created(content interface{}) (int, map[string]interface{}) {
+	if ins.msg == "" {
+		ins.msg = "新建成功"
 	}
-	return 201, cls.set(content, nil, 201, 0).get()
+	return 201, ins.set(content, nil, 201, 0).get()
 }
 
 // Updated 更新成功
-func (cls *correct) Updated(content interface{}) (int, map[string]interface{}) {
-	if cls.msg == "" {
-		cls.msg = "编辑成功"
+func (ins *correct) Updated(content interface{}) (int, map[string]interface{}) {
+	if ins.msg == "" {
+		ins.msg = "编辑成功"
 	}
 
-	return 202, cls.set(content, nil, 202, 0).get()
+	return 202, ins.set(content, nil, 202, 0).get()
 }
 
 // Deleted 删除成功
-func (cls *correct) Deleted() (int, interface{}) {
-	if cls.msg == "" {
-		cls.msg = "删除成功"
+func (ins *correct) Deleted() (int, interface{}) {
+	if ins.msg == "" {
+		ins.msg = "删除成功"
 	}
-	return 204, cls.set(nil, nil, 204, 0).get()
+	return 204, ins.set(nil, nil, 204, 0).get()
 }

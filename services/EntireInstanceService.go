@@ -2,7 +2,6 @@ package services
 
 import (
 	"fix-workshop-ue/tools"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -11,8 +10,8 @@ type EntireInstanceService struct{}
 
 // GetAccountOrganizationLevel 获取用户级别
 func (EntireInstanceService) GetAccountOrganizationLevel(ctx *gin.Context) {
-	fmt.Println(ctx.Get(tools.AccountOrganizationLevel))
-	fmt.Println(ctx.Get(tools.AccountOrganizationWorkAreaProfessionUniqueCode))
+	//fmt.Println(ctx.Get(tools.AccountOrganizationLevel))
+	//fmt.Println(ctx.Get(tools.AccountOrganizationWorkAreaProfessionUniqueCode))
 }
 
 // PrepareByAccountOrganizationLevel 根据用户级别设置器材条件

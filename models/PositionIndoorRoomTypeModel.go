@@ -18,13 +18,13 @@ func (PositionIndoorRoomTypeModel) TableName() string {
 }
 
 // FindOneByUUID 根据UUID获取单条数据
-//  @receiver cls
+//  @receiver ins
 //  @param uuid
 //  @return PositionIndoorRoomTypeModel
-func (cls PositionIndoorRoomTypeModel) FindOneByUUID(uuid string) PositionIndoorRoomTypeModel {
-	if ret := BootByModel(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare("").First(&cls); ret.Error != nil {
+func (ins PositionIndoorRoomTypeModel) FindOneByUUID(uuid string) PositionIndoorRoomTypeModel {
+	if ret := BootByModel(ins).SetWheres(tools.Map{"uuid": uuid}).Prepare("").First(&ins); ret.Error != nil {
 		panic(wrongs.PanicWhenIsEmpty(ret, "工区"))
 	}
 
-	return cls
+	return ins
 }

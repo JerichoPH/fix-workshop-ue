@@ -9,7 +9,7 @@ import (
 type AuthorizationRouter struct{}
 
 // Load 加载路由
-//  @receiver cls
+//  @receiver ins
 //  @param router
 func (AuthorizationRouter) Load(engine *gin.Engine) {
 	r := engine.Group("/api/v1/authorization")

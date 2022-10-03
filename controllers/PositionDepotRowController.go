@@ -23,42 +23,42 @@ type PositionDepotRowStoreForm struct {
 }
 
 // ShouldBind 绑定表单
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return PositionDepotRowStoreForm
-func (cls PositionDepotRowStoreForm) ShouldBind(ctx *gin.Context) PositionDepotRowStoreForm {
+func (ins PositionDepotRowStoreForm) ShouldBind(ctx *gin.Context) PositionDepotRowStoreForm {
 	var ret *gorm.DB
 
-	if err := ctx.ShouldBind(&cls); err != nil {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if cls.UniqueCode == "" {
+	if ins.UniqueCode == "" {
 		wrongs.PanicValidate("仓库排代码必填")
 	}
-	if cls.Name == "" {
+	if ins.Name == "" {
 		wrongs.PanicValidate("仓库排名称必填")
 	}
-	if len(cls.Name) > 64 {
+	if len(ins.Name) > 64 {
 		wrongs.PanicValidate("仓库排名称不能超过64位")
 	}
-	if cls.PositionDepotRowTypeUuid == "" {
+	if ins.PositionDepotRowTypeUuid == "" {
 		wrongs.PanicValidate("所属排类型必选")
 	}
 	models.BootByModel(models.PositionDepotRowTypeModel{}).
-		SetWheres(tools.Map{"uuid": cls.PositionDepotRowTypeUuid}).
+		SetWheres(tools.Map{"uuid": ins.PositionDepotRowTypeUuid}).
 		PrepareByDefaultDbDriver().
-		First(&cls.PositionDepotRowType)
+		First(&ins.PositionDepotRowType)
 	wrongs.PanicWhenIsEmpty(ret, "所属仓库排类型")
-	if cls.PositionDepotSectionUuid == "" {
+	if ins.PositionDepotSectionUuid == "" {
 		wrongs.PanicValidate("所属仓库区域必选")
 	}
 	ret = models.BootByModel(models.PositionDepotSectionModel{}).
-		SetWheres(tools.Map{"uuid": cls.PositionDepotSectionUuid}).
+		SetWheres(tools.Map{"uuid": ins.PositionDepotSectionUuid}).
 		PrepareByDefaultDbDriver().
-		First(&cls.PositionDepotSection)
+		First(&ins.PositionDepotSection)
 	wrongs.PanicWhenIsEmpty(ret, "所属仓库区域")
 
-	return cls
+	return ins
 }
 
 // C 新建
@@ -156,7 +156,7 @@ func (PositionDepotRowController) U(ctx *gin.Context) {
 	positionDepotRow.Name = form.Name
 	positionDepotRow.PositionDepotRowType = form.PositionDepotRowType
 	positionDepotRow.PositionDepotSection = form.PositionDepotSection
-	if ret = models.BootByModel(models.PositionDepotRowModel{}).SetWheres(tools.Map{"uuid":ctx.Param("uuid")}).PrepareByDefaultDbDriver().Save(&positionDepotRow); ret.Error != nil {
+	if ret = models.BootByModel(models.PositionDepotRowModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefaultDbDriver().Save(&positionDepotRow); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
@@ -182,8 +182,8 @@ func (PositionDepotRowController) S(ctx *gin.Context) {
 func (PositionDepotRowController) I(ctx *gin.Context) {
 	var (
 		locationDepotRows []models.PositionDepotRowModel
-		count           int64
-		db              *gorm.DB
+		count             int64
+		db                *gorm.DB
 	)
 	db = models.BootByModel(models.PositionDepotRowModel{}).
 		SetPreloads("RbacPermissionGroup").

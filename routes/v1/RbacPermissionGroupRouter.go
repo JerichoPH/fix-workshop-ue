@@ -10,7 +10,7 @@ import (
 type RbacPermissionGroupRouter struct{}
 
 // Load 加载路由
-//  @receiver cls
+//  @receiver ins
 //  @param router
 func (RbacPermissionGroupRouter) Load(engine *gin.Engine) {
 	r := engine.Group(

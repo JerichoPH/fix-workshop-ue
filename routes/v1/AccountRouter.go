@@ -10,7 +10,7 @@ import (
 type AccountRouter struct{}
 
 // Load 加载路由
-//  @receiver cls
+//  @receiver ins
 //  @param router
 func (AccountRouter) Load(engine *gin.Engine) {
 	r := engine.Group(

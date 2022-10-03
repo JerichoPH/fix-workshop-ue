@@ -23,33 +23,33 @@ type OrganizationRailwayStoreForm struct {
 }
 
 // ShouldBind 绑定表单
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return OrganizationRailwayStoreForm
-func (cls OrganizationRailwayStoreForm) ShouldBind(ctx *gin.Context) OrganizationRailwayStoreForm {
-	if err := ctx.ShouldBind(&cls); err != nil {
+func (ins OrganizationRailwayStoreForm) ShouldBind(ctx *gin.Context) OrganizationRailwayStoreForm {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if cls.UniqueCode == "" {
+	if ins.UniqueCode == "" {
 		wrongs.PanicValidate("路局代码必填")
 	}
-	if len(cls.UniqueCode) != 3 {
+	if len(ins.UniqueCode) != 3 {
 		wrongs.PanicValidate("路局代码必须是3位")
 	}
-	if cls.Name == "" {
+	if ins.Name == "" {
 		wrongs.PanicValidate("路局名称必填")
 	}
-	if len(cls.Name) > 64 {
+	if len(ins.Name) > 64 {
 		wrongs.PanicValidate("路局名称不能超过64位")
 	}
-	if len(cls.LocationLineUuids) > 0 {
+	if len(ins.LocationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
 			PrepareByDefaultDbDriver().
-			Where("uuid in ?", cls.LocationLineUuids).
-			Find(&cls.LocationLines)
+			Where("uuid in ?", ins.LocationLineUuids).
+			Find(&ins.LocationLines)
 	}
 
-	return cls
+	return ins
 }
 
 // OrganizationRailwayBindLinesFrom 路局绑定线别
@@ -59,19 +59,19 @@ type OrganizationRailwayBindLinesFrom struct {
 }
 
 // ShouldBind 绑定表单
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
-func (cls OrganizationRailwayBindLinesFrom) ShouldBind(ctx *gin.Context) OrganizationRailwayBindLinesFrom {
-	if err := ctx.ShouldBind(&cls); err != nil {
+func (ins OrganizationRailwayBindLinesFrom) ShouldBind(ctx *gin.Context) OrganizationRailwayBindLinesFrom {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
 
 	models.BootByModel(models.LocationLineModel{}).
 		PrepareByDefaultDbDriver().
-		Where("uuid in ?", cls.LocationLineUUIDs).
-		Find(&cls.LocationLines)
+		Where("uuid in ?", ins.LocationLineUUIDs).
+		Find(&ins.LocationLines)
 
-	return cls
+	return ins
 }
 
 // C 新建

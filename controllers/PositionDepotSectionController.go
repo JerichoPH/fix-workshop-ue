@@ -21,34 +21,34 @@ type PositionDepotSectionStoreForm struct {
 }
 
 // ShouldBind 绑定表单
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return PositionDepotSectionStoreForm
-func (cls PositionDepotSectionStoreForm) ShouldBind(ctx *gin.Context) PositionDepotSectionStoreForm {
+func (ins PositionDepotSectionStoreForm) ShouldBind(ctx *gin.Context) PositionDepotSectionStoreForm {
 	var ret *gorm.DB
 
-	if err := ctx.ShouldBind(&cls); err != nil {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if cls.UniqueCode == "" {
+	if ins.UniqueCode == "" {
 		wrongs.PanicValidate("仓库区域代码不能必填")
 	}
-	if cls.Name == "" {
+	if ins.Name == "" {
 		wrongs.PanicValidate("仓库区域名称不能必填")
 	}
-	if len(cls.Name) > 64 {
+	if len(ins.Name) > 64 {
 		wrongs.PanicValidate("仓库区域名称不能超过64位")
 	}
-	if cls.PositionDepotStorehouseUuid == "" {
+	if ins.PositionDepotStorehouseUuid == "" {
 		wrongs.PanicValidate("所属仓库必选")
 	}
 	ret = models.BootByModel(models.PositionDepotStorehouseModel{}).
-		SetWheres(tools.Map{"uuid": cls.PositionDepotStorehouseUuid}).
+		SetWheres(tools.Map{"uuid": ins.PositionDepotStorehouseUuid}).
 		PrepareByDefaultDbDriver().
-		First(&cls.PositionDepotStorehouse)
+		First(&ins.PositionDepotStorehouse)
 	wrongs.PanicWhenIsEmpty(ret, "所属仓库")
 
-	return cls
+	return ins
 }
 
 // C 新建
@@ -144,7 +144,7 @@ func (PositionDepotSectionController) U(ctx *gin.Context) {
 	positionDepotSection.BaseModel.Sort = form.Sort
 	positionDepotSection.Name = form.Name
 	positionDepotSection.PositionDepotStorehouse = form.PositionDepotStorehouse
-	if ret = models.BootByModel(models.PositionDepotSectionModel{}).SetWheres(tools.Map{"uuid":ctx.Param("uuid")}).PrepareByDefaultDbDriver().Save(&positionDepotSection); ret.Error != nil {
+	if ret = models.BootByModel(models.PositionDepotSectionModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefaultDbDriver().Save(&positionDepotSection); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
@@ -170,8 +170,8 @@ func (PositionDepotSectionController) S(ctx *gin.Context) {
 func (PositionDepotSectionController) I(ctx *gin.Context) {
 	var (
 		positionDepotSections []models.PositionDepotSectionModel
-		count           int64
-		db              *gorm.DB
+		count                 int64
+		db                    *gorm.DB
 	)
 	db = models.BootByModel(models.PositionDepotSectionModel{}).
 		SetWhereFields().

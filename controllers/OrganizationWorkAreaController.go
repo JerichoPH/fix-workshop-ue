@@ -29,42 +29,42 @@ type OrganizationWorkAreaStoreForm struct {
 //  @receiver cl
 //  @param ctx
 //  @return OrganizationWorkAreaStoreForm
-func (cls OrganizationWorkAreaStoreForm) ShouldBind(ctx *gin.Context) OrganizationWorkAreaStoreForm {
+func (ins OrganizationWorkAreaStoreForm) ShouldBind(ctx *gin.Context) OrganizationWorkAreaStoreForm {
 	var ret *gorm.DB
 
-	if err := ctx.ShouldBind(&cls); err != nil {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if cls.UniqueCode == "" {
+	if ins.UniqueCode == "" {
 		wrongs.PanicValidate("工区代码必填")
 	}
-	if len(cls.UniqueCode) != 4 {
+	if len(ins.UniqueCode) != 4 {
 		wrongs.PanicValidate("工区代码必须是4位")
 	}
-	if cls.Name == "" {
+	if ins.Name == "" {
 		wrongs.PanicValidate("工区名称必填")
 	}
-	if len(cls.Name) > 64 {
+	if len(ins.Name) > 64 {
 		wrongs.PanicValidate("工区名称不能超过64位")
 	}
 
-	if cls.OrganizationWorkAreaTypeUuid == "" {
+	if ins.OrganizationWorkAreaTypeUuid == "" {
 		wrongs.PanicValidate("工区类型必选")
 	}
-	ret = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).SetWheres(map[string]interface{}{"uuid": cls.OrganizationWorkAreaTypeUuid}).PrepareByDefaultDbDriver().First(&cls.OrganizationWorkAreaType)
+	ret = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).SetWheres(map[string]interface{}{"uuid": ins.OrganizationWorkAreaTypeUuid}).PrepareByDefaultDbDriver().First(&ins.OrganizationWorkAreaType)
 	wrongs.PanicWhenIsEmpty(ret, "工区类型")
 
-	if cls.OrganizationWorkshopUuid == "" {
+	if ins.OrganizationWorkshopUuid == "" {
 		wrongs.PanicValidate("所属车间必选")
 	}
-	ret = models.BootByModel(models.OrganizationWorkshopModel{}).SetWheres(map[string]interface{}{"uuid": cls.OrganizationWorkshopUuid}).SetPreloads("OrganizationParagraph", "OrganizationParagraph.OrganizationRailway").PrepareByDefaultDbDriver().First(&cls.OrganizationWorkshop)
+	ret = models.BootByModel(models.OrganizationWorkshopModel{}).SetWheres(map[string]interface{}{"uuid": ins.OrganizationWorkshopUuid}).SetPreloads("OrganizationParagraph", "OrganizationParagraph.OrganizationRailway").PrepareByDefaultDbDriver().First(&ins.OrganizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "所属车间")
 
-	if cls.OrganizationWorkAreaProfessionUuid != "" {
-		ret = models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaProfessionUuid}).PrepareByDefaultDbDriver().First(&cls.OrganizationWorkAreaProfession)
+	if ins.OrganizationWorkAreaProfessionUuid != "" {
+		ret = models.BootByModel(models.OrganizationWorkAreaProfessionModel{}).SetWheres(tools.Map{"uuid": ins.OrganizationWorkAreaProfessionUuid}).PrepareByDefaultDbDriver().First(&ins.OrganizationWorkAreaProfession)
 		wrongs.PanicWhenIsEmpty(ret, "工区专业")
 	}
-	return cls
+	return ins
 }
 
 // C 新建

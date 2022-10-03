@@ -11,7 +11,7 @@ type PositionDepotTierModel struct {
 }
 
 // TableName 表名称
-//  @receiver cls
+//  @receiver ins
 //  @return string
 func (PositionDepotTierModel) TableName() string {
 	return "position_depot_tiers"

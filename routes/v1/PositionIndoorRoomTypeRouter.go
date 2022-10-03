@@ -10,7 +10,7 @@ import (
 type PositionIndoorRoomTypeRouter struct{}
 
 // Load 加载路由
-//  @receiver cls
+//  @receiver ins
 //  @param engine
 func (PositionIndoorRoomTypeRouter) Load(engine *gin.Engine) {
 	r := engine.Group(

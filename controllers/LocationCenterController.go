@@ -26,51 +26,51 @@ type LocationCenterStoreForm struct {
 }
 
 // ShouldBind 表单绑定
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return LocationCenterStoreForm
-func (cls LocationCenterStoreForm) ShouldBind(ctx *gin.Context) LocationCenterStoreForm {
+func (ins LocationCenterStoreForm) ShouldBind(ctx *gin.Context) LocationCenterStoreForm {
 	var ret *gorm.DB
 
-	if err := ctx.ShouldBind(&cls); err != nil {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if cls.UniqueCode == "" {
+	if ins.UniqueCode == "" {
 		wrongs.PanicValidate("中心代码必填")
 	}
-	if len(cls.UniqueCode) != 3 {
+	if len(ins.UniqueCode) != 3 {
 		wrongs.PanicValidate("中心代码必须是3位")
 	}
-	if cls.Name == "" {
+	if ins.Name == "" {
 		wrongs.PanicValidate("中心名称必填")
 	}
-	if len(cls.Name) > 64 {
+	if len(ins.Name) > 64 {
 		wrongs.PanicValidate("中心名称不能大于64位")
 	}
-	if cls.OrganizationWorkshopUuid == "" {
+	if ins.OrganizationWorkshopUuid == "" {
 		wrongs.PanicValidate("所属车间必选")
 	}
 	ret = models.BootByModel(models.OrganizationWorkshopModel{}).
-		SetWheres(tools.Map{"uuid": cls.OrganizationWorkshopUuid}).
+		SetWheres(tools.Map{"uuid": ins.OrganizationWorkshopUuid}).
 		SetPreloads("OrganizationParagraph", "OrganizationParagraph.OrganizationRailway").
 		PrepareByDefaultDbDriver().
-		First(&cls.OrganizationWorkshop)
+		First(&ins.OrganizationWorkshop)
 	wrongs.PanicWhenIsEmpty(ret, "所属车间")
-	if cls.OrganizationWorkAreaUuid != "" {
+	if ins.OrganizationWorkAreaUuid != "" {
 		models.BootByModel(models.OrganizationWorkAreaModel{}).
-			SetWheres(tools.Map{"uuid": cls.OrganizationWorkAreaUuid}).
+			SetWheres(tools.Map{"uuid": ins.OrganizationWorkAreaUuid}).
 			PrepareByDefaultDbDriver().
-			First(&cls.OrganizationWorkArea)
+			First(&ins.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "所属工区")
 	}
-	if len(cls.LocationLineUuids) > 0 {
+	if len(ins.LocationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
 			PrepareByDefaultDbDriver().
-			Where("uuid in ?", cls.LocationLineUuids).
-			Find(&cls.LocationLines)
+			Where("uuid in ?", ins.LocationLineUuids).
+			Find(&ins.LocationLines)
 	}
 
-	return cls
+	return ins
 }
 
 // LocationCenterBindLocationLinesForm 中心绑定线别表单
@@ -80,22 +80,22 @@ type LocationCenterBindLocationLinesForm struct {
 }
 
 // ShouldBind 绑定表单
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return LocationCenterBindLocationLinesForm
-func (cls LocationCenterBindLocationLinesForm) ShouldBind(ctx *gin.Context) LocationCenterBindLocationLinesForm {
-	if err := ctx.ShouldBind(&cls); err != nil {
+func (ins LocationCenterBindLocationLinesForm) ShouldBind(ctx *gin.Context) LocationCenterBindLocationLinesForm {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
 
-	if len(cls.LocationLineUuids) > 0 {
+	if len(ins.LocationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
 			PrepareByDefaultDbDriver().
-			Where("uuid in ?", cls.LocationLineUuids).
-			Find(&cls.LocationLines)
+			Where("uuid in ?", ins.LocationLineUuids).
+			Find(&ins.LocationLines)
 	}
 
-	return cls
+	return ins
 }
 
 // N 新建

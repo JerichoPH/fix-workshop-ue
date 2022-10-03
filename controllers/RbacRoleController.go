@@ -20,21 +20,21 @@ type RbacRoleStoreForm struct {
 }
 
 // ShouldBind 绑定表单
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return RbacRoleStoreForm
-func (cls RbacRoleStoreForm) ShouldBind(ctx *gin.Context) RbacRoleStoreForm {
-	if err := ctx.ShouldBind(&cls); err != nil {
+func (ins RbacRoleStoreForm) ShouldBind(ctx *gin.Context) RbacRoleStoreForm {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if cls.Name == "" {
+	if ins.Name == "" {
 		wrongs.PanicValidate("角色名称必填")
 	}
-	if len(cls.Name) > 64 {
+	if len(ins.Name) > 64 {
 		wrongs.PanicValidate("角色名称不能超过64位")
 	}
 
-	return cls
+	return ins
 }
 
 // RbacRoleUpdateForm 编辑角色表单
@@ -49,22 +49,22 @@ type RbacRoleBindAccountsForm struct {
 }
 
 // ShouldBind 表单绑定
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return RbacRoleBindAccountsForm
-func (cls RbacRoleBindAccountsForm) ShouldBind(ctx *gin.Context) RbacRoleBindAccountsForm {
-	if err := ctx.ShouldBind(&cls); err != nil {
+func (ins RbacRoleBindAccountsForm) ShouldBind(ctx *gin.Context) RbacRoleBindAccountsForm {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicForbidden(err.Error())
 	}
 
-	if len(cls.AccountUUIDs) > 0 {
+	if len(ins.AccountUUIDs) > 0 {
 		models.BootByModel(models.AccountModel{}).
 			PrepareByDefaultDbDriver().
-			Where("uuid in ?", cls.AccountUUIDs).
-			Find(&cls.Accounts)
+			Where("uuid in ?", ins.AccountUUIDs).
+			Find(&ins.Accounts)
 	}
 
-	return cls
+	return ins
 }
 
 // RbacRoleBindPermissionsForm 角色绑定权限表单
@@ -74,22 +74,22 @@ type RbacRoleBindPermissionsForm struct {
 }
 
 // ShouldBind 表单绑定
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return RbacRoleBindPermissionsForm
-func (cls RbacRoleBindPermissionsForm) ShouldBind(ctx *gin.Context) RbacRoleBindPermissionsForm {
-	if err := ctx.ShouldBind(&cls); err != nil {
+func (ins RbacRoleBindPermissionsForm) ShouldBind(ctx *gin.Context) RbacRoleBindPermissionsForm {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicForbidden(err.Error())
 	}
 
-	if len(cls.RbacPermissionUuids) > 0 {
+	if len(ins.RbacPermissionUuids) > 0 {
 		models.BootByModel(models.RbacPermissionModel{}).
 			PrepareByDefaultDbDriver().
-			Where("uuid in ?", cls.RbacPermissionUuids).
-			Find(&cls.RbacPermissions)
+			Where("uuid in ?", ins.RbacPermissionUuids).
+			Find(&ins.RbacPermissions)
 	}
 
-	return cls
+	return ins
 }
 
 // RbacRoleBindPermissionsByRbacPermissionGroupForm 角色绑定权限表单（根据权限分组）
@@ -101,24 +101,24 @@ type RbacRoleBindPermissionsByRbacPermissionGroupForm struct {
 }
 
 // ShouldBind 绑定表单
-func (cls RbacRoleBindPermissionsByRbacPermissionGroupForm) ShouldBind(ctx *gin.Context) RbacRoleBindPermissionsByRbacPermissionGroupForm {
+func (ins RbacRoleBindPermissionsByRbacPermissionGroupForm) ShouldBind(ctx *gin.Context) RbacRoleBindPermissionsByRbacPermissionGroupForm {
 	var ret *gorm.DB
 
-	if err := ctx.ShouldBind(&cls); err != nil {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
 
-	if cls.RbacPermissionGroupUuid == "" {
+	if ins.RbacPermissionGroupUuid == "" {
 		wrongs.PanicValidate("所属权限分组必选")
 	}
-	ret = models.BootByModel(models.RbacPermissionGroupModel{}).SetWheres(tools.Map{"uuid": cls.RbacPermissionGroupUuid}).PrepareByDefaultDbDriver().First(&cls.RbacPermissionGroup)
+	ret = models.BootByModel(models.RbacPermissionGroupModel{}).SetWheres(tools.Map{"uuid": ins.RbacPermissionGroupUuid}).PrepareByDefaultDbDriver().First(&ins.RbacPermissionGroup)
 	wrongs.PanicWhenIsEmpty(ret, "权限分组")
 
-	if len(cls.RbacPermissionUuids) > 0 {
-		models.BootByModel(models.RbacPermissionModel{}).PrepareByDefaultDbDriver().Where("uuid in ?", cls.RbacPermissionUuids).Find(&cls.RbacPermissions)
+	if len(ins.RbacPermissionUuids) > 0 {
+		models.BootByModel(models.RbacPermissionModel{}).PrepareByDefaultDbDriver().Where("uuid in ?", ins.RbacPermissionUuids).Find(&ins.RbacPermissions)
 	}
 
-	return cls
+	return ins
 }
 
 // N 新建

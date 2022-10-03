@@ -11,7 +11,7 @@ type PositionDepotCabinetModel struct {
 }
 
 // TableName 表名称
-//  @receiver cls
+//  @receiver ins
 //  @return string
 func (PositionDepotCabinetModel) TableName() string {
 	return "position_depot_cabinets"

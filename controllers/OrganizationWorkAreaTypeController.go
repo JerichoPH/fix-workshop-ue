@@ -19,27 +19,27 @@ type OrganizationWorkAreaTypeStoreForm struct {
 }
 
 // ShouldBind 绑定表单
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return OrganizationWorkAreaTypeStoreForm
-func (cls OrganizationWorkAreaTypeStoreForm) ShouldBind(ctx *gin.Context) OrganizationWorkAreaTypeStoreForm {
-	if err := ctx.ShouldBind(&cls); err != nil {
+func (ins OrganizationWorkAreaTypeStoreForm) ShouldBind(ctx *gin.Context) OrganizationWorkAreaTypeStoreForm {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if cls.UniqueCode == "" {
+	if ins.UniqueCode == "" {
 		wrongs.PanicValidate("工区类型代码必填")
 	}
-	if len(cls.UniqueCode) > 64{
+	if len(ins.UniqueCode) > 64 {
 		wrongs.PanicValidate("工区类型代码不能超过64位")
 	}
-	if cls.Name == "" {
+	if ins.Name == "" {
 		wrongs.PanicValidate("工区类型名称必填")
 	}
-	if len(cls.Name) > 64 {
+	if len(ins.Name) > 64 {
 		wrongs.PanicValidate("工区类型名称不能超过64位")
 	}
 
-	return cls
+	return ins
 }
 
 // C 新建
@@ -136,7 +136,7 @@ func (OrganizationWorkAreaTypeController) I(ctx *gin.Context) {
 	var (
 		organizationWorkAreaTypes []models.OrganizationWorkAreaTypeModel
 		count                     int64
-		db              *gorm.DB
+		db                        *gorm.DB
 	)
 	db = models.BootByModel(models.OrganizationWorkAreaTypeModel{}).
 		SetWhereFields().

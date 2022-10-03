@@ -23,13 +23,13 @@ func (MenuModel) TableName() string {
 }
 
 // FindOneByUUID 根据UUID获取单条数据
-//  @receiver cls
+//  @receiver ins
 //  @param uuid
 //  @return MenuModel
-func (cls MenuModel) FindOneByUUID(uuid string) MenuModel {
-	if ret := BootByModel(cls).SetWheres(tools.Map{"uuid": uuid}).Prepare("").First(&cls); ret.Error != nil {
+func (ins MenuModel) FindOneByUUID(uuid string) MenuModel {
+	if ret := BootByModel(ins).SetWheres(tools.Map{"uuid": uuid}).Prepare("").First(&ins); ret.Error != nil {
 		panic(wrongs.PanicWhenIsEmpty(ret, "菜单"))
 	}
 
-	return cls
+	return ins
 }

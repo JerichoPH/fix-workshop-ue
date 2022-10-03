@@ -36,83 +36,83 @@ type LocationLineStoreForm struct {
 }
 
 // ShouldBind 绑定表单
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return LocationLineStoreForm
-func (cls LocationLineStoreForm) ShouldBind(ctx *gin.Context) LocationLineStoreForm {
-	if err := ctx.ShouldBind(&cls); err != nil {
+func (ins LocationLineStoreForm) ShouldBind(ctx *gin.Context) LocationLineStoreForm {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if cls.UniqueCode == "" {
+	if ins.UniqueCode == "" {
 		wrongs.PanicValidate("线别代码必填")
 	}
-	if len(cls.UniqueCode) != 5 {
+	if len(ins.UniqueCode) != 5 {
 		wrongs.PanicValidate("线别代码必须是5位")
 	}
-	if cls.Name == "" {
+	if ins.Name == "" {
 		wrongs.PanicValidate("线别名称必填")
 	}
-	if len(cls.Name) > 64 {
+	if len(ins.Name) > 64 {
 		wrongs.PanicValidate("线别名称不能超过64位")
 	}
 	// 查询路局
-	if len(cls.OrganizationRailwayUuids) > 0 {
+	if len(ins.OrganizationRailwayUuids) > 0 {
 		models.BootByModel(models.OrganizationRailwayModel{}).
 			PrepareByDefaultDbDriver().
-			Where("uuid in ?", cls.OrganizationRailwayUuids).
-			Find(&cls.OrganizationRailways)
+			Where("uuid in ?", ins.OrganizationRailwayUuids).
+			Find(&ins.OrganizationRailways)
 	}
 	// 查询站段
-	if len(cls.OrganizationParagraphUuids) > 0 {
+	if len(ins.OrganizationParagraphUuids) > 0 {
 		models.BootByModel(models.OrganizationParagraphModel{}).
 			PrepareByDefaultDbDriver().
-			Where("uuid in ?", cls.OrganizationParagraphUuids).
-			Find(&cls.OrganizationParagraphs)
+			Where("uuid in ?", ins.OrganizationParagraphUuids).
+			Find(&ins.OrganizationParagraphs)
 	}
 	// 查询车间
-	if len(cls.OrganizationWorkshopUuids) > 0 {
+	if len(ins.OrganizationWorkshopUuids) > 0 {
 		models.BootByModel(models.OrganizationWorkshopModel{}).
 			PrepareByDefaultDbDriver().
-			Where("uuid in ?", cls.OrganizationWorkshopUuids).
-			Find(&cls.OrganizationWorkshops)
+			Where("uuid in ?", ins.OrganizationWorkshopUuids).
+			Find(&ins.OrganizationWorkshops)
 	}
 	// 查询工区
-	if len(cls.OrganizationWorkAreaUuids) > 0 {
+	if len(ins.OrganizationWorkAreaUuids) > 0 {
 		models.BootByModel(models.OrganizationWorkAreaModel{}).
 			PrepareByDefaultDbDriver().
-			Where("uuid in ?", cls.OrganizationWorkAreaUuids).
-			Find(&cls.OrganizationWorkAreas)
+			Where("uuid in ?", ins.OrganizationWorkAreaUuids).
+			Find(&ins.OrganizationWorkAreas)
 	}
 	// 查询区间
-	if len(cls.LocationSectionUuids) > 0 {
+	if len(ins.LocationSectionUuids) > 0 {
 		models.BootByModel(models.LocationSectionModel{}).
 			PrepareByDefaultDbDriver().
-			Where("uuid in ?", cls.LocationSectionUuids).
-			Find(&cls.LocationSections)
+			Where("uuid in ?", ins.LocationSectionUuids).
+			Find(&ins.LocationSections)
 	}
 	// 查询站场
-	if len(cls.LocationStationUuids) > 0 {
+	if len(ins.LocationStationUuids) > 0 {
 		models.BootByModel(models.LocationStationModel{}).
 			PrepareByDefaultDbDriver().
-			Where("uuid in ?", cls.LocationStationUuids).
-			Find(&cls.LocationStations)
+			Where("uuid in ?", ins.LocationStationUuids).
+			Find(&ins.LocationStations)
 	}
 	// 查询道口
-	if len(cls.LocationRailroadGradeCrossUuids) > 0 {
+	if len(ins.LocationRailroadGradeCrossUuids) > 0 {
 		models.BootByModel(models.LocationRailroadGradeCrossModel{}).
 			PrepareByDefaultDbDriver().
-			Where("uuid in ?", cls.LocationRailroadGradeCrossUuids).
-			Find(&cls.LocationRailroadGradeCrosses)
+			Where("uuid in ?", ins.LocationRailroadGradeCrossUuids).
+			Find(&ins.LocationRailroadGradeCrosses)
 	}
 	// 查询道口
-	if len(cls.LocationRailroadGradeCrossUuids) > 0 {
+	if len(ins.LocationRailroadGradeCrossUuids) > 0 {
 		models.BootByModel(models.LocationRailroadGradeCrossModel{}).
 			PrepareByDefaultDbDriver().
-			Where("uuid in ?", cls.LocationRailroadGradeCrossUuids).
-			Find(&cls.LocationRailroadGradeCrosses)
+			Where("uuid in ?", ins.LocationRailroadGradeCrossUuids).
+			Find(&ins.LocationRailroadGradeCrosses)
 	}
 
-	return cls
+	return ins
 }
 
 // LocationLineBindForm 线别多对多绑定
@@ -263,7 +263,7 @@ func (LocationLineController) L(ctx *gin.Context) {
 	var (
 		locationLines []models.LocationLineModel
 		count         int64
-		db                *gorm.DB
+		db            *gorm.DB
 	)
 	db = models.BootByModel(models.LocationLineModel{}).
 		SetWhereFields("unique_code", "name", "be_enable", "sort").

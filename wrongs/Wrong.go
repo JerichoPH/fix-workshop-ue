@@ -12,10 +12,10 @@ type Wrong struct{ errorMessage string }
 type EmptyWrong struct{ Wrong }
 
 // Error 获取异常信息
-//  @receiver cls
+//  @receiver ins
 //  @return string
-func (cls *Wrong) Error() string {
-	return cls.errorMessage
+func (ins *Wrong) Error() string {
+	return ins.errorMessage
 }
 
 // ValidateWrong 表单验证错误

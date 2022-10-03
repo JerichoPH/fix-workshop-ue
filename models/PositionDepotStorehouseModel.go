@@ -13,7 +13,7 @@ type PositionDepotStorehouseModel struct {
 }
 
 // TableName 表名称
-//  @receiver cls
+//  @receiver ins
 //  @return strung
 func (PositionDepotStorehouseModel) TableName() string {
 	return "position_depot_storehouses"

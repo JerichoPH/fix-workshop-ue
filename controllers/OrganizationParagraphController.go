@@ -24,42 +24,42 @@ type OrganizationParagraphStoreForm struct {
 }
 
 // ShouldBind 绑定表单
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return OrganizationParagraphStoreForm
-func (cls OrganizationParagraphStoreForm) ShouldBind(ctx *gin.Context) OrganizationParagraphStoreForm {
+func (ins OrganizationParagraphStoreForm) ShouldBind(ctx *gin.Context) OrganizationParagraphStoreForm {
 	var ret *gorm.DB
-	if err := ctx.ShouldBind(&cls); err != nil {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if cls.UniqueCode == "" {
+	if ins.UniqueCode == "" {
 		wrongs.PanicValidate("站段代码必填")
 	}
-	if len(cls.UniqueCode) != 4 {
+	if len(ins.UniqueCode) != 4 {
 		wrongs.PanicValidate("站段代码必须是4位")
 	}
-	if cls.Name == "" {
+	if ins.Name == "" {
 		wrongs.PanicValidate("站段名称必填")
 	}
-	if len(cls.Name) > 64 {
+	if len(ins.Name) > 64 {
 		wrongs.PanicValidate("站段名称不能超过64位")
 	}
-	if cls.OrganizationRailwayUuid == "" {
+	if ins.OrganizationRailwayUuid == "" {
 		wrongs.PanicValidate("所属路局必选")
 	}
 	ret = models.BootByModel(models.OrganizationRailwayModel{}).
-		SetWheres(tools.Map{"uuid": cls.OrganizationRailwayUuid}).
+		SetWheres(tools.Map{"uuid": ins.OrganizationRailwayUuid}).
 		PrepareByDefaultDbDriver().
-		First(&cls.OrganizationRailway)
+		First(&ins.OrganizationRailway)
 	wrongs.PanicWhenIsEmpty(ret, "路局")
-	if len(cls.OrganizationLineUuids) > 0 {
+	if len(ins.OrganizationLineUuids) > 0 {
 		models.BootByModel(models.LocationLineModel{}).
 			PrepareByDefaultDbDriver().
-			Where("uuid in ?", cls.OrganizationLineUuids).
-			Find(&cls.OrganizationLines)
+			Where("uuid in ?", ins.OrganizationLineUuids).
+			Find(&ins.OrganizationLines)
 	}
 
-	return cls
+	return ins
 }
 
 // C 新建

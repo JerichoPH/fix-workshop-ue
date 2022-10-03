@@ -20,27 +20,27 @@ type MySql struct {
 var mySqlConn *gorm.DB
 
 // getConn 获取数据库链接
-//  @receiver cls
+//  @receiver ins
 //  @return db
-func (cls *MySql) getConn() (db *gorm.DB) {
+func (ins *MySql) getConn() (db *gorm.DB) {
 	ctf := settings.Setting{}
 	config := ctf.Init()
 
-	cls.Username = config.DB.Section("mysql").Key("username").MustString("root")
-	cls.Password = config.DB.Section("mysql").Key("password").MustString("root")
-	cls.Host = config.DB.Section("mysql").Key("host").MustString("127.0.0.1")
-	cls.Port = config.DB.Section("mysql").Key("port").MustString("3306")
-	cls.Database = config.DB.Section("mysql").Key("database").MustString("FixWorkshop")
-	cls.Charset = config.DB.Section("mysql").Key("charset").MustString("utf8mb4")
+	ins.Username = config.DB.Section("mysql").Key("username").MustString("root")
+	ins.Password = config.DB.Section("mysql").Key("password").MustString("root")
+	ins.Host = config.DB.Section("mysql").Key("host").MustString("127.0.0.1")
+	ins.Port = config.DB.Section("mysql").Key("port").MustString("3306")
+	ins.Database = config.DB.Section("mysql").Key("database").MustString("FixWorkshop")
+	ins.Charset = config.DB.Section("mysql").Key("charset").MustString("utf8mb4")
 
 	dsn := fmt.Sprintf(
 		"%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local",
-		cls.Username,
-		cls.Password,
-		cls.Host,
-		cls.Port,
-		cls.Database,
-		cls.Charset,
+		ins.Username,
+		ins.Password,
+		ins.Host,
+		ins.Port,
+		ins.Database,
+		ins.Charset,
 	)
 
 	mySqlConn, _ := gorm.Open(mysql.Open(dsn), &gorm.Config{
@@ -58,14 +58,14 @@ func (cls *MySql) getConn() (db *gorm.DB) {
 }
 
 // GetConn 获取数据库链接
-func (cls *MySql) GetConn() *gorm.DB {
+func (ins *MySql) GetConn() *gorm.DB {
 	if mySqlConn == nil {
-		mySqlConn = cls.getConn()
+		mySqlConn = ins.getConn()
 	}
 	return mySqlConn
 }
 
 // NewConn 获取新数据库链接
-func (cls *MySql) NewConn() *gorm.DB {
-	return cls.getConn()
+func (ins *MySql) NewConn() *gorm.DB {
+	return ins.getConn()
 }

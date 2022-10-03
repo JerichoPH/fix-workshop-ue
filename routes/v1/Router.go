@@ -22,7 +22,7 @@ func (Router) Load(engine *gin.Engine) {
 	new(OrganizationWorkAreaProfessionRouter).Load(engine) //  工区专业
 	new(OrganizationWorkAreaRouter).Load(engine)           // 工区
 
-	// 使用处所
+	// 使用地点
 	new(LocationLineRouter).Load(engine)               // 线别
 	new(LocationStationRouter).Load(engine)            // 站场
 	new(LocationSectionRouter).Load(engine)            // 区间

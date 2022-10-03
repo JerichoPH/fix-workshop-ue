@@ -22,27 +22,27 @@ type KindCategoryStoreForm struct {
 }
 
 // ShouldBind 绑定表单
-//  @receiver cls
+//  @receiver ins
 //  @param ctx
 //  @return KindCategoryStoreForm
-func (cls KindCategoryStoreForm) ShouldBind(ctx *gin.Context) KindCategoryStoreForm {
-	if err := ctx.ShouldBind(&cls); err != nil {
+func (ins KindCategoryStoreForm) ShouldBind(ctx *gin.Context) KindCategoryStoreForm {
+	if err := ctx.ShouldBind(&ins); err != nil {
 		wrongs.PanicValidate(err.Error())
 	}
-	if cls.UniqueCode == "" {
+	if ins.UniqueCode == "" {
 		wrongs.PanicValidate("种类代码必填")
 	}
-	if len(cls.UniqueCode) != 3 {
+	if len(ins.UniqueCode) != 3 {
 		wrongs.PanicValidate("种类代码必须是3位")
 	}
-	if cls.Name == "" {
+	if ins.Name == "" {
 		wrongs.PanicValidate("种类名称必填")
 	}
-	if len(cls.Name) > 64 {
+	if len(ins.Name) > 64 {
 		wrongs.PanicValidate("种类名称不能超过64位")
 	}
 
-	return cls
+	return ins
 }
 
 // N 保存
