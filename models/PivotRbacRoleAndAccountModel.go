@@ -1,10 +1,11 @@
 package models
 
 type PivotRbacRoleAndAccountModel struct {
-	RbacRoleId uint64        `json:"rbac_role_id"`
-	RbacRole   RbacRoleModel `json:"rbac_role"`
-	AccountId  uint64        `json:"account_id"`
-	Account    AccountModel  `json:"account"`
+	Id           uint64        `json:"id"`
+	RbacRoleUuid string        `json:"rbac_role_uuid"`
+	RbacRole     RbacRoleModel `json:"rbac_role"`
+	AccountUuid  string        `json:"account_uuid"`
+	Account      AccountModel  `json:"account"`
 }
 
 func (PivotRbacRoleAndAccountModel) TableName() string {

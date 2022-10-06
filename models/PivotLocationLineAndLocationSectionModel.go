@@ -2,10 +2,11 @@ package models
 
 // PivotLocationLineAndLocationSectionModel 线别对区间多对多
 type PivotLocationLineAndLocationSectionModel struct {
-	LocationLineId    uint64               `json:"location_line_id"`
-	LocationLine      LocationLineModel    `json:"location_line"`
-	LocationSectionId uint64               `json:"location_section_id"`
-	LocationSection   LocationSectionModel `json:"location_section"`
+	Id                  uint64               `json:"id"`
+	LocationLineUuid    string               `json:"location_line_uuid"`
+	LocationLine        LocationLineModel    `json:"location_line"`
+	LocationSectionUuid string               `json:"location_section_uuid"`
+	LocationSection     LocationSectionModel `json:"location_section"`
 }
 
 // TableName 表名称

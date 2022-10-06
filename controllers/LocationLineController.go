@@ -30,7 +30,7 @@ type LocationLineStoreForm struct {
 	LocationStationUuids            []string `form:"location_station_uuids" json:"location_station_uuids"`
 	LocationStations                []*models.LocationStationModel
 	LocationRailroadGradeCrossUuids []string `form:"location_railroad_grade_cross_uuids" json:"location_railroad_grade_cross_uuids"`
-	LocationRailroadGradeCrosses    []*models.LocationRailroadGradeCrossModel
+	LocationRailroadGradeCrosses    []*models.LocationRailroadModel
 	LocationCenterUuids             []string `form:"location_center_uuids" json:"location_center_uuids"`
 	LocationCenters                 []*models.LocationCenterModel
 }
@@ -99,14 +99,14 @@ func (ins LocationLineStoreForm) ShouldBind(ctx *gin.Context) LocationLineStoreF
 	}
 	// 查询道口
 	if len(ins.LocationRailroadGradeCrossUuids) > 0 {
-		models.BootByModel(models.LocationRailroadGradeCrossModel{}).
+		models.BootByModel(models.LocationRailroadModel{}).
 			PrepareByDefaultDbDriver().
 			Where("uuid in ?", ins.LocationRailroadGradeCrossUuids).
 			Find(&ins.LocationRailroadGradeCrosses)
 	}
 	// 查询道口
 	if len(ins.LocationRailroadGradeCrossUuids) > 0 {
-		models.BootByModel(models.LocationRailroadGradeCrossModel{}).
+		models.BootByModel(models.LocationRailroadModel{}).
 			PrepareByDefaultDbDriver().
 			Where("uuid in ?", ins.LocationRailroadGradeCrossUuids).
 			Find(&ins.LocationRailroadGradeCrosses)
@@ -130,7 +130,7 @@ type LocationLineBindForm struct {
 	LocationStationUuids            []string `form:"location_station_uuids" json:"location_station_uuids"`
 	LocationStations                []*models.LocationStationModel
 	LocationRailroadGradeCrossUuids []string `form:"location_railroad_grade_cross_uuids" json:"location_railroad_grade_cross_uuids"`
-	LocationRailroadGradeCrosses    []*models.LocationRailroadGradeCrossModel
+	LocationRailroadGradeCrosses    []*models.LocationRailroadModel
 	LocationCenterUuids             []string `form:"location_center_uuids" json:"location_center_uuids"`
 	LocationCenters                 []*models.LocationCenterModel
 }
@@ -159,14 +159,14 @@ func (LocationLineController) N(ctx *gin.Context) {
 
 	// 新建
 	organizationLine := &models.LocationLineModel{
-		BaseModel:                    models.BaseModel{Sort: form.Sort, Uuid: uuid.NewV4().String()},
-		UniqueCode:                   form.UniqueCode,
-		Name:                         form.Name,
-		BeEnable:                     form.BeEnable,
-		LocationSections:             form.LocationSections,
-		LocationStations:             form.LocationStations,
-		LocationRailroadGradeCrosses: form.LocationRailroadGradeCrosses,
-		LocationCenters:              form.LocationCenters,
+		BaseModel:         models.BaseModel{Sort: form.Sort, Uuid: uuid.NewV4().String()},
+		UniqueCode:        form.UniqueCode,
+		Name:              form.Name,
+		BeEnable:          form.BeEnable,
+		LocationSections:  form.LocationSections,
+		LocationStations:  form.LocationStations,
+		LocationRailroads: form.LocationRailroadGradeCrosses,
+		LocationCenters:   form.LocationCenters,
 	}
 	if ret = models.BootByModel(models.LocationLineModel{}).PrepareByDefaultDbDriver().Create(organizationLine); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())

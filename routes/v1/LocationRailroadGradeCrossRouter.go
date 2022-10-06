@@ -20,21 +20,21 @@ func (LocationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 	)
 	{
 		// 新建
-		r.POST("", func(ctx *gin.Context) { new(controllers.LocationRailroadGradeCrossController).N(ctx) })
+		r.POST("", func(ctx *gin.Context) { new(controllers.LocationRailroadController).N(ctx) })
 
 		// 删除
-		r.DELETE(":uuid", func(ctx *gin.Context) { new(controllers.LocationRailroadGradeCrossController).R(ctx) })
+		r.DELETE(":uuid", func(ctx *gin.Context) { new(controllers.LocationRailroadController).R(ctx) })
 
 		// 编辑
-		r.PUT(":uuid", func(ctx *gin.Context) { new(controllers.LocationRailroadGradeCrossController).E(ctx) })
+		r.PUT(":uuid", func(ctx *gin.Context) { new(controllers.LocationRailroadController).E(ctx) })
 
 		// 道口绑定线别
-		r.PUT(":uuid/bindLocationLines", func(ctx *gin.Context) { new(controllers.LocationRailroadGradeCrossController).PutBindLines(ctx) })
+		r.PUT(":uuid/bindLocationLines", func(ctx *gin.Context) { new(controllers.LocationRailroadController).PutBindLines(ctx) })
 
 		// 详情
-		r.GET(":uuid", func(ctx *gin.Context) { new(controllers.LocationRailroadGradeCrossController).D(ctx) })
+		r.GET(":uuid", func(ctx *gin.Context) { new(controllers.LocationRailroadController).D(ctx) })
 
 		// 列表
-		r.GET("", func(ctx *gin.Context) { new(controllers.LocationRailroadGradeCrossController).L(ctx) })
+		r.GET("", func(ctx *gin.Context) { new(controllers.LocationRailroadController).L(ctx) })
 	}
 }

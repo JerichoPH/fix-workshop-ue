@@ -228,8 +228,8 @@ func (RbacRoleController) PutBindAccounts(ctx *gin.Context) {
 	if len(form.Accounts) > 0 {
 		for _, account := range form.Accounts {
 			pivotRbacRoleAndAccount := models.PivotRbacRoleAndAccountModel{
-				RbacRoleId: rbacRole.Id,
-				AccountId:  account.Id,
+				RbacRoleUuid: rbacRole.Uuid,
+				AccountUuid:  account.Uuid,
 			}
 
 			models.BootByModel(models.PivotRbacRoleAndAccountModel{}).
@@ -284,8 +284,8 @@ delete from pivot_rbac_role_and_rbac_permissions
 	if len(form.RbacPermissions) > 0 {
 		for _, rbacPermission := range form.RbacPermissions {
 			pivotRbacRoleAndPermission := models.PivotRbacRoleAndPermissionModel{
-				RbacRoleId:       rbacRole.Id,
-				RbacPermissionId: rbacPermission.Id,
+				RbacRoleUuid:       rbacRole.Uuid,
+				RbacPermissionUuid: rbacPermission.Uuid,
 			}
 
 			models.BootByModel(models.PivotRbacRoleAndPermissionModel{}).
@@ -323,8 +323,8 @@ func (RbacRoleController) PutBindRbacPermissions(ctx *gin.Context) {
 	if len(form.RbacPermissions) > 0 {
 		for _, rbacPermission := range form.RbacPermissions {
 			pivotRbacRoleAndPermission := models.PivotRbacRoleAndPermissionModel{
-				RbacRoleId:       rbacRole.Id,
-				RbacPermissionId: rbacPermission.Id,
+				RbacRoleUuid:       rbacRole.Uuid,
+				RbacPermissionUuid: rbacPermission.Uuid,
 			}
 
 			models.BootByModel(models.PivotRbacRoleAndPermissionModel{}).

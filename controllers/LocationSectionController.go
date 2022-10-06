@@ -225,8 +225,8 @@ func (LocationSectionController) PutBindLines(ctx *gin.Context) {
 	if len(form.LocationLines) > 0 {
 		for _, locationLine := range form.LocationLines {
 			pivotLocationLineAndLocationSections = append(pivotLocationLineAndLocationSections, models.PivotLocationLineAndLocationSectionModel{
-				LocationLineId:    locationLine.Id,
-				LocationSectionId: locationSection.Id,
+				LocationLineUuid:    locationLine.Uuid,
+				LocationSectionUuid: locationSection.Uuid,
 			})
 		}
 		models.BootByModel(models.PivotLocationLineAndLocationSectionModel{}).

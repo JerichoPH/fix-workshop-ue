@@ -2,10 +2,11 @@ package models
 
 // PivotLocationLineAndLocationCenterModel 线别对中心多对多
 type PivotLocationLineAndLocationCenterModel struct {
-	LocationLineId   uint64              `json:"location_line_id"`
-	LocationLine     LocationLineModel   `json:"location_line"`
-	LocationCenterId uint64              `json:"location_center_id"`
-	LocationCenter   LocationCenterModel `json:"location_center"`
+	Id                 uint64              `json:"id"`
+	LocationLineUuid   string              `json:"location_line_uuid"`
+	LocationLine       LocationLineModel   `json:"location_line"`
+	LocationCenterUuid string              `json:"location_center_uuid"`
+	LocationCenter     LocationCenterModel `json:"location_center"`
 }
 
 // TableName 表名称

@@ -230,8 +230,8 @@ func (LocationStationController) PutBindLocationLines(ctx *gin.Context) {
 	if len(form.LocationLines) > 0 {
 		for _, locationLine := range form.LocationLines {
 			pivotLocationLineAndLocationStations = append(pivotLocationLineAndLocationStations, models.PivotLocationLineAndLocationStationModel{
-				LocationLineId:    locationLine.Id,
-				LocationStationId: locationStation.Id,
+				LocationLineUuid:    locationLine.Uuid,
+				LocationStationUuid: locationStation.Uuid,
 			})
 		}
 		models.BootByModel(models.PivotLocationLineAndLocationStationModel{}).
