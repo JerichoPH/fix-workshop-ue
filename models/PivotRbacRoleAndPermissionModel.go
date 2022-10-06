@@ -8,6 +8,7 @@ type PivotRbacRoleAndPermissionModel struct {
 	RbacPermission     RbacPermissionModel `json:"rbac_permission"`
 }
 
+// TableName 获取表名称
 func (PivotRbacRoleAndPermissionModel) TableName() string {
 	return "pivot_rbac_role_and_rbac_permissions"
 }
