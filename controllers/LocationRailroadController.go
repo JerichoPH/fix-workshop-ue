@@ -132,7 +132,7 @@ func (LocationRailroadController) N(ctx *gin.Context) {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
-	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"location_railroad_grade_cross": locationRailroadGradeCross}))
+	ctx.JSON(tools.CorrectBootByDefault().Created(tools.Map{"location_railroad": locationRailroadGradeCross}))
 }
 
 // R 删除
@@ -199,7 +199,7 @@ func (LocationRailroadController) E(ctx *gin.Context) {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
-	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"location_railroad_grade_cross": locationRailroadGradeCross}))
+	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"location_railroad": locationRailroadGradeCross}))
 }
 
 // PutBindLines 道口绑定线别
@@ -254,7 +254,7 @@ func (LocationRailroadController) D(ctx *gin.Context) {
 		First(&locationRailroadGradeCross)
 	wrongs.PanicWhenIsEmpty(ret, "道口")
 
-	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_railroad_grade_cross": locationRailroadGradeCross}))
+	ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_railroad": locationRailroadGradeCross}))
 }
 
 // L 列表
@@ -272,10 +272,10 @@ func (LocationRailroadController) L(ctx *gin.Context) {
 
 	if ctx.Query("__page__") == "" {
 		db.Find(&locationRailroadGradeCrosses)
-		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_railroad_grade_crosses": locationRailroadGradeCrosses}))
+		ctx.JSON(tools.CorrectBootByDefault().Ok(tools.Map{"location_railroads": locationRailroadGradeCrosses}))
 	} else {
 		db.Count(&count)
 		models.Pagination(db, ctx).Find(&locationRailroadGradeCrosses)
-		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"location_railroad_grade_crosses": locationRailroadGradeCrosses}, ctx.Query("__page__"), count))
+		ctx.JSON(tools.CorrectBootByDefault().OkForPagination(tools.Map{"location_railroads": locationRailroadGradeCrosses}, ctx.Query("__page__"), count))
 	}
 }
