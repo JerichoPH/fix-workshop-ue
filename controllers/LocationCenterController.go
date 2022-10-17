@@ -21,8 +21,8 @@ type LocationCenterStoreForm struct {
 	OrganizationWorkshop     models.OrganizationWorkshopModel
 	OrganizationWorkAreaUuid string `form:"organization_work_area_uuid" json:"organization_work_area_uuid"`
 	OrganizationWorkArea     models.OrganizationWorkAreaModel
-	LocationLineUuids        []string `form:"location_line_uuids" json:"location_line_uuids"`
-	LocationLines            []*models.LocationLineModel
+	LocationLineUuids        []string `form:"location_line_uuid" json:"location_line_uuid"`
+	LocationLine             models.LocationLineModel
 }
 
 // ShouldBind 表单绑定
@@ -67,7 +67,7 @@ func (ins LocationCenterStoreForm) ShouldBind(ctx *gin.Context) LocationCenterSt
 		models.BootByModel(models.LocationLineModel{}).
 			PrepareByDefaultDbDriver().
 			Where("uuid in ?", ins.LocationLineUuids).
-			Find(&ins.LocationLines)
+			Find(&ins.LocationLine)
 	}
 
 	return ins
@@ -128,7 +128,7 @@ func (LocationCenterController) N(ctx *gin.Context) {
 		BeEnable:                 form.BeEnable,
 		OrganizationWorkshopUuid: form.OrganizationWorkshop.Uuid,
 		OrganizationWorkAreaUuid: form.OrganizationWorkAreaUuid,
-		LocationLines:            form.LocationLines,
+		LocationLine:             form.LocationLine,
 	}
 	if ret = models.BootByModel(models.LocationCenterModel{}).PrepareByDefaultDbDriver().Create(&locationCenter); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
@@ -201,43 +201,6 @@ func (LocationCenterController) E(ctx *gin.Context) {
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"location_center": locationCenter}))
-}
-
-// PutBindLines 绑定线别
-func (LocationCenterController) PutBindLines(ctx *gin.Context) {
-	var (
-		ret                                 *gorm.DB
-		locationCenter                      models.LocationCenterModel
-		pivotLocationLineAndLocationCenters []models.PivotLocationLineAndLocationCenterModel
-	)
-
-	// 表单
-	form := (&LocationCenterBindLocationLinesForm{}).ShouldBind(ctx)
-
-	if ret = models.BootByModel(models.LocationCenterModel{}).
-		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefaultDbDriver().
-		First(&locationCenter); ret.Error != nil {
-		wrongs.PanicWhenIsEmpty(ret, "中心")
-	}
-
-	// 删除原有绑定关系
-	ret = models.BootByModel(models.BaseModel{}).PrepareByDefaultDbDriver().Exec("delete from pivot_location_line_and_location_centers where location_center_id = ?", locationCenter.Id)
-
-	// 创建绑定关系
-	if len(form.LocationLines) > 0 {
-		for _, locationLine := range form.LocationLines {
-			pivotLocationLineAndLocationCenters = append(pivotLocationLineAndLocationCenters, models.PivotLocationLineAndLocationCenterModel{
-				LocationLineUuid:   locationLine.Id,
-				LocationCenterUuid: locationCenter.Id,
-			})
-		}
-		models.BootByModel(models.PivotLocationLineAndLocationCenterModel{}).
-			PrepareByDefaultDbDriver().
-			CreateInBatches(&pivotLocationLineAndLocationCenters, 100)
-	}
-
-	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{}))
 }
 
 // D 详情

@@ -248,7 +248,7 @@ func (LocationRailroadController) D(ctx *gin.Context) {
 	ret = models.BootByModel(models.LocationRailroadModel{}).
 		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
 		SetWhereFields("be_enable").
-		SetPreloads("OrganizationWorkshop", "OrganizationWorkArea", "LocationLines").
+		SetPreloads("OrganizationWorkshop", "OrganizationWorkArea", "LocationLine").
 		SetPreloadsByDefault().
 		PrepareUseQueryByDefaultDbDriver(ctx).
 		First(&locationRailroadGradeCross)
@@ -266,7 +266,7 @@ func (LocationRailroadController) L(ctx *gin.Context) {
 	)
 	db = models.BootByModel(models.LocationRailroadModel{}).
 		SetWhereFields("unique_code", "name", "be_enable", "organization_workshop_uuid", "organization_work_area_uuid").
-		SetPreloads("OrganizationWorkshop", "OrganizationWorkArea", "LocationLines").
+		SetPreloads("OrganizationWorkshop", "OrganizationWorkArea", "LocationLine").
 		SetPreloadsByDefault().
 		PrepareUseQueryByDefaultDbDriver(ctx)
 
