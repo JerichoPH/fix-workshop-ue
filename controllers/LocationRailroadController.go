@@ -21,14 +21,11 @@ type LocationRailroadStoreForm struct {
 	OrganizationWorkshop     models.OrganizationWorkshopModel
 	OrganizationWorkAreaUuid string `form:"organization_work_area_uuid" json:"organization_work_area_uuid"`
 	OrganizationWorkArea     models.OrganizationWorkAreaModel
-	LocationLineUuids        []string `form:"location_line_uuids" json:"location_line_uuids"`
-	LocationLines            []*models.LocationLineModel
+	LocationLineUuid         string `form:"location_line_uuid" json:"location_line_uuid"`
+	LocationLine             models.LocationLineModel
 }
 
 // ShouldBind 表单绑定
-//  @receiver ins
-//  @param ctx
-//  @return LocationCenterStoreForm
 func (ins LocationRailroadStoreForm) ShouldBind(ctx *gin.Context) LocationRailroadStoreForm {
 	var ret *gorm.DB
 
@@ -62,35 +59,11 @@ func (ins LocationRailroadStoreForm) ShouldBind(ctx *gin.Context) LocationRailro
 			First(&ins.OrganizationWorkArea)
 		wrongs.PanicWhenIsEmpty(ret, "工区")
 	}
-	if len(ins.LocationLineUuids) > 0 {
+	if ins.LocationLineUuid != "" {
 		models.BootByModel(models.LocationLineModel{}).
+			SetWheres(tools.Map{"uuid": ins.LocationLineUuid}).
 			PrepareByDefaultDbDriver().
-			Where("uuid in ?", ins.LocationLineUuids).
-			Find(&ins.LocationLines)
-	}
-
-	return ins
-}
-
-// LocationRailroadBindLocationLinesForm 道口绑定线别表单
-type LocationRailroadBindLocationLinesForm struct {
-	LocationLineUuids []string `json:"location_line_uuids"`
-	LocationLines     []*models.LocationLineModel
-}
-
-// ShouldBind 绑定表单
-//  @receiver ins
-//  @param ctx
-//  @return LocationRailroadBindLocationLinesForm
-func (ins LocationRailroadBindLocationLinesForm) ShouldBind(ctx *gin.Context) LocationRailroadBindLocationLinesForm {
-	if err := ctx.ShouldBind(&ins); err != nil {
-		wrongs.PanicValidate(err.Error())
-	}
-	if len(ins.LocationLineUuids) > 0 {
-		models.BootByModel(models.LocationLineModel{}).
-			PrepareByDefaultDbDriver().
-			Where("uuid in ?", ins.LocationLineUuids).
-			Find(&ins.LocationLines)
+			First(&ins.LocationLine)
 	}
 
 	return ins
@@ -126,7 +99,7 @@ func (LocationRailroadController) N(ctx *gin.Context) {
 		BeEnable:                 form.BeEnable,
 		OrganizationWorkshopUuid: form.OrganizationWorkshop.Uuid,
 		OrganizationWorkAreaUuid: form.OrganizationWorkAreaUuid,
-		LocationLines:            form.LocationLines,
+		LocationLine:             form.LocationLine,
 	}
 	if ret = models.BootByModel(models.LocationRailroadModel{}).PrepareByDefaultDbDriver().Create(&locationRailroadGradeCross); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
@@ -194,49 +167,12 @@ func (LocationRailroadController) E(ctx *gin.Context) {
 	locationRailroadGradeCross.BeEnable = form.BeEnable
 	locationRailroadGradeCross.OrganizationWorkshopUuid = form.OrganizationWorkshop.Uuid
 	locationRailroadGradeCross.OrganizationWorkAreaUuid = form.OrganizationWorkAreaUuid
-	locationRailroadGradeCross.LocationLines = form.LocationLines
+	locationRailroadGradeCross.LocationLine = form.LocationLine
 	if ret = models.BootByModel(models.LocationRailroadModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefaultDbDriver().Save(&locationRailroadGradeCross); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
 	}
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"location_railroad": locationRailroadGradeCross}))
-}
-
-// PutBindLines 道口绑定线别
-func (LocationRailroadController) PutBindLines(ctx *gin.Context) {
-	var (
-		ret                                              *gorm.DB
-		locationRailroadGradeCross                       models.LocationRailroadModel
-		pivotLocationLineAndLocationRailroadGradeCrosses []models.PivotLocationLineAndLocationRailroadGradeCrossModel
-	)
-
-	// 表单
-	form := (&LocationRailroadBindLocationLinesForm{}).ShouldBind(ctx)
-
-	if ret = models.BootByModel(models.LocationRailroadModel{}).
-		SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).
-		PrepareByDefaultDbDriver().
-		First(&locationRailroadGradeCross); ret.Error != nil {
-		wrongs.PanicWhenIsEmpty(ret, "道口")
-	}
-
-	// 删除原有绑定关系
-	ret = models.BootByModel(models.BaseModel{}).PrepareByDefaultDbDriver().Exec("delete from pivot_location_line_and_location_railroad_grade_crosses where location_railroad_grade_cross_id = ?", locationRailroadGradeCross.Id)
-
-	// 创建绑定关系
-	if len(form.LocationLines) > 0 {
-		for _, locationLine := range form.LocationLines {
-			pivotLocationLineAndLocationRailroadGradeCrosses = append(pivotLocationLineAndLocationRailroadGradeCrosses, models.PivotLocationLineAndLocationRailroadGradeCrossModel{
-				LocationLineId:     locationLine.Id,
-				LocationRailroadId: locationRailroadGradeCross.Id,
-			})
-		}
-		models.BootByModel(models.PivotLocationLineAndLocationRailroadGradeCrossModel{}).
-			PrepareByDefaultDbDriver().
-			CreateInBatches(&pivotLocationLineAndLocationRailroadGradeCrosses, 100)
-	}
-
-	ctx.JSON(tools.CorrectBoot("绑定成功").Updated(tools.Map{}))
 }
 
 // D 详情
