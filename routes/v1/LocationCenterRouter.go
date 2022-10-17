@@ -28,9 +28,6 @@ func (LocationCenterRouter) Load(engine *gin.Engine) {
 		// 编辑
 		r.PUT(":uuid", func(ctx *gin.Context) { new(controllers.LocationCenterController).E(ctx) })
 
-		// 中心绑定线别
-		r.PUT(":uuid/bindLocationLines", func(ctx *gin.Context) { new(controllers.LocationCenterController).PutBindLines(ctx) })
-
 		// 详情
 		r.GET(":uuid", func(ctx *gin.Context) { new(controllers.LocationCenterController).D(ctx) })
 

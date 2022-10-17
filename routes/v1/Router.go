@@ -23,11 +23,11 @@ func (Router) Load(engine *gin.Engine) {
 	new(OrganizationWorkAreaRouter).Load(engine)           // 工区
 
 	// 使用地点
-	new(LocationLineRouter).Load(engine)               // 线别
-	new(LocationStationRouter).Load(engine)            // 站场
-	new(LocationSectionRouter).Load(engine)            // 区间
-	new(LocationCenterRouter).Load(engine)             // 中心
-	new(LocationRailroadGradeCrossRouter).Load(engine) // 道口
+	new(LocationLineRouter).Load(engine)     // 线别
+	new(LocationStationRouter).Load(engine)  // 站场
+	new(LocationSectionRouter).Load(engine)  // 区间
+	new(LocationCenterRouter).Load(engine)   // 中心
+	new(LocationRailroadRouter).Load(engine) // 道口
 
 	// 存放位置-仓储
 	new(PositionDepotStorehouseRouter).Load(engine) // 仓库

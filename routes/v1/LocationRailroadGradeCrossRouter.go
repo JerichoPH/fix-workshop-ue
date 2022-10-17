@@ -6,13 +6,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// LocationRailroadGradeCrossRouter 道口路由
-type LocationRailroadGradeCrossRouter struct{}
+// LocationRailroadRouter 道口路由
+type LocationRailroadRouter struct{}
 
 // Load 加载路由
 //  @receiver ins
 //  @param router
-func (LocationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
+func (LocationRailroadRouter) Load(engine *gin.Engine) {
 	r := engine.Group(
 		"api/v1/locationRailroadGradeCross",
 		middlewares.CheckJwt(),
@@ -27,9 +27,6 @@ func (LocationRailroadGradeCrossRouter) Load(engine *gin.Engine) {
 
 		// 编辑
 		r.PUT(":uuid", func(ctx *gin.Context) { new(controllers.LocationRailroadController).E(ctx) })
-
-		// 道口绑定线别
-		r.PUT(":uuid/bindLocationLines", func(ctx *gin.Context) { new(controllers.LocationRailroadController).PutBindLines(ctx) })
 
 		// 详情
 		r.GET(":uuid", func(ctx *gin.Context) { new(controllers.LocationRailroadController).D(ctx) })

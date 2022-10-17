@@ -28,9 +28,6 @@ func (LocationStationRouter) Load(engine *gin.Engine) {
 		// 编辑
 		r.PUT(":uuid", func(ctx *gin.Context) { new(controllers.LocationStationController).U(ctx) })
 
-		// 站场绑定线别
-		r.PUT(":uuid/bindLocationLines", func(ctx *gin.Context) { new(controllers.LocationStationController).PutBindLocationLines(ctx) })
-
 		// 详情
 		r.GET(":uuid", func(ctx *gin.Context) { new(controllers.LocationStationController).S(ctx) })
 
