@@ -14,7 +14,7 @@ type OrganizationWorkAreaModel struct {
 	OrganizationWorkshop               OrganizationWorkshopModel           `gorm:"foreignKey:OrganizationWorkshopUuid;references:Uuid;COMMENT:所属车间;" json:"organization_workshop"`
 	LocationSections                   []LocationSectionModel              `gorm:"foreignKey:OrganizationWorkAreaUuid;references:Uuid;COMMENT:相关区间;" json:"organization_sections"`
 	LocationCenters                    []LocationCenterModel               `gorm:"foreignKey:OrganizationWorkAreaUuid;references:Uuid;COMMENT:相关中心;" json:"organization_centers"`
-	LocationRailroadGradeCrossModel    []LocationRailroadModel             `gorm:"foreignKey:OrganizationWorkAreaUuid;references:Uuid;COMMENT:相关道口;" json:"organization_railroad_grade_crosses"`
+	LocationRailroads                  []LocationRailroadModel             `gorm:"foreignKey:OrganizationWorkAreaUuid;references:Uuid;COMMENT:相关道口;" json:"organization_railroads"`
 	LocationStations                   []LocationStationModel              `gorm:"foreignKey:OrganizationWorkAreaUuid;references:Uuid;COMMENT:相关站场;" json:"organization_stations"`
 }
 

@@ -72,7 +72,7 @@ func runAutoMigrate() {
 	//&models.OrganizationWorkAreaModel{},           // 工区
 	//&models.LocationSectionModel{},                // 区间
 	//&models.LocationCenterModel{},                 // 中心
-	//&models.LocationRailroadGradeCrossModel{},     // 道口
+	//&models.LocationRailroads{},     // 道口
 	//&models.LocationStationModel{},                // 站场
 
 	// 仓储

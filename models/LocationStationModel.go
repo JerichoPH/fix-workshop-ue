@@ -9,7 +9,8 @@ type LocationStationModel struct {
 	OrganizationWorkshop     OrganizationWorkshopModel `gorm:"foreignKey:OrganizationWorkshopUuid;references:Uuid;COMMENT:所属车间;" json:"organization_workshop"`
 	OrganizationWorkAreaUuid string                    `gorm:"type:VARCHAR(36);COMMENT:所属工区uuid;" json:"organization_work_area_uuid"`
 	OrganizationWorkArea     OrganizationWorkAreaModel `gorm:"foreignKey:OrganizationWorkAreaUuid;references:Uuid;COMMENT:所属工区;" json:"organization_work_area"`
-	LocationLines            []*LocationLineModel      `gorm:"many2many:pivot_location_line_and_location_stations;foreignKey:id;joinForeignKey:location_station_id;references:id;joinReferences:location_line_id;COMMENT:线别与车站多对多;" json:"location_lines"`
+	LocationLineUuid         string                    `gorm:"type:CHAR(36);COMMENT:线别Uuid;" json:"location_line_uuid"`
+	LocationLine             LocationLineModel         `gorm:"foreignKey:LocationLineUuid;references:Uuid;COMMENT:所属线别;" json:"location_line"`
 	LocationIndoorRooms      []PositionIndoorRoomModel `gorm:"foreignKey:LocationStationUuid;references:Uuid;COMMENT:所属站场;" json:"organization_station"`
 }
 

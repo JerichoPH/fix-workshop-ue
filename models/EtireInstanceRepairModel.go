@@ -18,8 +18,8 @@ type EntireInstanceRepairModel struct {
 	PrevCheckedAt              time.Time           `gorm:"type:DATETIME;COMMENT:上一次验收时间;" json:"prev_checked_at"`
 	SpotCheckerName            string              `gorm:"type:VARCHAR(64);COMMENT:抽验人;" json:"spot_checker_name"`
 	SpotCheckedAt              time.Time           `gorm:"type:DATETIME;COMMENT:抽验时间;" json:"spot_checked_at"`
-	PrevSpotCheckerName           string            `gorm:"type:VARCHAR(64);COMMENT:上一次抽验人;" json:"prev_spot_checker_name"`
-	PrevSpotCheckedAt             time.Time         `gorm:"type:DATETIME;COMMENT:上一次抽验时间;" json:"prev_spot_checked_at"`
+	PrevSpotCheckerName        string              `gorm:"type:VARCHAR(64);COMMENT:上一次抽验人;" json:"prev_spot_checker_name"`
+	PrevSpotCheckedAt          time.Time           `gorm:"type:DATETIME;COMMENT:上一次抽验时间;" json:"prev_spot_checked_at"`
 	//FixWorkflowReportSerialNumber string            `gorm:"type:VARCHAR(64);COMMENT:所属检修单流水号;" json:"fix_workflow_report_serial_number"`
 	//FixWorkflowReportModel             FixWorkflowReportModel `gorm:"constraint:OnUpdate:CASCADE;foreignKey:FixWorkflowReportSerialNumber;references:SerialNumber;COMMENT:所属检修单;" json:"fix_workflow_report"`
 	//PrevFixWorkflowSerialNumber   string            `gorm:"type:VARCHAR(64);COMMENT:上一次所属检修单号;" json:"prev_fix_workflow_serial_number"`

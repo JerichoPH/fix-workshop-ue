@@ -11,7 +11,8 @@ type LocationRailroadModel struct {
 	OrganizationWorkAreaUuid string                    `gorm:"type:VARCHAR(36);COMMENT:所属工区UUID;" json:"organization_work_area_uuid"`
 	OrganizationWorkArea     OrganizationWorkAreaModel `gorm:"foreignKey:OrganizationWorkAreaUuid;references:Uuid;COMMENT:所属工区;" json:"organization_work_area"`
 	LocationIndoorRooms      []PositionIndoorRoomModel `gorm:"foreignKey:LocationRailroadUuid;COMMENT:所属道口;" json:"location_indoor_rooms"`
-	LocationLines            []*LocationLineModel      `gorm:"many2many:pivot_location_line_and_location_railroad_grade_crosses;foreignKey:id;joinForeignKey:location_railroad_grade_cross_id;references:id;joinReferences:location_line_id;COMMENT:线别与道口多对多;" json:"location_lines"`
+	LocationLineUuid         string                    `gorm:"type:CHAR(36);COMMENT:线别Uuid;" json:"location_line_uuid"`
+	LocationLine             LocationLineModel         `gorm:"foreignKey:LocationLineUuid;references:Uuid;COMMENT:所属线别;" json:"location_line"`
 }
 
 // TableName 表名称
