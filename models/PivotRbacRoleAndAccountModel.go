@@ -1,7 +1,6 @@
 package models
 
 type PivotRbacRoleAndAccountModel struct {
-	Id           uint64        `json:"id"`
 	RbacRoleUuid string        `json:"rbac_role_uuid"`
 	RbacRole     RbacRoleModel `json:"rbac_role"`
 	AccountUuid  string        `json:"account_uuid"`

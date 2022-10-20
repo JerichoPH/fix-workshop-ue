@@ -14,7 +14,7 @@ type MenuModel struct {
 	Icon       string           `gorm:"type:VARCHAR(64);COMMENT:图标;" json:"icon"`
 	Parent     *MenuModel       `gorm:"foreignKey:ParentUuid;references:Uuid;COMMENT:所属父级;" json:"parent"`
 	Subs       []*MenuModel     `gorm:"foreignKey:ParentUuid;references:Uuid;COMMENT:相关子集;" json:"subs"`
-	RbacRoles  []*RbacRoleModel `gorm:"many2many:pivot_rbac_role_and_menus;foreignKey:id;joinForeignKey:menu_id;references:id;joinReferences:rbac_role_id;COMMENT:角色与菜单多对多;" json:"rbac_roles"`
+	RbacRoles  []*RbacRoleModel `gorm:"many2many:pivot_rbac_role_and_menus;foreignKey:uuid;joinForeignKey:menu_uuid;references:uuid;joinReferences:rbac_role_uuid;COMMENT:角色与菜单多对多;" json:"rbac_roles"`
 }
 
 // TableName 表名称

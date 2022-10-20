@@ -144,13 +144,13 @@ func (AuthorizationController) PostLogin(ctx *gin.Context) {
 // GetMenus 获取当前用户菜单
 func (AuthorizationController) GetMenus(ctx *gin.Context) {
 	var ret *gorm.DB
-	if accountUUID, exists := ctx.Get(tools.AccountUuid); !exists {
+	if accountUuid, exists := ctx.Get(tools.AccountUuid); !exists {
 		wrongs.PanicUnLogin("用户未登录")
 	} else {
 		// 获取当前用户信息
 		var account models.AccountModel
 		ret = models.BootByModel(models.AccountModel{}).
-			SetWheres(tools.Map{"uuid": accountUUID}).
+			SetWheres(tools.Map{"uuid": accountUuid}).
 			SetPreloads("RbacRoles", "RbacRoles.Menus").
 			PrepareByDefaultDbDriver().
 			First(&account)
@@ -161,10 +161,10 @@ func (AuthorizationController) GetMenus(ctx *gin.Context) {
 		var menus []models.MenuModel
 		models.BootByModel(models.MenuModel{}).
 			PrepareByDefaultDbDriver().
-			Joins("join pivot_rbac_role_and_menus prram on menus.id = prram.menu_id").
-			Joins("join rbac_roles r on prram.rbac_role_id = r.id").
-			Joins("join pivot_rbac_role_and_accounts prraa on r.id = prraa.rbac_role_id").
-			Joins("join accounts a on prraa.account_id = a.id").
+			Joins("join pivot_rbac_role_and_menus prram on menus.uuid = prram.menu_uuid").
+			Joins("join rbac_roles r on prram.rbac_role_uuid = r.uuid").
+			Joins("join pivot_rbac_role_and_accounts prraa on r.uuid = prraa.rbac_role_uuid").
+			Joins("join accounts a on prraa.account_uuid = a.uuid").
 			Where("a.uuid = ?", account.BaseModel.Uuid).
 			Where("menus.deleted_at is null").
 			Where("menus.parent_uuid = ''").

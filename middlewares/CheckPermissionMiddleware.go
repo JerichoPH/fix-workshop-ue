@@ -27,8 +27,8 @@ func CheckPermission() gin.HandlerFunc {
 
 		if cfg.App.Section("app").Key("production").MustBool(true) {
 			var (
-				ret               *gorm.DB
-				currentRbacRoleID int64
+				ret                 *gorm.DB
+				currentRbacPermission models.RbacPermissionModel
 			)
 
 			// 获取权限
@@ -46,16 +46,18 @@ func CheckPermission() gin.HandlerFunc {
 				}
 			}
 
-			models.BootByModel(models.BaseModel{}).Prepare("").Raw(`select prp.rbac_role_id
-from pivot_rbac_role_and_rbac_permissions as prp
-         join rbac_roles r on prp.rbac_role_id = r.id
-         join rbac_permissions p on prp.rbac_permission_id = p.id
-         join pivot_rbac_role_and_accounts pra on prp.rbac_role_id = pra.rbac_role_id
-         join accounts a on pra.account_id = a.id
-where p.uri = ? and p.method = ? and a.uuid = ?`, ctx.FullPath(), ctx.Request.Method, currentAccountUuid).
-				Scan(&currentRbacRoleID)
+			models.BootByModel(models.RbacPermissionModel{}).
+				PrepareByDefaultDbDriver().
+				Joins("join pivot_rbac_role_and_rbac_permissions prrarp on rbac_permissions.uuid = prrarp.rbac_permission_uuid").
+				Joins("join rbac_roles rr on prrarp.rbac_role_uuid = rr.uuid").
+				Joins("join pivot_rbac_role_and_accounts prraa on rr.uuid = prraa.rbac_role_uuid").
+				Joins("join accounts a on prraa.account_uuid = a.uuid").
+				Where("rbac_permissions.uri = ?", ctx.FullPath()).
+				Where("rbac_permissions.method = ?",ctx.Request.Method).
+				Where("a.uuid = ?",currentAccountUuid).
+				First(&currentRbacPermission)
 
-			if currentRbacRoleID == 0 {
+			if currentRbacPermission.BaseModel.Id == 0 {
 				wrongs.PanicUnAuth(fmt.Sprintf("当前用户没有权限进行此操作 %s %s", ctx.Request.Method, ctx.FullPath()))
 			}
 		}
