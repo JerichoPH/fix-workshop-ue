@@ -16,7 +16,7 @@ type OrganizationWorkshopTypeStoreForm struct {
 	Sort       int64  `gorm:"sort" json:"sort"`
 	UniqueCode string `gorm:"unique_code" json:"unique_code"`
 	Name       string `gorm:"name" json:"name"`
-	Number     string `gorm:"number" json:"number"`
+	NumberCode string `gorm:"number_code" json:"number_code"`
 }
 
 // ShouldBind 绑定表单
@@ -67,7 +67,7 @@ func (OrganizationWorkshopTypeController) C(ctx *gin.Context) {
 		BaseModel:  models.BaseModel{Sort: form.Sort, Uuid: uuid.NewV4().String()},
 		UniqueCode: form.UniqueCode,
 		Name:       form.Name,
-		NumberCode: form.Number,
+		NumberCode: form.NumberCode,
 	}
 	if ret = models.BootByModel(models.OrganizationWorkshopTypeModel{}).PrepareByDefaultDbDriver().Create(&organizationWorkshopType); ret.Error != nil {
 		wrongs.PanicForbidden(ret.Error.Error())
@@ -119,7 +119,7 @@ func (OrganizationWorkshopTypeController) U(ctx *gin.Context) {
 	organizationWorkshopType.BaseModel.Sort = form.Sort
 	organizationWorkshopType.UniqueCode = form.UniqueCode
 	organizationWorkshopType.Name = form.Name
-	organizationWorkshopType.NumberCode = form.Number
+	organizationWorkshopType.NumberCode = form.NumberCode
 	models.BootByModel(models.OrganizationWorkshopTypeModel{}).SetWheres(tools.Map{"uuid": ctx.Param("uuid")}).PrepareByDefaultDbDriver().Save(&organizationWorkshopType)
 
 	ctx.JSON(tools.CorrectBootByDefault().Updated(tools.Map{"organization_workshop_type": organizationWorkshopType}))
