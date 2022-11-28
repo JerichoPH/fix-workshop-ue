@@ -29,7 +29,7 @@ func CorrectBoot(msg string) *correct {
 //  @return *correct
 func CorrectBootByDefault() *correct {
 	correctOnce.Do(func() { responseIns = &correct{msg: ""} })
-	responseIns.msg = ""
+	responseIns.msg = "OK"
 	return responseIns
 }
 

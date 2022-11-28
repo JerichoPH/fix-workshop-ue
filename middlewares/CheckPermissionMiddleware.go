@@ -27,7 +27,7 @@ func CheckPermission() gin.HandlerFunc {
 
 		if cfg.App.Section("app").Key("production").MustBool(true) {
 			var (
-				ret                 *gorm.DB
+				ret                   *gorm.DB
 				currentRbacPermission models.RbacPermissionModel
 			)
 
@@ -53,8 +53,8 @@ func CheckPermission() gin.HandlerFunc {
 				Joins("join pivot_rbac_role_and_accounts prraa on rr.uuid = prraa.rbac_role_uuid").
 				Joins("join accounts a on prraa.account_uuid = a.uuid").
 				Where("rbac_permissions.uri = ?", ctx.FullPath()).
-				Where("rbac_permissions.method = ?",ctx.Request.Method).
-				Where("a.uuid = ?",currentAccountUuid).
+				Where("rbac_permissions.method = ?", ctx.Request.Method).
+				Where("a.uuid = ?", currentAccountUuid).
 				First(&currentRbacPermission)
 
 			if currentRbacPermission.BaseModel.Id == 0 {
