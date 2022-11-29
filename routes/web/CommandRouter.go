@@ -11,6 +11,9 @@ func (CommandRouter) Load(engine *gin.Engine) {
 	r := engine.Group("command")
 	{
 		// ExcelHelper类演示
-		r.GET("excelHelper", func(ctx *gin.Context) { (&controllers.CommandController{}).ExcelHelperDemo(ctx) })
+		r.GET("excelHelperDemo", func(ctx *gin.Context) { (&controllers.CommandController{}).ExcelHelperDemo(ctx) })
+
+		// Command类演示
+		r.GET("commandHelperDemo", func(ctx *gin.Context) { (&controllers.CommandController{}).CommandHelperDemo(ctx) })
 	}
 }

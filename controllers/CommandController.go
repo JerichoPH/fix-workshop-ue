@@ -10,6 +10,25 @@ import (
 
 type CommandController struct{}
 
+func (cls *CommandController) CommandHelperDemo(ctx *gin.Context) {
+	success := tools.StdoutSuccess("成功：", "").GetContentAndNext("这里是提示")
+	fmt.Println(success)
+	info := tools.StdoutInfo("提示", "").GetContent()
+	fmt.Println(info)
+	comment := tools.StdoutComment("注释", "").GetContent()
+	fmt.Println(comment)
+	warning := tools.StdoutWarning("警告", "").GetContent()
+	fmt.Println(warning)
+	wrong := tools.StdoutWrong("错误", "").GetContent()
+	fmt.Println(wrong)
+
+	ctx.JSON(
+		tools.CorrectBootByDefault().Ok(
+			tools.Map{"success": success},
+		),
+	)
+}
+
 // ExcelHelperDemo 列表
 func (cls *CommandController) ExcelHelperDemo(ctx *gin.Context) {
 	dir := os.Getenv("PWD")
