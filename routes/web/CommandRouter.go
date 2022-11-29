@@ -8,7 +8,7 @@ import (
 type CommandRouter struct{}
 
 func (CommandRouter) Load(engine *gin.Engine) {
-	r := engine.Group("")
+	r := engine.Group("command")
 	{
 		// ExcelHelper类演示
 		r.GET("excelHelper", func(ctx *gin.Context) { (&controllers.CommandController{}).ExcelHelperDemo(ctx) })

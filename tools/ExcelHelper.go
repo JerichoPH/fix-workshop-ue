@@ -3,6 +3,8 @@ package tools
 import (
 	"fix-workshop-ue/wrongs"
 	"fmt"
+	"github.com/go-gota/gota/dataframe"
+	"github.com/go-gota/gota/series"
 	"github.com/xuri/excelize/v2"
 	"strconv"
 )
@@ -16,6 +18,7 @@ type ExcelReader struct {
 	finishedRow int
 	titleRow    int
 	titles      []string
+	content     [][]string
 }
 
 // ToList 获取数据（数组类型）
@@ -118,7 +121,7 @@ func (cls *ExcelReader) OpenFile(filename string) *ExcelReader {
 	}
 	f, err := excelize.OpenFile(filename)
 	if err != nil {
-		wrongs.PanicForbidden("打开文件错误")
+		wrongs.PanicForbidden(fmt.Sprintf("打开文件错误：%s", err.Error()))
 	}
 	cls.excel = f
 
@@ -152,8 +155,6 @@ func (cls *ExcelReader) ReadTitle() *ExcelReader {
 
 // Read 读取Excel
 func (cls *ExcelReader) Read() *ExcelReader {
-	var _rows [][]string
-
 	if cls.GetSheetName() == "" {
 		wrongs.PanicEmpty("未设置工作表名称")
 	}
@@ -162,17 +163,53 @@ func (cls *ExcelReader) Read() *ExcelReader {
 		wrongs.PanicForbidden("读取数据错误")
 	} else {
 		if cls.finishedRow == 0 {
-			_rows = rows[cls.GetOriginalRow():]
+			cls.content = rows[cls.GetOriginalRow():]
 		} else {
-			_rows = rows[cls.GetOriginalRow():cls.GetFinishedRow()]
+			cls.content = rows[cls.GetOriginalRow():cls.GetFinishedRow()]
 		}
 
-		for rowNumber, row := range _rows {
+		for rowNumber, row := range cls.content {
 			cls.SetDataByRow(rowNumber, row)
 		}
 	}
 
 	return cls
+}
+
+// GetByDataFrameUseDefaultType 获取DataFrame类型数据 通过Excel表头自定义数据类型
+func (cls *ExcelReader) GetByDataFrameUseDefaultType() dataframe.DataFrame {
+	titleWithType := make(map[string]series.Type)
+	for _, title := range cls.GetTitle() {
+		titleWithType[title] = series.String
+	}
+
+	return cls.GetByDataFrame(titleWithType)
+}
+
+// GetByDataFrame 获取DataFrame类型数据
+func (cls *ExcelReader) GetByDataFrame(titleWithType map[string]series.Type) dataframe.DataFrame {
+	if cls.GetSheetName() == "" {
+		wrongs.PanicEmpty("未设置工作表名称")
+	}
+
+	var _content [][]string
+
+	if rows, err := cls.excel.GetRows(cls.GetSheetName()); err != nil {
+		wrongs.PanicForbidden("读取数据错误")
+	} else {
+		if cls.finishedRow == 0 {
+			_content = rows[cls.GetTitleRow():]
+		} else {
+			_content = rows[cls.GetTitleRow():cls.GetFinishedRow()]
+		}
+	}
+
+	return dataframe.LoadRecords(
+		_content,
+		dataframe.DetectTypes(false),
+		dataframe.DefaultType(series.String),
+		dataframe.WithTypes(titleWithType),
+	)
 }
 
 // ExcelWriter Excel写入器
