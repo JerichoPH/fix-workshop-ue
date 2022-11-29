@@ -8,10 +8,10 @@ import (
 	"os"
 )
 
-type ExcelReadTestController struct{}
+type CommandController struct{}
 
 // L 列表
-func (cls *ExcelReadTestController) L(ctx *gin.Context) {
+func (cls *CommandController) ExcelHelperDemo(ctx *gin.Context) {
 	dir := os.Getenv("PWD")
 
 	fmt.Println(dir + "/static/Book1.xlsx")
