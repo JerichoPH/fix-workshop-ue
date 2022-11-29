@@ -7,7 +7,9 @@ import (
 	"fix-workshop-ue/routes/web"
 	"fix-workshop-ue/routes/webSocket"
 	"fix-workshop-ue/settings"
+	"fix-workshop-ue/tools"
 	"fix-workshop-ue/wrongs"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -113,6 +115,9 @@ func runAutoMigrate() {
 
 // main 程序入口
 func main() {
+	var daemon string
+	flag.StringVar(daemon,"d","false")
+
 	InitProcess()
 
 	setting := settings.Boot() // 获取配置
@@ -127,7 +132,6 @@ func main() {
 	runServer(engine, settingApp.Section("app").Key("addr").MustString(":8080")) // 启动服务
 }
 
-
 func InitProcess() {
 	if syscall.Getppid() == 1 {
 		if err := os.Chdir("./"); err != nil {
@@ -137,7 +141,17 @@ func InitProcess() {
 		return
 	}
 	fmt.Println("go fix-workshop-ue!!!")
-	fp, err := os.OpenFile("fix-workshop-ue.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+	currentDir := os.Getenv("PWD")
+	logDir := fmt.Sprintf("%s/logs", currentDir)
+	if !(&tools.FileSystem{}).IsExist(logDir) {
+		err := os.MkdirAll(logDir, os.ModePerm)
+		if err != nil {
+			fmt.Println("创建日志目录错误：" + err.Error())
+			return
+		}
+	}
+	filenameOnToday := fmt.Sprintf("%s/logs/%s.log", currentDir, time.Now().Format("2006-01-02"))
+	fp, err := os.OpenFile(filenameOnToday, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
 		panic(err)
 	}
