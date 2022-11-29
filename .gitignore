@@ -1,6 +1,7 @@
 .idea/
 .vscode/
+./static/
+./out/
 __debug_bin.exe
 __debug_bin
 app
-static/
