@@ -115,8 +115,12 @@ func runAutoMigrate() {
 
 // main 程序入口
 func main() {
-	var daemon string
-	flag.StringVar(daemon,"d","false")
+	var daemon bool
+	flag.BoolVar(&daemon, "d", true, "是否启动守护进程")
+	flag.Parse()
+	if daemon {
+		InitProcess()
+	}
 
 	InitProcess()
 
