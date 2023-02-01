@@ -170,7 +170,9 @@ func InitProcess() {
 		panic(err)
 	}
 
-	_, _ = fp.WriteString(fmt.Sprintf(
-		"[PID] %d Start At %s", cmd.Process.Pid, time.Now().Format("2006-01-02 15:04:05")))
+	startLogContent := fmt.Sprintf("%s [进程号%d] 启动于：%s\r\n", title, cmd.Process.Pid, time.Now().Format("2006-01-02 15:04:05"))
+	print(startLogContent)
+
+	_, _ = fp.WriteString("\r\n\r\n\r\n>>>>>>>>>>>>>>>>>>>>\r\n"+startLogContent)
 	os.Exit(0)
 }
