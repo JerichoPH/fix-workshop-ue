@@ -122,8 +122,6 @@ func main() {
 		InitProcess()
 	}
 
-	InitProcess()
-
 	setting := settings.Boot() // 获取配置
 	settingApp := setting.App  // 加载参数（程序）
 	//runAutoMigrate()                   // 数据库迁移
