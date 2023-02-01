@@ -119,7 +119,7 @@ func main() {
 	flag.BoolVar(&daemon, "d", true, "是否启动守护进程")
 	flag.Parse()
 	if daemon {
-		InitProcess()
+		InitProcess("")
 	}
 
 	setting := settings.Boot() // 获取配置
@@ -134,7 +134,7 @@ func main() {
 	runServer(engine, settingApp.Section("app").Key("addr").MustString(":8080")) // 启动服务
 }
 
-func InitProcess() {
+func InitProcess(title string) {
 	if syscall.Getppid() == 1 {
 		if err := os.Chdir("./"); err != nil {
 			panic(err)
